@@ -1,0 +1,7 @@
+- Name: SorbetHelper
+  Version: 1.0.0
+  DLL: bin/Debug/net452/SorbetHelper.dll
+  Dependencies:
+    - Name: Everest
+      Version: 1.0.0
+
