@@ -3,77 +3,44 @@ using Celeste;
 using Microsoft.Xna.Framework;
 using Monocle;
 using System.Reflection;
+using System.Collections;
+using System.Collections.Generic;
+using MonoMod.Utils;
 
 namespace Celeste.Mod.SorbetHelper {
+	
 
     [CustomEntity("SorbetHelper/ReturnBerry")]
     [RegisterStrawberry(true, false)]
-    [TrackedAs(typeof(Strawberry))]
-    public class ReturnBerry : Strawberry, IStrawberry {
-  //public bool Winged { get; private set; }
-        private Sprite sprite;
-        private bool collected;
-        private bool isGhostBerry;
-        private Wiggler wiggler;
-		private Vector2 start;
+    public class ReturnBerry : Strawberry {
+
 		private Vector2[] nodes;
-		public bool IsWinged { get; private set; }
-
-		private static MethodInfo strawberryOnDash = typeof(Strawberry).GetMethod("OnDash", BindingFlags.Instance | BindingFlags.NonPublic);
-
-
-        //private bool flyingAway;
-
 
         public ReturnBerry(EntityData data, Vector2 offset, EntityID gid) : base(data, offset, gid) {
-            ID = gid;
-			Position = (start = data.Position + offset);
-			IsWinged = data.Bool("winged") || data.Name == "memorialTextController";
-			base.Depth = -100;
-            base.Collider = new Hitbox(14f, 14f, -7f, -7f);
+			nodes = data.NodesOffset(offset);
 			Add(new PlayerCollider(OnPlayer));
-            if (IsWinged) {
-				Add(new DashListener {
-					OnDash = OnDash
-				});
+			if (data.Nodes != null && data.Nodes.Length != 0) {
+				Seeds = new List<StrawberrySeed>();
 			}
         }
-        
-        //public ReturnBerry
-		private void OnDash(Vector2 dir) {
-			strawberryOnDash.Invoke(this, new object[] { dir} );
+
+        public new void OnPlayer(Player player) {
+			base.OnPlayer(player);
+			if (nodes != null && nodes.Length >= 2) {
+				Logger.Log("SorbetHelper", "Adding NodeRoutine!");
+				Add(new Coroutine(NodeRoutine(player)));
+				Collidable = false;
+			}
+			
+        }
+		private IEnumerator NodeRoutine(Player player) {
+			yield return 0.3f;
+			if (!player.Dead) {
+				Audio.Play("event:/game/general/cassette_bubblereturn", SceneAs<Level>().Camera.Position + new Vector2(160f, 90f));
+				Logger.Log("SorbetHelper", "Starting Cassete Fly!");
+				player.StartCassetteFly(nodes[1], nodes[0]);
+			}
 		}
-		/*private void OnDash(Vector2 dir) {
-			if (!flyingAway && Winged && !WaitingOnSeeds) {
-				base.Depth = -1000000;
-				Add(new Coroutine(FlyAwayRoutine()));
-				flyingAway = true;
-			}
-		}*/
-        public void IsOnPlayer(Player player) {
-            if (Follower.Leader != null || collected)
-			{
-				return;
-			}
-			ReturnHomeWhenLost = true;
-			if (IsWinged)
-			{
-				Level level = SceneAs<Level>();
-				IsWinged = false;
-				sprite.Rate = 0f;
-				Alarm.Set(this, Follower.FollowDelay, delegate
-				{
-					sprite.Rate = 1f;
-					sprite.Play("idle");
-					level.Particles.Emit(P_WingsBurst, 8, Position + new Vector2(8f, 0f), new Vector2(4f, 2f));
-					level.Particles.Emit(P_WingsBurst, 8, Position - new Vector2(8f, 0f), new Vector2(4f, 2f));
-				});
-			}
-            Audio.Play(isGhostBerry ? "event:/game/general/strawberry_blue_touch" : "event:/game/general/strawberry_touch", Position);
-			player.Leader.GainFollower(Follower);
-			wiggler.Start();
-			base.Depth = -1000000;
-        }
     }
 
 
