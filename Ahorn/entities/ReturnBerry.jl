@@ -9,6 +9,8 @@ using ..Ahorn, Maple
     x::Integer,
     y::Integer,
     winged::Bool=false,
+    checkpointID::Integer=-1,
+    order::Integer=-1,
 )
 
 const placements = Ahorn.PlacementDict(
