@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using MonoMod.Utils;
 
 namespace Celeste.Mod.SorbetHelper {
-	
 
     [CustomEntity("SorbetHelper/ReturnBerry")]
     [RegisterStrawberry(true, false)]
@@ -32,8 +31,8 @@ namespace Celeste.Mod.SorbetHelper {
 				Add(new Coroutine(NodeRoutine(player)));
 				Collidable = false;
 			}
-			
         }
+
 		private IEnumerator NodeRoutine(Player player) {
 			yield return 0.3f;
 			// If the player is still alive, put them in the CassetteFly state
@@ -43,8 +42,4 @@ namespace Celeste.Mod.SorbetHelper {
 			}
 		}
     }
-
-
-
-
 }

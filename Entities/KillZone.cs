@@ -22,9 +22,5 @@ namespace Celeste.Mod.SorbetHelper {
         public void OnCollide(Player player) {
             player.Die(new Vector2(0f,0f));
         }
-        
-
-
     }
-
 }
