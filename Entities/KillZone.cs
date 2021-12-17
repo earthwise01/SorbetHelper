@@ -10,17 +10,30 @@ namespace Celeste.Mod.SorbetHelper {
     public class KillZone : Entity {
 
         private PlayerCollider pc;
+        private string flag;
+        private bool inverted;
 
-        public KillZone(Vector2 position) : base(position) {
+        public KillZone(EntityData data, Vector2 offset) : base(data.Position + offset) {
+            base.Collider = new Hitbox(data.Width, data.Height);
             Add(new LedgeBlocker());
             Add(pc = new PlayerCollider(OnCollide));
+            flag = data.Attr("flag");
+            inverted = data.Bool("inverted");
         }
 
-        public KillZone(EntityData e, Vector2 levelOffset)
-            : this(e.Position + levelOffset) { base.Collider = new Hitbox(e.Width, e.Height); }
-
         public void OnCollide(Player player) {
-            player.Die(new Vector2(0f,0f));
-         }
+			player.Die((player.Position - Position).SafeNormalize());
+        }
+        
+        public override void Update() {
+            if (Collidable && !string.IsNullOrEmpty(flag)) {
+                if ((!inverted && !SceneAs<Level>().Session.GetFlag(flag)) 
+                || (inverted && SceneAs<Level>().Session.GetFlag(flag))) {
+                    Collidable = false;
+                } else {
+                    Collidable = true;
+                }
+            }
+        }
     }
 }

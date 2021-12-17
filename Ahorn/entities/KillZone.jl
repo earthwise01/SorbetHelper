@@ -7,6 +7,8 @@ using ..Ahorn, Maple
     y::Integer,
     width::Integer=8,
     height::Integer=8,
+    flag::String="",
+    inverted::Bool=false,
 )
 
 const placements = Ahorn.PlacementDict(

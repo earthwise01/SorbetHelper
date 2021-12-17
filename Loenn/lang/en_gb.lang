@@ -5,6 +5,9 @@
 # entities.entityName.attributes.description.*
 
 entities.SorbetHelper/FlagToggledKillbox.placements.name.flag_toggled_killbox=Flag Toggled Killbox
-entities.SorbetHelper/FlagToggledKillbox.placements.description.flag_toggled_killbox=Acts like the vanilla Killbox entity but is flag toggled.
+entities.SorbetHelper/FlagToggledKillbox.placements.description.flag_toggled_killbox=Same as the vanilla Killbox entity, however it can also be flag toggled.
+
+entities.SorbetHelper/KillZone.placements.name.killzone=Kill Zone
+entities.SorbetHelper/KillZone.placements.description.killzone=Kills the player on contact, can also be flag toggled.
 
 mods.SorbetHelper.name=Sorbet Helper
