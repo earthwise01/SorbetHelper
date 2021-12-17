@@ -1,0 +1,10 @@
+# -- Entities --
+# entities.entityName.placements.name.*
+# entities.entityName.placements.description.*
+# entities.entityName.attributes.name.*
+# entities.entityName.attributes.description.*
+
+entities.SorbetHelper/FlagToggledKillbox.placements.name.flag_toggled_killbox=Flag Toggled Killbox
+entities.SorbetHelper/FlagToggledKillbox.placements.description.flag_toggled_killbox=Acts like the vanilla Killbox entity but is flag toggled.
+
+mods.SorbetHelper.name=Sorbet Helper
