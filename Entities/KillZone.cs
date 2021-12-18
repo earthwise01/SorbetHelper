@@ -26,13 +26,14 @@ namespace Celeste.Mod.SorbetHelper {
         }
         
         public override void Update() {
-            if (Collidable && !string.IsNullOrEmpty(flag)) {
+            if (!string.IsNullOrEmpty(flag)) {
+                // If the associated flag is disabled (or enabled and the inverted toggle is set) disable the Kill Zone
                 if ((!inverted && !SceneAs<Level>().Session.GetFlag(flag)) 
                 || (inverted && SceneAs<Level>().Session.GetFlag(flag))) {
                     Collidable = false;
-                } else {
+                } else if (!Collidable) {
                     Collidable = true;
-                }
+                } 
             }
         }
     }
