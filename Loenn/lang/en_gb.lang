@@ -10,4 +10,10 @@ entities.SorbetHelper/FlagToggledKillbox.placements.description.flag_toggled_kil
 entities.SorbetHelper/KillZone.placements.name.killzone=Kill Zone
 entities.SorbetHelper/KillZone.placements.description.killzone=Kills the player on contact, can also be flag toggled.
 
+entities.SorbetHelper/ReturnBerry.placements.name.normal=Strawberry (With Return)
+entities.SorbetHelper/ReturnBerry.placements.name.winged=Strawberry (Winged, With Return)
+entities.SorbetHelper/ReturnBerry.placements.description.normal=Same as a vanilla Strawberry except when the player collects it, they are put into a bubble and moved along a series of nodes.
+entities.SorbetHelper/ReturnBerry.placements.description.winged=Same as a vanilla Strawberry (Winged) except when the player collects it, they are put into a bubble and moved along a series of nodes.
+entities.SorbetHelper/ReturnBerry.attributes.description.winged=Whether the Strawberry should have wings.
+
 mods.SorbetHelper.name=Sorbet Helper
