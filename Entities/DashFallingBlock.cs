@@ -13,6 +13,9 @@ namespace Celeste.Mod.SorbetHelper.Entities {
     [CustomEntity("SorbetHelper/DashFallingBlock")]
     public class DashFallingBlock : FallingBlock {
         
+        public string shakeSfx;
+        public string impactSfx;
+
         private Wiggler bounce;
         private Shaker shaker;
 
@@ -21,14 +24,20 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public static void Load() {
             On.Celeste.FallingBlock.Sequence += onSequence;
             On.Celeste.FallingBlock.PlayerFallCheck += onPlayerFallCheck;
+            On.Celeste.FallingBlock.ShakeSfx += onShakeSfx;
+            On.Celeste.FallingBlock.ImpactSfx += onImpactSfx;
         }
 
         public static void Unload() {
             On.Celeste.FallingBlock.Sequence -= onSequence;
             On.Celeste.FallingBlock.PlayerFallCheck -= onPlayerFallCheck;
+            On.Celeste.FallingBlock.ShakeSfx -= onShakeSfx;
+            On.Celeste.FallingBlock.ImpactSfx -= onImpactSfx;
         }
 
         public DashFallingBlock(EntityData data, Vector2 offset) : base (data, offset) {
+            shakeSfx = data.Attr("shakeSfx", "event:/game/general/fallblock_shake");
+            impactSfx = data.Attr("impactSfx", "event:/game/general/fallblock_impact");
             bounce = Wiggler.Create(1f, 0.5f);
             bounce.StartZero = false;
             Add(bounce);
@@ -42,7 +51,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 shaker.On = true;
                 bounce.Start();
                 isTriggered = true;
-				Audio.Play("event:/game/general/fallblock_impact", base.Center);
+				Audio.Play(impactSfx, base.Center);
                 return DashCollisionResults.Rebound;
             }
 
@@ -65,6 +74,22 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 return true;
             }
             return orig(self);
+        }
+
+        private static void onShakeSfx(On.Celeste.FallingBlock.orig_ShakeSfx orig, FallingBlock self) {
+            if (self is DashFallingBlock block) {
+                Audio.Play(block.shakeSfx, self.Center);
+            } else {
+                orig(self);
+            }
+        }
+
+        private static void onImpactSfx(On.Celeste.FallingBlock.orig_ImpactSfx orig, FallingBlock self) {
+            if (self is DashFallingBlock block) {
+                Audio.Play(block.impactSfx, self.BottomCenter);
+            } else {
+                orig(self);
+            }
         }
     }
 }

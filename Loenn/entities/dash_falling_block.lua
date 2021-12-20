@@ -9,6 +9,8 @@ fallingBlock.placements = {
         tiletype = "3",
         climbFall = true,
         behind = false,
+        shakeSfx = "event:/game/general/fallblock_shake",
+        impactSfx = "event:/game/general/fallblock_impact",
         width = 8,
         height = 8
     }
