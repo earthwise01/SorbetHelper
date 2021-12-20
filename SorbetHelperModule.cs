@@ -1,8 +1,8 @@
 ﻿using System;
 using Monocle;
+using Celeste.Mod.SorbetHelper.Entities;
 
-namespace Celeste.Mod.SorbetHelper
-{
+namespace Celeste.Mod.SorbetHelper {
     public class SorbetHelperModule : EverestModule {
         
         public static SorbetHelperModule Instance;
@@ -28,7 +28,7 @@ namespace Celeste.Mod.SorbetHelper
         // Set up any hooks, event handlers and your mod in general here.
         // Load runs before Celeste itself has initialized properly. */
         public override void Load() {
-            
+            DashFallingBlock.Load();
         }
 
         /* Optional, initialize anything after Celeste has initialized itself properly.
@@ -44,7 +44,7 @@ namespace Celeste.Mod.SorbetHelper
 
         // Unload the entirety of your mod's content. Free up any native resources.
         public override void Unload() {
-            
+            DashFallingBlock.Unload();
         }
 
     }
