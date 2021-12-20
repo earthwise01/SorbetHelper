@@ -15,6 +15,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         
         public string shakeSfx;
         public string impactSfx;
+        public bool fallOnTouch;
 
         private Wiggler bounce;
         private Shaker shaker;
@@ -35,9 +36,11 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             On.Celeste.FallingBlock.ImpactSfx -= onImpactSfx;
         }
 
-        public DashFallingBlock(EntityData data, Vector2 offset) : base (data, offset) {
+        public DashFallingBlock(EntityData data, Vector2 offset) : base(data, offset) {
             shakeSfx = data.Attr("shakeSfx", "event:/game/general/fallblock_shake");
             impactSfx = data.Attr("impactSfx", "event:/game/general/fallblock_impact");
+            fallOnTouch = data.Bool("fallOnTouch", false);
+            base.Depth = data.Int("depth", base.Depth);
             bounce = Wiggler.Create(1f, 0.5f);
             bounce.StartZero = false;
             Add(bounce);
@@ -68,10 +71,11 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         private static bool onPlayerFallCheck(On.Celeste.FallingBlock.orig_PlayerFallCheck orig, FallingBlock self) {
             if (self is DashFallingBlock block) {
-                if (!block.isTriggered) {
+                if (block.isTriggered) {
+                    return true;
+                } else if (!block.fallOnTouch) {
                     return false;
                 }
-                return true;
             }
             return orig(self);
         }

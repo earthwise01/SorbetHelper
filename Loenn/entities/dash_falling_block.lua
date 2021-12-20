@@ -7,10 +7,11 @@ fallingBlock.placements = {
     name = "falling_block",
     data = {
         tiletype = "3",
-        climbFall = true,
-        behind = false,
+        depth = -9000,
         shakeSfx = "event:/game/general/fallblock_shake",
         impactSfx = "event:/game/general/fallblock_impact",
+        fallOnTouch = false,
+        climbFall = false,
         width = 8,
         height = 8
     }
