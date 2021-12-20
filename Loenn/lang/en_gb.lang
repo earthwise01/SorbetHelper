@@ -17,5 +17,14 @@ entities.SorbetHelper/ReturnBerry.placements.description.winged=Same as a vanill
 entities.SorbetHelper/ReturnBerry.attributes.description.winged=Whether the Strawberry should have wings.
 
 entities.SorbetHelper/DashFallingBlock.placements.name.falling_block=Dash Falling Block
+entities.SorbetHelper/DashFallingBlock.placements.description.falling_block=A falling block that only gets activated once the player dashes into it.
+entities.SorbetHelper/DashFallingBlock.attributes.description.climbFall=If the block should fall if the player climbs on its sides. (note: needs Fall on Touch enabled in order to work)
+entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnTouch=If the block should fall if it comes in contact with the player, even if they don't dash into it.
+entities.SorbetHelper/DashFallingBlock.attributes.description.depth=Determines what visual layer the block should be on. (note: higher values mean further behind in the scene)
+entities.SorbetHelper/DashFallingBlock.attributes.description.shakeSfx=The sound the block should play before it falls.
+entities.SorbetHelper/DashFallingBlock.attributes.description.impactSfx=The sound the block should play either when it lands on the ground or is dashed into.
+entities.SorbetHelper/DashFallingBlock.attributes.description.tiletype=Changes the visual appearance of the falling block.
+
+
 
 mods.SorbetHelper.name=Sorbet Helper
