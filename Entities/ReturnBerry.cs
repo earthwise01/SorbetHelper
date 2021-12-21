@@ -7,7 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using MonoMod.Utils;
 
-namespace Celeste.Mod.SorbetHelper {
+namespace Celeste.Mod.SorbetHelper.Entities {
 
 	[CustomEntity("SorbetHelper/ReturnBerry")]
 	[RegisterStrawberry(true, false)]

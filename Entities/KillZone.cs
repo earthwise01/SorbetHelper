@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 using Monocle;
 using System;
 
-namespace Celeste.Mod.SorbetHelper {
+namespace Celeste.Mod.SorbetHelper.Entities {
 
     [CustomEntity("SorbetHelper/KillZone")]
     public class KillZone : Entity {

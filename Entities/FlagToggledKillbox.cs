@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Celeste.Mod.SorbetHelper {
+namespace Celeste.Mod.SorbetHelper.Entities {
     
     [CustomEntity("SorbetHelper/FlagToggledKillbox")]
     [TrackedAs(typeof(Killbox))]
