@@ -11,7 +11,7 @@ using ..Ahorn, Maple
     shakeSfx::String="event:/game/general/fallblock_shake",
     impactSfx::String="event:/game/general/fallblock_impact",
     fallOnTouch::Bool=false,
-    climbFall::Bool=false,
+    climbFall::Bool=true,
     fallOnStaticMover::Bool=false,
     depth::Integer=-9000,
 )
