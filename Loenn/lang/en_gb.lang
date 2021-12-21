@@ -16,6 +16,7 @@ entities.SorbetHelper/ReturnBerry.placements.description.normal=Same as a vanill
 entities.SorbetHelper/ReturnBerry.placements.description.winged=Same as a vanilla Strawberry (Winged) except when the player collects it, they are put into a bubble and moved along a series of nodes.
 entities.SorbetHelper/ReturnBerry.attributes.description.winged=Whether the Strawberry should have wings.
 
+# Dash Falling Block
 entities.SorbetHelper/DashFallingBlock.placements.name.falling_block=Dash Falling Block
 entities.SorbetHelper/DashFallingBlock.placements.description.falling_block=A falling block that only gets activated once the player dashes into it.
 entities.SorbetHelper/DashFallingBlock.attributes.description.climbFall=If the block should fall if the player climbs on its sides. (note: needs Fall on Touch enabled in order to work)
