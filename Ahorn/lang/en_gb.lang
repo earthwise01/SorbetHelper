@@ -1,3 +1,14 @@
+# Flag Toggled Killbox
+placements.entities.SorbetHelper/FlagToggledKillbox.tooltips.flag=The flag that needs to be set in order for the killbox to be activated.
+placements.entities.SorbetHelper/FlagToggledKillbox.tooltips.inverted=When checked, the killbox will only be active when the associated flag is disabled rather than only when the associated flag is enabled.
+
+# Kill Zone
+placements.entities.SorbetHelper/KillZone.tooltips.flag=The flag that needs to be set in order for the kill zone to be activated.
+placements.entities.SorbetHelper/KillZone.tooltips.inverted=When checked, the kill zone will only be active when the associated flag is disabled rather than only when the associated flag is enabled.
+
+# Strawberry (With Return)
+placements.entities.SorbetHelper/ReturnBerry.tooltips.winged=If the Strawberry should have wings.
+
 # Dash Falling Block
 placements.entities.SorbetHelper/DashFallingBlock.tooltips.climbFall=If the block should fall if the player climbs on its sides. (note: needs Fall on Touch enabled in order to work)
 placements.entities.SorbetHelper/DashFallingBlock.tooltips.fallOnTouch=If the block should fall if it comes in contact with the player, even if they don't dash into it.
