@@ -1,0 +1,9 @@
+# Dash Falling Block
+placements.entities.SorbetHelper/DashFallingBlock.tooltips.climbFall=If the block should fall if the player climbs on its sides. (note: needs Fall on Touch enabled in order to work)
+placements.entities.SorbetHelper/DashFallingBlock.tooltips.fallOnTouch=If the block should fall if it comes in contact with the player, even if they don't dash into it.
+placements.entities.SorbetHelper/DashFallingBlock.names.fallOnStaticMover=Fall On Static Mover Interaction
+placements.entities.SorbetHelper/DashFallingBlock.tooltips.fallOnStaticMover=If the block should fall if a static mover attached to it is interacted with.
+placements.entities.SorbetHelper/DashFallingBlock.tooltips.depth=Determines what visual layer the block should be on. (note: higher values mean further behind in the scene)
+placements.entities.SorbetHelper/DashFallingBlock.tooltips.shakeSfx=The sound the block should play before it falls.
+placements.entities.SorbetHelper/DashFallingBlock.tooltips.impactSfx=The sound the block should play either when it lands on the ground or is dashed into.
+placements.entities.SorbetHelper/DashFallingBlock.tooltips.tiletype=Changes the visual appearance of the falling block.
