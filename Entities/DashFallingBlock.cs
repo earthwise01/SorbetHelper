@@ -56,7 +56,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 shaker.On = true;
                 bounce.Start();
                 isTriggered = true;
-			    Audio.Play(impactSfx, base.Center);
+                Audio.Play(impactSfx, base.Center);
                 return DashCollisionResults.Rebound;
             }
 
