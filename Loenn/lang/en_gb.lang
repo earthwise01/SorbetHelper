@@ -4,16 +4,23 @@
 # entities.entityName.attributes.name.*
 # entities.entityName.attributes.description.*
 
+# Flag Toggled Killbox
 entities.SorbetHelper/FlagToggledKillbox.placements.name.flag_toggled_killbox=Flag Toggled Killbox
 entities.SorbetHelper/FlagToggledKillbox.placements.description.flag_toggled_killbox=Same as the vanilla Killbox entity, however it can also be flag toggled.
+entities.SorbetHelper/FlagToggledKillbox.attributes.description.flag=The flag that needs to be set in order for the killbox to be activated.
+entities.SorbetHelper/FlagToggledKillbox.attributes.description.inverted=When checked, the killbox will only be active when the associated flag is disabled rather than only when the associated flag is enabled.
 
+# Kill Zone
 entities.SorbetHelper/KillZone.placements.name.killzone=Kill Zone
 entities.SorbetHelper/KillZone.placements.description.killzone=Kills the player on contact, can also be flag toggled.
+entities.SorbetHelper/KillZone.attributes.description.flag=The flag that needs to be set in order for the kill zone to be activated.
+entities.SorbetHelper/KillZone.attributes.description.inverted=When checked, the kill zone will only be active when the associated flag is disabled rather than only when the associated flag is enabled.
 
+# Strawberry (With Return)
 entities.SorbetHelper/ReturnBerry.placements.name.normal=Strawberry (With Return)
 entities.SorbetHelper/ReturnBerry.placements.name.winged=Strawberry (Winged, With Return)
 entities.SorbetHelper/ReturnBerry.placements.description.normal=Same as a vanilla Strawberry except when the player collects it, they are put into a bubble and moved along a series of nodes.
 entities.SorbetHelper/ReturnBerry.placements.description.winged=Same as a vanilla Strawberry (Winged) except when the player collects it, they are put into a bubble and moved along a series of nodes.
-entities.SorbetHelper/ReturnBerry.attributes.description.winged=Whether the Strawberry should have wings.
+entities.SorbetHelper/ReturnBerry.attributes.description.winged=If the Strawberry should have wings.
 
 mods.SorbetHelper.name=Sorbet Helper
