@@ -56,6 +56,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 shaker.On = true;
                 bounce.Start();
                 isTriggered = true;
+
 				Audio.Play(impactSfx, base.Center);
                 return DashCollisionResults.Rebound;
             }
@@ -84,6 +85,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                     return true;
                 } else if (!block.fallOnTouch) {
                     return false;
+                } else if (orig(self)) {
+                    block.isTriggered = true;
                 }
             }
             return orig(self);
