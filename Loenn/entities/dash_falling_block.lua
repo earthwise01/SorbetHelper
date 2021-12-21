@@ -21,7 +21,7 @@ fallingBlock.placements = {
 fallingBlock.sprite = fakeTilesHelper.getEntitySpriteFunction("tiletype", false)
 
 function fallingBlock.depth(room, entity)
-    return entity.behind and 5000 or 0
+    return entity.depth
 end
 
 return fallingBlock
