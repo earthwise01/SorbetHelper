@@ -7,7 +7,7 @@ placements.entities.SorbetHelper/KillZone.tooltips.flag=The flag that needs to b
 placements.entities.SorbetHelper/KillZone.tooltips.inverted=When checked, the kill zone will only be active when the associated flag is disabled rather than only when the associated flag is enabled.
 
 # Strawberry (With Return)
-placements.entities.SorbetHelper/ReturnBerry.tooltips.winged=If the Strawberry should have wings.
+placements.entities.SorbetHelper/ReturnBerry.tooltips.winged=When checked, the strawberry will have wings.
 
 # Dash Falling Block
 placements.entities.SorbetHelper/DashFallingBlock.tooltips.climbFall=If the block should fall if the player climbs on its sides. (note: needs Fall on Touch enabled in order to work)

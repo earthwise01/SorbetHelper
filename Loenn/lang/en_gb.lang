@@ -21,7 +21,7 @@ entities.SorbetHelper/ReturnBerry.placements.name.normal=Strawberry (With Return
 entities.SorbetHelper/ReturnBerry.placements.name.winged=Strawberry (Winged, With Return)
 entities.SorbetHelper/ReturnBerry.placements.description.normal=Same as a vanilla Strawberry except when the player collects it, they are put into a bubble and moved along a series of nodes.
 entities.SorbetHelper/ReturnBerry.placements.description.winged=Same as a vanilla Strawberry (Winged) except when the player collects it, they are put into a bubble and moved along a series of nodes.
-entities.SorbetHelper/ReturnBerry.attributes.description.winged=If the Strawberry should have wings.
+entities.SorbetHelper/ReturnBerry.attributes.description.winged=When checked, the strawberry will have wings.
 
 # Dash Falling Block
 entities.SorbetHelper/DashFallingBlock.placements.name.falling_block=Dash Falling Block
@@ -34,7 +34,5 @@ entities.SorbetHelper/DashFallingBlock.attributes.description.depth=Determines w
 entities.SorbetHelper/DashFallingBlock.attributes.description.shakeSfx=The sound the block should play before it falls.
 entities.SorbetHelper/DashFallingBlock.attributes.description.impactSfx=The sound the block should play either when it lands on the ground or is dashed into.
 entities.SorbetHelper/DashFallingBlock.attributes.description.tiletype=Changes the visual appearance of the falling block.
-
-
 
 mods.SorbetHelper.name=Sorbet Helper
