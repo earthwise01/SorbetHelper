@@ -12,6 +12,7 @@ using ..Ahorn, Maple
     impactSfx::String="event:/game/general/fallblock_impact",
     fallOnTouch::Bool=false,
     climbFall::Bool=false,
+    fallOnStaticMover::Bool=false,
     depth::Integer=-9000,
 )
 
@@ -47,6 +48,6 @@ Ahorn.selection(entity::DashFallingBlock) = Ahorn.getEntityRectangle(entity)
 
 Ahorn.renderAbs(ctx::Ahorn.Cairo.CairoContext, entity::DashFallingBlock, room::Maple.Room) = Ahorn.drawTileEntity(ctx, room, entity)
 
-Ahorn.editingOrder(entity::DashFallingBlock) = String["x", "y", "width", "height", "shakeSfx", "impactSfx", "tiletype", "depth", "fallOnTouch", "climbFall"]
+Ahorn.editingOrder(entity::DashFallingBlock) = String["x", "y", "width", "height", "shakeSfx", "impactSfx", "tiletype", "depth", "fallOnTouch", "climbFall", "fallOnStaticMover"]
 
 end

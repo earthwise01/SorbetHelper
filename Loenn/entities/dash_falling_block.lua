@@ -12,6 +12,7 @@ fallingBlock.placements = {
         impactSfx = "event:/game/general/fallblock_impact",
         fallOnTouch = false,
         climbFall = false,
+        fallOnStaticMover = false,
         width = 8,
         height = 8
     }

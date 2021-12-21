@@ -16,6 +16,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public string shakeSfx;
         public string impactSfx;
         public bool fallOnTouch;
+        public bool fallOnStaticMover;
 
         private Wiggler bounce;
         private Shaker shaker;
@@ -40,6 +41,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             shakeSfx = data.Attr("shakeSfx", "event:/game/general/fallblock_shake");
             impactSfx = data.Attr("impactSfx", "event:/game/general/fallblock_impact");
             fallOnTouch = data.Bool("fallOnTouch", false);
+            fallOnStaticMover = data.Bool("fallOnStaticMover", false);
             base.Depth = data.Int("depth", base.Depth);
             bounce = Wiggler.Create(1f, 0.5f);
             bounce.StartZero = false;
@@ -60,6 +62,13 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
             return DashCollisionResults.NormalCollision;
 
+        }
+
+        public override void OnStaticMoverTrigger(StaticMover sm) {
+            if (fallOnStaticMover) {
+                base.OnStaticMoverTrigger(sm);
+                isTriggered = true;
+            }
         }
 
         private static IEnumerator onSequence(On.Celeste.FallingBlock.orig_Sequence orig, FallingBlock self) {
