@@ -18,3 +18,8 @@ There is also a winged vesion.
 
 ### Flag Toggled Killbox
 Same as the vanilla `Killbox` entity, except it can also be flag toggled.
+
+### Dash Falling Block
+Like a vanilla falling block, however it only gets activated if the player dashes into it.
+
+Also has options to customize its depth and SFX, along with toggles to allow activating it in the same ways as vanilla falling blocks.
