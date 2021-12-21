@@ -5,7 +5,7 @@ using ..Ahorn, Maple
 @mapdef Entity "SorbetHelper/FlagToggledKillbox" FlagToggledKillbox(
     x::Integer,
     y::Integer,
-    width::Integer=defaultBlockWidth,
+    width::Integer=Maple.defaultBlockWidth,
     flag::String= "",
     inverted::Bool=false,
     )

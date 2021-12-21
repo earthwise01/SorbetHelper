@@ -20,6 +20,7 @@ const placements = Ahorn.PlacementDict(
 
 Ahorn.minimumSize(entity::KillZone) = 8, 8
 Ahorn.resizable(entity::KillZone) = true, true
+Ahorn.editingOrder(entity::KillZone) = String["x", "y", "width", "height", "flag", "inverted"]
 
 function Ahorn.selection(entity::KillZone)
     x, y = Ahorn.position(entity)
@@ -34,7 +35,7 @@ function Ahorn.render(ctx::Ahorn.Cairo.CairoContext, entity::KillZone, room::Map
     width = Int(get(entity.data, "width", 32))
     height = Int(get(entity.data, "height", 32))
     
-    Ahorn.drawRectangle(ctx, 0, 0, width, height, (1.0, 0.8, 0.85, 0.8), (0.0, 1.0, 1.0, 0.0))
+    Ahorn.drawRectangle(ctx, 0, 0, width, height, (176 / 255, 99 / 255, 100 / 255, 0.45), (145 / 255, 59 / 255, 95 / 255, 0.82))
 end
 
 end
