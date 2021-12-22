@@ -17,8 +17,8 @@ entities.SorbetHelper/KillZone.attributes.description.flag=The flag that needs t
 entities.SorbetHelper/KillZone.attributes.description.inverted=When checked, the kill zone will only be active when the associated flag is disabled rather than only when the associated flag is enabled.
 
 # Strawberry (With Return)
-entities.SorbetHelper/ReturnBerry.placements.name.normal=Strawberry (With Return)
-entities.SorbetHelper/ReturnBerry.placements.name.winged=Strawberry (Winged, With Return)
+entities.SorbetHelper/ReturnBerry.placements.name.normal=Strawberry (With Node Based Return)
+entities.SorbetHelper/ReturnBerry.placements.name.winged=Strawberry (Winged, With Node Based Return)
 entities.SorbetHelper/ReturnBerry.placements.description.normal=Same as a vanilla Strawberry except when the player collects it, they are put into a bubble and moved along a series of nodes.
 entities.SorbetHelper/ReturnBerry.placements.description.winged=Same as a vanilla Strawberry (Winged) except when the player collects it, they are put into a bubble and moved along a series of nodes.
 entities.SorbetHelper/ReturnBerry.attributes.description.winged=When checked, the strawberry will have wings.

@@ -14,7 +14,7 @@ using ..Ahorn, Maple
 )
 
 const placements = Ahorn.PlacementDict(
-    "Strawberry (With Return) (Sorbet Helper)" => Ahorn.EntityPlacement(
+    "Strawberry (With Node Based Return) (Sorbet Helper)" => Ahorn.EntityPlacement(
         ReturnBerry,
         "point",
         Dict{String, Any}(),
@@ -25,7 +25,7 @@ const placements = Ahorn.PlacementDict(
             ]
         end
     ),
-    "Strawberry (Winged, With Return) (Sorbet Helper)" => Ahorn.EntityPlacement(
+    "Strawberry (Winged, With Node Based Return) (Sorbet Helper)" => Ahorn.EntityPlacement(
         ReturnBerry,
         "point",
         Dict{String, Any}(
