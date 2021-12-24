@@ -10,7 +10,7 @@ namespace Celeste.Mod.SorbetHelper {
             Instance = this;
         }
 
-                public override void Load() {
+        public override void Load() {
             DashFallingBlock.Load();
         }
 
