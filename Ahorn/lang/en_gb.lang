@@ -5,6 +5,8 @@ placements.entities.SorbetHelper/FlagToggledKillbox.tooltips.inverted=When check
 # Kill Zone
 placements.entities.SorbetHelper/KillZone.tooltips.flag=The flag that needs to be set in order for the kill zone to be activated.
 placements.entities.SorbetHelper/KillZone.tooltips.inverted=When checked, the kill zone will only be active when the associated flag is disabled rather than only when the associated flag is enabled.
+placements.entities.SorbetHelper/KillZone.tooltips.fastKill=When checked, the player will die instantly upon touching the kill zone rather than getting knocked back a bit first.
+
 
 # Strawberry (With Return)
 placements.entities.SorbetHelper/ReturnBerry.tooltips.winged=When checked, the strawberry will have wings.

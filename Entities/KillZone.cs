@@ -12,6 +12,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private PlayerCollider pc;
         private string flag;
         private bool inverted;
+        private bool fastKill;
 
         public KillZone(EntityData data, Vector2 offset) : base(data.Position + offset) {
             base.Collider = new Hitbox(data.Width, data.Height);
@@ -19,10 +20,16 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             Add(pc = new PlayerCollider(OnCollide));
             flag = data.Attr("flag");
             inverted = data.Bool("inverted");
+            fastKill = data.Bool("fastKill", false);
         }
 
         public void OnCollide(Player player) {
-			player.Die((player.Position - Position).SafeNormalize());
+            if (fastKill) {
+                player.Die(Vector2.Zero);
+                return;
+            }
+            player.Die((player.Position - Position).SafeNormalize());
+
         }
         
         public override void Update() {

@@ -10,7 +10,8 @@ killzone.placements = {
         width = 8,
         height = 8,
         flag = "",
-        inverted = false
+        inverted = false,
+        fastKill = false
     }
 }
 

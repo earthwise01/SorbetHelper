@@ -15,6 +15,7 @@ entities.SorbetHelper/KillZone.placements.name.killzone=Kill Zone
 entities.SorbetHelper/KillZone.placements.description.killzone=Kills the player on contact, can also be flag toggled.
 entities.SorbetHelper/KillZone.attributes.description.flag=The flag that needs to be set in order for the kill zone to be activated.
 entities.SorbetHelper/KillZone.attributes.description.inverted=When checked, the kill zone will only be active when the associated flag is disabled rather than only when the associated flag is enabled.
+entities.SorbetHelper/KillZone.attributes.description.fastKill=When checked, the player will die instantly upon touching the kill zone rather than getting knocked back a bit first.
 
 # Strawberry (With Return)
 entities.SorbetHelper/ReturnBerry.placements.name.normal=Strawberry (With Node Based Return)

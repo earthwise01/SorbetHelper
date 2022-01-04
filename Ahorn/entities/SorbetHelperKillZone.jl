@@ -9,6 +9,7 @@ using ..Ahorn, Maple
     height::Integer=8,
     flag::String="",
     inverted::Bool=false,
+    fastKill::Bool=false,
 )
 
 const placements = Ahorn.PlacementDict(
@@ -20,7 +21,7 @@ const placements = Ahorn.PlacementDict(
 
 Ahorn.minimumSize(entity::KillZone) = 8, 8
 Ahorn.resizable(entity::KillZone) = true, true
-Ahorn.editingOrder(entity::KillZone) = String["x", "y", "width", "height", "flag", "inverted"]
+Ahorn.editingOrder(entity::KillZone) = String["x", "y", "width", "height", "flag", "inverted", "fastKill"]
 
 function Ahorn.selection(entity::KillZone)
     x, y = Ahorn.position(entity)
