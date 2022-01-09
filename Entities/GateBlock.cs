@@ -13,6 +13,10 @@ namespace Celeste.Mod.SorbetHelper.Entities {
     [Tracked]
     public class GateBlock : Solid {
 
+        // A large chunk of this code is copy-pasted from MaxHelpingHand's Flag Switch Gates as I didn't want to have to bother with cleaning up the vanilla code
+        // Due to this I do not take full credit of the code here
+        // Methods which are copied from MaxHelpingHand are marked accordingly
+
         private ParticleType P_RecoloredFire;
         private ParticleType P_RecoloredFireBack;
 
@@ -48,7 +52,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public string iconSprite;
 
         public GateBlock(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, data.Height, safe: false) {
-            // Mostly copied from MaxHelpingHand's Flag Switch Gates, with a few changes to make it work how I'd like
+            // Mostly copied from MaxHelpingHand's Flag Switch Gates, with a few slight changes to better support how this entity is used
             ID = data.ID;
 
             if (data.Nodes.Length > 0) {
@@ -102,6 +106,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         public bool InView() {
+            // Copied from MaxHelpingHand's Flag Switch Gates
             Camera camera = (Scene as Level).Camera;
             return Position.X + Width > camera.X - 16f && Position.Y + Height > camera.Y - 16f && Position.X < camera.X + 320f && Position.Y < camera.Y + 180f;
         }
@@ -151,6 +156,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         public IEnumerator Sequence(Vector2 node) {
+            // Mostly copied from MaxHelpingHand's Flag Swith Gates with some slight changes here and there to better support how this entity is used
             Vector2 start = Position;
 
             Color fromColor, toColor;
@@ -178,7 +184,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
             yield return 0.1f;
 
-            // move the switch gate, emitting particles along the way
+            // move the gate block, emitting particles along the way
             int particleAt = 0;
             Tween tween = Tween.Create(Tween.TweenMode.Oneshot, moveEased ? Ease.CubeOut : null, moveTime + (moveEased ? 0.2f : 0f), start: true);
             tween.OnUpdate = tweenArg => {
@@ -282,7 +288,6 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 }
             }
             Collidable = collidableBackup;
-            //yield return null;
         }
     }
 }
