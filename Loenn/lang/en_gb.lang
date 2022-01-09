@@ -36,4 +36,16 @@ entities.SorbetHelper/DashFallingBlock.attributes.description.shakeSfx=The sound
 entities.SorbetHelper/DashFallingBlock.attributes.description.impactSfx=The sound the block should play either when it lands on the ground or is dashed into.
 entities.SorbetHelper/DashFallingBlock.attributes.description.tiletype=Changes the visual appearance of the falling block.
 
+# Dash Gate Block
+entities.SorbetHelper/DashGateBlock.placements.name.block=Dash Gate Block (Stone)
+entities.SorbetHelper/DashGateBlock.placements.name.temple=Dash Gate Block (Temple)
+entities.SorbetHelper/DashGateBlock.placements.name.mirror=Dash Gate Block (Mirror)
+entities.SorbetHelper/DashGateBlock.placements.name.stars=Dash Gate Block (Moon)
+
+# Touch Gate Block
+entities.SorbetHelper/TouchGateBlock.placements.name.block=Touch Gate Block (Stone)
+entities.SorbetHelper/TouchGateBlock.placements.name.temple=Touch Gate Block (Temple)
+entities.SorbetHelper/TouchGateBlock.placements.name.mirror=Touch Gate Block (Mirror)
+entities.SorbetHelper/TouchGateBlock.placements.name.stars=Touch Gate Block (Moon)
+
 mods.SorbetHelper.name=Sorbet Helper
