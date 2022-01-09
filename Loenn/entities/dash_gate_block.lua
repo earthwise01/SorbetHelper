@@ -21,7 +21,7 @@ for i, texture in ipairs(textures) do
             width = 16,
             height = 16,
             blockSprite = texture,
-            iconSprite = "switchgate/icon",
+            iconSprite = "SorbetHelper/gateblock/dash/icon",
             inactiveColor = "F86593",
             activeColor = "FFFFFF",
             finishColor = "62A1F5",
@@ -56,7 +56,7 @@ local ninePatchOptions = {
 }
 
 local frameTexture = "objects/switchgate/%s"
-local middleTexture = "objects/switchgate/icon00"
+local middleTexture = "objects/SorbetHelper/gateblock/dash/icon00"
 
 function dashGateBlock.sprite(room, entity)
     local x, y = entity.x or 0, entity.y or 0
