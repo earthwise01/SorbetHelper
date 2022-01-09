@@ -20,3 +20,33 @@ placements.entities.SorbetHelper/DashFallingBlock.tooltips.depth=Determines what
 placements.entities.SorbetHelper/DashFallingBlock.tooltips.shakeSfx=The sound the block should play before it falls.
 placements.entities.SorbetHelper/DashFallingBlock.tooltips.impactSfx=The sound the block should play either when it lands on the ground or is dashed into.
 placements.entities.SorbetHelper/DashFallingBlock.tooltips.tiletype=Changes the visual appearance of the falling block.
+
+# Dash Gate Block
+placements.entities.SorbetHelper/DashGateBlock.tooltips.iconSprite=The texture for the icon in the center of the gate block.
+placements.entities.SorbetHelper/DashGateBlock.tooltips.inactiveColor=The gate icon colour when not triggered yet.
+placements.entities.SorbetHelper/DashGateBlock.tooltips.activeColor=The gate icon colour when the block is moving.
+placements.entities.SorbetHelper/DashGateBlock.tooltips.finishColor=The gate icon colour when the block has reached its destination.
+placements.entities.SorbetHelper/DashGateBlock.tooltips.blockSprite=The texture for the gate block.
+placements.entities.SorbetHelper/DashGateBlock.tooltips.shakeTime=The time (in seconds) the block spends shaking before starting to move. Default value is 0.5 seconds.
+placements.entities.SorbetHelper/DashGateBlock.tooltips.moveTime=The time (in seconds) the block takes to move to its destination after shaking. Default value is 1.8 seconds.
+placements.entities.SorbetHelper/DashGateBlock.tooltips.moveEased=If the block should slow down before reaching its final position. If unchecked, the block will move at constant speed.
+placements.entities.SorbetHelper/DashGateBlock.tooltips.moveSound=The sound played by the gate when it starts moving.
+placements.entities.SorbetHelper/DashGateBlock.tooltips.finishedSound=The sound played by the gate when it is done moving.
+placements.entities.SorbetHelper/DashGateBlock.tooltips.allowWavedash=If you can wavedash of the block.
+placements.entities.SorbetHelper/DashGateBlock.tooltips.smoke=If the gate block should emit smoke when reaching its final position.
+
+
+# Touch Gate Block
+placements.entities.SorbetHelper/TouchGateBlock.tooltips.iconSprite=The texture for the icon in the center of the gate block.
+placements.entities.SorbetHelper/TouchGateBlock.tooltips.inactiveColor=The gate icon colour when not triggered yet.
+placements.entities.SorbetHelper/TouchGateBlock.tooltips.activeColor=The gate icon colour when the block is moving.
+placements.entities.SorbetHelper/TouchGateBlock.tooltips.finishColor=The gate icon colour when the block has reached its destination.
+placements.entities.SorbetHelper/TouchGateBlock.tooltips.blockSprite=The texture for the gate block.
+placements.entities.SorbetHelper/TouchGateBlock.tooltips.shakeTime=The time (in seconds) the block spends shaking before starting to move. Default value is 0.5 seconds.
+placements.entities.SorbetHelper/TouchGateBlock.tooltips.moveTime=The time (in seconds) the block takes to move to its destination after shaking. Default value is 1.8 seconds.
+placements.entities.SorbetHelper/TouchGateBlock.tooltips.moveEased=If the block should slow down before reaching its final position. If unchecked, the block will move at constant speed.
+placements.entities.SorbetHelper/TouchGateBlock.tooltips.moveSound=The sound played by the gate when it starts moving.
+placements.entities.SorbetHelper/TouchGateBlock.tooltips.finishedSound=The sound played by the gate when it is done moving.
+placements.entities.SorbetHelper/TouchGateBlock.tooltips.moveOnGrab=If the gate block should move if the player climbs on its sides.
+placements.entities.SorbetHelper/TouchGateBlock.tooltips.smoke=If the gate block should emit smoke when reaching its final position.
+
