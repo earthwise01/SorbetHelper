@@ -20,16 +20,14 @@ for i, texture in ipairs(textures) do
         data = {
             width = 16,
             height = 16,
-            sprite = texture,
-            -- persistent = false,
-            icon = "switchgate/icon",
-            inactiveColor = "5FCDE4",
+            blockSprite = texture,
+            iconSprite = "switchgate/icon",
+            inactiveColor = "F86593",
             activeColor = "FFFFFF",
-            finishColor = "F141DF",
+            finishColor = "62A1F5",
             shakeTime = 0.5,
             moveTime = 1.8,
             moveEased = true,
-            -- allowReturn = false,
             moveSound = "event:/game/general/touchswitch_gate_open",
             finishedSound = "event:/game/general/touchswitch_gate_finish",
             smoke = true
@@ -37,7 +35,7 @@ for i, texture in ipairs(textures) do
     }
 end
 
---dashGateBlock.fieldOrder = {"x", "y", "width", "height", "flag", "inactiveColor", "activeColor", "finishColor", "hitSound", "moveSound", "finishedSound", "shakeTime", "moveTime"}
+dashGateBlock.fieldOrder = {"x", "y", "width", "height", "inactiveColor", "activeColor", "finishColor", "moveSound", "finishedSound", "shakeTime", "moveTime", "moveEased", "blockSprite", "iconSprite", "smoke"}
 
 dashGateBlock.fieldInformation = {
     inactiveColor = {
@@ -58,21 +56,17 @@ local ninePatchOptions = {
 }
 
 local frameTexture = "objects/switchgate/%s"
+local middleTexture = "objects/switchgate/icon00"
 
 function dashGateBlock.sprite(room, entity)
     local x, y = entity.x or 0, entity.y or 0
     local width, height = entity.width or 24, entity.height or 24
 
-    local blockSprite = entity.sprite or "block"
+    local blockSprite = entity.blockSprite or "block"
     local frame = string.format(frameTexture, blockSprite)
 
-    iconResource = "objects/switchgate/icon00"
-    --if entity.icon ~= "vanilla" then
-    --    iconResource = "objects/MaxHelpingHand/flagSwitchGate/" .. entity.icon .."/icon00"
-   -- end
-
     local ninePatch = drawableNinePatch.fromTexture(frame, ninePatchOptions, x, y, width, height)
-    local middleSprite = drawableSprite.fromTexture(iconResource, entity)
+    local middleSprite = drawableSprite.fromTexture(middleTexture, entity)
     local sprites = ninePatch:getDrawableSprite()
 
     middleSprite:addPosition(math.floor(width / 2), math.floor(height / 2))

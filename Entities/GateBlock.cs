@@ -72,8 +72,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
             smoke = data.Bool("smoke", true);
 
-            blockSprite = data.Attr("sprite", "block");
-            iconSprite = data.Attr("icon", "switchgate/icon");
+            blockSprite = data.Attr("blockSprite", "block");
+            iconSprite = data.Attr("iconSprite", "switchgate/icon");
 
             P_RecoloredFire = new ParticleType(TouchSwitch.P_Fire) {
                 Color = finishColor

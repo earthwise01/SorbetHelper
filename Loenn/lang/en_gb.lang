@@ -41,11 +41,35 @@ entities.SorbetHelper/DashGateBlock.placements.name.block=Dash Gate Block (Stone
 entities.SorbetHelper/DashGateBlock.placements.name.temple=Dash Gate Block (Temple)
 entities.SorbetHelper/DashGateBlock.placements.name.mirror=Dash Gate Block (Mirror)
 entities.SorbetHelper/DashGateBlock.placements.name.stars=Dash Gate Block (Moon)
+entities.SorbetHelper/DashGateBlock.attributes.description.iconSprite=The texture for the icon in the center of the gate block.
+entities.SorbetHelper/DashGateBlock.attributes.description.inactiveColor=The gate icon colour when not triggered yet.
+entities.SorbetHelper/DashGateBlock.attributes.description.activeColor=The gate icon colour when the block is moving.
+entities.SorbetHelper/DashGateBlock.attributes.description.finishColor=The gate icon colour when the block has reached its destination.
+entities.SorbetHelper/DashGateBlock.attributes.description.blockSprite=The texture for the gate block.
+entities.SorbetHelper/DashGateBlock.attributes.description.shakeTime=The time (in seconds) the block spends shaking before starting to move. Default value is 0.5 seconds.
+entities.SorbetHelper/DashGateBlock.attributes.description.moveTime=The time (in seconds) the block takes to move to its destination after shaking. Default value is 1.8 seconds.
+entities.SorbetHelper/DashGateBlock.attributes.description.moveEased=If the block should slow down before reaching its final position. If unchecked, the block will move at constant speed.
+entities.SorbetHelper/DashGateBlock.attributes.description.moveSound=The sound played by the gate when it starts moving.
+entities.SorbetHelper/DashGateBlock.attributes.description.finishedSound=The sound played by the gate when it is done moving.
+entities.SorbetHelper/DashGateBlock.attributes.description.smoke=If the gate block should emit smoke when reaching its final position.
 
 # Touch Gate Block
 entities.SorbetHelper/TouchGateBlock.placements.name.block=Touch Gate Block (Stone)
 entities.SorbetHelper/TouchGateBlock.placements.name.temple=Touch Gate Block (Temple)
 entities.SorbetHelper/TouchGateBlock.placements.name.mirror=Touch Gate Block (Mirror)
 entities.SorbetHelper/TouchGateBlock.placements.name.stars=Touch Gate Block (Moon)
+entities.SorbetHelper/TouchGateBlock.attributes.description.iconSprite=The texture for the icon in the center of the gate block.
+entities.SorbetHelper/TouchGateBlock.attributes.description.inactiveColor=The gate icon colour when not triggered yet.
+entities.SorbetHelper/TouchGateBlock.attributes.description.activeColor=The gate icon colour when the block is moving.
+entities.SorbetHelper/TouchGateBlock.attributes.description.finishColor=The gate icon colour when the block has reached its destination.
+entities.SorbetHelper/TouchGateBlock.attributes.description.blockSprite=The texture for the gate block.
+entities.SorbetHelper/TouchGateBlock.attributes.description.shakeTime=The time (in seconds) the block spends shaking before starting to move. Default value is 0.5 seconds.
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveTime=The time (in seconds) the block takes to move to its destination after shaking. Default value is 1.8 seconds.
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveEased=If the block should slow down before reaching its final position. If unchecked, the block will move at constant speed.
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveSound=The sound played by the gate when it starts moving.
+entities.SorbetHelper/TouchGateBlock.attributes.description.finishedSound=The sound played by the gate when it is done moving.
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnGrab=If the gate block should move if the player climbs on its sides.
+entities.SorbetHelper/TouchGateBlock.attributes.description.smoke=If the gate block should emit smoke when reaching its final position.
+
 
 mods.SorbetHelper.name=Sorbet Helper
