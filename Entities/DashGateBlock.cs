@@ -17,7 +17,10 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private Wiggler bounce;
         private Shaker shaker;
 
+        private bool allowWavedash;
+
         public DashGateBlock(EntityData data, Vector2 offset) : base(data, offset) {
+            allowWavedash = data.Bool("allowWavedash", false);
             bounce = Wiggler.Create(1f, 0.5f);
             bounce.StartZero = false;
             Add(bounce);
@@ -32,6 +35,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 bounce.Start();
                 Triggered = true;
                 Audio.Play("event:/game/general/wall_break_stone", base.Center);
+                if (allowWavedash && dir.Y == 1)
+                    return DashCollisionResults.NormalCollision;
                 return DashCollisionResults.Rebound;
             }
 

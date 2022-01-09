@@ -51,6 +51,7 @@ entities.SorbetHelper/DashGateBlock.attributes.description.moveTime=The time (in
 entities.SorbetHelper/DashGateBlock.attributes.description.moveEased=If the block should slow down before reaching its final position. If unchecked, the block will move at constant speed.
 entities.SorbetHelper/DashGateBlock.attributes.description.moveSound=The sound played by the gate when it starts moving.
 entities.SorbetHelper/DashGateBlock.attributes.description.finishedSound=The sound played by the gate when it is done moving.
+entities.SorbetHelper/DashGateBlock.attributes.description.allowWavedash=If you can wavedash of the block.
 entities.SorbetHelper/DashGateBlock.attributes.description.smoke=If the gate block should emit smoke when reaching its final position.
 
 # Touch Gate Block
