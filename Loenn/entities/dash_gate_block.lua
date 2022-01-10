@@ -34,12 +34,13 @@ for i, texture in ipairs(textures) do
             moveSound = "event:/game/general/touchswitch_gate_open",
             finishedSound = "event:/game/general/touchswitch_gate_finish",
             allowWavedash = false,
+            persistent = false,
             smoke = true
         }
     }
 end
 
-dashGateBlock.fieldOrder = {"x", "y", "width", "height", "inactiveColor", "activeColor", "finishColor", "moveSound", "finishedSound", "shakeTime", "moveTime", "moveEased", "blockSprite", "iconSprite", "allowWavedash", "smoke"}
+dashGateBlock.fieldOrder = {"x", "y", "width", "height", "inactiveColor", "activeColor", "finishColor", "moveSound", "finishedSound", "shakeTime", "moveTime", "moveEased", "blockSprite", "iconSprite", "allowWavedash", "smoke", "persistent"}
 
 dashGateBlock.fieldInformation = {
     inactiveColor = {

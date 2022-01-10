@@ -21,11 +21,10 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         public override bool TriggerCheck() {
-            if (!moveOnGrab) {
-                return HasPlayerOnTop();
+            if (!Triggered && (moveOnGrab && HasPlayerRider()) || (!moveOnGrab && HasPlayerOnTop())) {
+                Triggered = true;
             }
-            return HasPlayerRider();
-
+            return base.TriggerCheck();
         }
 
         public override void PlayMoveSounds() {

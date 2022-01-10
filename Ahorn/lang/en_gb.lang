@@ -34,6 +34,7 @@ placements.entities.SorbetHelper/DashGateBlock.tooltips.moveSound=The sound play
 placements.entities.SorbetHelper/DashGateBlock.tooltips.finishedSound=The sound played by the gate when it is done moving.
 placements.entities.SorbetHelper/DashGateBlock.tooltips.allowWavedash=If you can wavedash on top of the block.
 placements.entities.SorbetHelper/DashGateBlock.tooltips.smoke=If the gate block should emit smoke when reaching its final position.
+placements.entities.SorbetHelper/DashGateBlock.tooltips.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
 
 
 # Touch Gate Block
@@ -49,4 +50,5 @@ placements.entities.SorbetHelper/TouchGateBlock.tooltips.moveSound=The sound pla
 placements.entities.SorbetHelper/TouchGateBlock.tooltips.finishedSound=The sound played by the gate when it is done moving.
 placements.entities.SorbetHelper/TouchGateBlock.tooltips.moveOnGrab=If the gate block should move if the player climbs on its sides.
 placements.entities.SorbetHelper/TouchGateBlock.tooltips.smoke=If the gate block should emit smoke when reaching its final position.
+placements.entities.SorbetHelper/TouchGateBlock.tooltips.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
 

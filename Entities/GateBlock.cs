@@ -50,6 +50,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         public string blockSprite;
         public string iconSprite;
+        public bool persistent;
 
         public GateBlock(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, data.Height, safe: false) {
             // Mostly copied from MaxHelpingHand's Flag Switch Gates, with some slight changes to better support how this entity is used
@@ -74,6 +75,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
             blockSprite = data.Attr("blockSprite", "block");
             iconSprite = data.Attr("iconSprite", "switchgate/icon");
+
+            persistent = data.Bool("persistent", false);
 
             P_RecoloredFire = new ParticleType(TouchSwitch.P_Fire) {
                 Color = finishColor
@@ -103,7 +106,15 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         public override void Awake(Scene scene) {
             base.Awake(scene);
-            Add(new Coroutine(Sequence(node)));
+            if (persistent && (Scene as Level).Session.GetFlag("sorbet_helper_gate_block_persistent" + ID)) {
+                Triggered = true;
+                MoveTo(node);
+                icon.Rate = 0f;
+                icon.SetAnimationFrame(0);
+                icon.Color = finishColor;
+            } else {
+                Add(new Coroutine(Sequence(node)));
+            }
         }
 
         public bool InView() {
@@ -167,6 +178,9 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             while (!TriggerCheck()) {
                 yield return null;
             }
+
+            if (persistent)
+                (Scene as Level).Session.SetFlag("sorbet_helper_gate_block_persistent" + ID);
 
             yield return 0.1f;
 
