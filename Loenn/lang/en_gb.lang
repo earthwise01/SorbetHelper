@@ -55,6 +55,8 @@ entities.SorbetHelper/DashGateBlock.attributes.description.finishedSound=The sou
 entities.SorbetHelper/DashGateBlock.attributes.description.allowWavedash=If you can wavedash on top of the block.
 entities.SorbetHelper/DashGateBlock.attributes.description.smoke=If the gate block should emit smoke when reaching its final position.
 entities.SorbetHelper/DashGateBlock.attributes.description.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
+entities.SorbetHelper/DashGateBlock.attributes.description.linked=If the gate block can activate/be activated by other gate blocks sharing the same link tag.
+entities.SorbetHelper/DashGateBlock.attributes.description.linkTag=The link tag used to pair with other gate blocks, other gate blocks need to share this link tag in order for the gate to be able to pair with them.\n(needs 'Linked' enabled)
 
 # Touch Gate Block
 entities.SorbetHelper/TouchGateBlock.placements.name.block=Gate Block (Touch Activated, Stone)
@@ -75,6 +77,8 @@ entities.SorbetHelper/TouchGateBlock.attributes.description.finishedSound=The so
 entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnGrab=If the gate block should move if the player climbs on its sides.
 entities.SorbetHelper/TouchGateBlock.attributes.description.smoke=If the gate block should emit smoke when reaching its final position.
 entities.SorbetHelper/TouchGateBlock.attributes.description.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
+entities.SorbetHelper/TouchGateBlock.attributes.description.linked=If the gate block can activate/be activated by other gate blocks sharing the same link tag.
+entities.SorbetHelper/TouchGateBlock.attributes.description.linkTag=The link tag used to pair with other gate blocks, other gate blocks need to share this link tag in order for the gate to be able to pair with them.\n(needs 'Linked' enabled)
 
 # Linked Gate Block
 entities.SorbetHelper/LinkedGateBlock.placements.name.block=Gate Block (Link Activated, Stone)
@@ -94,6 +98,7 @@ entities.SorbetHelper/LinkedGateBlock.attributes.description.moveSound=The sound
 entities.SorbetHelper/LinkedGateBlock.attributes.description.finishedSound=The sound played by the gate when it is done moving.
 entities.SorbetHelper/LinkedGateBlock.attributes.description.smoke=If the gate block should emit smoke when reaching its final position.
 entities.SorbetHelper/LinkedGateBlock.attributes.description.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
+entities.SorbetHelper/LinkedGateBlock.attributes.description.linkTag=The link tag used to pair with other gate blocks, other gate blocks need to share this link tag in order for the gate to be able to pair with them.
 
 
 mods.SorbetHelper.name=Sorbet Helper

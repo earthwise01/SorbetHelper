@@ -12,7 +12,7 @@ placements.entities.SorbetHelper/KillZone.tooltips.fastKill=When checked, the pl
 placements.entities.SorbetHelper/ReturnBerry.tooltips.winged=When checked, the strawberry will have wings.
 
 # Dash Falling Block
-placements.entities.SorbetHelper/DashFallingBlock.tooltips.climbFall=If the block should fall if the player climbs on its sides. (note: needs Fall on Touch enabled in order to work)
+placements.entities.SorbetHelper/DashFallingBlock.tooltips.climbFall=If the block should fall if the player climbs on its sides.\n(needs 'Fall On Touch' enabled in order to have any effect)
 placements.entities.SorbetHelper/DashFallingBlock.tooltips.fallOnTouch=If the block should fall if it comes in contact with the player, even if they don't dash into it.
 placements.entities.SorbetHelper/DashFallingBlock.names.fallOnStaticMover=Fall On Static Mover Interaction
 placements.entities.SorbetHelper/DashFallingBlock.tooltips.fallOnStaticMover=If the block should fall if a static mover attached to it is interacted with.
@@ -32,9 +32,11 @@ placements.entities.SorbetHelper/DashGateBlock.tooltips.moveTime=The time (in se
 placements.entities.SorbetHelper/DashGateBlock.tooltips.moveEased=If the block should slow down before reaching its final position. If unchecked, the block will move at constant speed.
 placements.entities.SorbetHelper/DashGateBlock.tooltips.moveSound=The sound played by the gate when it starts moving.
 placements.entities.SorbetHelper/DashGateBlock.tooltips.finishedSound=The sound played by the gate when it is done moving.
-placements.entities.SorbetHelper/DashGateBlock.tooltips.allowWavedash=If you can wavedash on top of the block.
+placements.entities.SorbetHelper/DashGateBlock.tooltips.allowWavedash=If it is possible to wavedash on top of the block.
 placements.entities.SorbetHelper/DashGateBlock.tooltips.smoke=If the gate block should emit smoke when reaching its final position.
 placements.entities.SorbetHelper/DashGateBlock.tooltips.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
+placements.entities.SorbetHelper/DashGateBlock.tooltips.linked=If the gate block can activate/be activated by other gate blocks sharing the same link tag.
+placements.entities.SorbetHelper/DashGateBlock.tooltips.linkTag=The link tag used to pair with other gate blocks, other gate blocks need to share this link tag in order for the gate to be able to pair with them.\n(needs 'Linked' enabled)
 
 
 # Touch Gate Block
@@ -51,6 +53,8 @@ placements.entities.SorbetHelper/TouchGateBlock.tooltips.finishedSound=The sound
 placements.entities.SorbetHelper/TouchGateBlock.tooltips.moveOnGrab=If the gate block should move if the player climbs on its sides.
 placements.entities.SorbetHelper/TouchGateBlock.tooltips.smoke=If the gate block should emit smoke when reaching its final position.
 placements.entities.SorbetHelper/TouchGateBlock.tooltips.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
+placements.entities.SorbetHelper/TouchGateBlock.tooltips.linked=If the gate block can activate/be activated by other gate blocks sharing the same link tag.
+placements.entities.SorbetHelper/TouchGateBlock.tooltips.linkTag=The link tag used to pair with other gate blocks, other gate blocks need to share this link tag in order for the gate to be able to pair with them.\n(needs 'Linked' enabled)
 
 # Linked Gate Block
 placements.entities.SorbetHelper/LinkedGateBlock.tooltips.iconSprite=The texture for the icon in the center of the gate block.
@@ -65,3 +69,4 @@ placements.entities.SorbetHelper/LinkedGateBlock.tooltips.moveSound=The sound pl
 placements.entities.SorbetHelper/LinkedGateBlock.tooltips.finishedSound=The sound played by the gate when it is done moving.
 placements.entities.SorbetHelper/LinkedGateBlock.tooltips.smoke=If the gate block should emit smoke when reaching its final position.
 placements.entities.SorbetHelper/LinkedGateBlock.tooltips.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
+placements.entities.SorbetHelper/LinkedGateBlock.tooltips.linkTag=The link tag used to pair with other gate blocks, other gate blocks need to share this link tag in order for the gate to be able to pair with them.
