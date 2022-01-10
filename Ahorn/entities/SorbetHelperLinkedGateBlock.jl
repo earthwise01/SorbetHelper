@@ -1,15 +1,15 @@
-module SorbetHelperTouchGateBlock
+module SorbetHelperLinkedGateBlock
 
 using ..Ahorn, Maple
 
 # Most of this is copy-pasted from MaxHelpingHand's Flag Switch Gates since I dislike writing Ahorn plugins
 # https://github.com/max4805/MaxHelpingHand/blob/master/Ahorn/entities/maxHelpingHandFlagSwitchGate.jl
 
-@pardef TouchGateBlock(x1::Integer, y1::Integer, x2::Integer=x1+16, y2::Integer=y1, width::Integer=Maple.defaultBlockWidth, height::Integer=Maple.defaultBlockHeight,
-    blockSprite::String="block", iconSprite::String="SorbetHelper/gateblock/touch/icon", inactiveColor::String="4EF3CF", activeColor::String="FFFFFF", finishColor::String="FFF175",
-    shakeTime::Number=0.5, moveTime::Number=1.8, moveEased::Bool=true, moveOnGrab::Bool=true, moveSound::String="event:/game/general/touchswitch_gate_open", finishedSound::String="event:/game/general/touchswitch_gate_finish", smoke::Bool=true, persistent::Bool=false, linked::Bool=false, linkTag::String="") =
-    Entity("SorbetHelper/TouchGateBlock", x=x1, y=y1, nodes=Tuple{Int, Int}[(x2, y2)], width=width, height=height, blockSprite=blockSprite, iconSprite=iconSprite,
-    inactiveColor=inactiveColor, activeColor=activeColor, finishColor=finishColor, shakeTime=shakeTime, moveTime=moveTime, moveEased=moveEased, moveOnGrab=moveOnGrab, moveSound=moveSound, finishedSound=finishedSound, smoke=smoke, persistent=persistent, linked=linked, linkTag=linkTag)
+@pardef LinkedGateBlock(x1::Integer, y1::Integer, x2::Integer=x1+16, y2::Integer=y1, width::Integer=Maple.defaultBlockWidth, height::Integer=Maple.defaultBlockHeight,
+    blockSprite::String="block", iconSprite::String="SorbetHelper/gateblock/linked/icon", inactiveColor::String="4EF3CF", activeColor::String="FFFFFF", finishColor::String="FFF175",
+    shakeTime::Number=0.5, moveTime::Number=1.8, moveEased::Bool=true, moveSound::String="event:/game/general/touchswitch_gate_open", finishedSound::String="event:/game/general/touchswitch_gate_finish", smoke::Bool=true, persistent::Bool=false, linkTag::String="") =
+    Entity("SorbetHelper/LinkedGateBlock", x=x1, y=y1, nodes=Tuple{Int, Int}[(x2, y2)], width=width, height=height, blockSprite=blockSprite, iconSprite=iconSprite,
+    inactiveColor=inactiveColor, activeColor=activeColor, finishColor=finishColor, shakeTime=shakeTime, moveTime=moveTime, moveEased=moveEased, moveOnGrab=moveOnGrab, moveSound=moveSound, finishedSound=finishedSound, smoke=smoke, persistent=persistent, linkTag=linkTag)
 
 function gateFinalizer(entity)
     x, y = Ahorn.position(entity)
@@ -23,8 +23,8 @@ end
 const textures = String["block", "mirror", "temple", "stars"]
 
 const placements = Ahorn.PlacementDict(
-    "Touch Gate Block ($(uppercasefirst(texture))) (Sorbet Helper)" => Ahorn.EntityPlacement(
-        TouchGateBlock,
+    "Linked Gate Block ($(uppercasefirst(texture))) (Sorbet Helper)" => Ahorn.EntityPlacement(
+        LinkedGateBlock,
         "rectangle",
         Dict{String, Any}(
             "blockSprite" => texture
@@ -33,9 +33,9 @@ const placements = Ahorn.PlacementDict(
     ) for texture in textures
 )
 
-Ahorn.editingOrder(entity::TouchGateBlock) = String["x", "y", "width", "height", "inactiveColor", "activeColor", "finishColor", "moveSound", "finishedSound", "shakeTime", "moveTime", "moveEased", "blockSprite", "iconSprite", "moveOnGrab", "smoke", "persistent", "linked", "linkTag"]
+Ahorn.editingOrder(entity::LinkedGateBlock) = String["x", "y", "width", "height", "inactiveColor", "activeColor", "finishColor", "moveSound", "finishedSound", "shakeTime", "moveTime", "moveEased", "blockSprite", "iconSprite", "smoke", "persistent", "linkTag"]
 
-Ahorn.editingOptions(entity::TouchGateBlock) = Dict{String, Any}(
+Ahorn.editingOptions(entity::LinkedGateBlock) = Dict{String, Any}(
     "blockSprite" => textures,
     "iconSprite" => Dict{String, String}(
         "Vanilla" => "switchgate/icon",
@@ -45,12 +45,12 @@ Ahorn.editingOptions(entity::TouchGateBlock) = Dict{String, Any}(
     ),
 )
 
-Ahorn.nodeLimits(entity::TouchGateBlock) = 1, 1
+Ahorn.nodeLimits(entity::LinkedGateBlock) = 1, 1
 
-Ahorn.minimumSize(entity::TouchGateBlock) = 16, 16
-Ahorn.resizable(entity::TouchGateBlock) = true, true
+Ahorn.minimumSize(entity::LinkedGateBlock) = 16, 16
+Ahorn.resizable(entity::LinkedGateBlock) = true, true
 
-function Ahorn.selection(entity::TouchGateBlock)
+function Ahorn.selection(entity::LinkedGateBlock)
     x, y = Ahorn.position(entity)
     stopX, stopY = Int.(entity.data["nodes"][1])
 
@@ -60,8 +60,8 @@ function Ahorn.selection(entity::TouchGateBlock)
     return [Ahorn.Rectangle(x, y, width, height), Ahorn.Rectangle(stopX, stopY, width, height)]
 end
 
-function renderGateSwitch(ctx::Ahorn.Cairo.CairoContext, entity::TouchGateBlock, x::Number, y::Number, width::Number, height::Number, sprite::String)
-    icon = get(entity.data, "iconSprite", "SorbetHelper/gateblock/touch/icon") * "00"
+function renderGateSwitch(ctx::Ahorn.Cairo.CairoContext, entity::LinkedGateBlock, x::Number, y::Number, width::Number, height::Number, sprite::String)
+    icon = get(entity.data, "iconSprite", "SorbetHelper/gateblock/linked/icon") * "00"
 
     iconResource = "objects/$(icon)"
 
@@ -94,7 +94,7 @@ function renderGateSwitch(ctx::Ahorn.Cairo.CairoContext, entity::TouchGateBlock,
     Ahorn.drawImage(ctx, iconSprite, x + div(width - iconSprite.width, 2), y + div(height - iconSprite.height, 2))
 end
 
-function Ahorn.renderSelectedAbs(ctx::Ahorn.Cairo.CairoContext, entity::TouchGateBlock, room::Maple.Room)
+function Ahorn.renderSelectedAbs(ctx::Ahorn.Cairo.CairoContext, entity::LinkedGateBlock, room::Maple.Room)
     sprite = get(entity.data, "blockSprite", "block")
     startX, startY = Int(entity.data["x"]), Int(entity.data["y"])
     stopX, stopY = Int.(entity.data["nodes"][1])
@@ -106,7 +106,7 @@ function Ahorn.renderSelectedAbs(ctx::Ahorn.Cairo.CairoContext, entity::TouchGat
     Ahorn.drawArrow(ctx, startX + width / 2, startY + height / 2, stopX + width / 2, stopY + height / 2, Ahorn.colors.selection_selected_fc, headLength=6)
 end
 
-function Ahorn.renderAbs(ctx::Ahorn.Cairo.CairoContext, entity::TouchGateBlock, room::Maple.Room)
+function Ahorn.renderAbs(ctx::Ahorn.Cairo.CairoContext, entity::LinkedGateBlock, room::Maple.Room)
     sprite = get(entity.data, "blockSprite", "block")
 
     x = Int(get(entity.data, "x", 0))

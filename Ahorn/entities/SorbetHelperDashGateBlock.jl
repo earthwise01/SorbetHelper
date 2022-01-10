@@ -41,6 +41,7 @@ Ahorn.editingOptions(entity::DashGateBlock) = Dict{String, Any}(
         "Vanilla" => "switchgate/icon",
         "Dash" => "SorbetHelper/gateblock/dash/icon",
         "Touch" => "SorbetHelper/gateblock/touch/icon",
+        "Linked" => "SorbetHelper/gateblock/linked/icon",
     ),
 )
 
