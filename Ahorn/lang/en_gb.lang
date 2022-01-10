@@ -70,3 +70,10 @@ placements.entities.SorbetHelper/LinkedGateBlock.tooltips.finishedSound=The soun
 placements.entities.SorbetHelper/LinkedGateBlock.tooltips.smoke=If the gate block should emit smoke when reaching its final position.
 placements.entities.SorbetHelper/LinkedGateBlock.tooltips.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
 placements.entities.SorbetHelper/LinkedGateBlock.tooltips.linkTag=The link tag used to pair with other gate blocks, other gate blocks need to share this link tag in order for the gate to be able to pair with them.
+
+# -- Triggers --
+
+# Linked Gate Block Activator
+placements.triggers.SorbetHelper/LinkedGateBlockActivatorTrigger.tooltips.linkTag=The link tag used to pair with gate blocks, any gate blocks sharing this link tag will be activated when the player enters this trigger.
+placements.triggers.SorbetHelper/LinkedGateBlockActivatorTrigger.tooltips.flag=The flag that needs to be set in order for the trigger to be collidable, leaving this empty causes the trigger to always be collidable.
+placements.triggers.SorbetHelper/LinkedGateBlockActivatorTrigger.tooltips.inverted=When checked, the trigger will only be collidable when the associated flag is disabled, rather than only when the associated flag is enabled.
