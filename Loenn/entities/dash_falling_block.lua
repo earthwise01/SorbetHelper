@@ -13,12 +13,15 @@ fallingBlock.placements = {
         fallOnTouch = false,
         climbFall = true,
         fallOnStaticMover = false,
+        allowWavedash = false,
         width = 8,
         height = 8
     }
 }
 
 fallingBlock.sprite = fakeTilesHelper.getEntitySpriteFunction("tiletype", false)
+
+fallingBlock.fieldOrder = {"x", "y", "width", "height", "shakeSfx", "impactSfx", "tiletype", "depth", "fallOnTouch", "climbFall", "fallOnStaticMover", "allowWavedash"}
 
 function fallingBlock.depth(room, entity)
     return entity.depth

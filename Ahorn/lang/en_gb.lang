@@ -20,3 +20,4 @@ placements.entities.SorbetHelper/DashFallingBlock.tooltips.depth=Determines what
 placements.entities.SorbetHelper/DashFallingBlock.tooltips.shakeSfx=The sound the block should play before it falls.
 placements.entities.SorbetHelper/DashFallingBlock.tooltips.impactSfx=The sound the block should play either when it lands on the ground or is dashed into.
 placements.entities.SorbetHelper/DashFallingBlock.tooltips.tiletype=Changes the visual appearance of the falling block.
+placements.entities.SorbetHelper/DashFallingBlock.tooltips.allowWavedash=If it is possible to wavedash on top of the block.
