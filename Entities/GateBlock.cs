@@ -10,7 +10,7 @@ using Celeste.Mod.Entities;
 
 namespace Celeste.Mod.SorbetHelper.Entities {
 
-    [Tracked]
+    [Tracked(true)]
     public class GateBlock : Solid {
 
         // A bunch of code here is copy-pasted from MaxHelpingHand's Flag Switch Gates as I didn't want to have to bother with cleaning up the vanilla code
@@ -52,6 +52,9 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public string iconSprite;
         public bool persistent;
 
+        public bool linked;
+        public string linkTag { get; private set; }
+
         public GateBlock(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, data.Height, safe: false) {
             // Mostly copied from MaxHelpingHand's Flag Switch Gates, with some slight changes to better support how this entity is used
             ID = data.ID;
@@ -77,6 +80,9 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             iconSprite = data.Attr("iconSprite", "switchgate/icon");
 
             persistent = data.Bool("persistent", false);
+
+            linked = data.Bool("linked", false);
+            linkTag = data.Attr("linkTag", "");
 
             P_RecoloredFire = new ParticleType(TouchSwitch.P_Fire) {
                 Color = finishColor

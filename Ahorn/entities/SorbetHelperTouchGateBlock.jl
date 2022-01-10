@@ -7,9 +7,9 @@ using ..Ahorn, Maple
 
 @pardef TouchGateBlock(x1::Integer, y1::Integer, x2::Integer=x1+16, y2::Integer=y1, width::Integer=Maple.defaultBlockWidth, height::Integer=Maple.defaultBlockHeight,
     blockSprite::String="block", iconSprite::String="SorbetHelper/gateblock/touch/icon", inactiveColor::String="4EF3CF", activeColor::String="FFFFFF", finishColor::String="FFF175",
-    shakeTime::Number=0.5, moveTime::Number=1.8, moveEased::Bool=true, moveOnGrab::Bool=true, moveSound::String="event:/game/general/touchswitch_gate_open", finishedSound::String="event:/game/general/touchswitch_gate_finish", smoke::Bool=true, persistent::Bool=false) =
+    shakeTime::Number=0.5, moveTime::Number=1.8, moveEased::Bool=true, moveOnGrab::Bool=true, moveSound::String="event:/game/general/touchswitch_gate_open", finishedSound::String="event:/game/general/touchswitch_gate_finish", smoke::Bool=true, persistent::Bool=false, linked::Bool=false, linkTag::String="") =
     Entity("SorbetHelper/TouchGateBlock", x=x1, y=y1, nodes=Tuple{Int, Int}[(x2, y2)], width=width, height=height, blockSprite=blockSprite, iconSprite=iconSprite,
-    inactiveColor=inactiveColor, activeColor=activeColor, finishColor=finishColor, shakeTime=shakeTime, moveTime=moveTime, moveEased=moveEased, moveOnGrab=moveOnGrab, moveSound=moveSound, finishedSound=finishedSound, smoke=smoke, persistent=persistent)
+    inactiveColor=inactiveColor, activeColor=activeColor, finishColor=finishColor, shakeTime=shakeTime, moveTime=moveTime, moveEased=moveEased, moveOnGrab=moveOnGrab, moveSound=moveSound, finishedSound=finishedSound, smoke=smoke, persistent=persistent, linked=linked, linkTag=linkTag)
 
 function gateFinalizer(entity)
     x, y = Ahorn.position(entity)
@@ -33,7 +33,7 @@ const placements = Ahorn.PlacementDict(
     ) for texture in textures
 )
 
-Ahorn.editingOrder(entity::TouchGateBlock) = String["x", "y", "width", "height", "inactiveColor", "activeColor", "finishColor", "moveSound", "finishedSound", "shakeTime", "moveTime", "moveEased", "blockSprite", "iconSprite", "moveOnGrab", "smoke", "persistent"]
+Ahorn.editingOrder(entity::TouchGateBlock) = String["x", "y", "width", "height", "inactiveColor", "activeColor", "finishColor", "moveSound", "finishedSound", "shakeTime", "moveTime", "moveEased", "blockSprite", "iconSprite", "moveOnGrab", "smoke", "persistent", "linked", "linkTag"]
 
 Ahorn.editingOptions(entity::TouchGateBlock) = Dict{String, Any}(
     "blockSprite" => textures,

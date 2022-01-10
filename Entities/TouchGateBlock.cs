@@ -23,6 +23,13 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public override bool TriggerCheck() {
             if (!Triggered && (moveOnGrab && HasPlayerRider()) || (!moveOnGrab && HasPlayerOnTop())) {
                 Triggered = true;
+                if (linked) {
+                    foreach (GateBlock gateBlock in Scene.Tracker.GetEntities<GateBlock>()) {
+                        if (gateBlock.linked && gateBlock.linkTag == linkTag) {
+                            gateBlock.Triggered = true;
+                        }
+                    }
+                }
             }
             return base.TriggerCheck();
         }
