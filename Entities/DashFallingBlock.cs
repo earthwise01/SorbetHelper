@@ -17,6 +17,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public string impactSfx;
         public bool fallOnTouch;
         public bool fallOnStaticMover;
+        public bool allowWavedash;
 
         private Wiggler bounce;
         private Shaker shaker;
@@ -42,6 +43,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             impactSfx = data.Attr("impactSfx", "event:/game/general/fallblock_impact");
             fallOnTouch = data.Bool("fallOnTouch", false);
             fallOnStaticMover = data.Bool("fallOnStaticMover", false);
+            allowWavedash = data.Bool("allowWavedash", false);
             base.Depth = data.Int("depth", base.Depth);
             bounce = Wiggler.Create(1f, 0.5f);
             bounce.StartZero = false;
@@ -57,6 +59,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 bounce.Start();
                 isTriggered = true;
                 Audio.Play(impactSfx, base.Center);
+                if (allowWavedash && dir.Y == 1)
+                    return DashCollisionResults.NormalCollision;
                 return DashCollisionResults.Rebound;
             }
 
