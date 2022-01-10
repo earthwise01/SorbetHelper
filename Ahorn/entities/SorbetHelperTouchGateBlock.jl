@@ -23,7 +23,7 @@ end
 const textures = String["block", "mirror", "temple", "stars"]
 
 const placements = Ahorn.PlacementDict(
-    "Touch Gate Block ($(uppercasefirst(texture))) (Sorbet Helper)" => Ahorn.EntityPlacement(
+    "Gate Block (Touch Activated, $(uppercasefirst(texture))) (Sorbet Helper)" => Ahorn.EntityPlacement(
         TouchGateBlock,
         "rectangle",
         Dict{String, Any}(

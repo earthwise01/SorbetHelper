@@ -23,7 +23,7 @@ end
 const textures = String["block", "mirror", "temple", "stars"]
 
 const placements = Ahorn.PlacementDict(
-    "Dash Gate Block ($(uppercasefirst(texture))) (Sorbet Helper)" => Ahorn.EntityPlacement(
+    "Gate Block (Dash Activated, $(uppercasefirst(texture))) (Sorbet Helper)" => Ahorn.EntityPlacement(
         DashGateBlock,
         "rectangle",
         Dict{String, Any}(

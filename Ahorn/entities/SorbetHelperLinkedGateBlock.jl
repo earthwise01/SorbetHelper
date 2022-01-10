@@ -9,7 +9,7 @@ using ..Ahorn, Maple
     blockSprite::String="block", iconSprite::String="SorbetHelper/gateblock/linked/icon", inactiveColor::String="4EF3CF", activeColor::String="FFFFFF", finishColor::String="FFF175",
     shakeTime::Number=0.5, moveTime::Number=1.8, moveEased::Bool=true, moveSound::String="event:/game/general/touchswitch_gate_open", finishedSound::String="event:/game/general/touchswitch_gate_finish", smoke::Bool=true, persistent::Bool=false, linkTag::String="") =
     Entity("SorbetHelper/LinkedGateBlock", x=x1, y=y1, nodes=Tuple{Int, Int}[(x2, y2)], width=width, height=height, blockSprite=blockSprite, iconSprite=iconSprite,
-    inactiveColor=inactiveColor, activeColor=activeColor, finishColor=finishColor, shakeTime=shakeTime, moveTime=moveTime, moveEased=moveEased, moveOnGrab=moveOnGrab, moveSound=moveSound, finishedSound=finishedSound, smoke=smoke, persistent=persistent, linkTag=linkTag)
+    inactiveColor=inactiveColor, activeColor=activeColor, finishColor=finishColor, shakeTime=shakeTime, moveTime=moveTime, moveEased=moveEased, moveSound=moveSound, finishedSound=finishedSound, smoke=smoke, persistent=persistent, linkTag=linkTag)
 
 function gateFinalizer(entity)
     x, y = Ahorn.position(entity)
@@ -23,7 +23,7 @@ end
 const textures = String["block", "mirror", "temple", "stars"]
 
 const placements = Ahorn.PlacementDict(
-    "Linked Gate Block ($(uppercasefirst(texture))) (Sorbet Helper)" => Ahorn.EntityPlacement(
+    "Gate Block (Link Activated, $(uppercasefirst(texture))) (Sorbet Helper)" => Ahorn.EntityPlacement(
         LinkedGateBlock,
         "rectangle",
         Dict{String, Any}(

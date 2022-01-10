@@ -37,10 +37,11 @@ entities.SorbetHelper/DashFallingBlock.attributes.description.impactSfx=The soun
 entities.SorbetHelper/DashFallingBlock.attributes.description.tiletype=Changes the visual appearance of the falling block.
 
 # Dash Gate Block
-entities.SorbetHelper/DashGateBlock.placements.name.block=Dash Gate Block (Stone)
-entities.SorbetHelper/DashGateBlock.placements.name.temple=Dash Gate Block (Temple)
-entities.SorbetHelper/DashGateBlock.placements.name.mirror=Dash Gate Block (Mirror)
-entities.SorbetHelper/DashGateBlock.placements.name.stars=Dash Gate Block (Moon)
+entities.SorbetHelper/DashGateBlock.placements.name.block=Gate Block (Dash Activated, Stone)
+entities.SorbetHelper/DashGateBlock.placements.name.temple=Gate Block (Dash Activated, Temple)
+entities.SorbetHelper/DashGateBlock.placements.name.mirror=Gate Block (Dash Activated, Mirror)
+entities.SorbetHelper/DashGateBlock.placements.name.stars=Gate Block (Dash Activated, Moon)
+
 entities.SorbetHelper/DashGateBlock.attributes.description.iconSprite=The texture for the icon in the center of the gate block.
 entities.SorbetHelper/DashGateBlock.attributes.description.inactiveColor=The gate icon colour when not triggered yet.
 entities.SorbetHelper/DashGateBlock.attributes.description.activeColor=The gate icon colour when the block is moving.
@@ -56,10 +57,11 @@ entities.SorbetHelper/DashGateBlock.attributes.description.smoke=If the gate blo
 entities.SorbetHelper/DashGateBlock.attributes.description.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
 
 # Touch Gate Block
-entities.SorbetHelper/TouchGateBlock.placements.name.block=Touch Gate Block (Stone)
-entities.SorbetHelper/TouchGateBlock.placements.name.temple=Touch Gate Block (Temple)
-entities.SorbetHelper/TouchGateBlock.placements.name.mirror=Touch Gate Block (Mirror)
-entities.SorbetHelper/TouchGateBlock.placements.name.stars=Touch Gate Block (Moon)
+entities.SorbetHelper/TouchGateBlock.placements.name.block=Gate Block (Touch Activated, Stone)
+entities.SorbetHelper/TouchGateBlock.placements.name.temple=Gate Block (Touch Activated, Temple)
+entities.SorbetHelper/TouchGateBlock.placements.name.mirror=Gate Block (Touch Activated, Mirror)
+entities.SorbetHelper/TouchGateBlock.placements.name.stars=Gate Block (Touch Activated, Moon)
+
 entities.SorbetHelper/TouchGateBlock.attributes.description.iconSprite=The texture for the icon in the center of the gate block.
 entities.SorbetHelper/TouchGateBlock.attributes.description.inactiveColor=The gate icon colour when not triggered yet.
 entities.SorbetHelper/TouchGateBlock.attributes.description.activeColor=The gate icon colour when the block is moving.
@@ -75,10 +77,11 @@ entities.SorbetHelper/TouchGateBlock.attributes.description.smoke=If the gate bl
 entities.SorbetHelper/TouchGateBlock.attributes.description.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
 
 # Linked Gate Block
-entities.SorbetHelper/LinkedGateBlock.placements.name.block=Linked Gate Block (Stone)
-entities.SorbetHelper/LinkedGateBlock.placements.name.temple=Linked Gate Block (Temple)
-entities.SorbetHelper/LinkedGateBlock.placements.name.mirror=Linked Gate Block (Mirror)
-entities.SorbetHelper/LinkedGateBlock.placements.name.stars=Linked Gate Block (Moon)
+entities.SorbetHelper/LinkedGateBlock.placements.name.block=Gate Block (Link Activated, Stone)
+entities.SorbetHelper/LinkedGateBlock.placements.name.temple=Gate Block (Link Activated, Temple)
+entities.SorbetHelper/LinkedGateBlock.placements.name.mirror=Gate Block (Link Activated, Mirror)
+entities.SorbetHelper/LinkedGateBlock.placements.name.stars=Gate Block (Link Activated, Moon)
+
 entities.SorbetHelper/LinkedGateBlock.attributes.description.iconSprite=The texture for the icon in the center of the gate block.
 entities.SorbetHelper/LinkedGateBlock.attributes.description.inactiveColor=The gate icon colour when not triggered yet.
 entities.SorbetHelper/LinkedGateBlock.attributes.description.activeColor=The gate icon colour when the block is moving.
