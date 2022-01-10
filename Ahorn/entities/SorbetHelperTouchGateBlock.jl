@@ -3,7 +3,7 @@ module SorbetHelperTouchGateBlock
 using ..Ahorn, Maple
 
 # Most of this is copy-pasted from MaxHelpingHand's Flag Switch Gates since I dislike writing Ahorn plugins
-# Due to this I do not take full credit of the code here
+# https://github.com/max4805/MaxHelpingHand/blob/master/Ahorn/entities/maxHelpingHandFlagSwitchGate.jl
 
 @pardef TouchGateBlock(x1::Integer, y1::Integer, x2::Integer=x1+16, y2::Integer=y1, width::Integer=Maple.defaultBlockWidth, height::Integer=Maple.defaultBlockHeight,
     blockSprite::String="block", iconSprite::String="SorbetHelper/gateblock/touch/icon", inactiveColor::String="4EF3CF", activeColor::String="FFFFFF", finishColor::String="FFF175",

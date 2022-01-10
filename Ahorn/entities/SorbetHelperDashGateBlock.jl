@@ -3,7 +3,7 @@ module SorbetHelperDashGateBlock
 using ..Ahorn, Maple
 
 # Most of this is copy-pasted from MaxHelpingHand's Flag Switch Gates since I dislike writing Ahorn plugins
-# Due to this I do not take full credit of the code here
+# https://github.com/max4805/MaxHelpingHand/blob/master/Ahorn/entities/maxHelpingHandFlagSwitchGate.jl
 
 @pardef DashGateBlock(x1::Integer, y1::Integer, x2::Integer=x1+16, y2::Integer=y1, width::Integer=Maple.defaultBlockWidth, height::Integer=Maple.defaultBlockHeight,
     blockSprite::String="block", iconSprite::String="SorbetHelper/gateblock/dash/icon", inactiveColor::String="F86593", activeColor::String="FFFFFF", finishColor::String="62A1F5",

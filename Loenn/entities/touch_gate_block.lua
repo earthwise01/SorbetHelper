@@ -1,6 +1,9 @@
 local drawableNinePatch = require("structs.drawable_nine_patch")
 local drawableSprite = require("structs.drawable_sprite")
 
+-- Some of this plugin is copy-pasted from MaxHelpingHand's Flag Switch Gates
+-- https://github.com/max4805/MaxHelpingHand/blob/master/Loenn/entities/flagSwitchGate.lua
+
 local touchGateBlock = {}
 
 touchGateBlock.name = "SorbetHelper/TouchGateBlock"

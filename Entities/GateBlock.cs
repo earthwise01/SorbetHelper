@@ -13,8 +13,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
     [Tracked]
     public class GateBlock : Solid {
 
-        // A large chunk of this code is copy-pasted from MaxHelpingHand's Flag Switch Gates as I didn't want to have to bother with cleaning up the vanilla code
-        // Due to this I do not take full credit of the code here
+        // A bunch of code here is copy-pasted from MaxHelpingHand's Flag Switch Gates as I didn't want to have to bother with cleaning up the vanilla code
+        // https://github.com/max4805/MaxHelpingHand/blob/master/Entities/FlagSwitchGate.cs
         // Methods which are copied from MaxHelpingHand are marked accordingly
 
         private ParticleType P_RecoloredFire;
@@ -52,7 +52,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public string iconSprite;
 
         public GateBlock(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, data.Height, safe: false) {
-            // Mostly copied from MaxHelpingHand's Flag Switch Gates, with a few slight changes to better support how this entity is used
+            // Mostly copied from MaxHelpingHand's Flag Switch Gates, with some slight changes to better support how this entity is used
             ID = data.ID;
 
             if (data.Nodes.Length > 0) {
@@ -82,6 +82,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 Color = inactiveColor
             };
 
+            // Set up icon
             icon = new Sprite(GFX.Game, "objects/" + iconSprite);
             Add(icon);
             icon.Add("spin", "", 0.1f, "spin");
@@ -156,7 +157,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         public IEnumerator Sequence(Vector2 node) {
-            // Mostly copied from MaxHelpingHand's Flag Swith Gates with some slight changes here and there to better support how this entity is used
+            // Mostly copied from MaxHelpingHand's Flag Swith Gates with some slight changes to better support how this entity is used
             Vector2 start = Position;
 
             Color fromColor, toColor;
