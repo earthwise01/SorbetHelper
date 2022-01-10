@@ -35,6 +35,7 @@ entities.SorbetHelper/DashFallingBlock.attributes.description.depth=Determines w
 entities.SorbetHelper/DashFallingBlock.attributes.description.shakeSfx=The sound the block should play before it falls.
 entities.SorbetHelper/DashFallingBlock.attributes.description.impactSfx=The sound the block should play either when it lands on the ground or is dashed into.
 entities.SorbetHelper/DashFallingBlock.attributes.description.tiletype=Changes the visual appearance of the falling block.
+entities.SorbetHelper/DashFallingBlock.attributes.description.allowWavedash=If it is possible to wavedash on top of the block.
 
 # Dash Gate Block
 entities.SorbetHelper/DashGateBlock.placements.name.block=Gate Block (Dash Activated, Stone)

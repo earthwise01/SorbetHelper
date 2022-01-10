@@ -14,6 +14,7 @@ using ..Ahorn, Maple
     climbFall::Bool=true,
     fallOnStaticMover::Bool=false,
     depth::Integer=-9000,
+    allowWavedash::Bool=false,
 )
 
 const placements = Ahorn.PlacementDict(
@@ -48,6 +49,6 @@ Ahorn.selection(entity::DashFallingBlock) = Ahorn.getEntityRectangle(entity)
 
 Ahorn.renderAbs(ctx::Ahorn.Cairo.CairoContext, entity::DashFallingBlock, room::Maple.Room) = Ahorn.drawTileEntity(ctx, room, entity)
 
-Ahorn.editingOrder(entity::DashFallingBlock) = String["x", "y", "width", "height", "shakeSfx", "impactSfx", "tiletype", "depth", "fallOnTouch", "climbFall", "fallOnStaticMover"]
+Ahorn.editingOrder(entity::DashFallingBlock) = String["x", "y", "width", "height", "shakeSfx", "impactSfx", "tiletype", "depth", "fallOnTouch", "climbFall", "fallOnStaticMover", "allowWavedash"]
 
 end
