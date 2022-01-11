@@ -37,4 +37,93 @@ entities.SorbetHelper/DashFallingBlock.attributes.description.impactSfx=The soun
 entities.SorbetHelper/DashFallingBlock.attributes.description.tiletype=Changes the visual appearance of the falling block.
 entities.SorbetHelper/DashFallingBlock.attributes.description.allowWavedash=If it is possible to wavedash on top of the block.
 
+# Dash Gate Block
+entities.SorbetHelper/DashGateBlock.placements.name.block=Gate Block (Dash Activated, Stone)
+entities.SorbetHelper/DashGateBlock.placements.name.temple=Gate Block (Dash Activated, Temple)
+entities.SorbetHelper/DashGateBlock.placements.name.mirror=Gate Block (Dash Activated, Mirror)
+entities.SorbetHelper/DashGateBlock.placements.name.stars=Gate Block (Dash Activated, Moon)
+
+entities.SorbetHelper/DashGateBlock.placements.description.block=A Switch Gate like block which activates if the player dashes into it.
+entities.SorbetHelper/DashGateBlock.placements.description.temple=A Switch Gate like block which activates if the player dashes into it.
+entities.SorbetHelper/DashGateBlock.placements.description.mirror=A Switch Gate like block which activates if the player dashes into it.
+entities.SorbetHelper/DashGateBlock.placements.description.stars=A Switch Gate like block which activates if the player dashes into it.
+
+entities.SorbetHelper/DashGateBlock.attributes.description.iconSprite=The texture for the icon in the center of the gate block.
+entities.SorbetHelper/DashGateBlock.attributes.description.inactiveColor=The gate icon colour when not triggered yet.
+entities.SorbetHelper/DashGateBlock.attributes.description.activeColor=The gate icon colour when the block is moving.
+entities.SorbetHelper/DashGateBlock.attributes.description.finishColor=The gate icon colour when the block has reached its destination.
+entities.SorbetHelper/DashGateBlock.attributes.description.blockSprite=The texture for the gate block.
+entities.SorbetHelper/DashGateBlock.attributes.description.shakeTime=The time (in seconds) the block spends shaking before starting to move. Default value is 0.5 seconds.
+entities.SorbetHelper/DashGateBlock.attributes.description.moveTime=The time (in seconds) the block takes to move to its destination after shaking. Default value is 1.8 seconds.
+entities.SorbetHelper/DashGateBlock.attributes.description.moveEased=If the block should slow down before reaching its final position. If unchecked, the block will move at constant speed.
+entities.SorbetHelper/DashGateBlock.attributes.description.moveSound=The sound played by the gate when it starts moving.
+entities.SorbetHelper/DashGateBlock.attributes.description.finishedSound=The sound played by the gate when it is done moving.
+entities.SorbetHelper/DashGateBlock.attributes.description.allowWavedash=If you can wavedash on top of the block.
+entities.SorbetHelper/DashGateBlock.attributes.description.dashCornerCorrection=Makes wallbouncing off of the gate block less precise (by allowing it up to 4 pixels deep into the block horizontally, dashing from the bottom).
+entities.SorbetHelper/DashGateBlock.attributes.description.smoke=If the gate block should emit smoke when reaching its final position.
+entities.SorbetHelper/DashGateBlock.attributes.description.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
+entities.SorbetHelper/DashGateBlock.attributes.description.linked=If the gate block can activate/be activated by other gate blocks sharing the same link tag.
+entities.SorbetHelper/DashGateBlock.attributes.description.linkTag=The link tag used to pair with other gate blocks, any gate blocks sharing this link tag will be activated when this gate block is activated (and vice versa).\n(needs 'Linked' enabled)
+
+# Touch Gate Block
+entities.SorbetHelper/TouchGateBlock.placements.name.block=Gate Block (Touch Activated, Stone)
+entities.SorbetHelper/TouchGateBlock.placements.name.temple=Gate Block (Touch Activated, Temple)
+entities.SorbetHelper/TouchGateBlock.placements.name.mirror=Gate Block (Touch Activated, Mirror)
+entities.SorbetHelper/TouchGateBlock.placements.name.stars=Gate Block (Touch Activated, Moon)
+
+entities.SorbetHelper/TouchGateBlock.placements.description.block=A Switch Gate like block which activates if the player touches it.
+entities.SorbetHelper/TouchGateBlock.placements.description.temple=A Switch Gate like block which activates if the player touches it.
+entities.SorbetHelper/TouchGateBlock.placements.description.mirror=A Switch Gate like block which activates if the player touches it.
+entities.SorbetHelper/TouchGateBlock.placements.description.stars=A Switch Gate like block which activates if the player touches it.
+
+entities.SorbetHelper/TouchGateBlock.attributes.description.iconSprite=The texture for the icon in the center of the gate block.
+entities.SorbetHelper/TouchGateBlock.attributes.description.inactiveColor=The gate icon colour when not triggered yet.
+entities.SorbetHelper/TouchGateBlock.attributes.description.activeColor=The gate icon colour when the block is moving.
+entities.SorbetHelper/TouchGateBlock.attributes.description.finishColor=The gate icon colour when the block has reached its destination.
+entities.SorbetHelper/TouchGateBlock.attributes.description.blockSprite=The texture for the gate block.
+entities.SorbetHelper/TouchGateBlock.attributes.description.shakeTime=The time (in seconds) the block spends shaking before starting to move. Default value is 0.5 seconds.
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveTime=The time (in seconds) the block takes to move to its destination after shaking. Default value is 1.8 seconds.
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveEased=If the block should slow down before reaching its final position. If unchecked, the block will move at constant speed.
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveSound=The sound played by the gate when it starts moving.
+entities.SorbetHelper/TouchGateBlock.attributes.description.finishedSound=The sound played by the gate when it is done moving.
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnGrab=If the gate block should move if the player climbs on its sides.
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnStaticMoverInteract=If the gate block can be activated by static movers (such as springs) attached to it.
+entities.SorbetHelper/TouchGateBlock.attributes.description.smoke=If the gate block should emit smoke when reaching its final position.
+entities.SorbetHelper/TouchGateBlock.attributes.description.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
+entities.SorbetHelper/TouchGateBlock.attributes.description.linked=If the gate block can activate/be activated by other gate blocks sharing the same link tag.
+entities.SorbetHelper/TouchGateBlock.attributes.description.linkTag=The link tag used to pair with other gate blocks, any gate blocks sharing this link tag will be activated when this gate block is activated (and vice versa).\n(needs 'Linked' enabled)
+
+# Linked Gate Block
+entities.SorbetHelper/LinkedGateBlock.placements.name.block=Gate Block (Link Activated, Stone)
+entities.SorbetHelper/LinkedGateBlock.placements.name.temple=Gate Block (Link Activated, Temple)
+entities.SorbetHelper/LinkedGateBlock.placements.name.mirror=Gate Block (Link Activated, Mirror)
+entities.SorbetHelper/LinkedGateBlock.placements.name.stars=Gate Block (Link Activated, Moon)
+
+entities.SorbetHelper/LinkedGateBlock.placements.description.block=A Switch Gate like block which activates if it shares its link tag with another Gate Block that gets activated.
+entities.SorbetHelper/LinkedGateBlock.placements.description.temple=A Switch Gate like block which activates if it shares its link tag with another Gate Block that gets activated.
+entities.SorbetHelper/LinkedGateBlock.placements.description.mirror=A Switch Gate like block which activates if it shares its link tag with another Gate Block that gets activated.
+entities.SorbetHelper/LinkedGateBlock.placements.description.stars=A Switch Gate like block which activates if it shares its link tag with another Gate Block that gets activated.
+
+entities.SorbetHelper/LinkedGateBlock.attributes.description.iconSprite=The texture for the icon in the center of the gate block.
+entities.SorbetHelper/LinkedGateBlock.attributes.description.inactiveColor=The gate icon colour when not triggered yet.
+entities.SorbetHelper/LinkedGateBlock.attributes.description.activeColor=The gate icon colour when the block is moving.
+entities.SorbetHelper/LinkedGateBlock.attributes.description.finishColor=The gate icon colour when the block has reached its destination.
+entities.SorbetHelper/LinkedGateBlock.attributes.description.blockSprite=The texture for the gate block.
+entities.SorbetHelper/LinkedGateBlock.attributes.description.shakeTime=The time (in seconds) the block spends shaking before starting to move. Default value is 0.5 seconds.
+entities.SorbetHelper/LinkedGateBlock.attributes.description.moveTime=The time (in seconds) the block takes to move to its destination after shaking. Default value is 1.8 seconds.
+entities.SorbetHelper/LinkedGateBlock.attributes.description.moveEased=If the block should slow down before reaching its final position. If unchecked, the block will move at constant speed.
+entities.SorbetHelper/LinkedGateBlock.attributes.description.moveSound=The sound played by the gate when it starts moving.
+entities.SorbetHelper/LinkedGateBlock.attributes.description.finishedSound=The sound played by the gate when it is done moving.
+entities.SorbetHelper/LinkedGateBlock.attributes.description.smoke=If the gate block should emit smoke when reaching its final position.
+entities.SorbetHelper/LinkedGateBlock.attributes.description.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
+entities.SorbetHelper/LinkedGateBlock.attributes.description.linkTag=The link tag used to pair with other gate blocks, any gate blocks sharing this link tag will also activate this gate block when they are activated.
+
+# -- Triggers --
+
+# Linked Gate Block Activator
+triggers.SorbetHelper/LinkedGateBlockActivatorTrigger.placements.name.linked_gate_block_activator_trigger=Linked Gate Block Activator
+triggers.SorbetHelper/LinkedGateBlockActivatorTrigger.attributes.description.linkTag=The link tag used to pair with gate blocks, any gate blocks sharing this link tag will be activated when the player enters this trigger.
+triggers.SorbetHelper/LinkedGateBlockActivatorTrigger.attributes.description.flag=The flag that needs to be set in order for the trigger to be collidable, leaving this empty causes the trigger to always be collidable.
+triggers.SorbetHelper/LinkedGateBlockActivatorTrigger.attributes.description.inverted=When checked, the trigger will only be collidable when the associated flag is disabled, rather than only when the associated flag is enabled.
+
 mods.SorbetHelper.name=Sorbet Helper
