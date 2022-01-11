@@ -175,14 +175,6 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             return Triggered;
         }
 
-        public virtual void PlayMoveSounds() {
-            openSfx.Play(moveSound);
-        }
-
-        public virtual void PlayFinishedSounds() {
-            Audio.Play(finishedSound, Position);
-        }
-
         public IEnumerator Sequence(Vector2 node) {
             // Mostly copied from MaxHelpingHand's Flag Swith Gates with some slight changes to better support how this entity is used
             Vector2 start = Position;
@@ -201,7 +193,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             yield return 0.1f;
 
             // animate the icon
-            PlayMoveSounds();
+            openSfx.Play(moveSound);
             if (shakeTime > 0f) {
                 StartShaking(shakeTime);
                 while (icon.Rate < 1f) {
@@ -298,7 +290,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             Collidable = collidableBackup;
 
             // moving is over
-            PlayFinishedSounds();
+            Audio.Play(finishedSound, Position);
             StartShaking(0.2f);
             while (icon.Rate > 0f) {
                 icon.Color = Color.Lerp(activeColor, toColor, 1f - icon.Rate);

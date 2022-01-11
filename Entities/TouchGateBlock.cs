@@ -26,6 +26,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             if (!Triggered && moveOnStaticMover) {
                 Triggered = true;
                 TriggerLinked();
+                Audio.Play("event:/game/general/fallblock_shake", Position);
             }
         }
 
@@ -33,13 +34,9 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             if (!Triggered && (moveOnGrab && HasPlayerRider()) || (!moveOnGrab && HasPlayerOnTop())) {
                 Triggered = true;
                 TriggerLinked();
+                Audio.Play("event:/game/general/fallblock_shake", Position);
             }
             return base.TriggerCheck();
-        }
-
-        public override void PlayMoveSounds() {
-            base.PlayMoveSounds();
-            Audio.Play("event:/game/general/fallblock_shake", Position);
         }
 
     }
