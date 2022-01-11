@@ -80,6 +80,7 @@ entities.SorbetHelper/TouchGateBlock.attributes.description.smoke=If the gate bl
 entities.SorbetHelper/TouchGateBlock.attributes.description.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
 entities.SorbetHelper/TouchGateBlock.attributes.description.linked=If the gate block can activate/be activated by other gate blocks sharing the same link tag.
 entities.SorbetHelper/TouchGateBlock.attributes.description.linkTag=The link tag used to pair with other gate blocks, other gate blocks need to share this link tag in order for the gate to be able to pair with them.\n(needs 'Linked' enabled)
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnStaticMoverInteract=If the gate block can be activated by static movers (such as springs) attached to it.
 
 # Linked Gate Block
 entities.SorbetHelper/LinkedGateBlock.placements.name.block=Gate Block (Link Activated, Stone)

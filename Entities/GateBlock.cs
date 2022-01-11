@@ -161,6 +161,16 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             base.Render();
         }
 
+        public void TriggerLinked() {
+            if (linked) {
+                foreach (GateBlock gateBlock in Scene.Tracker.GetEntities<GateBlock>()) {
+                    if (!gateBlock.Triggered && gateBlock.linked && gateBlock.linkTag == linkTag) {
+                        gateBlock.Triggered = true;
+                    }
+                }
+            }
+        }
+
         public virtual bool TriggerCheck() {
             return Triggered;
         }

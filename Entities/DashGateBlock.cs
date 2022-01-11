@@ -25,13 +25,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             if (!Triggered) {
                 (Scene as Level).DirectionalShake(dir);
                 Triggered = true;
-                if (linked) {
-                    foreach (GateBlock gateBlock in Scene.Tracker.GetEntities<GateBlock>()) {
-                        if (gateBlock.linked && gateBlock.linkTag == linkTag) {
-                            gateBlock.Triggered = true;
-                        }
-                    }
-                }
+                TriggerLinked();
                 Audio.Play("event:/game/general/wall_break_stone", base.Center);
                 Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
                 if (allowWavedash && dir.Y == 1)

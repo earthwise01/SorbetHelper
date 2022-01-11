@@ -71,6 +71,7 @@ placements.entities.SorbetHelper/LinkedGateBlock.tooltips.finishedSound=The soun
 placements.entities.SorbetHelper/LinkedGateBlock.tooltips.smoke=If the gate block should emit smoke when reaching its final position.
 placements.entities.SorbetHelper/LinkedGateBlock.tooltips.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
 placements.entities.SorbetHelper/LinkedGateBlock.tooltips.linkTag=The link tag used to pair with other gate blocks, other gate blocks need to share this link tag in order for the gate to be able to pair with them.
+placements.entities.SorbetHelper/LinkedGateBlock.tooltips.moveOnStaticMoverInteract=If the gate block can be activated by static movers (such as springs) attached to it.
 
 # -- Triggers --
 

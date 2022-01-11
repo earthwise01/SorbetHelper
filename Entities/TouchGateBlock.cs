@@ -15,21 +15,24 @@ namespace Celeste.Mod.SorbetHelper.Entities {
     public class TouchGateBlock : GateBlock {
 
         private bool moveOnGrab;
+        private bool moveOnStaticMover;
 
         public TouchGateBlock(EntityData data, Vector2 offset) : base(data, offset) {
             moveOnGrab = data.Bool("moveOnGrab", true);
+            moveOnStaticMover = data.Bool("moveOnStaticMoverInteract", false);
+        }
+
+        public override void OnStaticMoverTrigger(StaticMover sm) {
+            if (!Triggered && moveOnStaticMover) {
+                Triggered = true;
+                TriggerLinked();
+            }
         }
 
         public override bool TriggerCheck() {
             if (!Triggered && (moveOnGrab && HasPlayerRider()) || (!moveOnGrab && HasPlayerOnTop())) {
                 Triggered = true;
-                if (linked) {
-                    foreach (GateBlock gateBlock in Scene.Tracker.GetEntities<GateBlock>()) {
-                        if (gateBlock.linked && gateBlock.linkTag == linkTag) {
-                            gateBlock.Triggered = true;
-                        }
-                    }
-                }
+                TriggerLinked();
             }
             return base.TriggerCheck();
         }
