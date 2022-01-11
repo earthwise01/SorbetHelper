@@ -15,14 +15,20 @@ namespace Celeste.Mod.SorbetHelper.Entities {
     public class DashGateBlock : GateBlock {
 
         private bool allowWavedash;
+        private bool dashCornerCorrection;
 
         public DashGateBlock(EntityData data, Vector2 offset) : base(data, offset) {
             allowWavedash = data.Bool("allowWavedash", false);
+            dashCornerCorrection = data.Bool("dashCornerCorrection", false);
             OnDashCollide = OnDashCollision;
         }
 
         public DashCollisionResults OnDashCollision(Player player, Vector2 dir) {
             if (!Triggered) {
+                // Make wallbouncing easier if dash corner correction is enabled
+                if ((player.Left >= Right - 4f || player.Right < Left + 4f) && dir.Y == -1 && dashCornerCorrection)
+                    return DashCollisionResults.NormalCollision;
+                // Trigger the gate and if it is linked trigger any linked gates as well
                 (Scene as Level).DirectionalShake(dir);
                 Triggered = true;
                 TriggerLinked();

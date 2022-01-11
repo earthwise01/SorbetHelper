@@ -34,6 +34,7 @@ placements.entities.SorbetHelper/DashGateBlock.tooltips.moveEased=If the block s
 placements.entities.SorbetHelper/DashGateBlock.tooltips.moveSound=The sound played by the gate when it starts moving.
 placements.entities.SorbetHelper/DashGateBlock.tooltips.finishedSound=The sound played by the gate when it is done moving.
 placements.entities.SorbetHelper/DashGateBlock.tooltips.allowWavedash=If it is possible to wavedash on top of the block.
+placements.entities.SorbetHelper/DashGateBlock.tooltips.dashCornerCorrection=Makes wallbouncing off of the gate block less precise (by allowing it up to 4 pixels deep into the block horizontally, dashing from the bottom).
 placements.entities.SorbetHelper/DashGateBlock.tooltips.smoke=If the gate block should emit smoke when reaching its final position.
 placements.entities.SorbetHelper/DashGateBlock.tooltips.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
 placements.entities.SorbetHelper/DashGateBlock.tooltips.linked=If the gate block can activate/be activated by other gate blocks sharing the same link tag.
