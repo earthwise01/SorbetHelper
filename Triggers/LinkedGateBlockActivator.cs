@@ -26,9 +26,11 @@ namespace Celeste.Mod.SorbetHelper.Triggers {
 
         public override void OnEnter(Player player) {
             base.OnEnter(player);
-            foreach (GateBlock gateBlock in Scene.Tracker.GetEntities<GateBlock>()) {
-                if (!gateBlock.Triggered && gateBlock.linked && gateBlock.linkTag == linkTag) {
-                    gateBlock.Triggered = true;
+            if (!string.IsNullOrEmpty(linkTag)) {
+                foreach (GateBlock gateBlock in Scene.Tracker.GetEntities<GateBlock>()) {
+                    if (!gateBlock.Triggered && gateBlock.linked && gateBlock.linkTag == linkTag) {
+                        gateBlock.Triggered = true;
+                    }
                 }
             }
         }
