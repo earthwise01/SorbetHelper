@@ -21,6 +21,7 @@ placements.entities.SorbetHelper/DashFallingBlock.tooltips.shakeSfx=The sound th
 placements.entities.SorbetHelper/DashFallingBlock.tooltips.impactSfx=The sound the block should play either when it lands on the ground or is dashed into.
 placements.entities.SorbetHelper/DashFallingBlock.tooltips.tiletype=Changes the visual appearance of the falling block.
 placements.entities.SorbetHelper/DashFallingBlock.tooltips.allowWavedash=If it is possible to wavedash on top of the block.
+placements.entities.SorbetHelper/DashFallingBlock.tooltips.dashCornerCorrection=Makes wallbouncing off of the block less precise (by allowing it up to 4 pixels deep into the block horizontally, dashing from the bottom).
 
 # Dash Gate Block
 placements.entities.SorbetHelper/DashGateBlock.tooltips.iconSprite=The texture for the icon in the center of the gate block.

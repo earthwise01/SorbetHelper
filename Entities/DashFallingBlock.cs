@@ -18,6 +18,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public bool fallOnTouch;
         public bool fallOnStaticMover;
         public bool allowWavedash;
+        private bool dashCornerCorrection;
 
         private Wiggler bounce;
         private Shaker shaker;
@@ -44,6 +45,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             fallOnTouch = data.Bool("fallOnTouch", false);
             fallOnStaticMover = data.Bool("fallOnStaticMover", false);
             allowWavedash = data.Bool("allowWavedash", false);
+            dashCornerCorrection = data.Bool("dashCornerCorrection", false);
             base.Depth = data.Int("depth", base.Depth);
             bounce = Wiggler.Create(1f, 0.5f);
             bounce.StartZero = false;
@@ -54,6 +56,10 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         public DashCollisionResults OnDashCollision(Player player, Vector2 dir) {
             if (!isTriggered) {
+                // Make wallbouncing easier if dash corner correction is enabled
+                if ((player.Left >= Right - 4f || player.Right < Left + 4f) && dir.Y == -1 && dashCornerCorrection)
+                    return DashCollisionResults.NormalCollision;
+                // Trigger the block
                 (Scene as Level).DirectionalShake(dir);
                 shaker.On = true;
                 bounce.Start();
