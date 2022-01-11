@@ -13,7 +13,7 @@ entities.SorbetHelper/FlagToggledKillbox.attributes.description.inverted=When ch
 # Kill Zone
 entities.SorbetHelper/KillZone.placements.name.killzone=Kill Zone
 entities.SorbetHelper/KillZone.placements.description.killzone=Kills the player on contact, can also be flag toggled.
-entities.SorbetHelper/KillZone.attributes.description.flag=The flag that needs to be set in order for the kill zone to be activated.
+entities.SorbetHelper/KillZone.attributes.description.flag=The flag that needs to be set in order for the kill zone to be activated, leaving this empty causes the kill zone to always be active.
 entities.SorbetHelper/KillZone.attributes.description.inverted=When checked, the kill zone will only be active when the associated flag is disabled rather than only when the associated flag is enabled.
 entities.SorbetHelper/KillZone.attributes.description.fastKill=When checked, the player will die instantly upon touching the kill zone rather than getting knocked back a bit first.
 
@@ -27,13 +27,13 @@ entities.SorbetHelper/ReturnBerry.attributes.description.winged=When checked, th
 # Dash Falling Block
 entities.SorbetHelper/DashFallingBlock.placements.name.falling_block=Dash Falling Block
 entities.SorbetHelper/DashFallingBlock.placements.description.falling_block=A falling block that only gets activated once the player dashes into it.
-entities.SorbetHelper/DashFallingBlock.attributes.description.climbFall=If the block should fall if the player climbs on its sides. (note: needs Fall on Touch enabled in order to work)
+entities.SorbetHelper/DashFallingBlock.attributes.description.climbFall=If the block should fall if the player climbs on its sides.\n(needs 'Fall On Touch' enabled)
 entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnTouch=If the block should fall if it comes in contact with the player, even if they don't dash into it.
-entities.SorbetHelper/DashFallingBlock.attributes.name.fallOnStaticMover=Fall On Static Mover Interaction
-entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnStaticMover=If the block should fall if a static mover attached to it is interacted with.
-entities.SorbetHelper/DashFallingBlock.attributes.description.depth=Determines what visual layer the block should be on. (note: higher values mean further behind in the scene, default value is -9000)
-entities.SorbetHelper/DashFallingBlock.attributes.description.shakeSfx=The sound the block should play before it falls.
-entities.SorbetHelper/DashFallingBlock.attributes.description.impactSfx=The sound the block should play either when it lands on the ground or is dashed into.
+entities.SorbetHelper/DashFallingBlock.attributes.name.fallOnStaticMover=Fall On Static Mover Interact
+entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnStaticMover=If the falling block can be activated by static movers (such as springs) attached to it.
+entities.SorbetHelper/DashFallingBlock.attributes.description.depth=Determines what visual layer the block should be on (higher values mean further behind in the scene, default value is -9000).
+entities.SorbetHelper/DashFallingBlock.attributes.description.shakeSfx=The sound played by the block before it falls.
+entities.SorbetHelper/DashFallingBlock.attributes.description.impactSfx=The sound played by the block either when it lands on the ground or is dashed into.
 entities.SorbetHelper/DashFallingBlock.attributes.description.tiletype=Changes the visual appearance of the falling block.
 entities.SorbetHelper/DashFallingBlock.attributes.description.allowWavedash=If it is possible to wavedash on top of the block.
 entities.SorbetHelper/DashFallingBlock.attributes.description.dashCornerCorrection=Makes wallbouncing off of the block less precise (by allowing it up to 4 pixels deep into the block horizontally, dashing from the bottom).
@@ -62,7 +62,7 @@ entities.SorbetHelper/DashGateBlock.attributes.description.finishedSound=The sou
 entities.SorbetHelper/DashGateBlock.attributes.description.allowWavedash=If you can wavedash on top of the block.
 entities.SorbetHelper/DashGateBlock.attributes.description.dashCornerCorrection=Makes wallbouncing off of the gate block less precise (by allowing it up to 4 pixels deep into the block horizontally, dashing from the bottom).
 entities.SorbetHelper/DashGateBlock.attributes.description.smoke=If the gate block should emit smoke when reaching its final position.
-entities.SorbetHelper/DashGateBlock.attributes.description.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
+entities.SorbetHelper/DashGateBlock.attributes.description.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThe gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
 entities.SorbetHelper/DashGateBlock.attributes.description.linked=If the gate block can activate/be activated by other gate blocks sharing the same link tag.
 entities.SorbetHelper/DashGateBlock.attributes.description.linkTag=The link tag used to pair with other gate blocks, any gate blocks sharing this link tag will be activated when this gate block is activated (and vice versa).\n(needs 'Linked' enabled)
 
@@ -90,7 +90,7 @@ entities.SorbetHelper/TouchGateBlock.attributes.description.finishedSound=The so
 entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnGrab=If the gate block should move if the player climbs on its sides.
 entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnStaticMoverInteract=If the gate block can be activated by static movers (such as springs) attached to it.
 entities.SorbetHelper/TouchGateBlock.attributes.description.smoke=If the gate block should emit smoke when reaching its final position.
-entities.SorbetHelper/TouchGateBlock.attributes.description.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
+entities.SorbetHelper/TouchGateBlock.attributes.description.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThe gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
 entities.SorbetHelper/TouchGateBlock.attributes.description.linked=If the gate block can activate/be activated by other gate blocks sharing the same link tag.
 entities.SorbetHelper/TouchGateBlock.attributes.description.linkTag=The link tag used to pair with other gate blocks, any gate blocks sharing this link tag will be activated when this gate block is activated (and vice versa).\n(needs 'Linked' enabled)
 
@@ -116,7 +116,7 @@ entities.SorbetHelper/LinkedGateBlock.attributes.description.moveEased=If the bl
 entities.SorbetHelper/LinkedGateBlock.attributes.description.moveSound=The sound played by the gate when it starts moving.
 entities.SorbetHelper/LinkedGateBlock.attributes.description.finishedSound=The sound played by the gate when it is done moving.
 entities.SorbetHelper/LinkedGateBlock.attributes.description.smoke=If the gate block should emit smoke when reaching its final position.
-entities.SorbetHelper/LinkedGateBlock.attributes.description.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
+entities.SorbetHelper/LinkedGateBlock.attributes.description.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThe gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
 entities.SorbetHelper/LinkedGateBlock.attributes.description.linkTag=The link tag used to pair with other gate blocks, any gate blocks sharing this link tag will also activate this gate block when they are activated.
 
 # -- Triggers --
