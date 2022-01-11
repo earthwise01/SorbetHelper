@@ -37,7 +37,7 @@ placements.entities.SorbetHelper/DashGateBlock.tooltips.allowWavedash=If it is p
 placements.entities.SorbetHelper/DashGateBlock.tooltips.smoke=If the gate block should emit smoke when reaching its final position.
 placements.entities.SorbetHelper/DashGateBlock.tooltips.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
 placements.entities.SorbetHelper/DashGateBlock.tooltips.linked=If the gate block can activate/be activated by other gate blocks sharing the same link tag.
-placements.entities.SorbetHelper/DashGateBlock.tooltips.linkTag=The link tag used to pair with other gate blocks, other gate blocks need to share this link tag in order for the gate to be able to pair with them.\n(needs 'Linked' enabled)
+placements.entities.SorbetHelper/DashGateBlock.tooltips.linkTag=The link tag used to pair with other gate blocks, any gate blocks sharing this link tag will be activated when this gate block is activated (and vice versa).\n(needs 'Linked' enabled)
 
 
 # Touch Gate Block
@@ -52,10 +52,11 @@ placements.entities.SorbetHelper/TouchGateBlock.tooltips.moveEased=If the block 
 placements.entities.SorbetHelper/TouchGateBlock.tooltips.moveSound=The sound played by the gate when it starts moving.
 placements.entities.SorbetHelper/TouchGateBlock.tooltips.finishedSound=The sound played by the gate when it is done moving.
 placements.entities.SorbetHelper/TouchGateBlock.tooltips.moveOnGrab=If the gate block should move if the player climbs on its sides.
+placements.entities.SorbetHelper/TouchGateBlock.tooltips.moveOnStaticMoverInteract=If the gate block can be activated by static movers (such as springs) attached to it.
 placements.entities.SorbetHelper/TouchGateBlock.tooltips.smoke=If the gate block should emit smoke when reaching its final position.
 placements.entities.SorbetHelper/TouchGateBlock.tooltips.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
 placements.entities.SorbetHelper/TouchGateBlock.tooltips.linked=If the gate block can activate/be activated by other gate blocks sharing the same link tag.
-placements.entities.SorbetHelper/TouchGateBlock.tooltips.linkTag=The link tag used to pair with other gate blocks, other gate blocks need to share this link tag in order for the gate to be able to pair with them.\n(needs 'Linked' enabled)
+placements.entities.SorbetHelper/TouchGateBlock.tooltips.linkTag=The link tag used to pair with other gate blocks, any gate blocks sharing this link tag will be activated when this gate block is activated (and vice versa).\n(needs 'Linked' enabled)
 
 # Linked Gate Block
 placements.entities.SorbetHelper/LinkedGateBlock.tooltips.iconSprite=The texture for the icon in the center of the gate block.
@@ -70,8 +71,7 @@ placements.entities.SorbetHelper/LinkedGateBlock.tooltips.moveSound=The sound pl
 placements.entities.SorbetHelper/LinkedGateBlock.tooltips.finishedSound=The sound played by the gate when it is done moving.
 placements.entities.SorbetHelper/LinkedGateBlock.tooltips.smoke=If the gate block should emit smoke when reaching its final position.
 placements.entities.SorbetHelper/LinkedGateBlock.tooltips.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThis gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
-placements.entities.SorbetHelper/LinkedGateBlock.tooltips.linkTag=The link tag used to pair with other gate blocks, other gate blocks need to share this link tag in order for the gate to be able to pair with them.
-placements.entities.SorbetHelper/LinkedGateBlock.tooltips.moveOnStaticMoverInteract=If the gate block can be activated by static movers (such as springs) attached to it.
+placements.entities.SorbetHelper/LinkedGateBlock.tooltips.linkTag=The link tag used to pair with other gate blocks, any gate blocks sharing this link tag will also activate this gate block when they are activated.
 
 # -- Triggers --
 
