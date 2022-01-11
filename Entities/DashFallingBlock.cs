@@ -20,9 +20,6 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public bool allowWavedash;
         private bool dashCornerCorrection;
 
-        private Wiggler bounce;
-        private Shaker shaker;
-
         public bool isTriggered;
 
         public static void Load() {
@@ -47,10 +44,6 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             allowWavedash = data.Bool("allowWavedash", false);
             dashCornerCorrection = data.Bool("dashCornerCorrection", false);
             base.Depth = data.Int("depth", base.Depth);
-            bounce = Wiggler.Create(1f, 0.5f);
-            bounce.StartZero = false;
-            Add(bounce);
-            Add(shaker = new Shaker(on: false));
             OnDashCollide = OnDashCollision;
         }
 
@@ -61,8 +54,6 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                     return DashCollisionResults.NormalCollision;
                 // Trigger the block
                 (Scene as Level).DirectionalShake(dir);
-                shaker.On = true;
-                bounce.Start();
                 isTriggered = true;
                 Audio.Play(impactSfx, base.Center);
                 if (allowWavedash && dir.Y == 1)
