@@ -43,6 +43,11 @@ entities.SorbetHelper/DashGateBlock.placements.name.temple=Gate Block (Dash Acti
 entities.SorbetHelper/DashGateBlock.placements.name.mirror=Gate Block (Dash Activated, Mirror)
 entities.SorbetHelper/DashGateBlock.placements.name.stars=Gate Block (Dash Activated, Moon)
 
+entities.SorbetHelper/DashGateBlock.placements.description.block=A Switch Gate like block which activates if the player dashes into it.
+entities.SorbetHelper/DashGateBlock.placements.description.temple=A Switch Gate like block which activates if the player dashes into it.
+entities.SorbetHelper/DashGateBlock.placements.description.mirror=A Switch Gate like block which activates if the player dashes into it.
+entities.SorbetHelper/DashGateBlock.placements.description.stars=A Switch Gate like block which activates if the player dashes into it.
+
 entities.SorbetHelper/DashGateBlock.attributes.description.iconSprite=The texture for the icon in the center of the gate block.
 entities.SorbetHelper/DashGateBlock.attributes.description.inactiveColor=The gate icon colour when not triggered yet.
 entities.SorbetHelper/DashGateBlock.attributes.description.activeColor=The gate icon colour when the block is moving.
@@ -66,6 +71,11 @@ entities.SorbetHelper/TouchGateBlock.placements.name.temple=Gate Block (Touch Ac
 entities.SorbetHelper/TouchGateBlock.placements.name.mirror=Gate Block (Touch Activated, Mirror)
 entities.SorbetHelper/TouchGateBlock.placements.name.stars=Gate Block (Touch Activated, Moon)
 
+entities.SorbetHelper/TouchGateBlock.placements.description.block=A Switch Gate like block which activates if the player touches it.
+entities.SorbetHelper/TouchGateBlock.placements.description.temple=A Switch Gate like block which activates if the player touches it.
+entities.SorbetHelper/TouchGateBlock.placements.description.mirror=A Switch Gate like block which activates if the player touches it.
+entities.SorbetHelper/TouchGateBlock.placements.description.stars=A Switch Gate like block which activates if the player touches it.
+
 entities.SorbetHelper/TouchGateBlock.attributes.description.iconSprite=The texture for the icon in the center of the gate block.
 entities.SorbetHelper/TouchGateBlock.attributes.description.inactiveColor=The gate icon colour when not triggered yet.
 entities.SorbetHelper/TouchGateBlock.attributes.description.activeColor=The gate icon colour when the block is moving.
@@ -88,6 +98,11 @@ entities.SorbetHelper/LinkedGateBlock.placements.name.block=Gate Block (Link Act
 entities.SorbetHelper/LinkedGateBlock.placements.name.temple=Gate Block (Link Activated, Temple)
 entities.SorbetHelper/LinkedGateBlock.placements.name.mirror=Gate Block (Link Activated, Mirror)
 entities.SorbetHelper/LinkedGateBlock.placements.name.stars=Gate Block (Link Activated, Moon)
+
+entities.SorbetHelper/LinkedGateBlock.placements.description.block=A Switch Gate like block which activates if it shares its link tag with another Gate Block that gets activated.
+entities.SorbetHelper/LinkedGateBlock.placements.description.temple=A Switch Gate like block which activates if it shares its link tag with another Gate Block that gets activated.
+entities.SorbetHelper/LinkedGateBlock.placements.description.mirror=A Switch Gate like block which activates if it shares its link tag with another Gate Block that gets activated.
+entities.SorbetHelper/LinkedGateBlock.placements.description.stars=A Switch Gate like block which activates if it shares its link tag with another Gate Block that gets activated.
 
 entities.SorbetHelper/LinkedGateBlock.attributes.description.iconSprite=The texture for the icon in the center of the gate block.
 entities.SorbetHelper/LinkedGateBlock.attributes.description.inactiveColor=The gate icon colour when not triggered yet.
