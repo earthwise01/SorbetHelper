@@ -81,13 +81,10 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         private static bool onPlayerFallCheck(On.Celeste.FallingBlock.orig_PlayerFallCheck orig, FallingBlock self) {
             if (self is DashFallingBlock block) {
-                if (block.isTriggered) {
-                    return true;
-                } else if (!block.fallOnTouch) {
-                    return false;
-                } else if (orig(self)) {
-                    block.isTriggered = true;
+                if (!block.isTriggered && block.fallOnTouch) {
+                    block.isTriggered = orig(self);
                 }
+                return block.isTriggered;
             }
             return orig(self);
         }
