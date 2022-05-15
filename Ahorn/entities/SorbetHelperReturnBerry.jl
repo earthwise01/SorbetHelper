@@ -9,6 +9,7 @@ using ..Ahorn, Maple
     x::Integer,
     y::Integer,
     winged::Bool=false,
+    delay::Number=0.3,
     checkpointID::Integer=-1,
     order::Integer=-1,
 )

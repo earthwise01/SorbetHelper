@@ -14,9 +14,11 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 	public class ReturnBerry : Strawberry {
 
 		private Vector2[] nodes;
+		public float delay;
 
 		public ReturnBerry(EntityData data, Vector2 offset, EntityID gid) : base(data, offset, gid) {
 			nodes = data.NodesOffset(offset);
+			delay = data.Float("delay", 0.3f);
 			Add(new PlayerCollider(OnPlayer));
 			// Creates a strawberry seed list with no strawberry seeds to effectively remove them.
 			if (data.Nodes != null && data.Nodes.Length != 0) {
@@ -34,7 +36,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 		}
 
 		private IEnumerator NodeRoutine(Player player) {
-			yield return 0.3f;
+			yield return delay;
 			// If the player is still alive, put them in the CassetteFly state
 			if (!player.Dead) {
 				Audio.Play("event:/game/general/cassette_bubblereturn", SceneAs<Level>().Camera.Position + new Vector2(160f, 90f));

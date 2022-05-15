@@ -20,6 +20,7 @@ return_berry.placements = {
         placementType = "point",
         data = {
             winged = false,
+            delay = 0.3,
             nodes = {
                 {x = 0, y = 0},
                 {x = 0, y = 0}
@@ -31,6 +32,7 @@ return_berry.placements = {
         placementType = "point",
         data = {
             winged = true,
+            delay = 0.3,
             nodes = {
                 {x = 0, y = 0},
                 {x = 0, y = 0}
