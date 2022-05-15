@@ -13,16 +13,24 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 	[RegisterStrawberry(true, false)]
 	public class ReturnBerry : Strawberry {
 
+		private bool isGhostBerry;
+
 		private Vector2[] nodes;
 		public float delay;
 
 		public ReturnBerry(EntityData data, Vector2 offset, EntityID gid) : base(data, offset, gid) {
 			nodes = data.NodesOffset(offset);
 			delay = data.Float("delay", 0.3f);
+			isGhostBerry = SaveData.Instance.CheckStrawberry(ID);
 			Add(new PlayerCollider(OnPlayer));
 			// Creates a strawberry seed list with no strawberry seeds to effectively remove them.
 			if (data.Nodes != null && data.Nodes.Length != 0) {
 				Seeds = new List<StrawberrySeed>();
+				if (data.Nodes.Length > 2) {
+					for (int i = 2; i < data.Nodes.Length; i++) {
+						Seeds.Add(new StrawberrySeed(this, offset + data.Nodes[i], i, isGhostBerry));
+					}
+				}
 			}
 		}
 
