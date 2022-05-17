@@ -8,8 +8,11 @@ placements.entities.SorbetHelper/KillZone.tooltips.inverted=When checked, the ki
 placements.entities.SorbetHelper/KillZone.tooltips.fastKill=When checked, the player will die instantly upon touching the kill zone rather than getting knocked back a bit first.
 
 
-# Strawberry (With Return)
-placements.entities.SorbetHelper/ReturnBerry.tooltips.winged=When checked, the strawberry will have wings.
+# Strawberry (With Node Based Return)
+placements.entities.SorbetHelper/ReturnBerry.tooltips.winged=Determines whether the strawberry has wings.
+placements.entities.SorbetHelper/ReturnBerry.tooltips.delay=The delay (in seconds) before the player is placed into a bubble after grabbing the strawberry.
+placements.entities.SorbetHelper/ReturnBerry.tooltips.checkpointID=Manually determine what checkpoint section strawberries are visually grouped up in, showing up on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)
+placements.entities.SorbetHelper/ReturnBerry.tooltips.order=Manually determine what order strawberries are visually placed in on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)
 
 # Dash Falling Block
 placements.entities.SorbetHelper/DashFallingBlock.tooltips.climbFall=If the block should fall if the player climbs on its sides.\n(needs 'Fall On Touch' enabled)

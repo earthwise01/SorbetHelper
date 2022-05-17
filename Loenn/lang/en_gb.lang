@@ -17,12 +17,15 @@ entities.SorbetHelper/KillZone.attributes.description.flag=The flag that needs t
 entities.SorbetHelper/KillZone.attributes.description.inverted=When checked, the kill zone will only be active when the associated flag is disabled rather than only when the associated flag is enabled.
 entities.SorbetHelper/KillZone.attributes.description.fastKill=When checked, the player will die instantly upon touching the kill zone rather than getting knocked back a bit first.
 
-# Strawberry (With Return)
+# Strawberry (With Node Based Return)
 entities.SorbetHelper/ReturnBerry.placements.name.normal=Strawberry (With Node Based Return)
 entities.SorbetHelper/ReturnBerry.placements.name.winged=Strawberry (Winged, With Node Based Return)
-entities.SorbetHelper/ReturnBerry.placements.description.normal=Same as a vanilla Strawberry except when the player collects it, they are put into a bubble and moved along a series of nodes.
-entities.SorbetHelper/ReturnBerry.placements.description.winged=Same as a vanilla Strawberry (Winged) except when the player collects it, they are put into a bubble and moved along a series of nodes.
-entities.SorbetHelper/ReturnBerry.attributes.description.winged=When checked, the strawberry will have wings.
+entities.SorbetHelper/ReturnBerry.placements.description.normal=Similar to a Strawberry, but when the player grabs it they are placed into a bubble and moved along a path of nodes.
+entities.SorbetHelper/ReturnBerry.placements.description.winged=Similar to a Strawberry (Winged), but when the player grabs it they are placed into a bubble and moved along a path of nodes.
+entities.SorbetHelper/ReturnBerry.attributes.description.winged=Determines whether the strawberry has wings.
+entities.SorbetHelper/ReturnBerry.attributes.description.delay=The delay (in seconds) before the player is placed into a bubble after grabbing the strawberry.
+entities.SorbetHelper/ReturnBerry.attributes.description.checkpointID=Manually determine what checkpoint section strawberries are visually grouped up in, showing up on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)
+entities.SorbetHelper/ReturnBerry.attributes.description.order=Manually determine what order strawberries are visually placed in on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)
 
 # Dash Falling Block
 entities.SorbetHelper/DashFallingBlock.placements.name.falling_block=Dash Falling Block
