@@ -12,7 +12,12 @@ namespace Celeste.Mod.SorbetHelper.Entities {
     [Tracked(false)]
     [CustomEntity("SorbetHelper/DashFallingBlock")]
     public class DashFallingBlock : FallingBlock {
-        
+
+        /*
+         * the implementation for scale and hitOffset (and how they affect the appearance of the block) is based on code from Communal Helper's Station Blocks
+         * https://github.com/CommunalHelper/CommunalHelper/blob/dev/src/Entities/StationBlock/StationBlock.cs
+         */
+
         public string shakeSfx;
         public string impactSfx;
         public bool fallOnTouch;
@@ -22,8 +27,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         public bool isTriggered;
         public TileGrid tilegrid;
-        public Vector2 hitOffset;
         public Vector2 scale = Vector2.One;
+        public Vector2 hitOffset;
 
         public static void Load() {
             On.Celeste.FallingBlock.Sequence += onSequence;
@@ -40,8 +45,10 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         public DashFallingBlock(EntityData data, Vector2 offset) : base(data, offset) {
+            // remove the TileGrid added by the vanilla falling block
             DynamicData fallingBlockData = new DynamicData(this);
             Remove(fallingBlockData.Get<TileGrid>("tiles"));
+
             shakeSfx = data.Attr("shakeSfx", "event:/game/general/fallblock_shake");
             impactSfx = data.Attr("impactSfx", "event:/game/general/fallblock_impact");
             fallOnTouch = data.Bool("fallOnTouch", false);
@@ -49,31 +56,43 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             allowWavedash = data.Bool("allowWavedash", false);
             dashCornerCorrection = data.Bool("dashCornerCorrection", false);
             base.Depth = data.Int("depth", base.Depth);
+
+            // generate the TileGrid
             char tile = data.Char("tiletype", '3');
             int newSeed = Calc.Random.Next();
             Calc.PushRandom(newSeed);
             Add(tilegrid = GFX.FGAutotiler.GenerateBox(tile, data.Width / 8, data.Height / 8).TileGrid);
             Calc.PopRandom();
             Add(new TileInterceptor(tilegrid, highPriority: false));
+            // make the tilegrid invisible since we want to render it manually later
+            tilegrid.Alpha = 0f;
+
             OnDashCollide = OnDashCollision;
         }
 
         public DashCollisionResults OnDashCollision(Player player, Vector2 dir) {
             if (!isTriggered) {
-                // Make wallbouncing easier if dash corner correction is enabled
-                if ((player.Left >= Right - 4f || player.Right < Left + 4f) && dir.Y == -1 && dashCornerCorrection)
+                // make wallbouncing easier if dash corner correction is enabled
+                if ((player.Left >= Right - 4f || player.Right < Left + 4f) && dir.Y == -1 && dashCornerCorrection) {
                     return DashCollisionResults.NormalCollision;
-                // Trigger the block
+                }
+
+                // trigger the block
                 (Scene as Level).DirectionalShake(dir);
                 isTriggered = true;
                 Audio.Play(impactSfx, base.Center);
+
+                // emit the dust particles and update the scale and hitOffset
                 ActivateParticles(-dir);
                 scale = new Vector2(
-                    1f + Math.Abs(dir.Y) * 0.35f - Math.Abs(dir.X) * 0.35f,
-                    1f + Math.Abs(dir.X) * 0.35f - Math.Abs(dir.Y) * 0.35f);
+                    1f + Math.Abs(dir.Y) * 0.3f - Math.Abs(dir.X) * 0.3f,
+                    1f + Math.Abs(dir.X) * 0.3f - Math.Abs(dir.Y) * 0.3f
+                );
                 hitOffset = dir * 5f;
-                if (allowWavedash && dir.Y == 1)
+
+                if (allowWavedash && dir.Y == 1) {
                     return DashCollisionResults.NormalCollision;
+                }
                 return DashCollisionResults.Rebound;
             }
 
@@ -94,16 +113,13 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         public override void Render() {
-            tilegrid.Alpha = 0f;
 
             base.Render();
 
-            tilegrid.Alpha = 1f;
-
+            // TileGrids can't have their scale changed, so we have to render the block manually
             Vector2 position = Position + tilegrid.Position;
 
             var clip = tilegrid.GetClippedRenderTiles();
-            //MTexture tile;
 
             for (int tx = clip.Left; tx < clip.Right; tx++) {
                 for (int ty = clip.Top; ty < clip.Bottom; ty++) {
@@ -111,8 +127,6 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                     vec.X = Center.X + (vec.X - Center.X) * scale.X;
                     vec.Y = Center.Y + (vec.Y - Center.Y) * scale.Y;
 
-                    //tile = tiles.Tiles[tx, ty];
-                    //if (tile != null)
                     tilegrid.Tiles[tx, ty].DrawCentered(vec, Color.White, scale);
                 }
             }
@@ -120,6 +134,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         public override void Update() {
             base.Update();
+            // ease scale and hitOffset towards their default values
             scale.X = Calc.Approach(scale.X, 1f, Engine.DeltaTime * 4f);
             scale.Y = Calc.Approach(scale.Y, 1f, Engine.DeltaTime * 4f);
             hitOffset.X = Calc.Approach(hitOffset.X, 0f, Engine.DeltaTime * 15f);
@@ -160,6 +175,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         private void ActivateParticles(Vector2 dir) {
+            // copied from the vanilla CrushBlock code
 			float direction;
 			Vector2 position;
 			Vector2 positionRange;
