@@ -122,6 +122,15 @@ entities.SorbetHelper/LinkedGateBlock.attributes.description.smoke=If the gate b
 entities.SorbetHelper/LinkedGateBlock.attributes.description.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThe gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
 entities.SorbetHelper/LinkedGateBlock.attributes.description.linkTag=The link tag used to pair with other gate blocks, any gate blocks sharing this link tag will also activate this gate block when they are activated.
 
+entities.SorbetHelper/CrumbleOnFlagBlock.placements.name.crumble_on_flag_block=Crumble On Flag Block
+entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.blendin=Blends the block in with the walls it touches, making it less apparent.
+entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.tiletype=Determines the visual appearance of the block.
+entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.inverted=When checked, the block will only be visible when the associated flag is disabled rather than only when the associated flag is enabled.
+entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.flag=The flag that needs to be set in order for the block to break.
+entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.showDebris=Determines whether the block spawns debris when it breaks.
+entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.playAudio=Determines whether the block plays sound effects when breaking/appearing.
+entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.depth=Determines what visual layer the block should be on (higher values mean further behind in the scene, default value is -10010).
+
 # -- Triggers --
 
 # Linked Gate Block Activator
