@@ -83,12 +83,17 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 Audio.Play(impactSfx, base.Center);
 
                 // emit the dust particles and update the scale and hitOffset
-                ActivateParticles(-dir);
+                for (int i = 2; (float)i <= base.Width; i += 4) {
+				    if (!base.Scene.CollideCheck<Solid>(base.BottomLeft + new Vector2(i, 3f))) {
+                        SceneAs<Level>().Particles.Emit(P_FallDustB, 1, new Vector2(base.X + (float)i, base.Bottom), Vector2.One * 4f);
+                        SceneAs<Level>().Particles.Emit(P_FallDustA, 1, new Vector2(base.X + (float)i, base.Bottom), Vector2.One * 4f);
+				    }
+			    }
                 scale = new Vector2(
-                    1f + Math.Abs(dir.Y) * 0.3f - Math.Abs(dir.X) * 0.3f,
-                    1f + Math.Abs(dir.X) * 0.3f - Math.Abs(dir.Y) * 0.3f
+                    1f + Math.Abs(dir.Y) * 0.28f - Math.Abs(dir.X) * 0.28f,
+                    1f + Math.Abs(dir.X) * 0.28f - Math.Abs(dir.Y) * 0.28f
                 );
-                hitOffset = dir * 5f;
+                hitOffset = dir * 4.15f;
 
                 if (allowWavedash && dir.Y == 1) {
                     return DashCollisionResults.NormalCollision;
@@ -173,39 +178,5 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 orig(self);
             }
         }
-
-        private void ActivateParticles(Vector2 dir) {
-            // copied from the vanilla CrushBlock code
-			float direction;
-			Vector2 position;
-			Vector2 positionRange;
-			int num;
-			if (dir == Vector2.UnitX) {
-				direction = 0f;
-				position = base.CenterRight - Vector2.UnitX;
-				positionRange = Vector2.UnitY * (base.Height - 2f) * 0.5f;
-				num = (int)(base.Height / 8f) * 4;
-			}
-			else if (dir == -Vector2.UnitX) {
-				direction = (float)Math.PI;
-				position = base.CenterLeft + Vector2.UnitX;
-				positionRange = Vector2.UnitY * (base.Height - 2f) * 0.5f;
-				num = (int)(base.Height / 8f) * 4;
-			}
-			else if (dir == Vector2.UnitY) {
-				direction = (float)Math.PI / 2f;
-				position = base.BottomCenter - Vector2.UnitY;
-				positionRange = Vector2.UnitX * (base.Width - 2f) * 0.5f;
-				num = (int)(base.Width / 8f) * 4;
-			}
-			else {
-				direction = -(float)Math.PI / 2f;
-				position = base.TopCenter + Vector2.UnitY;
-				positionRange = Vector2.UnitX * (base.Width - 2f) * 0.5f;
-				num = (int)(base.Width / 8f) * 4;
-			}
-			num += 2;
-			SceneAs<Level>().Particles.Emit(P_LandDust, num, position, positionRange, direction);
-		}
     }
 }
