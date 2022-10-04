@@ -118,7 +118,10 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 				Vector2 position = (base.Scene as Level).Camera.Position;
 				//loopingSfx.Position = new Vector2(RenderPosition.X - base.X, Calc.Clamp(position.Y + 90f, base.Y, height) - base.Y);
                 loopingSfx.Position.Y = Calc.Clamp(position.Y + 90f, base.Y, height);
-
+			}
+			if (water != null || solid != null) {
+				Vector2 position2 = new Vector2(base.X + (width / 2f), base.Y + height + 2f);
+				(base.Scene as Level).ParticlesFG.Emit(Water.P_Splash, 1, position2, new Vector2((width / 2f) + 4f, 2f), new Vector2(0f, -1f).Angle());
 			}
 			base.Update();
 		}
