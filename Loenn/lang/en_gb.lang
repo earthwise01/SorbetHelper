@@ -131,6 +131,12 @@ entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.showDebris=Deter
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.playAudio=Determines whether the block plays sound effects when breaking/appearing.
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.depth=Determines what visual layer the block should be on (higher values mean further behind in the scene, default value is -10010).
 
+# resizable waterfall
+entities.SorbetHelper/BigWaterfall.placements.name.normal=Resizable Waterfall
+entities.SorbetHelper/BigWaterfall.placements.name.abovefg=Resizable Waterfall (Above Foreground)
+
+
+
 # -- Triggers --
 
 # Linked Gate Block Activator
