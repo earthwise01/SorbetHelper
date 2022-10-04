@@ -29,6 +29,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         private List<float> lines = new List<float>();
 
+		private Color baseColor;
+
 		private Color surfaceColor;
 
 		private Color fillColor;
@@ -40,17 +42,12 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public BigWaterfall(EntityData data, Vector2 offset) : base (data.Position + offset) {
             base.Tag = Tags.TransitionUpdate;
 
-            //layer = data.Enum("layer", Layers.BG);
 			width = data.Width;
             ignoreSolids = data.Bool("ignoreSolids");
-			//height = data.Height;
-			//if (layer == Layers.FG)
-			//{
 			base.Depth = data.Int("depth", -49900);
-			//parallax = 0.1f + Calc.Random.NextFloat() * 0.2f;
-			surfaceColor = Water.SurfaceColor;
-			fillColor = Water.FillColor;
-			//Add(new DisplacementRenderHook(RenderDisplacement));
+			baseColor = Calc.HexToColor(data.Attr("color", "87CEFA"));
+			surfaceColor = baseColor * 0.8f;
+			fillColor = baseColor * 0.3f;
 			lines.Add(3f);
 			lines.Add(width - 4f);
 			Add(loopingSfx = new SoundSource());
@@ -117,7 +114,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 				Vector2 position = (base.Scene as Level).Camera.Position;
                 loopingSfx.Position.Y = Calc.Clamp(position.Y + 90f, base.Y, height);
 			}
-			if (water != null && base.Scene.OnInterval(0.3f)) {
+			if (water != null && water.Active && water.TopSurface != null && base.Scene.OnInterval(0.3f)) {
 				water.TopSurface.DoRipple(new Vector2(base.X + (width / 2f), water.Y), 0.75f);
 				if (width >= 32) {
 					water.TopSurface.DoRipple(new Vector2(base.X + 8f, water.Y), 0.75f);
@@ -126,7 +123,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 			}
 			if (water != null || solid != null) {
 				Vector2 position2 = new Vector2(base.X + (width / 2f), base.Y + height + 2f);
-				(base.Scene as Level).ParticlesFG.Emit(Water.P_Splash, 1, position2, new Vector2((width / 2f) + 4f, 2f), new Vector2(0f, -1f).Angle());
+				(base.Scene as Level).ParticlesFG.Emit(Water.P_Splash, 1, position2, new Vector2((width / 2f) + 4f, 2f), baseColor, new Vector2(0f, -1f).Angle());
 			}
 			base.Update();
 		}
