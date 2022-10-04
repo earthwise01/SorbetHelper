@@ -113,11 +113,16 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 		}
 
         public override void Update() {
-		 	//sine += Engine.DeltaTime;
 			if (loopingSfx != null) {
 				Vector2 position = (base.Scene as Level).Camera.Position;
-				//loopingSfx.Position = new Vector2(RenderPosition.X - base.X, Calc.Clamp(position.Y + 90f, base.Y, height) - base.Y);
                 loopingSfx.Position.Y = Calc.Clamp(position.Y + 90f, base.Y, height);
+			}
+			if (water != null && base.Scene.OnInterval(0.3f)) {
+				water.TopSurface.DoRipple(new Vector2(base.X + (width / 2f), water.Y), 0.75f);
+				if (width >= 32) {
+					water.TopSurface.DoRipple(new Vector2(base.X + 8f, water.Y), 0.75f);
+					water.TopSurface.DoRipple(new Vector2(base.X + width - 8f, water.Y), 0.75f);
+				}
 			}
 			if (water != null || solid != null) {
 				Vector2 position2 = new Vector2(base.X + (width / 2f), base.Y + height + 2f);
