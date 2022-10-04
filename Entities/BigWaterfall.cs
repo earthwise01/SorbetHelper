@@ -22,6 +22,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         private bool ignoreSolids;
         private float height;
+		private bool hasLines;
 
         private Water water;
 		private Solid solid;
@@ -44,12 +45,15 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
 			width = data.Width;
             ignoreSolids = data.Bool("ignoreSolids");
+			hasLines = data.Bool("lines", true);
 			base.Depth = data.Int("depth", -49900);
 			baseColor = Calc.HexToColor(data.Attr("color", "87CEFA"));
 			surfaceColor = baseColor * 0.8f;
 			fillColor = baseColor * 0.3f;
-			lines.Add(3f);
-			lines.Add(width - 4f);
+			if (hasLines) {
+				lines.Add(3f);
+				lines.Add(width - 4f);
+			}
 			Add(loopingSfx = new SoundSource());
 			loopingSfx.Play("event:/env/local/waterfall_big_main");
 			//}
@@ -74,7 +78,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 					fade = 1f - f;
 				}
 			});*/
-			if (width > 16f) {
+			if (width > 16f && hasLines) {
 				int num = Calc.Random.Next((int)(width / 16f));
 				for (int i = 0; i < num; i++) {
 					lines.Add(8f + Calc.Random.NextFloat(width - 16f));
