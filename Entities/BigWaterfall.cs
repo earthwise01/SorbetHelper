@@ -39,6 +39,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 		//private float sine;
 
 		private SoundSource loopingSfx;
+		private SoundSource enteringSfx;
+
 
         public BigWaterfall(EntityData data, Vector2 offset) : base (data.Position + offset) {
             base.Tag = Tags.TransitionUpdate;
@@ -54,8 +56,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 				lines.Add(3f);
 				lines.Add(width - 4f);
 			}
-			Add(loopingSfx = new SoundSource());
-			loopingSfx.Play("event:/env/local/waterfall_big_main");
+			
 			//}
 			/*else
 			{
@@ -96,6 +97,16 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 				height += 8f;
 				solid = null;
 			}
+
+			/*if (water != null && !base.Scene.CollideCheck<Solid>(new Rectangle((int)base.X, (int)(base.Y + height), 8, 16)))
+			{
+				flag = true;
+			}*/
+			Add(loopingSfx = new SoundSource());
+			loopingSfx.Play(width <= 24 ? "event:/env/local/waterfall_small_main" : "event:/env/local/waterfall_big_main");
+			Add(enteringSfx = new SoundSource());
+			enteringSfx.Play((water != null && !base.Scene.CollideCheck<Solid>(new Rectangle((int)base.X, (int)(base.Y + height), 8, 16))) ? "event:/env/local/waterfall_small_in_deep" : "event:/env/local/waterfall_small_in_shallow");
+			enteringSfx.Position.Y = height;
 			/*if (water != null && !base.Scene.CollideCheck<Solid>(new Rectangle((int)base.X, (int)(base.Y + height), 8, 16)))
 			{
 				flag = true;
