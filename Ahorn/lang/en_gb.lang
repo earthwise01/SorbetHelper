@@ -87,6 +87,13 @@ placements.entities.SorbetHelper/CrumbleOnFlagBlock.tooltips.showDebris=Determin
 placements.entities.SorbetHelper/CrumbleOnFlagBlock.tooltips.playAudio=Determines whether the block plays sound effects when breaking/appearing.
 placements.entities.SorbetHelper/CrumbleOnFlagBlock.tooltips.depth=Determines what visual layer the block should be on (higher values mean further behind in the scene, default value is -10010).
 
+# resizable waterfall
+placements.entities.SorbetHelper/BigWaterfall.tooltips.color=The color of the waterfall.
+placements.entities.SorbetHelper/BigWaterfall.tooltips.ignoreSolids=When checked, the waterfall will ignore any solids in its way (e.g. foreground tiles). however, water can still block it.
+placements.entities.SorbetHelper/BigWaterfall.tooltips.lines=Determines whether the waterfall will have any additional lines for detail, disabling this will make the waterfall appear closer in appearance to a vanilla small waterfall as opposed to a big waterfall.
+placements.entities.SorbetHelper/BigWaterfall.tooltips.depth=Determines what visual layer the waterfall should be on (higher values mean further behind in the scene, default value is -9999 for the normal placement or -49900 for the above foreground placement).\nNote that this doesn't have any effect on the distortion effect. (meaning even if you set the waterfall to be in the background, the distortion will still exist in the foreground)
+
+
 # -- Triggers --
 
 # Linked Gate Block Activator
