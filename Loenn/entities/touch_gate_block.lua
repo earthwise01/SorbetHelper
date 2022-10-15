@@ -1,3 +1,7 @@
+return {}
+
+--[[
+
 local drawableNinePatch = require("structs.drawable_nine_patch")
 local drawableSprite = require("structs.drawable_sprite")
 
@@ -84,3 +88,5 @@ function touchGateBlock.sprite(room, entity)
 end
 
 return touchGateBlock
+
+]]--

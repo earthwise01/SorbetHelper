@@ -1,5 +1,7 @@
 module SorbetHelperTouchGateBlock
 
+#=
+
 using ..Ahorn, Maple
 
 # Most of this is copy-pasted from MaxHelpingHand's Flag Switch Gates since I dislike writing Ahorn plugins
@@ -117,5 +119,7 @@ function Ahorn.renderAbs(ctx::Ahorn.Cairo.CairoContext, entity::TouchGateBlock, 
 
     renderGateSwitch(ctx, entity, x, y, width, height, sprite)
 end
+
+=#
 
 end
