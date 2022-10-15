@@ -1,3 +1,7 @@
+return {}
+
+--[[
+
 local linkedGateBlockActivator = {}
 
 linkedGateBlockActivator.name = "SorbetHelper/LinkedGateBlockActivatorTrigger"
@@ -13,3 +17,5 @@ linkedGateBlockActivator.placements = {
 linkedGateBlockActivator.fieldOrder = {"x", "y", "width", "height", "linkTag", "flag", "inverted"}
 
 return linkedGateBlockActivator
+
+]]--
