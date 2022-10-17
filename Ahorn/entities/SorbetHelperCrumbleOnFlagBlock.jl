@@ -36,4 +36,6 @@ Ahorn.selection(entity::CrumbleOnFlagBlock) = Ahorn.getEntityRectangle(entity)
 
 Ahorn.renderAbs(ctx::Ahorn.Cairo.CairoContext, entity::CrumbleOnFlagBlock, room::Maple.Room) = Ahorn.drawTileEntity(ctx, room, entity)
 
+Ahorn.editingOrder(entity::CrumbleOnFlagBlock) = String["x", "y", "width", "height", "flag", "tiletype", "depth", "inverted", "blendin", "playAudio", "showDebris"]
+
 end
