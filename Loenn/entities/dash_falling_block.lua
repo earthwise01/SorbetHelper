@@ -23,6 +23,8 @@ fallingBlock.placements = {
 
 fallingBlock.sprite = fakeTilesHelper.getEntitySpriteFunction("tiletype", false)
 
+fallingBlock.fieldInformation = fakeTilesHelper.getFieldInformation("tiletype")
+
 fallingBlock.fieldOrder = {"x", "y", "width", "height", "shakeSfx", "impactSfx", "tiletype", "depth", "fallOnTouch", "climbFall", "fallOnStaticMover", "allowWavedash", "dashCornerCorrection"}
 
 return fallingBlock
