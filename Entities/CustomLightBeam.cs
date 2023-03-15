@@ -27,6 +27,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         public string Flag;
 
+        public bool Rainbow;
+
         private float timer = Calc.Random.NextFloat(1000f);
 
         public CustomLightBeam(EntityData data, Vector2 offset) : base(data.Position + offset) {
@@ -34,8 +36,9 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             base.Depth = -9998;
             LightWidth = data.Width;
             LightLength = data.Height;
-            Flag = data.Attr("flag");
-            Rotation = data.Float("rotation") * ((float)Math.PI / 180f);
+            Flag = data.Attr("flag", "");
+            Rainbow = data.Bool("rainbow", false);
+            Rotation = data.Float("rotation", 0f) * ((float)Math.PI / 180f);
         }
 
         public override void Update() {
@@ -69,8 +72,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 Vector2 position = Position - vector3 * 4f;
                 float num = Calc.Random.Next(LightWidth - 4) + 2 - LightWidth / 2;
                 position += num * vector3.Perpendicular();
-                level.Particles.Emit(LightBeam.P_Glow, position, Rotation + (float)Math.PI / 2f);
-            }
+                Color particleColor = Rainbow ? GetHue(position) : Color.White;
+                level.Particles.Emit(LightBeam.P_Glow, position, particleColor, Rotation + (float)Math.PI / 2f);                }
             base.Update();
         }
 
@@ -90,9 +93,18 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         private void DrawTexture(float offset, float width, float length, float a) {
             float rotation = Rotation + (float)Math.PI / 2f;
+            if (Rainbow) {
+                color = GetHue(Position + Calc.AngleToVector(Rotation, 1f) * offset);
+            }
             if (width >= 1f) {
                 texture.Draw(Position + Calc.AngleToVector(Rotation, 1f) * offset, new Vector2(0f, 0.5f), color * a * alpha, new Vector2(1f / (float)texture.Width * length, width), rotation);
             }
+        }
+
+        private Color GetHue(Vector2 position) {
+            float value = (position.Length() + Scene.TimeActive * 50f) % 280f / 280f;
+            float hue = 0.4f + Calc.YoYo(value) * 0.4f;
+            return Calc.HsvToColor(hue, 0.4f, 0.9f);
         }
     }
 }
