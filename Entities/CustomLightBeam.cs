@@ -3,6 +3,8 @@ using Celeste;
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Celeste.Mod.SorbetHelper.Entities {
 
@@ -13,9 +15,15 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         private Color color = new Color(0.8f, 1f, 1f);
 
+        private List<Color> rainbowColors = new List<Color>();
+        private float rainbowGradientSize;
+        private float rainbowGradientSpeed;
+        private bool rainbowLoopColors;
+        private Vector2 rainbowCenter;
+
         private float baseAlpha;
 
-        private float flagAlpha;
+        private float flagAlpha = 1;
 
         private float alpha;
 
@@ -37,8 +45,21 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             LightWidth = data.Width;
             LightLength = data.Height;
             Flag = data.Attr("flag", "");
-            Rainbow = data.Bool("rainbow", false);
             Rotation = data.Float("rotation", 0f) * ((float)Math.PI / 180f);
+            Rainbow = data.Bool("rainbow", false);
+
+            rainbowGradientSize = data.Float("gradientSize", 280f);
+            rainbowGradientSpeed = data.Float("gradientSpeed", 50f);
+            rainbowLoopColors = data.Bool("loopColors", false);
+            rainbowCenter = new Vector2(data.Float("centerX", 0), data.Float("centerY", 0));
+
+            string[] colorsAsStrings = data.Attr("colors", "89E5AE,88E0E0,87A9DD,9887DB,D088E2").Split(',');
+            for (int i = 0; i < colorsAsStrings.Length; i++) {
+                rainbowColors.Add(Calc.HexToColor(colorsAsStrings[i]));
+            }
+            if (rainbowLoopColors) {
+                rainbowColors.Add(rainbowColors[0]);
+            }
         }
 
         public override void Update() {
@@ -102,9 +123,27 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         private Color GetHue(Vector2 position) {
-            float value = (position.Length() + Scene.TimeActive * 50f) % 280f / 280f;
-            float hue = 0.4f + Calc.YoYo(value) * 0.4f;
-            return Calc.HsvToColor(hue, 0.4f, 0.9f);
+            if (rainbowColors.Count == 1) {
+                return rainbowColors[0];
+            }
+
+            float progress = (position - rainbowCenter).Length() + this.Scene.TimeActive * rainbowGradientSpeed;
+            while (progress < 0) {
+                progress += rainbowGradientSize;
+            }
+            progress = progress % rainbowGradientSize / rainbowGradientSize;
+            if (!rainbowLoopColors) {
+                progress = Calc.YoYo(progress);
+            }
+
+            if (progress == 1) {
+                return rainbowColors[rainbowColors.Count - 1];
+            }
+
+            float globalProgress = (rainbowColors.Count - 1) * progress;
+            int colorIndex = (int) globalProgress;
+            float progressInIndex = globalProgress - colorIndex;
+            return Color.Lerp(rainbowColors[colorIndex], rainbowColors[colorIndex + 1], progressInIndex);
         }
     }
 }
