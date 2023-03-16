@@ -34,6 +34,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public float Rotation;
 
         public string Flag;
+        public bool Inverted;
 
         public bool Rainbow;
 
@@ -45,6 +46,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             LightWidth = data.Width;
             LightLength = data.Height;
             Flag = data.Attr("flag", "");
+            Inverted = data.Bool("inverted", false);
             Rotation = data.Float("rotation", 0f) * ((float)Math.PI / 180f);
             Rainbow = data.Bool("rainbow", false);
 
@@ -80,7 +82,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             }
             if (!string.IsNullOrEmpty(Flag)) {
                 float flagTarget;
-                if (level.Session.GetFlag(Flag)) {
+                if ((!Inverted && !level.Session.GetFlag(Flag))
+                || (Inverted && level.Session.GetFlag(Flag))) {
                     flagTarget = 0f;
                 } else {
                     flagTarget = 1f;
