@@ -20,6 +20,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private float rainbowGradientSpeed;
         private bool rainbowLoopColors;
         private Vector2 rainbowCenter;
+        private bool rainbowSingleColor;
 
         private float baseAlpha = 1;
 
@@ -61,6 +62,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 rainbowGradientSpeed = data.Float("gradientSpeed", 50f);
                 rainbowLoopColors = data.Bool("loopColors", false);
                 rainbowCenter = new Vector2(data.Float("centerX", 0), data.Float("centerY", 0));
+                rainbowSingleColor = data.Bool("singleColor", false);
 
                 string[] colorsAsStrings = data.Attr("colors", "89E5AE,88E0E0,87A9DD,9887DB,D088E2").Split(',');
                 for (int i = 0; i < colorsAsStrings.Length; i++) {
@@ -116,12 +118,15 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 flagAlpha = Calc.Approach(flagAlpha, flagTarget, Engine.DeltaTime * 2f);
             }
             alpha = baseAlpha * flagAlpha;
+            if (Rainbow && rainbowSingleColor && level.OnInterval(0.08f)) {
+                color = GetHue(Position);
+            }
             if (alpha >= 0.5f && level.OnInterval(0.8f)) {
                 Vector2 vector3 = Calc.AngleToVector(Rotation + (float)Math.PI / 2f, 1f);
                 Vector2 position = Position - vector3 * 4f;
                 float num = Calc.Random.Next(LightWidth - 4) + 2 - LightWidth / 2;
                 position += num * vector3.Perpendicular();
-                level.Particles.Emit(LightBeam.P_Glow, position, Rainbow ? GetHue(position) : color, Rotation + (float)Math.PI / 2f);                }
+                level.Particles.Emit(LightBeam.P_Glow, position, (Rainbow && !rainbowSingleColor) ? GetHue(position) : color, Rotation + (float)Math.PI / 2f);                }
             base.Update();
         }
 
@@ -141,7 +146,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         private void DrawTexture(float offset, float width, float length, float a) {
             float rotation = Rotation + (float)Math.PI / 2f;
-            if (Rainbow) {
+            if (Rainbow && !rainbowSingleColor) {
                 color = GetHue(Position + Calc.AngleToVector(Rotation, 1f) * offset);
             }
             if (width >= 1f) {
