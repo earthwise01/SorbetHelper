@@ -48,6 +48,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             Flag = data.Attr("flag", "");
             Inverted = data.Bool("inverted", false);
             Rotation = data.Float("rotation", 0f) * ((float)Math.PI / 180f);
+            color = Calc.HexToColor(data.Attr("color", "CCFFFF"));
             Rainbow = data.Bool("rainbow", false);
 
             if (Rainbow) {
@@ -109,7 +110,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 Vector2 position = Position - vector3 * 4f;
                 float num = Calc.Random.Next(LightWidth - 4) + 2 - LightWidth / 2;
                 position += num * vector3.Perpendicular();
-                level.Particles.Emit(LightBeam.P_Glow, position, Rainbow ? GetHue(position) : Color.White, Rotation + (float)Math.PI / 2f);                }
+                level.Particles.Emit(LightBeam.P_Glow, position, Rainbow ? GetHue(position) : color, Rotation + (float)Math.PI / 2f);                }
             base.Update();
         }
 
