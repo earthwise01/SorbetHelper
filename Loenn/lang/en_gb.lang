@@ -141,8 +141,9 @@ entities.SorbetHelper/BigWaterfall.attributes.description.ignoreSolids=When chec
 entities.SorbetHelper/BigWaterfall.attributes.description.lines=Determines whether the waterfall will have any additional lines for detail, disabling this will make the waterfall appear closer in appearance to a vanilla small waterfall as opposed to a big waterfall.
 entities.SorbetHelper/BigWaterfall.attributes.description.depth=Determines what visual layer the waterfall should be on (higher values mean further behind in the scene, default value is -9999 for the normal placement or -49900 for the above foreground placement).\nNote that this doesn't have any effect on the distortion effect. (meaning even if you set the waterfall to be in the background, the distortion will still exist in the foreground)
 
-
-
+# custom/rainbow lightbeam
+entities.SorbetHelper/CustomLightbeam.placements.name.customlightbeam=Custom Lightbeam
+entities.SorbetHelper/CustomLightbeam.placements.name.rainbowlightbeam=Custom Lightbeam (Rainbow)
 
 # -- Triggers --
 
