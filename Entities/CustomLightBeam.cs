@@ -21,7 +21,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private bool rainbowLoopColors;
         private Vector2 rainbowCenter;
 
-        private float baseAlpha;
+        private float baseAlpha = 1;
 
         private float flagAlpha = 1;
 
@@ -38,6 +38,9 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         public bool Rainbow;
 
+        public bool FadeWhenNear = true;
+        public bool FadeOnTransition = true;
+
         private float timer = Calc.Random.NextFloat(1000f);
 
         public CustomLightBeam(EntityData data, Vector2 offset) : base(data.Position + offset) {
@@ -48,6 +51,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             Flag = data.Attr("flag", "");
             Inverted = data.Bool("inverted", false);
             Rotation = data.Float("rotation", 0f) * ((float)Math.PI / 180f);
+            FadeWhenNear = data.Bool("fadeWhenNear", true);
+            FadeOnTransition = data.Bool("fadeOnTransition", true);
             color = Calc.HexToColor(data.Attr("color", "CCFFFF"));
             Rainbow = data.Bool("rainbow", false);
 
@@ -76,6 +81,9 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             } else {
                 flagAlpha = 1f;
             }
+            if (level.Transitioning && FadeOnTransition) {
+                baseAlpha = 0f;
+            }
         }
 
         public override void Update() {
@@ -83,13 +91,16 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             Level level = base.Scene as Level;
             Player entity = base.Scene.Tracker.GetEntity<Player>();
             if (entity != null) {
-                Vector2 vector = Calc.AngleToVector(Rotation + (float)Math.PI / 2f, 1f);
-                Vector2 vector2 = Calc.ClosestPointOnLine(Position, Position + vector * 10000f, entity.Center);
-                float target = Math.Min(1f, Math.Max(0f, (vector2 - Position).Length() - 8f) / (float)LightLength);
-                if ((vector2 - entity.Center).Length() > (float)LightWidth / 2f) {
-                    target = 1f;
+                float target = 1f;
+                if (FadeWhenNear) {
+                    Vector2 vector = Calc.AngleToVector(Rotation + (float)Math.PI / 2f, 1f);
+                    Vector2 vector2 = Calc.ClosestPointOnLine(Position, Position + vector * 10000f, entity.Center);
+                    target = Math.Min(1f, Math.Max(0f, (vector2 - Position).Length() - 8f) / (float)LightLength);
+                    if ((vector2 - entity.Center).Length() > (float)LightWidth / 2f) {
+                        target = 1f;
+                    }
                 }
-                if (level.Transitioning) {
+                if (level.Transitioning && FadeOnTransition) {
                     target = 0f;
                 }
                 baseAlpha = Calc.Approach(baseAlpha, target, Engine.DeltaTime * 4f);
