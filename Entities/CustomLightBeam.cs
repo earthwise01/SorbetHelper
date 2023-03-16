@@ -50,17 +50,30 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             Rotation = data.Float("rotation", 0f) * ((float)Math.PI / 180f);
             Rainbow = data.Bool("rainbow", false);
 
-            rainbowGradientSize = data.Float("gradientSize", 280f);
-            rainbowGradientSpeed = data.Float("gradientSpeed", 50f);
-            rainbowLoopColors = data.Bool("loopColors", false);
-            rainbowCenter = new Vector2(data.Float("centerX", 0), data.Float("centerY", 0));
+            if (Rainbow) {
+                rainbowGradientSize = data.Float("gradientSize", 280f);
+                rainbowGradientSpeed = data.Float("gradientSpeed", 50f);
+                rainbowLoopColors = data.Bool("loopColors", false);
+                rainbowCenter = new Vector2(data.Float("centerX", 0), data.Float("centerY", 0));
 
-            string[] colorsAsStrings = data.Attr("colors", "89E5AE,88E0E0,87A9DD,9887DB,D088E2").Split(',');
-            for (int i = 0; i < colorsAsStrings.Length; i++) {
-                rainbowColors.Add(Calc.HexToColor(colorsAsStrings[i]));
+                string[] colorsAsStrings = data.Attr("colors", "89E5AE,88E0E0,87A9DD,9887DB,D088E2").Split(',');
+                for (int i = 0; i < colorsAsStrings.Length; i++) {
+                    rainbowColors.Add(Calc.HexToColor(colorsAsStrings[i]));
+                }
+                if (rainbowLoopColors) {
+                    rainbowColors.Add(rainbowColors[0]);
+                }
             }
-            if (rainbowLoopColors) {
-                rainbowColors.Add(rainbowColors[0]);
+        }
+
+        public override void Awake(Scene scene) {
+            base.Awake(scene);
+            Level level = base.Scene as Level;
+            if (!string.IsNullOrEmpty(Flag) && (!Inverted && !level.Session.GetFlag(Flag))
+            || (Inverted && level.Session.GetFlag(Flag))) {
+                flagAlpha = 0f;
+            } else {
+                flagAlpha = 1f;
             }
         }
 
@@ -96,8 +109,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 Vector2 position = Position - vector3 * 4f;
                 float num = Calc.Random.Next(LightWidth - 4) + 2 - LightWidth / 2;
                 position += num * vector3.Perpendicular();
-                Color particleColor = Rainbow ? GetHue(position) : Color.White;
-                level.Particles.Emit(LightBeam.P_Glow, position, particleColor, Rotation + (float)Math.PI / 2f);                }
+                level.Particles.Emit(LightBeam.P_Glow, position, Rainbow ? GetHue(position) : Color.White, Rotation + (float)Math.PI / 2f);                }
             base.Update();
         }
 
