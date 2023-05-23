@@ -15,6 +15,7 @@ lightBeam.placements = {
             inverted = false,
             rotation = 0.0,
             depth = -9998,
+            particles = true,
             color = "CCFFFF",
             rainbow = false,
             colors = "89E5AE,88E0E0,87A9DD,9887DB,D088E2",
@@ -37,6 +38,7 @@ lightBeam.placements = {
             inverted = false,
             rotation = 0.0,
             depth = -9998,
+            particles = true,
             color = "CCFFFF",
             rainbow = true,
             colors = "89E5AE,88E0E0,87A9DD,9887DB,D088E2",
@@ -65,12 +67,12 @@ function lightBeam.fieldOrder(entity)
     if entity.rainbow == true then
         fields = {
             "x", "y", "width", "height", "centerX", "centerY", "colors", "gradientSize", "gradientSpeed", "depth", "rotation", "flag",
-            "fadeWhenNear", "fadeOnTransition", "inverted", "rainbow", "loopColors", "singleColor"
+            "fadeWhenNear", "fadeOnTransition", "inverted", "rainbow", "loopColors", "singleColor", "particles"
         }
     else
         fields = {
             "x", "y", "width", "height", "color", "depth", "rotation", "flag",
-            "fadeWhenNear", "fadeOnTransition", "inverted", "rainbow"
+            "fadeWhenNear", "fadeOnTransition", "inverted", "rainbow", "particles"
         }
     end
     return fields
