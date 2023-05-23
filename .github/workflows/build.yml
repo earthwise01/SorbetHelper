@@ -40,7 +40,7 @@ jobs:
         name: SorbetHelper
         path: |
           everest.yml
-          bin/Debug/net452/SorbetHelper.dll
+          bin/SorbetHelper.dll
           Ahorn/
           Loenn/
           Graphics/
