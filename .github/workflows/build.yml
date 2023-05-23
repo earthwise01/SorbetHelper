@@ -30,7 +30,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build SorbetHelper.csproj --configuration Debug --no-restore
+      run: dotnet build SorbetHelper.csproj --configuration Release --no-restore
       env:
         CELESTEGAMEPATH: ${{ github.workspace }}/lib-stripped
 
