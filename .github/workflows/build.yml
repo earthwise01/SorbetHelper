@@ -39,7 +39,7 @@ jobs:
       with:
         name: SorbetHelper
         path: |
-          everest.yml
+          everest.yaml
           bin/SorbetHelper.dll
           Ahorn/
           Loenn/
