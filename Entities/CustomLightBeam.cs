@@ -46,7 +46,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         public CustomLightBeam(EntityData data, Vector2 offset) : base(data.Position + offset) {
             base.Tag = Tags.TransitionUpdate;
-            base.Depth = -9998;
+            base.Depth = data.Int("depth", -9998);
             LightWidth = data.Width;
             LightLength = data.Height;
             Flag = data.Attr("flag", "");
@@ -126,7 +126,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 Vector2 position = Position - vector3 * 4f;
                 float num = Calc.Random.Next(LightWidth - 4) + 2 - LightWidth / 2;
                 position += num * vector3.Perpendicular();
-                level.Particles.Emit(LightBeam.P_Glow, position, (Rainbow && !rainbowSingleColor) ? GetHue(position) : color, Rotation + (float)Math.PI / 2f);                }
+                level.Particles.Emit(LightBeam.P_Glow, position, (Rainbow && !rainbowSingleColor) ? GetHue(position) : color, Rotation + (float)Math.PI / 2f);
+            }
             base.Update();
         }
 
