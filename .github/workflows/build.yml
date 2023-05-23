@@ -26,7 +26,7 @@ jobs:
       run: unzip lib-stripped.zip
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
@@ -35,7 +35,7 @@ jobs:
         CELESTEGAMEPATH: ${{ github.workspace }}/lib-stripped
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3.1.2
       with:
         name: SorbetHelper
         path: |
