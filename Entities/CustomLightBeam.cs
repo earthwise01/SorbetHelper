@@ -31,7 +31,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private Vector2 rainbowCenter;
         private bool rainbowSingleColor;
 
-        public bool showParticles;
+        public bool noParticles;
 
         private float baseAlpha = 1;
         private float flagAlpha = 1;
@@ -58,7 +58,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             fadeWhenNear = data.Bool("fadeWhenNear", true);
             fadeOnTransition = data.Bool("fadeOnTransition", true);
 
-            showParticles = data.Bool("particles", true);
+            noParticles = data.Bool("noParticles", false);
             color = Calc.HexToColor(data.Attr("color", "CCFFFF"));
             rainbow = data.Bool("rainbow", false);
 
@@ -137,7 +137,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             }
 
             // emit particles
-            if (showParticles && alpha >= 0.5f && level.OnInterval(0.8f)) {
+            if (!noParticles && alpha >= 0.5f && level.OnInterval(0.8f)) {
                 Vector2 vector3 = Calc.AngleToVector(rotation + (float)Math.PI / 2f, 1f);
                 Vector2 position = Position - vector3 * 4f;
                 float num = Calc.Random.Next(lightWidth - 4) + 2 - lightWidth / 2;
