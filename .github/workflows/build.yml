@@ -1,0 +1,46 @@
+name: Build
+
+on:
+  push:
+    branches:
+        - '*'
+  pull_request:
+    branches:
+        - 'main'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download Everest lib-stripped
+      uses: robinraju/release-downloader@v1.4
+      with:
+        repository: EverestAPI/Everest
+        latest: true
+        fileName: lib-stripped.zip
+
+    - name: Extract lib-stripped.zip
+      run: unzip lib-stripped.zip
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build SorbetHelper.csproj --configuration Debug --no-restore
+      env:
+        CELESTEGAMEPATH: ${{ github.workspace }}/lib-stripped
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3.1.2
+      with:
+        name: SorbetHelper
+        path: |
+          everest.yml
+          bin/Debug/net452/SorbetHelper.dll
+          Ahorn/
+          Loenn/
+          Graphics/
