@@ -12,10 +12,12 @@ namespace Celeste.Mod.SorbetHelper {
 
         public override void Load() {
             DashFallingBlock.Load();
+            WingedStrawberryDirectionController.Load();
         }
 
         public override void Unload() {
             DashFallingBlock.Unload();
+            WingedStrawberryDirectionController.Unload();
         }
 
     }
