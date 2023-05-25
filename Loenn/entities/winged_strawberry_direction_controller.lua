@@ -4,7 +4,11 @@ directions = {
     "Up",
     "Down",
     "Left",
-    "Right"
+    "Right",
+    "UpLeft",
+    "UpRight",
+    "DownLeft",
+    "DownRight"
 }
 
 wingedStrawberryDirectionController.name = "SorbetHelper/WingedStrawberryDirectionController"

@@ -21,7 +21,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
     public class WingedStrawberryDirectionController : Entity {
 
         private static ILHook strawberryUpdateHook;
-        public enum Directions {Up, Down, Left, Right};
+        public enum Directions {Up, Down, Left, Right, UpLeft, UpRight, DownLeft, DownRight};
         public Directions direction;
         public WingedStrawberryDirectionController(EntityData data, Vector2 offset) : base(data.Position + offset) {
             direction = data.Enum("direction", Directions.Up);
@@ -42,7 +42,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         private static bool movesUpCheck(Strawberry self) {
             WingedStrawberryDirectionController controller = self.Scene.Tracker.GetEntity<WingedStrawberryDirectionController>();
-            if (controller == null || controller.direction == Directions.Up) {
+            if (controller == null || controller.direction == Directions.Up || controller.direction == Directions.UpLeft  || controller.direction == Directions.UpRight) {
                 return true;
             }
             return false;
@@ -83,6 +83,22 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                                     break;
                                 case Directions.Right:
                                     self.X -= flapSpeed * Engine.DeltaTime;
+                                    break;
+                                case Directions.UpLeft:
+                                    // the up part is handled normally by the game
+                                    self.X += flapSpeed * Engine.DeltaTime; // left
+                                    break;
+                                case Directions.UpRight:
+                                    // the up part is handled normally by the game
+                                    self.X -= flapSpeed * Engine.DeltaTime; // right
+                                    break;
+                                case Directions.DownLeft:
+                                    self.Y -= flapSpeed * Engine.DeltaTime; // down
+                                    self.X += flapSpeed * Engine.DeltaTime; // left
+                                    break;
+                                case Directions.DownRight:
+                                    self.Y -= flapSpeed * Engine.DeltaTime; // down
+                                    self.X -= flapSpeed * Engine.DeltaTime; // right
                                     break;
                                 default:
                                     break;
