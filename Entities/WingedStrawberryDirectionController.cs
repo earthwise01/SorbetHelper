@@ -24,7 +24,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public enum Directions {Up, Down, Left, Right};
         public Directions direction;
         public WingedStrawberryDirectionController(EntityData data, Vector2 offset) : base(data.Position + offset) {
-            direction = Directions.Left;
+            direction = data.Enum("direction", Directions.Up);
         }
 
         public override void Update()
