@@ -12,7 +12,7 @@ directions = {
 }
 
 wingedStrawberryDirectionController.name = "SorbetHelper/WingedStrawberryDirectionController"
-wingedStrawberryDirectionController.texture = "@Internal@/northern_lights"
+wingedStrawberryDirectionController.texture = "objects/SorbetHelper/wingedStrawberryDirectionController/icon"
 wingedStrawberryDirectionController.placements = {
     name = "wingedStrawberryController",
     data = {
