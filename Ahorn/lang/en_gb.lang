@@ -26,58 +26,6 @@ placements.entities.SorbetHelper/DashFallingBlock.tooltips.tiletype=Changes the 
 placements.entities.SorbetHelper/DashFallingBlock.tooltips.allowWavedash=If it is possible to wavedash on top of the block.
 placements.entities.SorbetHelper/DashFallingBlock.tooltips.dashCornerCorrection=Makes wallbouncing off of the block less precise (by allowing it up to 4 pixels deep into the block horizontally, dashing from the bottom).
 
-# Dash Gate Block
-placements.entities.SorbetHelper/DashGateBlock.tooltips.iconSprite=The texture for the icon in the center of the gate block.
-placements.entities.SorbetHelper/DashGateBlock.tooltips.inactiveColor=The gate icon colour when not triggered yet.
-placements.entities.SorbetHelper/DashGateBlock.tooltips.activeColor=The gate icon colour when the block is moving.
-placements.entities.SorbetHelper/DashGateBlock.tooltips.finishColor=The gate icon colour when the block has reached its destination.
-placements.entities.SorbetHelper/DashGateBlock.tooltips.blockSprite=The texture for the gate block.
-placements.entities.SorbetHelper/DashGateBlock.tooltips.shakeTime=The time (in seconds) the block spends shaking before starting to move. Default value is 0.5 seconds.
-placements.entities.SorbetHelper/DashGateBlock.tooltips.moveTime=The time (in seconds) the block takes to move to its destination after shaking. Default value is 1.8 seconds.
-placements.entities.SorbetHelper/DashGateBlock.tooltips.moveEased=If the block should slow down before reaching its final position. If unchecked, the block will move at constant speed.
-placements.entities.SorbetHelper/DashGateBlock.tooltips.moveSound=The sound played by the gate when it starts moving.
-placements.entities.SorbetHelper/DashGateBlock.tooltips.finishedSound=The sound played by the gate when it is done moving.
-placements.entities.SorbetHelper/DashGateBlock.tooltips.allowWavedash=If it is possible to wavedash on top of the block.
-placements.entities.SorbetHelper/DashGateBlock.tooltips.dashCornerCorrection=Makes wallbouncing off of the gate block less precise (by allowing it up to 4 pixels deep into the block horizontally, dashing from the bottom).
-placements.entities.SorbetHelper/DashGateBlock.tooltips.smoke=If the gate block should emit smoke when reaching its final position.
-placements.entities.SorbetHelper/DashGateBlock.tooltips.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThe gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
-placements.entities.SorbetHelper/DashGateBlock.tooltips.linked=If the gate block can activate/be activated by other gate blocks sharing the same link tag.
-placements.entities.SorbetHelper/DashGateBlock.tooltips.linkTag=The link tag used to pair with other gate blocks, any gate blocks sharing this link tag will be activated when this gate block is activated (and vice versa).\n(needs 'Linked' enabled)
-
-
-# Touch Gate Block
-placements.entities.SorbetHelper/TouchGateBlock.tooltips.iconSprite=The texture for the icon in the center of the gate block.
-placements.entities.SorbetHelper/TouchGateBlock.tooltips.inactiveColor=The gate icon colour when not triggered yet.
-placements.entities.SorbetHelper/TouchGateBlock.tooltips.activeColor=The gate icon colour when the block is moving.
-placements.entities.SorbetHelper/TouchGateBlock.tooltips.finishColor=The gate icon colour when the block has reached its destination.
-placements.entities.SorbetHelper/TouchGateBlock.tooltips.blockSprite=The texture for the gate block.
-placements.entities.SorbetHelper/TouchGateBlock.tooltips.shakeTime=The time (in seconds) the block spends shaking before starting to move. Default value is 0.5 seconds.
-placements.entities.SorbetHelper/TouchGateBlock.tooltips.moveTime=The time (in seconds) the block takes to move to its destination after shaking. Default value is 1.8 seconds.
-placements.entities.SorbetHelper/TouchGateBlock.tooltips.moveEased=If the block should slow down before reaching its final position. If unchecked, the block will move at constant speed.
-placements.entities.SorbetHelper/TouchGateBlock.tooltips.moveSound=The sound played by the gate when it starts moving.
-placements.entities.SorbetHelper/TouchGateBlock.tooltips.finishedSound=The sound played by the gate when it is done moving.
-placements.entities.SorbetHelper/TouchGateBlock.tooltips.moveOnGrab=If the gate block should move if the player climbs on its sides.
-placements.entities.SorbetHelper/TouchGateBlock.tooltips.moveOnStaticMoverInteract=If the gate block can be activated by static movers (such as springs) attached to it.
-placements.entities.SorbetHelper/TouchGateBlock.tooltips.smoke=If the gate block should emit smoke when reaching its final position.
-placements.entities.SorbetHelper/TouchGateBlock.tooltips.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThe gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
-placements.entities.SorbetHelper/TouchGateBlock.tooltips.linked=If the gate block can activate/be activated by other gate blocks sharing the same link tag.
-placements.entities.SorbetHelper/TouchGateBlock.tooltips.linkTag=The link tag used to pair with other gate blocks, any gate blocks sharing this link tag will be activated when this gate block is activated (and vice versa).\n(needs 'Linked' enabled)
-
-# Linked Gate Block
-placements.entities.SorbetHelper/LinkedGateBlock.tooltips.iconSprite=The texture for the icon in the center of the gate block.
-placements.entities.SorbetHelper/LinkedGateBlock.tooltips.inactiveColor=The gate icon colour when not triggered yet.
-placements.entities.SorbetHelper/LinkedGateBlock.tooltips.activeColor=The gate icon colour when the block is moving.
-placements.entities.SorbetHelper/LinkedGateBlock.tooltips.finishColor=The gate icon colour when the block has reached its destination.
-placements.entities.SorbetHelper/LinkedGateBlock.tooltips.blockSprite=The texture for the gate block.
-placements.entities.SorbetHelper/LinkedGateBlock.tooltips.shakeTime=The time (in seconds) the block spends shaking before starting to move. Default value is 0.5 seconds.
-placements.entities.SorbetHelper/LinkedGateBlock.tooltips.moveTime=The time (in seconds) the block takes to move to its destination after shaking. Default value is 1.8 seconds.
-placements.entities.SorbetHelper/LinkedGateBlock.tooltips.moveEased=If the block should slow down before reaching its final position. If unchecked, the block will move at constant speed.
-placements.entities.SorbetHelper/LinkedGateBlock.tooltips.moveSound=The sound played by the gate when it starts moving.
-placements.entities.SorbetHelper/LinkedGateBlock.tooltips.finishedSound=The sound played by the gate when it is done moving.
-placements.entities.SorbetHelper/LinkedGateBlock.tooltips.smoke=If the gate block should emit smoke when reaching its final position.
-placements.entities.SorbetHelper/LinkedGateBlock.tooltips.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThe gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
-placements.entities.SorbetHelper/LinkedGateBlock.tooltips.linkTag=The link tag used to pair with other gate blocks, any gate blocks sharing this link tag will also activate this gate block when they are activated.
-
 # Crumble On Flag Block
 placements.entities.SorbetHelper/CrumbleOnFlagBlock.tooltips.blendin=Blends the block in with the walls it touches, making it less apparent.
 placements.entities.SorbetHelper/CrumbleOnFlagBlock.tooltips.tiletype=Determines the visual appearance of the block.
@@ -116,10 +64,3 @@ placements.entities.SorbetHelper/CustomLightbeam.names.colors=Rainbow Colors
 placements.entities.SorbetHelper/CustomLightbeam.names.centerX=Rainbow Center X
 placements.entities.SorbetHelper/CustomLightbeam.names.centerY=Rainbow Center Y
 placements.entities.SorbetHelper/CustomLightbeam.names.singleColor=Uniform Color
-
-# -- Triggers --
-
-# Linked Gate Block Activator
-placements.triggers.SorbetHelper/LinkedGateBlockActivatorTrigger.tooltips.linkTag=The link tag used to pair with gate blocks, any gate blocks sharing this link tag will be activated when the player enters this trigger.
-placements.triggers.SorbetHelper/LinkedGateBlockActivatorTrigger.tooltips.flag=The flag that needs to be set in order for the trigger to be collidable, leaving this empty causes the trigger to always be collidable.
-placements.triggers.SorbetHelper/LinkedGateBlockActivatorTrigger.tooltips.inverted=When checked, the trigger will only be collidable when the associated flag is disabled, rather than only when the associated flag is enabled.
