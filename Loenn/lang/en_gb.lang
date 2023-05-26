@@ -144,6 +144,10 @@ entities.SorbetHelper/BigWaterfall.attributes.description.depth=Determines what 
 
 
 
+# winged strawberry direction controller
+entities.SorbetHelper/WingedStrawberryDirectionController.placements.name.wingedStrawberryController=Winged Strawberry Direction Controller
+entities.SorbetHelper/WingedStrawberryDirectionController.attributes.description.direction=The direction winged strawberries in the room will fly.
+
 # -- Triggers --
 
 # Linked Gate Block Activator
