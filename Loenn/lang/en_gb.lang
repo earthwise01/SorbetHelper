@@ -141,8 +141,34 @@ entities.SorbetHelper/BigWaterfall.attributes.description.ignoreSolids=When chec
 entities.SorbetHelper/BigWaterfall.attributes.description.lines=Determines whether the waterfall will have any additional lines for detail, disabling this will make the waterfall appear closer in appearance to a vanilla small waterfall as opposed to a big waterfall.
 entities.SorbetHelper/BigWaterfall.attributes.description.depth=Determines what visual layer the waterfall should be on (higher values mean further behind in the scene, default value is -9999 for the normal placement or -49900 for the above foreground placement).\nNote that this doesn't have any effect on the distortion effect. (meaning even if you set the waterfall to be in the background, the distortion will still exist in the foreground)
 
-
-
+# custom/rainbow lightbeam
+entities.SorbetHelper/CustomLightbeam.placements.name.customlightbeam=Custom Lightbeam
+entities.SorbetHelper/CustomLightbeam.placements.name.rainbowlightbeam=Custom Lightbeam (Rainbow)
+entities.SorbetHelper/CustomLightbeam.attributes.description.flag=The flag that needs to be set in order for the lightbeam to be activated, leaving this empty causes the lightbeam to always be active.
+entities.SorbetHelper/CustomLightbeam.attributes.description.inverted=When checked, the lightbeam will only be active when the associated flag is disabled rather than only when the associated flag is enabled.
+entities.SorbetHelper/CustomLightbeam.attributes.description.rotation=The rotation of the lightbeam.
+entities.SorbetHelper/CustomLightbeam.attributes.description.depth=Determines what visual layer the lightbeam should be on (higher values mean further behind in the scene, default value is -9998).\nDoes not affect the particles.
+entities.SorbetHelper/CustomLightbeam.attributes.description.noParticles=Determines whether the lightbeam emits particles.
+entities.SorbetHelper/CustomLightbeam.attributes.description.color=The color of the lightbeam.
+entities.SorbetHelper/CustomLightbeam.attributes.description.rainbow=Determines whether the lightbeam is rainbow.\nChanging this requires reopening this menu for the correct settings to appear.
+# ^^^ might still be able to write this in a cleaner way but this should be good enough at least?
+entities.SorbetHelper/CustomLightbeam.attributes.description.colors=The colors the rainbow lightbeam will use, separated by commas.
+entities.SorbetHelper/CustomLightbeam.attributes.description.gradientSize=The distance required to achieve a complete loop across all colors. Vanilla value is 280.
+entities.SorbetHelper/CustomLightbeam.attributes.description.loopColors=Determines how the colors loop. For example, if 3 colors A, B and C are specified:\n- when unchecked, the colors will cycle in the following order: A > B > C > B > A\n- when checked, the colors will cycle in the following order: A > B > C > A > B > C
+entities.SorbetHelper/CustomLightbeam.attributes.description.centerX=The horizontal position of the center of the gradient. Uses "world" coordinates. Vanilla value is 0.
+entities.SorbetHelper/CustomLightbeam.attributes.description.centerY=The vertical position of the center of the gradient. Uses "world" coordinates. Vanilla value is 0.
+entities.SorbetHelper/CustomLightbeam.attributes.description.gradientSpeed=Determines how fast the gradient scrolls, in pixels per second. You can use negative values to make it scroll in the opposite direction. Vanilla value is 50.
+entities.SorbetHelper/CustomLightbeam.attributes.description.singleColor=Determines whether the rainbow lightbeam is the same color throughout or uses a gradient across all the beams of light.
+# ^^^ last bit sounds a bit off i think but i can't come up with anything better currently.
+entities.SorbetHelper/CustomLightbeam.attributes.description.fadeWhenNear=Determines whether the lightbeam fades out when the player is close to it.
+entities.SorbetHelper/CustomLightbeam.attributes.description.fadeOnTransition=Determines whether the lightbeam fades out during screen transitions.
+entities.SorbetHelper/CustomLightbeam.attributes.name.gradientSize=Rainbow Gradient Size
+entities.SorbetHelper/CustomLightbeam.attributes.name.gradientSpeed=Rainbow Gradient Speed
+entities.SorbetHelper/CustomLightbeam.attributes.name.colors=Rainbow Colors
+entities.SorbetHelper/CustomLightbeam.attributes.name.centerX=Rainbow Center X
+entities.SorbetHelper/CustomLightbeam.attributes.name.centerY=Rainbow Center Y
+entities.SorbetHelper/CustomLightbeam.attributes.name.singleColor=Uniform Color
+# ^^^ this might not be an accurate way of saying this but honestly at this point i've given up trying to find anything better.
 
 # -- Triggers --
 
