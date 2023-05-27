@@ -46,8 +46,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         public DashFallingBlock(EntityData data, Vector2 offset) : base(data, offset) {
             // remove the TileGrid added by the vanilla falling block
-            DynamicData fallingBlockData = new DynamicData(this);
-            Remove(fallingBlockData.Get<TileGrid>("tiles"));
+            Remove(Get<TileGrid>());
 
             shakeSfx = data.Attr("shakeSfx", "event:/game/general/fallblock_shake");
             impactSfx = data.Attr("impactSfx", "event:/game/general/fallblock_impact");
@@ -65,7 +64,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             Calc.PopRandom();
             Add(new TileInterceptor(tilegrid, highPriority: false));
             // make the tilegrid invisible since we want to render it manually later
-            tilegrid.Alpha = 0f;
+            tilegrid.Visible = false;
 
             OnDashCollide = OnDashCollision;
         }
