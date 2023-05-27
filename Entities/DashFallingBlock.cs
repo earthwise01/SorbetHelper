@@ -25,20 +25,20 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public bool allowWavedash;
         public bool dashCornerCorrection;
 
-        public bool isTriggered;
+        //public bool isTriggered;
         public TileGrid tilegrid;
         public Vector2 scale = Vector2.One;
         public Vector2 hitOffset;
 
         public static void Load() {
-            On.Celeste.FallingBlock.Sequence += onSequence;
+            //On.Celeste.FallingBlock.Sequence += onSequence;
             On.Celeste.FallingBlock.PlayerFallCheck += onPlayerFallCheck;
             On.Celeste.FallingBlock.ShakeSfx += onShakeSfx;
             On.Celeste.FallingBlock.ImpactSfx += onImpactSfx;
         }
 
         public static void Unload() {
-            On.Celeste.FallingBlock.Sequence -= onSequence;
+            //On.Celeste.FallingBlock.Sequence -= onSequence;
             On.Celeste.FallingBlock.PlayerFallCheck -= onPlayerFallCheck;
             On.Celeste.FallingBlock.ShakeSfx -= onShakeSfx;
             On.Celeste.FallingBlock.ImpactSfx -= onImpactSfx;
@@ -71,7 +71,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         public DashCollisionResults OnDashCollision(Player player, Vector2 dir) {
-            if (!isTriggered) {
+            if (!Triggered) {
                 // make wallbouncing easier if dash corner correction is enabled
                 if ((player.Left >= Right - 4f || player.Right < Left + 4f) && dir.Y == -1 && dashCornerCorrection) {
                     return DashCollisionResults.NormalCollision;
@@ -79,7 +79,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
                 // trigger the block
                 (Scene as Level).DirectionalShake(dir);
-                isTriggered = true;
+                Triggered = true;
                 Audio.Play(impactSfx, base.Center);
 
                 // emit the dust particles and update the scale and hitOffset
@@ -108,7 +108,6 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public override void OnStaticMoverTrigger(StaticMover sm) {
             if (fallOnStaticMover) {
                 base.OnStaticMoverTrigger(sm);
-                isTriggered = true;
             }
         }
 
@@ -146,19 +145,19 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             hitOffset.Y = Calc.Approach(hitOffset.Y, 0f, Engine.DeltaTime * 15f);
         }
 
-        private static IEnumerator onSequence(On.Celeste.FallingBlock.orig_Sequence orig, FallingBlock self) {
+        /*private static IEnumerator onSequence(On.Celeste.FallingBlock.orig_Sequence orig, FallingBlock self) {
             if (self is DashFallingBlock block) {
                 self.Triggered = block.isTriggered;
             }
             yield return new SwapImmediately(orig(self));
-        }
+        }*/
 
         private static bool onPlayerFallCheck(On.Celeste.FallingBlock.orig_PlayerFallCheck orig, FallingBlock self) {
             if (self is DashFallingBlock block) {
-                if (!block.isTriggered && block.fallOnTouch) {
-                    block.isTriggered = orig(self);
+                if (!block.Triggered && block.fallOnTouch) {
+                    block.Triggered = orig(self);
                 }
-                return block.isTriggered;
+                return block.Triggered;
             }
             return orig(self);
         }
