@@ -30,7 +30,7 @@ entities.SorbetHelper/ReturnBerry.attributes.description.order=Manually determin
 # Dash Falling Block
 entities.SorbetHelper/DashFallingBlock.placements.name.falling_block=Dash Falling Block
 entities.SorbetHelper/DashFallingBlock.placements.description.falling_block=A falling block that only gets activated once the player dashes into it.
-entities.SorbetHelper/DashFallingBlock.attributes.description.climbFall=If the block should fall if the player climbs on its sides.\n(needs 'Fall On Touch' enabled)
+entities.SorbetHelper/DashFallingBlock.attributes.description.climbFall=If the block should fall if the player climbs on its sides.\nDoes nothing unless Fall On Touch is enabled.
 entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnTouch=If the block should fall if it comes in contact with the player, even if they don't dash into it.
 entities.SorbetHelper/DashFallingBlock.attributes.name.fallOnStaticMover=Fall On Static Mover Interact
 entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnStaticMover=If the falling block can be activated by static movers (such as springs) attached to it.
@@ -40,6 +40,10 @@ entities.SorbetHelper/DashFallingBlock.attributes.description.impactSfx=The soun
 entities.SorbetHelper/DashFallingBlock.attributes.description.tiletype=Changes the visual appearance of the falling block.
 entities.SorbetHelper/DashFallingBlock.attributes.description.allowWavedash=If it is possible to wavedash on top of the block.
 entities.SorbetHelper/DashFallingBlock.attributes.description.dashCornerCorrection=Makes wallbouncing off of the block less precise (by allowing it up to 4 pixels deep into the block horizontally, dashing from the bottom).
+entities.SorbetHelper/DashFallingBlock.attributes.description.direction=The direction the falling block will fall.
+entities.SorbetHelper/DashFallingBlock.attributes.name.fallDashMode=Fall Towards Dash Direction
+entities.SorbetHelper/DashFallingBlock.attributes.description.fallDashMode=Whether the direction the falling block will fall towards is determined by the direction it was dashed into from.\nOverrides the normal direction setting when enabled.
+
 
 entities.SorbetHelper/CrumbleOnFlagBlock.placements.name.crumble_on_flag_block=Crumble On Flag Block
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.blendin=Blends the block in with the walls it touches, making it less apparent.

@@ -16,6 +16,8 @@ fallingBlock.placements = {
         fallOnStaticMover = false,
         allowWavedash = false,
         dashCornerCorrection = false,
+        direction = "Down",
+        fallDashMode = "Disabled",
         width = 8,
         height = 8
     }
@@ -23,8 +25,23 @@ fallingBlock.placements = {
 
 fallingBlock.sprite = fakeTilesHelper.getEntitySpriteFunction("tiletype", false)
 
-fallingBlock.fieldInformation = fakeTilesHelper.getFieldInformation("tiletype")
+fallingBlock.fieldInformation = {
+    tiletype = {
+        options = function()
+            return fakeTilesHelper.getTilesOptions()
+        end,
+        editable = false,
+    },
+    direction = {
+        options = { "Down", "Up", "Left", "Right" },
+        editable = false
+    },
+    fallDashMode = {
+        options = { "Disabled", "Push", "Pull" },
+        editable = false
+    }
+}
 
-fallingBlock.fieldOrder = {"x", "y", "width", "height", "shakeSfx", "impactSfx", "tiletype", "depth", "fallOnTouch", "climbFall", "fallOnStaticMover", "allowWavedash", "dashCornerCorrection"}
+fallingBlock.fieldOrder = {"x", "y", "width", "height", "shakeSfx", "impactSfx", "tiletype", "depth", "direction", "fallDashMode", "fallOnTouch", "climbFall", "fallOnStaticMover", "allowWavedash", "dashCornerCorrection"}
 
 return fallingBlock
