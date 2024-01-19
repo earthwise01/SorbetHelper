@@ -1,16 +1,5 @@
 local wingedStrawberryDirectionController = {}
 
-directions = {
-    "Up",
-    "Down",
-    "Left",
-    "Right",
-    "UpLeft",
-    "UpRight",
-    "DownLeft",
-    "DownRight"
-}
-
 wingedStrawberryDirectionController.name = "SorbetHelper/WingedStrawberryDirectionController"
 wingedStrawberryDirectionController.texture = "objects/SorbetHelper/wingedStrawberryDirectionController/icon"
 wingedStrawberryDirectionController.placements = {
@@ -21,7 +10,16 @@ wingedStrawberryDirectionController.placements = {
 }
 wingedStrawberryDirectionController.fieldInformation = {
     direction = {
-        options = directions,
+        options = {
+            "Up",
+            "Down",
+            "Left",
+            "Right",
+            "UpLeft",
+            "UpRight",
+            "DownLeft",
+            "DownRight"
+        },
         editable = false
     }
 }
