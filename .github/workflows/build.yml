@@ -41,6 +41,9 @@ jobs:
         path: |
           everest.yaml
           bin/SorbetHelper.dll
-          Ahorn/
-          Loenn/
-          Graphics/
+          bin/SorbetHelper.pdb
+          Ahorn/**/*
+          Audio/**/*
+          Dialog/**/*
+          Graphics/**/*
+          Loenn/**/*

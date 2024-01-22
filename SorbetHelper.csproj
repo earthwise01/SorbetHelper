@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net452</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <AssemblyName>SorbetHelper</AssemblyName>
         <RootNamespace>Celeste.Mod.SorbetHelper</RootNamespace>
         <LangVersion>latest</LangVersion>
-        <!--If Celeste.exe is missing, attempt to reference a lib-stripped directory instead-->
-        <CELESTEGAMEPATH Condition="'$(CELESTEGAMEPATH)' == '' And Exists('..\..\Celeste.exe')">..\..</CELESTEGAMEPATH>
+        <!--If Celeste.dll is missing, attempt to reference a lib-stripped directory instead-->
+        <CELESTEGAMEPATH Condition="'$(CELESTEGAMEPATH)' == '' And Exists('..\..\Celeste.dll')">..\..</CELESTEGAMEPATH>
         <CELESTEGAMEPATH Condition="'$(CELESTEGAMEPATH)' == ''">lib-stripped</CELESTEGAMEPATH>
     </PropertyGroup>
 
@@ -17,11 +17,12 @@
     </ItemDefinitionGroup>
 
     <ItemGroup>
-        <PackageReference Include="MonoMod.RuntimeDetour" Version="22.01.04.03" PrivateAssets="all" ExcludeAssets="runtime" />
+        <PackageReference Include="MonoMod.RuntimeDetour" Version="25.0.2" PrivateAssets="all" ExcludeAssets="runtime" />
+        <PackageReference Include="MonoMod.Patcher" Version="25.0.0-prerelease.2" />
     </ItemGroup>
 
     <ItemGroup>
-        <Reference Include="$(CELESTEGAMEPATH)\Celeste.exe">
+        <Reference Include="$(CELESTEGAMEPATH)\Celeste.dll">
             <Private>false</Private>
         </Reference>
         <Reference Include="$(CELESTEGAMEPATH)\MMHOOK_Celeste.dll">
@@ -34,14 +35,11 @@
 
     <Target Name="CopyFiles" AfterTargets="Build">
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="bin" />
+        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).pdb" DestinationFolder="bin" />
     </Target>
 
     <PropertyGroup>
         <PathMap>$(MSBuildProjectDirectory)=SorbetHelper/</PathMap>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
     </PropertyGroup>
 
 </Project>
