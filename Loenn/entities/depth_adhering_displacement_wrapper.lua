@@ -9,7 +9,7 @@ depthAdheringDisplacementWrapper.placements = {
             width = 8,
             height = 8,
             distortBehind = false,
-            onlyCollideTopLeft = false
+            -- onlyCollideTopLeft = false
         }
     },
     {
@@ -18,7 +18,7 @@ depthAdheringDisplacementWrapper.placements = {
             width = 8,
             height = 8,
             distortBehind = true,
-            onlyCollideTopLeft = false
+            -- onlyCollideTopLeft = false
         }
     }
 }
