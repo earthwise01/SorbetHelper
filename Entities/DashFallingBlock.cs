@@ -14,31 +14,33 @@ namespace Celeste.Mod.SorbetHelper.Entities {
     public class DashFallingBlock : FallingBlock {
 
         /*
-         * the implementation for scale and hitOffset (and how they affect the appearance of the block) is based on code from Communal Helper's Station Blocks
-         * https://github.com/CommunalHelper/CommunalHelper/blob/dev/src/Entities/StationBlock/StationBlock.cs
-         */
+            the implementation for scale and hitOffset (and how they affect the appearance of the block) is heavily based on code from Communal Helper's Station Blocks
+            https://github.com/CommunalHelper/CommunalHelper/blob/dev/src/Entities/StationBlocks/StationBlock.cs
+        */
 
         private enum FallDashModes { Disabled, Push, Pull }
 
-        public string shakeSfx;
-        public string impactSfx;
+        private readonly string shakeSfx;
+        private readonly string impactSfx;
         public bool fallOnTouch;
         public bool fallOnStaticMover;
         public bool allowWavedash;
         public bool dashCornerCorrection;
 
         public TileGrid tilegrid;
-        public Vector2 scale = Vector2.One;
-        public Vector2 hitOffset;
+        private Vector2 scale = Vector2.One;
+        private Vector2 hitOffset;
         public new bool HasStartedFalling { get; private set; }
 
-        private static Dictionary<string, Vector2> directionToVector = new Dictionary<string, Vector2>() { { "down", new Vector2(0f, 1f) }, { "up", new Vector2(0f, -1f) }, { "left", new Vector2(-1f, 0f) }, { "right", new Vector2(1f, 0f) } };
+        private static readonly Dictionary<string, Vector2> directionToVector = new Dictionary<string, Vector2>() {
+            {"down", new Vector2(0f, 1f)}, {"up", new Vector2(0f, -1f)}, {"left", new Vector2(-1f, 0f)}, {"right", new Vector2(1f, 0f)}
+        };
         public Vector2 direction;
-        private FallDashModes fallDashMode;
+        private readonly FallDashModes fallDashMode;
 
-        private static MethodInfo landParticlesInfo = typeof(FallingBlock).GetMethod("LandParticles", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod);
-        private static MethodInfo playerFallCheckInfo = typeof(FallingBlock).GetMethod("PlayerFallCheck", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod);
-        private static MethodInfo playerWaitCheckInfo = typeof(FallingBlock).GetMethod("PlayerWaitCheck", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod);
+        private static readonly MethodInfo landParticlesInfo = typeof(FallingBlock).GetMethod("LandParticles", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod);
+        private static readonly MethodInfo playerFallCheckInfo = typeof(FallingBlock).GetMethod("PlayerFallCheck", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod);
+        private static readonly MethodInfo playerWaitCheckInfo = typeof(FallingBlock).GetMethod("PlayerWaitCheck", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod);
         private void LandParticles() => landParticlesInfo.Invoke(this, new object[] {});
         private bool PlayerFallCheck() => (bool)playerFallCheckInfo.Invoke(this, new object[] {});
         private bool PlayerWaitCheck() => (bool)playerWaitCheckInfo.Invoke(this, new object[] {});
@@ -82,7 +84,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
                 // if the falling block is set to move in the direction of madeline's dash, update the direction accordingly
                 if (fallDashMode != FallDashModes.Disabled) {
-                    direction = (fallDashMode == FallDashModes.Pull ? -dir : dir);
+                    direction = fallDashMode == FallDashModes.Pull ? -dir : dir;
                 }
 
                 // trigger the block
@@ -91,10 +93,10 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 Audio.Play(impactSfx, base.Center);
 
                 // emit the dust particles and update the scale and hitOffset
-                for (int i = 2; (float)i <= base.Width; i += 4) {
+                for (int i = 2; i <= base.Width; i += 4) {
                     if (!base.Scene.CollideCheck<Solid>(base.BottomLeft + new Vector2(i, 3f))) {
-                        SceneAs<Level>().Particles.Emit(P_FallDustB, 1, new Vector2(base.X + (float)i, base.Bottom), Vector2.One * 4f);
-                        SceneAs<Level>().Particles.Emit(P_FallDustA, 1, new Vector2(base.X + (float)i, base.Bottom), Vector2.One * 4f);
+                        SceneAs<Level>().Particles.Emit(P_FallDustB, 1, new Vector2(base.X + i, base.Bottom), Vector2.One * 4f);
+                        SceneAs<Level>().Particles.Emit(P_FallDustA, 1, new Vector2(base.X + i, base.Bottom), Vector2.One * 4f);
                     }
                 }
                 scale = new Vector2(
@@ -169,10 +171,11 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 }
 
                 StopShaking();
-                for (int i = 2; (float)i < Width; i += 4) {
+                for (int i = 2; i < Width; i += 4) {
                     if (Scene.CollideCheck<Solid>(TopLeft + new Vector2(i, -2f)))
-                        SceneAs<Level>().Particles.Emit(P_FallDustA, 2, new Vector2(X + (float)i, Y), Vector2.One * 4f, (float)Math.PI / 2f);
-                    SceneAs<Level>().Particles.Emit(P_FallDustB, 2, new Vector2(X + (float)i, Y), Vector2.One * 4f);
+                        SceneAs<Level>().Particles.Emit(P_FallDustA, 2, new Vector2(X + i, Y), Vector2.One * 4f, (float)Math.PI / 2f);
+
+                    SceneAs<Level>().Particles.Emit(P_FallDustB, 2, new Vector2(X + i, Y), Vector2.One * 4f);
                 }
 
                 float speed = 0f;
@@ -189,9 +192,9 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
                     // checks whether the falling block fell out of bounds
                     // all of these checks are done on any dash falling block regardless of its direction so hopefully that wont break anything somewhere
-                    if (Top > (float)(level.Bounds.Bottom + 16) || Bottom < (float)(level.Bounds.Top - 16) || Right < (float)(level.Bounds.Left - 16) || Left > (float)(level.Bounds.Right + 16) ||
-                    ((Top > (float)(level.Bounds.Bottom - 1) || Bottom < (float)(level.Bounds.Top + 1) || Right < (float)(level.Bounds.Left + 1) || Left > (float)(level.Bounds.Right - 1)) && CollideCheck<Solid>(Position + direction))) {
-                        Collidable = (Visible = false);
+                    if (Top > level.Bounds.Bottom + 16 || Bottom < level.Bounds.Top - 16 || Right < level.Bounds.Left - 16 || Left > level.Bounds.Right + 16 ||
+                    ((Top > level.Bounds.Bottom - 1 || Bottom < level.Bounds.Top + 1 || Right < level.Bounds.Left + 1 || Left > level.Bounds.Right - 1) && CollideCheck<Solid>(Position + direction))) {
+                        Collidable = Visible = false;
                         yield return 0.2f;
 
                         // checks whether the falling block fell into a screen transition (i think)
