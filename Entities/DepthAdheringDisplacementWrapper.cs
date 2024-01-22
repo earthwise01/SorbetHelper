@@ -56,7 +56,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                     if (!onlyCollideTopLeft) {
                         // if the entity has fields called "width" or "height" try to use those for the temporary hitbox instead of the default of 8f
                         Type entityType = entity.GetType();
-                        Console.WriteLine($"making backup hitbox for {entityType.ToString()}");
+                        // Logger.Log(LogLevel.Verbose, "SorbetHelper/DepthAdheringDisplacementWrapper", $"making backup hitbox for {entityType}");
                         FieldInfo widthInfo = entityType.GetField("width", BindingFlags.NonPublic | BindingFlags.Instance);
                         FieldInfo heightInfo = entityType.GetField("height", BindingFlags.NonPublic | BindingFlags.Instance);
 

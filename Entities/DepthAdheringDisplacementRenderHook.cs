@@ -98,8 +98,16 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             if (distortBehind)
                 Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
 
+            // temporarily force the anxiety effect off to stop the game from applying it multiple times
+            // done manually rather than via Distort.Anxiety to prevent issues with ExtendedVariants
+            // this is gonna affect literally no-one but at the very least this means i don't have to freak out over the fact that i knowingly left a bug in
+            float anxietyBackup = GFX.FxDistort.Parameters["anxiety"].GetValueSingle();
+            GFX.FxDistort.Parameters["anxiety"].SetValue(0f);
+
             // apply the displacement effect to the entity buffer and render the result to the main gameplay buffer
             Distort.Render((RenderTarget2D)entityBuffer, (RenderTarget2D)displacementMapBuffer, hasDistortion: true);
+
+            GFX.FxDistort.Parameters["anxiety"].SetValue(anxietyBackup);
 
             GameplayRenderer.Begin();
             renderingCustomDisplacement = false;
@@ -116,10 +124,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         private void Dispose() {
-            if (entityBuffer != null)
-                entityBuffer.Dispose();
-            if (displacementMapBuffer != null)
-                displacementMapBuffer.Dispose();
+            entityBuffer?.Dispose();
+            displacementMapBuffer?.Dispose();
 
             entityBuffer = null;
             displacementMapBuffer = null;
@@ -144,26 +150,27 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 // check if the entity has a DepthAdheringDisplacementRenderHook, if it does skip rendering the entity and render it instead
                 Logger.Log("SorbetHelper", $"Injecting check to render DepthAdheringDisplacementRenderHooks instead of their entity at {cursor.Index} in CIL code for {cursor.Method.FullName}");
                 cursor.Emit(OpCodes.Ldloc_1);
-                cursor.EmitDelegate<Func<Entity, bool>>(entity => {
-                    // the tracker is used here instead of searching through each entity's components as to not something something
-                    List<Component> list = entity.Scene.Tracker.GetComponents<DepthAdheringDisplacementRenderHook>();
-
-                    //if (list.Count != 0) {
-                    foreach (Component component in list) {
-                        if (component.Entity == entity) {
-                            component.Render();
-                            return true;
-                        }
-                    }
-                    //}
-                    return false;
-                });
+                cursor.EmitDelegate<Func<Entity, bool>>(renderDepthAdheringRenderHooks);
                 cursor.Emit(OpCodes.Brtrue, label);
 
                 cursor.GotoNext(MoveType.After, instr => instr.MatchCallvirt<Entity>("Render"));
 
                 cursor.MarkLabel(label);
             }
+        }
+
+        private static bool renderDepthAdheringRenderHooks(Entity entity) {
+            // the tracker is used here instead of searching through each entity's components as to not something something
+            List<Component> list = entity.Scene.Tracker.GetComponents<DepthAdheringDisplacementRenderHook>();
+
+            foreach (Component component in list) {
+                if (component.Entity == entity) {
+                    component.Render();
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
