@@ -64,3 +64,6 @@ placements.entities.SorbetHelper/CustomLightbeam.names.colors=Rainbow Colors
 placements.entities.SorbetHelper/CustomLightbeam.names.centerX=Rainbow Center X
 placements.entities.SorbetHelper/CustomLightbeam.names.centerY=Rainbow Center Y
 placements.entities.SorbetHelper/CustomLightbeam.names.singleColor=Uniform Color
+
+# winged strawberry direction controller
+placements.entities.SorbetHelper/WingedStrawberryDirectionController.tooltips.direction=The direction winged strawberries in the room will fly.

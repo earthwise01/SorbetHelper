@@ -93,4 +93,8 @@ entities.SorbetHelper/CustomLightbeam.attributes.name.centerY=Rainbow Center Y
 entities.SorbetHelper/CustomLightbeam.attributes.name.singleColor=Uniform Color
 # ^^^ this might not be an accurate way of saying this but honestly at this point i've given up trying to find anything better.
 
+# winged strawberry direction controller
+entities.SorbetHelper/WingedStrawberryDirectionController.placements.name.wingedStrawberryController=Winged Strawberry Direction Controller
+entities.SorbetHelper/WingedStrawberryDirectionController.attributes.description.direction=The direction winged strawberries in the room will fly.
+
 mods.SorbetHelper.name=Sorbet Helper

@@ -11,9 +11,11 @@ namespace Celeste.Mod.SorbetHelper {
         }
 
         public override void Load() {
+            WingedStrawberryDirectionController.Load();
         }
 
         public override void Unload() {
+            WingedStrawberryDirectionController.Unload();
         }
 
     }
