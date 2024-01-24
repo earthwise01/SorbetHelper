@@ -41,9 +41,9 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private static readonly MethodInfo landParticlesInfo = typeof(FallingBlock).GetMethod("LandParticles", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod);
         private static readonly MethodInfo playerFallCheckInfo = typeof(FallingBlock).GetMethod("PlayerFallCheck", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod);
         private static readonly MethodInfo playerWaitCheckInfo = typeof(FallingBlock).GetMethod("PlayerWaitCheck", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod);
-        private void LandParticles() => landParticlesInfo.Invoke(this, new object[] {});
-        private bool PlayerFallCheck() => (bool)playerFallCheckInfo.Invoke(this, new object[] {});
-        private bool PlayerWaitCheck() => (bool)playerWaitCheckInfo.Invoke(this, new object[] {});
+        private void LandParticles() => landParticlesInfo.Invoke(this, []);
+        private bool PlayerFallCheck() => (bool)playerFallCheckInfo.Invoke(this, []);
+        private bool PlayerWaitCheck() => (bool)playerWaitCheckInfo.Invoke(this, []);
 
         public DashFallingBlock(EntityData data, Vector2 offset) : base(data, offset) {
             // remove the TileGrid and Coroutine added by the vanilla falling block

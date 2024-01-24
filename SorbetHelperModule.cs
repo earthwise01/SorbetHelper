@@ -4,8 +4,8 @@ using Celeste.Mod.SorbetHelper.Entities;
 
 namespace Celeste.Mod.SorbetHelper {
     public class SorbetHelperModule : EverestModule {
-
         public static SorbetHelperModule Instance;
+
         public SorbetHelperModule() {
             Instance = this;
         }
@@ -17,7 +17,5 @@ namespace Celeste.Mod.SorbetHelper {
         public override void Unload() {
             WingedStrawberryDirectionController.Unload();
         }
-
     }
-
 }

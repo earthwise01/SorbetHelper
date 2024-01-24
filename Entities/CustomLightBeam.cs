@@ -9,40 +9,39 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
     [CustomEntity("SorbetHelper/CustomLightbeam")]
     public class CustomLightBeam : Entity {
-
         public string flag;
         public bool inverted;
 
         public float rotation;
 
-        private bool fadeWhenNear = true;
-        private bool fadeOnTransition = true;
+        private readonly bool fadeWhenNear = true;
+        private readonly bool fadeOnTransition = true;
 
-        private bool rainbow;
+        private readonly bool rainbow;
 
         // used only when either rainbow == true && rainbowSingleColor == true or rainbow == false, otherwise ignored in favor of directly calling GetHue.
         // probably slightly messy but results in less unnecessary changes to the variable.
         public Color color = new Color(0.8f, 1f, 1f);
 
         public List<Color> rainbowColors = new List<Color>();
-        private float rainbowGradientSize;
-        private float rainbowGradientSpeed;
-        private bool rainbowLoopColors;
+        private readonly float rainbowGradientSize;
+        private readonly float rainbowGradientSpeed;
+        private readonly bool rainbowLoopColors;
         private Vector2 rainbowCenter;
-        private bool rainbowSingleColor;
+        private readonly bool rainbowSingleColor;
 
-        public bool noParticles;
+        private readonly bool noParticles;
 
         private float baseAlpha = 1;
         private float flagAlpha = 1;
         private float alpha;
 
-        private int lightWidth;
-        private int lightLength;
+        private readonly int lightWidth;
+        private readonly int lightLength;
 
         private float timer = Calc.Random.NextFloat(1000f);
 
-        private MTexture texture = GFX.Game["util/lightbeam"];
+        private readonly MTexture texture = GFX.Game["util/lightbeam"];
 
         public CustomLightBeam(EntityData data, Vector2 offset) : base(data.Position + offset) {
             base.Tag = Tags.TransitionUpdate;
@@ -83,12 +82,13 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             base.Awake(scene);
             Level level = base.Scene as Level;
 
-            if (!string.IsNullOrEmpty(flag) && (!inverted && !level.Session.GetFlag(flag))
-            || (inverted && level.Session.GetFlag(flag))) {
+            if (!string.IsNullOrEmpty(flag) && ((!inverted && !level.Session.GetFlag(flag))
+            || (inverted && level.Session.GetFlag(flag)))) {
                 flagAlpha = 0f;
             } else {
                 flagAlpha = 1f;
             }
+
             if (level.Transitioning && fadeOnTransition) {
                 baseAlpha = 0f;
             }
@@ -105,8 +105,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 if (fadeWhenNear) {
                     Vector2 vector = Calc.AngleToVector(rotation + (float)Math.PI / 2f, 1f);
                     Vector2 vector2 = Calc.ClosestPointOnLine(Position, Position + vector * 10000f, entity.Center);
-                    target = Math.Min(1f, Math.Max(0f, (vector2 - Position).Length() - 8f) / (float)lightLength);
-                    if ((vector2 - entity.Center).Length() > (float)lightWidth / 2f) {
+                    target = Math.Min(1f, Math.Max(0f, (vector2 - Position).Length() - 8f) / lightLength);
+                    if ((vector2 - entity.Center).Length() > lightWidth / 2f) {
                         target = 1f;
                     }
                 }
@@ -151,12 +151,12 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         public override void Render() {
             if (alpha > 0f) {
-                DrawTexture(0f, lightWidth, (float)(lightLength - 4) + (float)Math.Sin(timer * 2f) * 4f, 0.4f);
+                DrawTexture(0f, lightWidth, lightLength - 4 + (float)Math.Sin(timer * 2f) * 4f, 0.4f);
                 for (int i = 0; i < lightWidth; i += 4) {
-                    float num = timer + (float)i * 0.6f;
+                    float num = timer + i * 0.6f;
                     float num2 = 4f + (float)Math.Sin(num * 0.5f + 1.2f) * 4f;
-                    float offset = (float)Math.Sin((double)((num + (float)(i * 32)) * 0.1f) + Math.Sin(num * 0.05f + (float)i * 0.1f) * 0.25) * ((float)lightWidth / 2f - num2 / 2f);
-                    float length = (float)lightLength + (float)Math.Sin(num * 0.25f) * 8f;
+                    float offset = (float)Math.Sin((double)((num + i * 32) * 0.1f) + Math.Sin(num * 0.05f + i * 0.1f) * 0.25) * (lightWidth / 2f - num2 / 2f);
+                    float length = lightLength + (float)Math.Sin(num * 0.25f) * 8f;
                     float a = 0.6f + (float)Math.Sin(num + 0.8f) * 0.3f;
                     DrawTexture(offset, num2, length, a);
                 }
@@ -169,7 +169,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             Color beamColor = ((rainbow && !rainbowSingleColor) ? GetHue(Position + Calc.AngleToVector(rotation, 1f) * offset) : color) * a * alpha;
 
             if (width >= 1f) {
-                texture.Draw(Position + Calc.AngleToVector(rotation, 1f) * offset, new Vector2(0f, 0.5f), beamColor, new Vector2(1f / (float)texture.Width * length, width), beamRotation);
+                texture.Draw(Position + Calc.AngleToVector(rotation, 1f) * offset, new Vector2(0f, 0.5f), beamColor, new Vector2(1f / texture.Width * length, width), beamRotation);
             }
         }
 
@@ -194,7 +194,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             }
 
             float globalProgress = (rainbowColors.Count - 1) * progress;
-            int colorIndex = (int) globalProgress;
+            int colorIndex = (int)globalProgress;
             float progressInIndex = globalProgress - colorIndex;
             return Color.Lerp(rainbowColors[colorIndex], rainbowColors[colorIndex + 1], progressInIndex);
         }
