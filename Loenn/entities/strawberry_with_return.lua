@@ -11,6 +11,28 @@ return_berry.nodeLineRenderType = "fan"
 return_berry.nodeLimits = {2, -1}
 return_berry.ignoredFields = { "nodes", "_name", "_id", "originX", "originY" }
 
+return_berry.fieldInformation = {
+    order = {
+        fieldType = "integer",
+    },
+    checkpointID = {
+        fieldType = "integer"
+    }
+}
+
+function return_berry.fieldOrder(entity)
+    local fields = {}
+    if entity.checkpointID == nil then
+        fields = {
+            "x", "y", "delay", "winged"
+        }
+    else
+        fields = {
+            "x", "y", "checkpointID", "order", "delay", "winged"
+        }
+    end
+    return fields
+end
 
 return_berry.placements = {
     {
@@ -18,6 +40,8 @@ return_berry.placements = {
         placementType = "point",
         data = {
             winged = false,
+            checkpointID = -1,
+            order = -1,
             delay = 0.3,
             nodes = {
                 {x = 0, y = 0},
@@ -30,6 +54,8 @@ return_berry.placements = {
         placementType = "point",
         data = {
             winged = true,
+            checkpointID = -1,
+            order = -1,
             delay = 0.3,
             nodes = {
                 {x = 0, y = 0},
