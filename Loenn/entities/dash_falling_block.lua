@@ -4,24 +4,26 @@ local fallingBlock = {}
 
 fallingBlock.name = "SorbetHelper/DashFallingBlock"
 fallingBlock.depth = -9000
-fallingBlock.placements = {
-    name = "falling_block",
-    data = {
-        tiletype = "3",
-        depth = -9000,
-        shakeSfx = "event:/game/general/fallblock_shake",
-        impactSfx = "event:/game/general/fallblock_impact",
-        fallOnTouch = false,
-        climbFall = true,
-        fallOnStaticMover = false,
-        allowWavedash = false,
-        dashCornerCorrection = false,
-        direction = "Down",
-        fallDashMode = "Disabled",
-        width = 8,
-        height = 8
+function fallingBlock.placements()
+    return {
+        name = "falling_block",
+        data = {
+            tiletype = fakeTilesHelper.getPlacementMaterial(),
+            depth = -9000,
+            shakeSfx = "event:/game/general/fallblock_shake",
+            impactSfx = "event:/game/general/fallblock_impact",
+            fallOnTouch = false,
+            climbFall = true,
+            fallOnStaticMover = false,
+            allowWavedash = false,
+            dashCornerCorrection = false,
+            direction = "Down",
+            fallDashMode = "Disabled",
+            width = 8,
+            height = 8
+        }
     }
-}
+end
 
 fallingBlock.sprite = fakeTilesHelper.getEntitySpriteFunction("tiletype", false)
 
