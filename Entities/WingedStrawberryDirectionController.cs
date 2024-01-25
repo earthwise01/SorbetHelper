@@ -105,7 +105,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             }
         }
 
-        private static bool controllerExists(Entity self) => self.Scene.Tracker.GetEntity<WingedStrawberryDirectionController>() != null;
+        private static bool controllerExists(Entity self) =>
+            self.Scene.Tracker.GetEntity<WingedStrawberryDirectionController>() != null;
 
         private static void moveStrawberry(Entity self, float flapSpeed) {
             WingedStrawberryDirectionController controller = self.Scene.Tracker.GetEntity<WingedStrawberryDirectionController>();
@@ -126,11 +127,11 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 return;
 
             // out of bounds checks are only done for the directions the berry flies towards bc otherwise berries that would fly into the room from offscreen will be removed as soon as they start flying
-            if (controller.movesDown && self.Y > (float)(self.SceneAs<Level>().Bounds.Bottom + 16))
+            if (controller.movesDown && self.Y > self.SceneAs<Level>().Bounds.Bottom + 16)
                 self.RemoveSelf();
-            if (controller.movesLeft && self.X < (float)(self.SceneAs<Level>().Bounds.Left - 24))
+            if (controller.movesLeft && self.X < self.SceneAs<Level>().Bounds.Left - 24)
                 self.RemoveSelf();
-            if (controller.movesRight && self.X > (float)(self.SceneAs<Level>().Bounds.Right + 24))
+            if (controller.movesRight && self.X > self.SceneAs<Level>().Bounds.Right + 24)
                 self.RemoveSelf();
         }
 
