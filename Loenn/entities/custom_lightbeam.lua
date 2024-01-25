@@ -104,7 +104,7 @@ function lightBeam.sprite(room, entity)
         color = utils.getColor(entity.color)
     end
 
-    result = lightBeamHelper.getSprites(room, entity, color, false)
+    local result = lightBeamHelper.getSprites(room, entity, color, false)
 
     return result
 end

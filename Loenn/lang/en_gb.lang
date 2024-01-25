@@ -60,11 +60,13 @@ entities.SorbetHelper/BigWaterfall.placements.name.abovefg=Resizable Waterfall (
 entities.SorbetHelper/BigWaterfall.placements.description.normal=A waterfall which behaves similarly to a vanilla Waterfall, but is also resizable like and closer visually to a vanilla Big Waterfall.
 entities.SorbetHelper/BigWaterfall.placements.description.abovefg=A waterfall which behaves similarly to a vanilla Waterfall, but is also resizable like and closer visually to a vanilla Big Waterfall. Ignores and renders above Foreground Tiles.
 entities.SorbetHelper/BigWaterfall.attributes.description.color=The color of the waterfall.
-entities.SorbetHelper/BigWaterfall.attributes.description.ignoreSolids=When checked, the waterfall will ignore any solids in its way (e.g. foreground tiles). however, water can still block it.
+entities.SorbetHelper/BigWaterfall.attributes.description.ignoreSolids=When checked, the waterfall will ignore any solid objects in its way (e.g. foreground tiles). however, water can still block it.
 entities.SorbetHelper/BigWaterfall.attributes.description.lines=Determines whether the waterfall will have any additional lines for detail, disabling this will make the waterfall appear closer in appearance to a vanilla small waterfall as opposed to a big waterfall.
 entities.SorbetHelper/BigWaterfall.attributes.description.depth=Determines what visual layer the waterfall should be on (higher values mean further behind in the scene, default value is -9999 for the normal placement or -49900 for the above foreground placement).\nNote that this doesn't have any effect on the distortion effect. (meaning even if you set the waterfall to be in the background, the distortion will still exist in the foreground)
 
 # custom/rainbow lightbeam
+# tooltips for most of the rainbow related attributes stolen from MaddieHelpingHand
+# https://github.com/maddie480/MaddieHelpingHand/blob/master/Loenn/lang/en_gb.lang#L532
 entities.SorbetHelper/CustomLightbeam.placements.name.customlightbeam=Custom Lightbeam
 entities.SorbetHelper/CustomLightbeam.placements.name.rainbowlightbeam=Custom Lightbeam (Rainbow)
 entities.SorbetHelper/CustomLightbeam.attributes.description.flag=The flag that needs to be set in order for the lightbeam to be activated, leaving this empty causes the lightbeam to always be active.

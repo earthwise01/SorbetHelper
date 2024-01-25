@@ -28,13 +28,15 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private SoundSource loopingSfx;
         private SoundSource enteringSfx;
 
+        private bool visibleOnCamera;
+
         public BigWaterfall(EntityData data, Vector2 offset) : base(data.Position + offset) {
             base.Tag = Tags.TransitionUpdate;
 
             width = data.Width;
             base.Depth = data.Int("depth", -49900);
 
-            ignoreSolids = data.Bool("ignoreSolids");
+            ignoreSolids = data.Bool("ignoreSolids", false);
             hasLines = data.Bool("lines", true);
 
             baseColor = Calc.HexToColor(data.Attr("color", "87CEFA"));
@@ -78,28 +80,34 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         public override void Update() {
+            visibleOnCamera = InView((base.Scene as Level).Camera);
+
             if (loopingSfx != null) {
                 Vector2 position = (base.Scene as Level).Camera.Position;
                 loopingSfx.Position.Y = Calc.Clamp(position.Y + 90f, base.Y, height);
             }
 
-            if (water != null && water.Active && water.TopSurface != null && base.Scene.OnInterval(0.3f)) {
-                water.TopSurface.DoRipple(new Vector2(base.X + (width / 2f), water.Y), 0.75f);
-                if (width >= 32) {
-                    water.TopSurface.DoRipple(new Vector2(base.X + 8f, water.Y), 0.75f);
-                    water.TopSurface.DoRipple(new Vector2(base.X + width - 8f, water.Y), 0.75f);
+            if (visibleOnCamera) {
+                if (water != null && water.Active && water.TopSurface != null && base.Scene.OnInterval(0.3f)) {
+                    water.TopSurface.DoRipple(new Vector2(base.X + (width / 2f), water.Y), 0.75f);
+                    if (width >= 32) {
+                        water.TopSurface.DoRipple(new Vector2(base.X + 8f, water.Y), 0.75f);
+                        water.TopSurface.DoRipple(new Vector2(base.X + width - 8f, water.Y), 0.75f);
+                    }
                 }
-            }
 
-            if (water != null || solid != null) {
-                Vector2 position2 = new Vector2(base.X + (width / 2f), base.Y + height + 2f);
-                (base.Scene as Level).ParticlesFG.Emit(Water.P_Splash, 1, position2, new Vector2((width / 2f) + 4f, 2f), baseColor, new Vector2(0f, -1f).Angle());
+                if (water != null || solid != null) {
+                    Vector2 position2 = new Vector2(base.X + (width / 2f), base.Y + height + 2f);
+                    (base.Scene as Level).ParticlesFG.Emit(Water.P_Splash, 1, position2, new Vector2((width / 2f) + 4f, 2f), baseColor, new Vector2(0f, -1f).Angle());
+                }
             }
 
             base.Update();
         }
 
         public override void Render() {
+            if (!visibleOnCamera) return;
+
             if (water == null || water.TopSurface == null) {
                 Draw.Rect(base.X, base.Y, width, height, fillColor);
 
@@ -128,5 +136,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 }
             }
         }
+
+        private bool InView(Camera camera) =>
+            base.X < camera.Right + 24f && base.X + width > camera.Left - 24f && base.Y < camera.Bottom + 24f && base.Y + height > camera.Top - 24f;
     }
 }
