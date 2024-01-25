@@ -76,7 +76,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         public void RenderDisplacement() {
-            Draw.Rect(base.X, base.Y, width, height, new Color(0.5f, 0.5f, 1f, 1f));
+            if (visibleOnCamera)
+                Draw.Rect(base.X, base.Y, width, height, new Color(0.5f, 0.5f, 1f, 1f));
         }
 
         public override void Update() {
