@@ -3,7 +3,6 @@ using Monocle;
 namespace Celeste.Mod.SorbetHelper {
 
     public class CameraOffsetCommands {
-
         [Command("set_camera_offset_x", "Sets the camera X offset to the specifed value. (Sorbet Helper)")]
         public static void SetXOffset(float offset = 0f) {
             (Engine.Scene as Level).CameraOffset.X = offset * 48f;
@@ -23,7 +22,5 @@ namespace Celeste.Mod.SorbetHelper {
             Engine.Commands.Log("X offset: " + x.ToString());
             Engine.Commands.Log("Y offset: " + y.ToString());
         }
-
     }
-
 }

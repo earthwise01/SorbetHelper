@@ -22,15 +22,15 @@ entities.SorbetHelper/ReturnBerry.placements.name.normal=Strawberry (With Node B
 entities.SorbetHelper/ReturnBerry.placements.name.winged=Strawberry (Winged, With Node Based Return)
 entities.SorbetHelper/ReturnBerry.placements.description.normal=Similar to a Strawberry, but when the player grabs it they are placed into a bubble and moved along a path of nodes.
 entities.SorbetHelper/ReturnBerry.placements.description.winged=Similar to a Strawberry (Winged), but when the player grabs it they are placed into a bubble and moved along a path of nodes.
-entities.SorbetHelper/ReturnBerry.attributes.description.winged=Determines whether the strawberry has wings.
-entities.SorbetHelper/ReturnBerry.attributes.description.delay=The delay (in seconds) before the player is placed into a bubble after grabbing the strawberry.
+entities.SorbetHelper/ReturnBerry.attributes.description.winged=Determines whether the strawberry has wings and attempts to vertically rise offscreen when the player dashes.
+entities.SorbetHelper/ReturnBerry.attributes.description.delay=The delay (in seconds) before the player is placed into a bubble after grabbing the strawberry. (Default= 0.3)
 entities.SorbetHelper/ReturnBerry.attributes.description.checkpointID=Manually determine what checkpoint section strawberries are visually grouped up in, showing up on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)
 entities.SorbetHelper/ReturnBerry.attributes.description.order=Manually determine what order strawberries are visually placed in on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)
 
 # Dash Falling Block
 entities.SorbetHelper/DashFallingBlock.placements.name.falling_block=Dash Falling Block
 entities.SorbetHelper/DashFallingBlock.placements.description.falling_block=A falling block that only gets activated once the player dashes into it.
-entities.SorbetHelper/DashFallingBlock.attributes.description.climbFall=If the block should fall if the player climbs on its sides.\n(needs 'Fall On Touch' enabled)
+entities.SorbetHelper/DashFallingBlock.attributes.description.climbFall=If the block should fall if the player climbs on its sides.\nDoes nothing unless Fall On Touch is enabled.
 entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnTouch=If the block should fall if it comes in contact with the player, even if they don't dash into it.
 entities.SorbetHelper/DashFallingBlock.attributes.name.fallOnStaticMover=Fall On Static Mover Interact
 entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnStaticMover=If the falling block can be activated by static movers (such as springs) attached to it.
@@ -40,7 +40,11 @@ entities.SorbetHelper/DashFallingBlock.attributes.description.impactSfx=The soun
 entities.SorbetHelper/DashFallingBlock.attributes.description.tiletype=Changes the visual appearance of the falling block.
 entities.SorbetHelper/DashFallingBlock.attributes.description.allowWavedash=If it is possible to wavedash on top of the block.
 entities.SorbetHelper/DashFallingBlock.attributes.description.dashCornerCorrection=Makes wallbouncing off of the block less precise (by allowing it up to 4 pixels deep into the block horizontally, dashing from the bottom).
+entities.SorbetHelper/DashFallingBlock.attributes.description.direction=The direction the falling block will fall.
+entities.SorbetHelper/DashFallingBlock.attributes.name.fallDashMode=Fall Towards Dash Direction
+entities.SorbetHelper/DashFallingBlock.attributes.description.fallDashMode=Whether the direction the falling block will fall towards is determined by the direction it was dashed into from.\nOverrides the normal direction setting when enabled.
 
+# crumble on flag block
 entities.SorbetHelper/CrumbleOnFlagBlock.placements.name.crumble_on_flag_block=Crumble On Flag Block
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.blendin=Blends the block in with the walls it touches, making it less apparent.
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.tiletype=Determines the visual appearance of the block.
@@ -56,11 +60,13 @@ entities.SorbetHelper/BigWaterfall.placements.name.abovefg=Resizable Waterfall (
 entities.SorbetHelper/BigWaterfall.placements.description.normal=A waterfall which behaves similarly to a vanilla Waterfall, but is also resizable like and closer visually to a vanilla Big Waterfall.
 entities.SorbetHelper/BigWaterfall.placements.description.abovefg=A waterfall which behaves similarly to a vanilla Waterfall, but is also resizable like and closer visually to a vanilla Big Waterfall. Ignores and renders above Foreground Tiles.
 entities.SorbetHelper/BigWaterfall.attributes.description.color=The color of the waterfall.
-entities.SorbetHelper/BigWaterfall.attributes.description.ignoreSolids=When checked, the waterfall will ignore any solids in its way (e.g. foreground tiles). however, water can still block it.
+entities.SorbetHelper/BigWaterfall.attributes.description.ignoreSolids=When checked, the waterfall will ignore any solid objects in its way (e.g. foreground tiles). however, water can still block it.
 entities.SorbetHelper/BigWaterfall.attributes.description.lines=Determines whether the waterfall will have any additional lines for detail, disabling this will make the waterfall appear closer in appearance to a vanilla small waterfall as opposed to a big waterfall.
 entities.SorbetHelper/BigWaterfall.attributes.description.depth=Determines what visual layer the waterfall should be on (higher values mean further behind in the scene, default value is -9999 for the normal placement or -49900 for the above foreground placement).\nNote that this doesn't have any effect on the distortion effect. (meaning even if you set the waterfall to be in the background, the distortion will still exist in the foreground)
 
 # custom/rainbow lightbeam
+# tooltips for most of the rainbow related attributes stolen from MaddieHelpingHand
+# https://github.com/maddie480/MaddieHelpingHand/blob/master/Loenn/lang/en_gb.lang#L532
 entities.SorbetHelper/CustomLightbeam.placements.name.customlightbeam=Custom Lightbeam
 entities.SorbetHelper/CustomLightbeam.placements.name.rainbowlightbeam=Custom Lightbeam (Rainbow)
 entities.SorbetHelper/CustomLightbeam.attributes.description.flag=The flag that needs to be set in order for the lightbeam to be activated, leaving this empty causes the lightbeam to always be active.
@@ -69,7 +75,7 @@ entities.SorbetHelper/CustomLightbeam.attributes.description.rotation=The rotati
 entities.SorbetHelper/CustomLightbeam.attributes.description.depth=Determines what visual layer the lightbeam should be on (higher values mean further behind in the scene, default value is -9998).\nDoes not affect the particles.
 entities.SorbetHelper/CustomLightbeam.attributes.description.noParticles=Determines whether the lightbeam emits particles.
 entities.SorbetHelper/CustomLightbeam.attributes.description.color=The color of the lightbeam.
-entities.SorbetHelper/CustomLightbeam.attributes.description.rainbow=Determines whether the lightbeam is rainbow.\nChanging this requires reopening this menu for the correct settings to appear.
+entities.SorbetHelper/CustomLightbeam.attributes.description.rainbow=Determines whether the lightbeam is rainbow.\nChanging this requires clicking save changes and reopening this menu for the correct settings to appear.
 # ^^^ might still be able to write this in a cleaner way but this should be good enough at least?
 entities.SorbetHelper/CustomLightbeam.attributes.description.colors=The colors the rainbow lightbeam will use, separated by commas.
 entities.SorbetHelper/CustomLightbeam.attributes.description.gradientSize=The distance required to achieve a complete loop across all colors. Vanilla value is 280.
@@ -88,6 +94,10 @@ entities.SorbetHelper/CustomLightbeam.attributes.name.centerX=Rainbow Center X
 entities.SorbetHelper/CustomLightbeam.attributes.name.centerY=Rainbow Center Y
 entities.SorbetHelper/CustomLightbeam.attributes.name.singleColor=Uniform Color
 # ^^^ this might not be an accurate way of saying this but honestly at this point i've given up trying to find anything better.
+
+# winged strawberry direction controller
+entities.SorbetHelper/WingedStrawberryDirectionController.placements.name.wingedStrawberryController=Winged Strawberry Direction Controller
+entities.SorbetHelper/WingedStrawberryDirectionController.attributes.description.direction=The direction winged strawberries in the room will fly.
 
 # depth adhering displacement wrapper
 entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.normal=Depth Adhering Displacement Wrapper
