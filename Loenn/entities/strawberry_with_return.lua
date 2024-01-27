@@ -17,6 +17,9 @@ return_berry.fieldInformation = {
     },
     checkpointID = {
         fieldType = "integer"
+    },
+    delay = {
+        minimumValue = 0.0
     }
 }
 

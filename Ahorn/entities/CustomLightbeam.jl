@@ -56,7 +56,7 @@ const placements = Ahorn.PlacementDict(
 
 Ahorn.editingOrder(entity::CustomLightbeam) = String[
     "x", "y", "width", "height", "centerX", "centerY", "color", "colors", "gradientSize", "gradientSpeed", "depth", "rotation", "flag",
-    "fadeWhenNear", "fadeOnTransition", "inverted", "rainbow", "loopColors", "singleColor", "noParticles"
+    "fadeWhenNear", "fadeOnTransition", "inverted", "noParticles", "rainbow", "loopColors", "singleColor"
 ]
 
 function Ahorn.editingIgnored(entity::CustomLightbeam, multiple::Bool=false)
