@@ -4,7 +4,7 @@ depthAdheringDisplacementWrapper.name = "SorbetHelper/DepthAdheringDisplacementW
 depthAdheringDisplacementWrapper.depth = -15000
 depthAdheringDisplacementWrapper.placements = {
     {
-        name = "normal",
+        name = "entityOnly",
         data = {
             width = 8,
             height = 8,

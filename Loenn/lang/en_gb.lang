@@ -100,19 +100,21 @@ entities.SorbetHelper/WingedStrawberryDirectionController.placements.name.winged
 entities.SorbetHelper/WingedStrawberryDirectionController.attributes.description.direction=The direction winged strawberries in the room will fly.
 
 # depth adhering displacement wrapper
-entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.normal=Depth Adhering Displacement Wrapper
-entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.distortBehind=Depth Adhering Displacement Wrapper (Distort Behind)
-entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.description.normal=Makes the displacement effect from entities which use any (e.g. water and waterfalls) only affect its entity and nothing else.\nNormal displacement affects everything in its area, no matter the depth.
-entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.description.distortBehind=Makes the displacement effect from entities which use any (e.g. water and waterfalls) only affect its entity and anything behind it.\nNormal displacement affects everything in its area, no matter the depth.
-entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.description.distortBehind=Determines whether any affected entities should also distort things behind them along with themselves.
+# names probably still kinda suck but i literally cant think of anything better
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.entityOnly=Displacement Wrapper (Only Distort Entity)
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.distortBehind=Displacement Wrapper (Depth Adhering)
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.description.entityOnly=Makes the displacement effects of entities which use any (e.g. water and waterfalls) only affect their entity and nothing else.\nNormal displacement affects everything in its area, no matter the depth.
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.description.distortBehind=Makes the displacement effects of entities which use any (e.g. water and waterfalls) only affect their entity and anything behind it.\nNormal displacement affects everything in its area, no matter the depth.
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.name.distortBehind=Distort Behind
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.description.distortBehind=Whether affected entities should also apply their displacement effects to things behind them.\nDisabling this makes entities only affect themselves.
 # unused
 entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.description.onlyCollideTopLeft=Makes it so that the wrapper needs to be touching the top left corner of entities in order to affect them.\nAllows for more precision when choosing which entities to affect when there are many close together, although at the cost of being less intuitive.
 
 # displacement blocker
 entities.SorbetHelper/DisplacementEffectBlocker.placements.name.normal=Displacement Effect Blocker
 entities.SorbetHelper/DisplacementEffectBlocker.placements.name.depthAdhering=Depth Adhering Displacement Effect Blocker
-entities.SorbetHelper/DisplacementEffectBlocker.placements.description.normal=Blocks the displacement effect produced by entities such as water or waterfalls.
-entities.SorbetHelper/DisplacementEffectBlocker.placements.description.depthAdhering=Blocks the displacement effect produced by entities such as water or waterfalls that are *affected by a Depth Adhering Displacement Wrapper* at a certain depth.
-entities.SorbetHelper/DisplacementEffectBlocker.attributes.description.depth=The depth of the displacement blocker. Any depth adhering distortion with a depth equal to or higher than this will be affected by the blocker.\n(higher values mean further behind in the scene.)
+entities.SorbetHelper/DisplacementEffectBlocker.placements.description.normal=Completely blocks the displacement effect produced by entities such as water or waterfalls.
+entities.SorbetHelper/DisplacementEffectBlocker.placements.description.depthAdhering=Blocks the displacement effect produced by entities such as water or waterfalls at a certain depth that are *affected by a Depth Adhering Displacement Wrapper*.
+entities.SorbetHelper/DisplacementEffectBlocker.attributes.description.depth=The depth of the displacement blocker. Any depth adhering displacement attached to an entity with a depth equal to or higher than this will be affected by the blocker.\n(higher values mean further behind in the scene.)
 
 mods.SorbetHelper.name=Sorbet Helper
