@@ -67,12 +67,12 @@ function lightBeam.fieldOrder(entity)
     if entity.rainbow == true then
         fields = {
             "x", "y", "width", "height", "centerX", "centerY", "colors", "gradientSize", "gradientSpeed", "depth", "rotation", "flag",
-            "fadeWhenNear", "fadeOnTransition", "inverted", "rainbow", "loopColors", "singleColor", "noParticles"
+            "fadeWhenNear", "fadeOnTransition", "inverted", "noParticles", "rainbow", "loopColors", "singleColor"
         }
     else
         fields = {
             "x", "y", "width", "height", "color", "depth", "rotation", "flag",
-            "fadeWhenNear", "fadeOnTransition", "inverted", "rainbow", "noParticles"
+            "fadeWhenNear", "fadeOnTransition", "inverted", "noParticles", "rainbow"
         }
     end
     return fields
@@ -104,7 +104,7 @@ function lightBeam.sprite(room, entity)
         color = utils.getColor(entity.color)
     end
 
-    result = lightBeamHelper.getSprites(room, entity, color, false)
+    local result = lightBeamHelper.getSprites(room, entity, color, false)
 
     return result
 end

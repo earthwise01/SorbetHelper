@@ -22,15 +22,15 @@ entities.SorbetHelper/ReturnBerry.placements.name.normal=Strawberry (With Node B
 entities.SorbetHelper/ReturnBerry.placements.name.winged=Strawberry (Winged, With Node Based Return)
 entities.SorbetHelper/ReturnBerry.placements.description.normal=Similar to a Strawberry, but when the player grabs it they are placed into a bubble and moved along a path of nodes.
 entities.SorbetHelper/ReturnBerry.placements.description.winged=Similar to a Strawberry (Winged), but when the player grabs it they are placed into a bubble and moved along a path of nodes.
-entities.SorbetHelper/ReturnBerry.attributes.description.winged=Determines whether the strawberry has wings.
-entities.SorbetHelper/ReturnBerry.attributes.description.delay=The delay (in seconds) before the player is placed into a bubble after grabbing the strawberry.
+entities.SorbetHelper/ReturnBerry.attributes.description.winged=Determines whether the strawberry has wings and attempts to vertically rise offscreen when the player dashes.
+entities.SorbetHelper/ReturnBerry.attributes.description.delay=The delay (in seconds) before the player is placed into a bubble after grabbing the strawberry. (Default= 0.3)
 entities.SorbetHelper/ReturnBerry.attributes.description.checkpointID=Manually determine what checkpoint section strawberries are visually grouped up in, showing up on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)
 entities.SorbetHelper/ReturnBerry.attributes.description.order=Manually determine what order strawberries are visually placed in on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)
 
 # Dash Falling Block
 entities.SorbetHelper/DashFallingBlock.placements.name.falling_block=Dash Falling Block
 entities.SorbetHelper/DashFallingBlock.placements.description.falling_block=A falling block that only gets activated once the player dashes into it.
-entities.SorbetHelper/DashFallingBlock.attributes.description.climbFall=If the block should fall if the player climbs on its sides.\n(needs 'Fall On Touch' enabled)
+entities.SorbetHelper/DashFallingBlock.attributes.description.climbFall=If the block should fall if the player climbs on its sides.\nDoes nothing unless Fall On Touch is enabled.
 entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnTouch=If the block should fall if it comes in contact with the player, even if they don't dash into it.
 entities.SorbetHelper/DashFallingBlock.attributes.name.fallOnStaticMover=Fall On Static Mover Interact
 entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnStaticMover=If the falling block can be activated by static movers (such as springs) attached to it.
@@ -40,88 +40,11 @@ entities.SorbetHelper/DashFallingBlock.attributes.description.impactSfx=The soun
 entities.SorbetHelper/DashFallingBlock.attributes.description.tiletype=Changes the visual appearance of the falling block.
 entities.SorbetHelper/DashFallingBlock.attributes.description.allowWavedash=If it is possible to wavedash on top of the block.
 entities.SorbetHelper/DashFallingBlock.attributes.description.dashCornerCorrection=Makes wallbouncing off of the block less precise (by allowing it up to 4 pixels deep into the block horizontally, dashing from the bottom).
+entities.SorbetHelper/DashFallingBlock.attributes.description.direction=The direction the falling block will fall.
+entities.SorbetHelper/DashFallingBlock.attributes.name.fallDashMode=Fall Towards Dash Direction
+entities.SorbetHelper/DashFallingBlock.attributes.description.fallDashMode=Whether the direction the falling block will fall towards is determined by the direction it was dashed into from.\nOverrides the normal direction setting when enabled.
 
-# Dash Gate Block
-entities.SorbetHelper/DashGateBlock.placements.name.block=Gate Block (Dash Activated, Stone)
-entities.SorbetHelper/DashGateBlock.placements.name.temple=Gate Block (Dash Activated, Temple)
-entities.SorbetHelper/DashGateBlock.placements.name.mirror=Gate Block (Dash Activated, Mirror)
-entities.SorbetHelper/DashGateBlock.placements.name.stars=Gate Block (Dash Activated, Moon)
-
-entities.SorbetHelper/DashGateBlock.placements.description.block=A Switch Gate like block which activates if the player dashes into it.
-entities.SorbetHelper/DashGateBlock.placements.description.temple=A Switch Gate like block which activates if the player dashes into it.
-entities.SorbetHelper/DashGateBlock.placements.description.mirror=A Switch Gate like block which activates if the player dashes into it.
-entities.SorbetHelper/DashGateBlock.placements.description.stars=A Switch Gate like block which activates if the player dashes into it.
-
-entities.SorbetHelper/DashGateBlock.attributes.description.iconSprite=The texture for the icon in the center of the gate block.
-entities.SorbetHelper/DashGateBlock.attributes.description.inactiveColor=The gate icon colour when not triggered yet.
-entities.SorbetHelper/DashGateBlock.attributes.description.activeColor=The gate icon colour when the block is moving.
-entities.SorbetHelper/DashGateBlock.attributes.description.finishColor=The gate icon colour when the block has reached its destination.
-entities.SorbetHelper/DashGateBlock.attributes.description.blockSprite=The texture for the gate block.
-entities.SorbetHelper/DashGateBlock.attributes.description.shakeTime=The time (in seconds) the block spends shaking before starting to move. Default value is 0.5 seconds.
-entities.SorbetHelper/DashGateBlock.attributes.description.moveTime=The time (in seconds) the block takes to move to its destination after shaking. Default value is 1.8 seconds.
-entities.SorbetHelper/DashGateBlock.attributes.description.moveEased=If the block should slow down before reaching its final position. If unchecked, the block will move at constant speed.
-entities.SorbetHelper/DashGateBlock.attributes.description.moveSound=The sound played by the gate when it starts moving.
-entities.SorbetHelper/DashGateBlock.attributes.description.finishedSound=The sound played by the gate when it is done moving.
-entities.SorbetHelper/DashGateBlock.attributes.description.allowWavedash=If you can wavedash on top of the block.
-entities.SorbetHelper/DashGateBlock.attributes.description.dashCornerCorrection=Makes wallbouncing off of the gate block less precise (by allowing it up to 4 pixels deep into the block horizontally, dashing from the bottom).
-entities.SorbetHelper/DashGateBlock.attributes.description.smoke=If the gate block should emit smoke when reaching its final position.
-entities.SorbetHelper/DashGateBlock.attributes.description.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThe gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
-entities.SorbetHelper/DashGateBlock.attributes.description.linked=If the gate block can activate/be activated by other gate blocks sharing the same link tag.
-entities.SorbetHelper/DashGateBlock.attributes.description.linkTag=The link tag used to pair with other gate blocks, any gate blocks sharing this link tag will be activated when this gate block is activated (and vice versa).\n(needs 'Linked' enabled)
-
-# Touch Gate Block
-entities.SorbetHelper/TouchGateBlock.placements.name.block=Gate Block (Touch Activated, Stone)
-entities.SorbetHelper/TouchGateBlock.placements.name.temple=Gate Block (Touch Activated, Temple)
-entities.SorbetHelper/TouchGateBlock.placements.name.mirror=Gate Block (Touch Activated, Mirror)
-entities.SorbetHelper/TouchGateBlock.placements.name.stars=Gate Block (Touch Activated, Moon)
-
-entities.SorbetHelper/TouchGateBlock.placements.description.block=A Switch Gate like block which activates if the player touches it.
-entities.SorbetHelper/TouchGateBlock.placements.description.temple=A Switch Gate like block which activates if the player touches it.
-entities.SorbetHelper/TouchGateBlock.placements.description.mirror=A Switch Gate like block which activates if the player touches it.
-entities.SorbetHelper/TouchGateBlock.placements.description.stars=A Switch Gate like block which activates if the player touches it.
-
-entities.SorbetHelper/TouchGateBlock.attributes.description.iconSprite=The texture for the icon in the center of the gate block.
-entities.SorbetHelper/TouchGateBlock.attributes.description.inactiveColor=The gate icon colour when not triggered yet.
-entities.SorbetHelper/TouchGateBlock.attributes.description.activeColor=The gate icon colour when the block is moving.
-entities.SorbetHelper/TouchGateBlock.attributes.description.finishColor=The gate icon colour when the block has reached its destination.
-entities.SorbetHelper/TouchGateBlock.attributes.description.blockSprite=The texture for the gate block.
-entities.SorbetHelper/TouchGateBlock.attributes.description.shakeTime=The time (in seconds) the block spends shaking before starting to move. Default value is 0.5 seconds.
-entities.SorbetHelper/TouchGateBlock.attributes.description.moveTime=The time (in seconds) the block takes to move to its destination after shaking. Default value is 1.8 seconds.
-entities.SorbetHelper/TouchGateBlock.attributes.description.moveEased=If the block should slow down before reaching its final position. If unchecked, the block will move at constant speed.
-entities.SorbetHelper/TouchGateBlock.attributes.description.moveSound=The sound played by the gate when it starts moving.
-entities.SorbetHelper/TouchGateBlock.attributes.description.finishedSound=The sound played by the gate when it is done moving.
-entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnGrab=If the gate block should move if the player climbs on its sides.
-entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnStaticMoverInteract=If the gate block can be activated by static movers (such as springs) attached to it.
-entities.SorbetHelper/TouchGateBlock.attributes.description.smoke=If the gate block should emit smoke when reaching its final position.
-entities.SorbetHelper/TouchGateBlock.attributes.description.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThe gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
-entities.SorbetHelper/TouchGateBlock.attributes.description.linked=If the gate block can activate/be activated by other gate blocks sharing the same link tag.
-entities.SorbetHelper/TouchGateBlock.attributes.description.linkTag=The link tag used to pair with other gate blocks, any gate blocks sharing this link tag will be activated when this gate block is activated (and vice versa).\n(needs 'Linked' enabled)
-
-# Linked Gate Block
-entities.SorbetHelper/LinkedGateBlock.placements.name.block=Gate Block (Link Activated, Stone)
-entities.SorbetHelper/LinkedGateBlock.placements.name.temple=Gate Block (Link Activated, Temple)
-entities.SorbetHelper/LinkedGateBlock.placements.name.mirror=Gate Block (Link Activated, Mirror)
-entities.SorbetHelper/LinkedGateBlock.placements.name.stars=Gate Block (Link Activated, Moon)
-
-entities.SorbetHelper/LinkedGateBlock.placements.description.block=A Switch Gate like block which activates if it shares its link tag with another Gate Block that gets activated.
-entities.SorbetHelper/LinkedGateBlock.placements.description.temple=A Switch Gate like block which activates if it shares its link tag with another Gate Block that gets activated.
-entities.SorbetHelper/LinkedGateBlock.placements.description.mirror=A Switch Gate like block which activates if it shares its link tag with another Gate Block that gets activated.
-entities.SorbetHelper/LinkedGateBlock.placements.description.stars=A Switch Gate like block which activates if it shares its link tag with another Gate Block that gets activated.
-
-entities.SorbetHelper/LinkedGateBlock.attributes.description.iconSprite=The texture for the icon in the center of the gate block.
-entities.SorbetHelper/LinkedGateBlock.attributes.description.inactiveColor=The gate icon colour when not triggered yet.
-entities.SorbetHelper/LinkedGateBlock.attributes.description.activeColor=The gate icon colour when the block is moving.
-entities.SorbetHelper/LinkedGateBlock.attributes.description.finishColor=The gate icon colour when the block has reached its destination.
-entities.SorbetHelper/LinkedGateBlock.attributes.description.blockSprite=The texture for the gate block.
-entities.SorbetHelper/LinkedGateBlock.attributes.description.shakeTime=The time (in seconds) the block spends shaking before starting to move. Default value is 0.5 seconds.
-entities.SorbetHelper/LinkedGateBlock.attributes.description.moveTime=The time (in seconds) the block takes to move to its destination after shaking. Default value is 1.8 seconds.
-entities.SorbetHelper/LinkedGateBlock.attributes.description.moveEased=If the block should slow down before reaching its final position. If unchecked, the block will move at constant speed.
-entities.SorbetHelper/LinkedGateBlock.attributes.description.moveSound=The sound played by the gate when it starts moving.
-entities.SorbetHelper/LinkedGateBlock.attributes.description.finishedSound=The sound played by the gate when it is done moving.
-entities.SorbetHelper/LinkedGateBlock.attributes.description.smoke=If the gate block should emit smoke when reaching its final position.
-entities.SorbetHelper/LinkedGateBlock.attributes.description.persistent=If enabled, the gate block will stay open when the player dies or changes rooms.\nThe gate block will also set a flag when it is activated: sorbet_helper_gate_block_persistent[entityID]
-entities.SorbetHelper/LinkedGateBlock.attributes.description.linkTag=The link tag used to pair with other gate blocks, any gate blocks sharing this link tag will also activate this gate block when they are activated.
-
+# crumble on flag block
 entities.SorbetHelper/CrumbleOnFlagBlock.placements.name.crumble_on_flag_block=Crumble On Flag Block
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.blendin=Blends the block in with the walls it touches, making it less apparent.
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.tiletype=Determines the visual appearance of the block.
@@ -137,11 +60,13 @@ entities.SorbetHelper/BigWaterfall.placements.name.abovefg=Resizable Waterfall (
 entities.SorbetHelper/BigWaterfall.placements.description.normal=A waterfall which behaves similarly to a vanilla Waterfall, but is also resizable like and closer visually to a vanilla Big Waterfall.
 entities.SorbetHelper/BigWaterfall.placements.description.abovefg=A waterfall which behaves similarly to a vanilla Waterfall, but is also resizable like and closer visually to a vanilla Big Waterfall. Ignores and renders above Foreground Tiles.
 entities.SorbetHelper/BigWaterfall.attributes.description.color=The color of the waterfall.
-entities.SorbetHelper/BigWaterfall.attributes.description.ignoreSolids=When checked, the waterfall will ignore any solids in its way (e.g. foreground tiles). however, water can still block it.
+entities.SorbetHelper/BigWaterfall.attributes.description.ignoreSolids=When checked, the waterfall will ignore any solid objects in its way (e.g. foreground tiles). however, water can still block it.
 entities.SorbetHelper/BigWaterfall.attributes.description.lines=Determines whether the waterfall will have any additional lines for detail, disabling this will make the waterfall appear closer in appearance to a vanilla small waterfall as opposed to a big waterfall.
 entities.SorbetHelper/BigWaterfall.attributes.description.depth=Determines what visual layer the waterfall should be on (higher values mean further behind in the scene, default value is -9999 for the normal placement or -49900 for the above foreground placement).\nNote that this doesn't have any effect on the distortion effect. (meaning even if you set the waterfall to be in the background, the distortion will still exist in the foreground)
 
 # custom/rainbow lightbeam
+# tooltips for most of the rainbow related attributes stolen from MaddieHelpingHand
+# https://github.com/maddie480/MaddieHelpingHand/blob/master/Loenn/lang/en_gb.lang#L532
 entities.SorbetHelper/CustomLightbeam.placements.name.customlightbeam=Custom Lightbeam
 entities.SorbetHelper/CustomLightbeam.placements.name.rainbowlightbeam=Custom Lightbeam (Rainbow)
 entities.SorbetHelper/CustomLightbeam.attributes.description.flag=The flag that needs to be set in order for the lightbeam to be activated, leaving this empty causes the lightbeam to always be active.
@@ -150,7 +75,7 @@ entities.SorbetHelper/CustomLightbeam.attributes.description.rotation=The rotati
 entities.SorbetHelper/CustomLightbeam.attributes.description.depth=Determines what visual layer the lightbeam should be on (higher values mean further behind in the scene, default value is -9998).\nDoes not affect the particles.
 entities.SorbetHelper/CustomLightbeam.attributes.description.noParticles=Determines whether the lightbeam emits particles.
 entities.SorbetHelper/CustomLightbeam.attributes.description.color=The color of the lightbeam.
-entities.SorbetHelper/CustomLightbeam.attributes.description.rainbow=Determines whether the lightbeam is rainbow.\nChanging this requires reopening this menu for the correct settings to appear.
+entities.SorbetHelper/CustomLightbeam.attributes.description.rainbow=Determines whether the lightbeam is rainbow.\nChanging this requires clicking save changes and reopening this menu for the correct settings to appear.
 # ^^^ might still be able to write this in a cleaner way but this should be good enough at least?
 entities.SorbetHelper/CustomLightbeam.attributes.description.colors=The colors the rainbow lightbeam will use, separated by commas.
 entities.SorbetHelper/CustomLightbeam.attributes.description.gradientSize=The distance required to achieve a complete loop across all colors. Vanilla value is 280.
@@ -170,12 +95,8 @@ entities.SorbetHelper/CustomLightbeam.attributes.name.centerY=Rainbow Center Y
 entities.SorbetHelper/CustomLightbeam.attributes.name.singleColor=Uniform Color
 # ^^^ this might not be an accurate way of saying this but honestly at this point i've given up trying to find anything better.
 
-# -- Triggers --
-
-# Linked Gate Block Activator
-triggers.SorbetHelper/LinkedGateBlockActivatorTrigger.placements.name.linked_gate_block_activator_trigger=Linked Gate Block Activator
-triggers.SorbetHelper/LinkedGateBlockActivatorTrigger.attributes.description.linkTag=The link tag used to pair with gate blocks, any gate blocks sharing this link tag will be activated when the player enters this trigger.
-triggers.SorbetHelper/LinkedGateBlockActivatorTrigger.attributes.description.flag=The flag that needs to be set in order for the trigger to be collidable, leaving this empty causes the trigger to always be collidable.
-triggers.SorbetHelper/LinkedGateBlockActivatorTrigger.attributes.description.inverted=When checked, the trigger will only be collidable when the associated flag is disabled, rather than only when the associated flag is enabled.
+# winged strawberry direction controller
+entities.SorbetHelper/WingedStrawberryDirectionController.placements.name.wingedStrawberryController=Winged Strawberry Direction Controller
+entities.SorbetHelper/WingedStrawberryDirectionController.attributes.description.direction=The direction winged strawberries in the room will fly.
 
 mods.SorbetHelper.name=Sorbet Helper

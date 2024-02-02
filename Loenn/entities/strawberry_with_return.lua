@@ -1,6 +1,7 @@
 local drawableSprite = require("structs.drawable_sprite")
 local drawableLine = require("structs.drawable_line")
 local utils = require("utils")
+local drawing = require("utils.drawing")
 local entities = require("entities")
 
 local return_berry = {}
@@ -11,6 +12,31 @@ return_berry.nodeLineRenderType = "fan"
 return_berry.nodeLimits = {2, -1}
 return_berry.ignoredFields = { "nodes", "_name", "_id", "originX", "originY" }
 
+return_berry.fieldInformation = {
+    order = {
+        fieldType = "integer",
+    },
+    checkpointID = {
+        fieldType = "integer"
+    },
+    delay = {
+        minimumValue = 0.0
+    }
+}
+
+function return_berry.fieldOrder(entity)
+    local fields = {}
+    if entity.checkpointID == nil then
+        fields = {
+            "x", "y", "delay", "winged"
+        }
+    else
+        fields = {
+            "x", "y", "checkpointID", "order", "delay", "winged"
+        }
+    end
+    return fields
+end
 
 return_berry.placements = {
     {
@@ -18,6 +44,8 @@ return_berry.placements = {
         placementType = "point",
         data = {
             winged = false,
+            checkpointID = -1,
+            order = -1,
             delay = 0.3,
             nodes = {
                 {x = 0, y = 0},
@@ -30,6 +58,8 @@ return_berry.placements = {
         placementType = "point",
         data = {
             winged = true,
+            checkpointID = -1,
+            order = -1,
             delay = 0.3,
             nodes = {
                 {x = 0, y = 0},
@@ -67,9 +97,10 @@ function return_berry.sprite(room, entity, viewport)
 
     return {
         drawableSprite.fromTexture(sprite, entity),
-        drawableSprite.fromTexture(bubble_sprite, {x = mx, y = my, color = {255 / 255, 255 / 255, 255 / 255, 185 / 255}}),
+        drawableSprite.fromTexture(bubble_sprite, {x = mx, y = my, color = {255 / 255, 255 / 255, 255 / 255, 80 / 255}}),
         drawableSprite.fromTexture(bubble_sprite, {x = nx, y = ny, color = {255 / 255, 255 / 255, 255 / 255, 185 / 255}}),
-        drawableLine.fromPoints({x, y, mx, my, nx, ny}, {255 / 255, 255 / 255, 255 / 255, 195 / 255})
+        drawableLine.fromPoints(drawing.getSimpleCurve({x, y}, {nx, ny}, {mx, my}), {255 / 255, 255 / 255, 255 / 255, 195 / 255}),
+        drawableLine.fromPoints({x, y, mx, my, nx, ny}, {255 / 255, 255 / 255, 255 / 255, 40 / 255})
     }
 end
 

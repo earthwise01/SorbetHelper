@@ -15,17 +15,17 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public TileGrid tiles;
         public EffectCutout cutout;
 
-        public char tileType;
-        public bool blendIn;
+        private readonly char tileType;
+        private readonly bool blendIn;
 
-        public string flag;
-        public bool inverted;
-        public bool playAudio;
-        public bool showDebris;
+        private readonly string flag;
+        private readonly bool inverted;
+        private readonly bool playAudio;
+        private readonly bool showDebris;
 
         public CrumbleOnFlagBlock(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, data.Height, false) {
-            tileType = data.Char("tiletype", '3');
             base.Depth = data.Int("depth", -10010);
+            tileType = data.Char("tiletype", '3');
             flag = data.Attr("flag", "");
             inverted = data.Bool("inverted", false);
             playAudio = data.Bool("playAudio", true);
@@ -37,39 +37,40 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         public override void Awake(Scene scene) {
             base.Awake(scene);
+            Level level = scene as Level;
+
             if (!blendIn) {
-				tiles = GFX.FGAutotiler.GenerateBox(tileType, (int)base.Width / 8, (int)base.Height / 8).TileGrid;
-			}
-			else {
-				Level level = SceneAs<Level>();
-				Rectangle tileBounds = level.Session.MapData.TileBounds;
-				VirtualMap<char> solidsData = level.SolidsData;
-				int x = (int)(base.X / 8f) - tileBounds.Left;
-				int y = (int)(base.Y / 8f) - tileBounds.Top;
-				int tilesX = (int)base.Width / 8;
-				int tilesY = (int)base.Height / 8;
-				tiles = GFX.FGAutotiler.GenerateOverlay(tileType, x, y, tilesX, tilesY, solidsData).TileGrid;
-			}
-			Add(tiles);
-			Add(new TileInterceptor(tiles, highPriority: true));
-			Add(new LightOcclude());
-            if (CollideCheck<Player>() || ((!inverted && SceneAs<Level>().Session.GetFlag(flag)) 
-                || (inverted && !SceneAs<Level>().Session.GetFlag(flag)))) {
-                cutout.Alpha = (tiles.Alpha = 0f);
+                tiles = GFX.FGAutotiler.GenerateBox(tileType, (int)base.Width / 8, (int)base.Height / 8).TileGrid;
+            } else {
+                Rectangle tileBounds = level.Session.MapData.TileBounds;
+                VirtualMap<char> solidsData = level.SolidsData;
+                int x = (int)(base.X / 8f) - tileBounds.Left;
+                int y = (int)(base.Y / 8f) - tileBounds.Top;
+                int tilesX = (int)base.Width / 8;
+                int tilesY = (int)base.Height / 8;
+                tiles = GFX.FGAutotiler.GenerateOverlay(tileType, x, y, tilesX, tilesY, solidsData).TileGrid;
+            }
+
+            Add(tiles);
+            Add(new TileInterceptor(tiles, highPriority: true));
+            Add(new LightOcclude());
+            if (CollideCheck<Player>() || (!inverted && level.Session.GetFlag(flag))
+            || (inverted && !level.Session.GetFlag(flag))) {
+                cutout.Alpha = tiles.Alpha = 0f;
                 Collidable = false;
             }
         }
 
         public override void Update() {
-			base.Update();
+            base.Update();
 
             if (!string.IsNullOrEmpty(flag)) {
-                if ((!inverted && !SceneAs<Level>().Session.GetFlag(flag)) 
+                if ((!inverted && !SceneAs<Level>().Session.GetFlag(flag))
                 || (inverted && SceneAs<Level>().Session.GetFlag(flag))) {
                     if (!Collidable && !CollideCheck<Player>()) {
                         Collidable = true;
                         if (playAudio) {
-				            Audio.Play("event:/game/general/passage_closed_behind", base.Center);
+                            Audio.Play("event:/game/general/passage_closed_behind", base.Center);
                         }
                     }
                 } else {
@@ -78,28 +79,28 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             }
 
             if (Collidable) {
-				cutout.Alpha = (tiles.Alpha = Calc.Approach(tiles.Alpha, 1f, Engine.DeltaTime));
+                cutout.Alpha = tiles.Alpha = Calc.Approach(tiles.Alpha, 1f, Engine.DeltaTime);
             }
-		}
+        }
 
         public virtual void Break() {
-			if (!Collidable || base.Scene == null) {
-				return;
-			}
-            if (playAudio) {
-			    Audio.Play(SFX.game_10_quake_rockbreak, Position);
+            if (!Collidable || base.Scene == null) {
+                return;
             }
-			Collidable = false;
+            if (playAudio) {
+                Audio.Play(SFX.game_10_quake_rockbreak, Position);
+            }
+            Collidable = false;
             if (showDebris) {
-			    for (int i = 0; (float)i < base.Width / 8f; i++) {
-			    	for (int j = 0; (float)j < base.Height / 8f; j++) {
-			    		if (!base.Scene.CollideCheck<Solid>(new Rectangle((int)base.X + i * 8, (int)base.Y + j * 8, 8, 8))) {
-			    			base.Scene.Add(Engine.Pooler.Create<Debris>().Init(Position + new Vector2(4 + i * 8, 4 + j * 8), tileType, playSound: true).BlastFrom(base.TopCenter));
-			    		}
-			    	}
+                for (int i = 0; i < base.Width / 8f; i++) {
+                    for (int j = 0; j < base.Height / 8f; j++) {
+                        if (!base.Scene.CollideCheck<Solid>(new Rectangle((int)base.X + i * 8, (int)base.Y + j * 8, 8, 8))) {
+                            base.Scene.Add(Engine.Pooler.Create<Debris>().Init(Position + new Vector2(4 + i * 8, 4 + j * 8), tileType, playSound: true).BlastFrom(base.TopCenter));
+                        }
+                    }
                 }
-			}
-			cutout.Alpha = (tiles.Alpha = 0f);
-		}
+            }
+            cutout.Alpha = tiles.Alpha = 0f;
+        }
     }
 }

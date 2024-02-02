@@ -14,40 +14,41 @@ namespace Celeste.Mod.SorbetHelper.Entities {
     public class DashFallingBlock : FallingBlock {
 
         /*
-         * the implementation for scale and hitOffset (and how they affect the appearance of the block) is based on code from Communal Helper's Station Blocks
-         * https://github.com/CommunalHelper/CommunalHelper/blob/dev/src/Entities/StationBlock/StationBlock.cs
-         */
+            the implementation for scale and hitOffset (and how they affect the appearance of the block) is heavily based on code from Communal Helper's Station Blocks
+            https://github.com/CommunalHelper/CommunalHelper/blob/dev/src/Entities/StationBlocks/StationBlock.cs
+        */
 
-        public string shakeSfx;
-        public string impactSfx;
+        private enum FallDashModes { Disabled, Push, Pull }
+
+        private readonly string shakeSfx;
+        private readonly string impactSfx;
         public bool fallOnTouch;
         public bool fallOnStaticMover;
         public bool allowWavedash;
         public bool dashCornerCorrection;
 
-        public bool isTriggered;
         public TileGrid tilegrid;
-        public Vector2 scale = Vector2.One;
-        public Vector2 hitOffset;
+        private Vector2 scale = Vector2.One;
+        private Vector2 hitOffset;
+        public new bool HasStartedFalling { get; private set; }
 
-        public static void Load() {
-            On.Celeste.FallingBlock.Sequence += onSequence;
-            On.Celeste.FallingBlock.PlayerFallCheck += onPlayerFallCheck;
-            On.Celeste.FallingBlock.ShakeSfx += onShakeSfx;
-            On.Celeste.FallingBlock.ImpactSfx += onImpactSfx;
-        }
+        private static readonly Dictionary<string, Vector2> directionToVector = new Dictionary<string, Vector2>() {
+            {"down", new Vector2(0f, 1f)}, {"up", new Vector2(0f, -1f)}, {"left", new Vector2(-1f, 0f)}, {"right", new Vector2(1f, 0f)}
+        };
+        public Vector2 direction;
+        private readonly FallDashModes fallDashMode;
 
-        public static void Unload() {
-            On.Celeste.FallingBlock.Sequence -= onSequence;
-            On.Celeste.FallingBlock.PlayerFallCheck -= onPlayerFallCheck;
-            On.Celeste.FallingBlock.ShakeSfx -= onShakeSfx;
-            On.Celeste.FallingBlock.ImpactSfx -= onImpactSfx;
-        }
+        private static readonly MethodInfo landParticlesInfo = typeof(FallingBlock).GetMethod("LandParticles", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod);
+        private static readonly MethodInfo playerFallCheckInfo = typeof(FallingBlock).GetMethod("PlayerFallCheck", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod);
+        private static readonly MethodInfo playerWaitCheckInfo = typeof(FallingBlock).GetMethod("PlayerWaitCheck", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod);
+        private void LandParticles() => landParticlesInfo.Invoke(this, []);
+        private bool PlayerFallCheck() => (bool)playerFallCheckInfo.Invoke(this, []);
+        private bool PlayerWaitCheck() => (bool)playerWaitCheckInfo.Invoke(this, []);
 
         public DashFallingBlock(EntityData data, Vector2 offset) : base(data, offset) {
-            // remove the TileGrid added by the vanilla falling block
-            DynamicData fallingBlockData = new DynamicData(this);
-            Remove(fallingBlockData.Get<TileGrid>("tiles"));
+            // remove the TileGrid and Coroutine added by the vanilla falling block
+            Remove(Get<TileGrid>());
+            Remove(Get<Coroutine>());
 
             shakeSfx = data.Attr("shakeSfx", "event:/game/general/fallblock_shake");
             impactSfx = data.Attr("impactSfx", "event:/game/general/fallblock_impact");
@@ -56,6 +57,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             allowWavedash = data.Bool("allowWavedash", false);
             dashCornerCorrection = data.Bool("dashCornerCorrection", false);
             base.Depth = data.Int("depth", base.Depth);
+            direction = directionToVector[data.Attr("direction", "down").ToLower()];
+            fallDashMode = data.Enum<FallDashModes>("fallDashMode", FallDashModes.Disabled);
 
             // generate the TileGrid
             char tile = data.Char("tiletype", '3');
@@ -65,30 +68,37 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             Calc.PopRandom();
             Add(new TileInterceptor(tilegrid, highPriority: false));
             // make the tilegrid invisible since we want to render it manually later
-            tilegrid.Alpha = 0f;
+            tilegrid.Visible = false;
+
+            Add(new Coroutine(Sequence()));
 
             OnDashCollide = OnDashCollision;
         }
 
         public DashCollisionResults OnDashCollision(Player player, Vector2 dir) {
-            if (!isTriggered) {
+            if (!HasStartedFalling && !Triggered) {
                 // make wallbouncing easier if dash corner correction is enabled
                 if ((player.Left >= Right - 4f || player.Right < Left + 4f) && dir.Y == -1 && dashCornerCorrection) {
                     return DashCollisionResults.NormalCollision;
                 }
 
+                // if the falling block is set to move in the direction of madeline's dash, update the direction accordingly
+                if (fallDashMode != FallDashModes.Disabled) {
+                    direction = fallDashMode == FallDashModes.Pull ? -dir : dir;
+                }
+
                 // trigger the block
                 (Scene as Level).DirectionalShake(dir);
-                isTriggered = true;
+                Triggered = true;
                 Audio.Play(impactSfx, base.Center);
 
                 // emit the dust particles and update the scale and hitOffset
-                for (int i = 2; (float)i <= base.Width; i += 4) {
-				    if (!base.Scene.CollideCheck<Solid>(base.BottomLeft + new Vector2(i, 3f))) {
-                        SceneAs<Level>().Particles.Emit(P_FallDustB, 1, new Vector2(base.X + (float)i, base.Bottom), Vector2.One * 4f);
-                        SceneAs<Level>().Particles.Emit(P_FallDustA, 1, new Vector2(base.X + (float)i, base.Bottom), Vector2.One * 4f);
-				    }
-			    }
+                for (int i = 2; i <= base.Width; i += 4) {
+                    if (!base.Scene.CollideCheck<Solid>(base.BottomLeft + new Vector2(i, 3f))) {
+                        SceneAs<Level>().Particles.Emit(P_FallDustB, 1, new Vector2(base.X + i, base.Bottom), Vector2.One * 4f);
+                        SceneAs<Level>().Particles.Emit(P_FallDustA, 1, new Vector2(base.X + i, base.Bottom), Vector2.One * 4f);
+                    }
+                }
                 scale = new Vector2(
                     1f + Math.Abs(dir.Y) * 0.28f - Math.Abs(dir.X) * 0.28f,
                     1f + Math.Abs(dir.X) * 0.28f - Math.Abs(dir.Y) * 0.28f
@@ -102,13 +112,11 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             }
 
             return DashCollisionResults.NormalCollision;
-
         }
 
         public override void OnStaticMoverTrigger(StaticMover sm) {
             if (fallOnStaticMover) {
-                base.OnStaticMoverTrigger(sm);
-                isTriggered = true;
+                Triggered = true;
             }
         }
 
@@ -118,7 +126,6 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         public override void Render() {
-
             base.Render();
 
             // TileGrids can't have their scale changed, so we have to render the block manually
@@ -146,37 +153,81 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             hitOffset.Y = Calc.Approach(hitOffset.Y, 0f, Engine.DeltaTime * 15f);
         }
 
-        private static IEnumerator onSequence(On.Celeste.FallingBlock.orig_Sequence orig, FallingBlock self) {
-            if (self is DashFallingBlock block) {
-                self.Triggered = block.isTriggered;
-            }
-            yield return new SwapImmediately(orig(self));
-        }
+        private IEnumerator Sequence() {
+            while (!Triggered && (!fallOnTouch || !PlayerFallCheck()))
+                yield return null;
 
-        private static bool onPlayerFallCheck(On.Celeste.FallingBlock.orig_PlayerFallCheck orig, FallingBlock self) {
-            if (self is DashFallingBlock block) {
-                if (!block.isTriggered && block.fallOnTouch) {
-                    block.isTriggered = orig(self);
+            HasStartedFalling = true;
+            while (true) {
+                Audio.Play(shakeSfx, base.Center);
+                StartShaking();
+                Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
+                yield return 0.2f;
+
+                float timer = 0.4f;
+                while (timer > 0f && PlayerWaitCheck()) {
+                    yield return null;
+                    timer -= Engine.DeltaTime;
                 }
-                return block.isTriggered;
-            }
-            return orig(self);
-        }
 
-        private static void onShakeSfx(On.Celeste.FallingBlock.orig_ShakeSfx orig, FallingBlock self) {
-            if (self is DashFallingBlock block) {
-                Audio.Play(block.shakeSfx, self.Center);
-            } else {
-                orig(self);
-            }
-        }
+                StopShaking();
+                for (int i = 2; i < Width; i += 4) {
+                    if (Scene.CollideCheck<Solid>(TopLeft + new Vector2(i, -2f)))
+                        SceneAs<Level>().Particles.Emit(P_FallDustA, 2, new Vector2(X + i, Y), Vector2.One * 4f, (float)Math.PI / 2f);
 
-        private static void onImpactSfx(On.Celeste.FallingBlock.orig_ImpactSfx orig, FallingBlock self) {
-            if (self is DashFallingBlock block) {
-                Audio.Play(block.impactSfx, self.BottomCenter);
-            } else {
-                orig(self);
+                    SceneAs<Level>().Particles.Emit(P_FallDustB, 2, new Vector2(X + i, Y), Vector2.One * 4f);
+                }
+
+                float speed = 0f;
+                float maxSpeed = 160f;
+                while (true) {
+                    Level level = SceneAs<Level>();
+                    speed = Calc.Approach(speed, maxSpeed, 500f * Engine.DeltaTime);
+
+                    if (MoveVCollideSolids(speed * direction.Y * Engine.DeltaTime, thruDashBlocks: true))
+                        break;
+
+                    if (MoveHCollideSolids(speed * direction.X * Engine.DeltaTime, thruDashBlocks: true))
+                        break;
+
+                    // checks whether the falling block fell out of bounds
+                    // all of these checks are done on any dash falling block regardless of its direction so hopefully that wont break anything somewhere
+                    if (Top > level.Bounds.Bottom + 16 || Bottom < level.Bounds.Top - 16 || Right < level.Bounds.Left - 16 || Left > level.Bounds.Right + 16 ||
+                    ((Top > level.Bounds.Bottom - 1 || Bottom < level.Bounds.Top + 1 || Right < level.Bounds.Left + 1 || Left > level.Bounds.Right - 1) && CollideCheck<Solid>(Position + direction))) {
+                        Collidable = Visible = false;
+                        yield return 0.2f;
+
+                        // checks whether the falling block fell into a screen transition (i think)
+                        if (level.Session.MapData.CanTransitionTo(level, new Vector2(Center.X, Bottom + 12f)) || level.Session.MapData.CanTransitionTo(level, new Vector2(Center.X, Top - 12f)) ||
+                        level.Session.MapData.CanTransitionTo(level, new Vector2(Left - 12f, Center.Y)) || level.Session.MapData.CanTransitionTo(level, new Vector2(Right + 12f, Center.Y))) {
+                            yield return 0.2f;
+                            SceneAs<Level>().Shake();
+                            Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
+                        }
+
+                        RemoveSelf();
+                        DestroyStaticMovers();
+                        yield break;
+                    }
+
+                    yield return null;
+                }
+
+                Audio.Play(impactSfx, base.BottomCenter);
+                Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
+                SceneAs<Level>().DirectionalShake(direction, 0.3f);
+                StartShaking();
+                LandParticles();
+                yield return 0.2f;
+                StopShaking();
+
+                if (CollideCheck<SolidTiles>(Position + direction))
+                    break;
+                while (CollideCheck<Platform>(Position + direction))
+                    yield return 0.1f;
             }
+
+            Safe = true;
         }
     }
 }

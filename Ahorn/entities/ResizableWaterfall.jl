@@ -105,10 +105,11 @@ Ahorn.editingOrder(entity::ResizableWaterfall) = String["x", "y", "width", "colo
 Ahorn.resizable(entity::ResizableWaterfall) = true, false
 
 function  Ahorn.selection(entity::ResizableWaterfall, room::Maple.Room)
-    entityHeightHackfix = entity.height
+    ### apparently this sometimes doesn't work in ahorn????? because for some reason i suddenly just kept having selection Not Work in rooms with these until i commented some stuff out, ahorn whyy
+    # entityHeightHackfix = entity.height
     entity.height = Int(getHeight(entity, room))
     rect = Ahorn.getEntityRectangle(entity)
-    entity.height = entityHeightHackfix
+    # entity.height = entityHeightHackfix
     return rect
 end
 
