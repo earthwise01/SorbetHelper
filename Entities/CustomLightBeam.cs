@@ -30,6 +30,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private Vector2 rainbowCenter;
         private readonly bool rainbowSingleColor;
 
+        private const int rainbowSegmentSize = 4;
+
         private readonly bool noParticles;
 
         private float baseAlpha = 1;
@@ -170,7 +172,14 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             if (!visibleOnCamera) return;
 
             if (alpha > 0f) {
-                DrawTexture(0f, lightWidth, lightLength - 4 + (float)Math.Sin(timer * 2f) * 4f, 0.4f);
+                if (rainbow && !rainbowSingleColor) {
+                    // draw the base in 4px segments to make a gradient effect
+                    for (int i = 0; i < lightWidth; i += rainbowSegmentSize) {
+                        DrawTexture(i - lightWidth / 2f, rainbowSegmentSize, lightLength - 4 + (float)Math.Sin(timer * 2f) * 4f, 0.4f);
+                    }
+                } else {
+                    DrawTexture(0f, lightWidth, lightLength - 4 + (float)Math.Sin(timer * 2f) * 4f, 0.4f);
+                }
                 for (int i = 0; i < lightWidth; i += 4) {
                     float num = timer + i * 0.6f;
                     float num2 = 4f + (float)Math.Sin(num * 0.5f + 1.2f) * 4f;
