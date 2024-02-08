@@ -11,6 +11,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
     public class CustomLightBeam : Entity {
         public string flag;
         public bool inverted;
+        private readonly float flagFadeTime;
 
         public float rotation;
 
@@ -57,6 +58,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
             flag = data.Attr("flag");
             inverted = data.Bool("inverted", false);
+            flagFadeTime = Math.Max(data.Float("flagFadeTime", 0.25f), 0f);
             rotation = data.Float("rotation", 0f) * ((float)Math.PI / 180f);
 
             fadeWhenNear = data.Bool("fadeWhenNear", true);
@@ -144,7 +146,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 } else {
                     flagTarget = 1f;
                 }
-                flagAlpha = Calc.Approach(flagAlpha, flagTarget, Engine.DeltaTime * 2f);
+                flagAlpha = Calc.Approach(flagAlpha, flagTarget, Engine.DeltaTime / flagFadeTime);
             }
 
             // multiply baseAlpha and flagAlpha together to get the actual alpha of the lightbeam.
