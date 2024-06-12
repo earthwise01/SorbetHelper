@@ -12,7 +12,6 @@ namespace Celeste.Mod.SorbetHelper.Entities {
     [CustomEntity("SorbetHelper/ReturnBerry")]
     [RegisterStrawberry(true, false)]
     public class ReturnBerry : Strawberry {
-        private readonly bool isGhostBerry;
         private readonly Vector2[] nodes;
         public float delay;
 
