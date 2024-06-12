@@ -22,6 +22,7 @@ lightBeam.placements = {
             noParticles = false,
             color = "CCFFFF",
             rainbow = false,
+            useCustomRainbowColors = false,
             colors = "89E5AE,88E0E0,87A9DD,9887DB,D088E2",
             gradientSize = 280.0,
             loopColors = false,
@@ -46,6 +47,7 @@ lightBeam.placements = {
             noParticles = false,
             color = "CCFFFF",
             rainbow = true,
+            useCustomRainbowColors = false,
             colors = "89E5AE,88E0E0,87A9DD,9887DB,D088E2",
             gradientSize = 280.0,
             loopColors = false,
@@ -73,15 +75,15 @@ lightBeam.fieldInformation = {
 -- hide rainbow specific fields unless rainbow is enabled and vice versa
 function lightBeam.fieldOrder(entity)
     local fields = {}
-    if entity.rainbow == true then
+    if entity.rainbow == true and entity.useCustomRainbowColors == true then
         fields = {
             "x", "y", "width", "height", "centerX", "centerY", "colors", "gradientSize", "gradientSpeed", "depth", "rotation", "flag", "flagFadeTime",
-            "fadeWhenNear", "fadeOnTransition", "inverted", "noParticles", "rainbow", "loopColors", "singleColor"
+            "fadeWhenNear", "fadeOnTransition", "inverted", "noParticles", "rainbow", "useCustomRainbowColors", "singleColor", "loopColors"
         }
     else
         fields = {
             "x", "y", "width", "height", "color", "depth", "rotation", "flag", "flagFadeTime",
-            "fadeWhenNear", "fadeOnTransition", "inverted", "noParticles", "rainbow"
+            "fadeWhenNear", "fadeOnTransition", "inverted", "noParticles", "rainbow", "useCustomRainbowColors", "singleColor"
         }
     end
     return fields
@@ -89,7 +91,7 @@ end
 
 function lightBeam.ignoredFields(entity)
     local ignored = {}
-    if entity.rainbow == true then
+    if entity.rainbow == true and entity.useCustomRainbowColors == true then
         ignored = {
             "_id", "_name",
             "color"
@@ -97,7 +99,7 @@ function lightBeam.ignoredFields(entity)
     else
         ignored = {
             "_id", "_name",
-            "colors", "gradientSize", "gradientSpeed", "centerX", "centerY", "singleColor", "loopColors"
+            "colors", "gradientSize", "gradientSpeed", "centerX", "centerY", "loopColors"
         }
     end
     return ignored

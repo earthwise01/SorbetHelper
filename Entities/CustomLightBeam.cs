@@ -24,6 +24,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         // probably slightly messy but results in less unnecessary changes to the variable.
         public Color color = new Color(0.8f, 1f, 1f);
 
+        private readonly bool useCustomRainbowColors;
+
         public List<Color> rainbowColors = new List<Color>();
         private readonly float rainbowGradientSize;
         private readonly float rainbowGradientSpeed;
@@ -67,6 +69,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             noParticles = data.Bool("noParticles", false);
             color = Calc.HexToColor(data.Attr("color", "CCFFFF"));
             rainbow = data.Bool("rainbow", false);
+            useCustomRainbowColors = data.Bool("useCustomRainbowColors", false);
 
             if (rainbow) {
                 rainbowGradientSize = data.Float("gradientSize", 280f);
@@ -204,6 +207,10 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         private Color GetHue(Vector2 position) {
+            // use vanilla/rainbow spinner color controller colors by default
+            if (!useCustomRainbowColors)
+                return Utils.GetRainbowHue(Scene, position);
+
             // stolen from MaddieHelpingHand's RainbowSpinnerColorController
             // https://github.com/maddie480/MaddieHelpingHand/blob/master/Entities/RainbowSpinnerColorController.cs#L311
             if (rainbowColors.Count == 1) {
