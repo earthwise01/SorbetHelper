@@ -1,6 +1,7 @@
 local drawableSprite = require("structs.drawable_sprite")
 local drawableLine = require("structs.drawable_line")
 local utils = require("utils")
+local drawing = require("utils.drawing")
 local entities = require("entities")
 
 local return_berry = {}
@@ -17,6 +18,9 @@ return_berry.fieldInformation = {
     },
     checkpointID = {
         fieldType = "integer"
+    },
+    delay = {
+        minimumValue = 0.0
     }
 }
 
@@ -93,9 +97,10 @@ function return_berry.sprite(room, entity, viewport)
 
     return {
         drawableSprite.fromTexture(sprite, entity),
-        drawableSprite.fromTexture(bubble_sprite, {x = mx, y = my, color = {255 / 255, 255 / 255, 255 / 255, 185 / 255}}),
+        drawableSprite.fromTexture(bubble_sprite, {x = mx, y = my, color = {255 / 255, 255 / 255, 255 / 255, 80 / 255}}),
         drawableSprite.fromTexture(bubble_sprite, {x = nx, y = ny, color = {255 / 255, 255 / 255, 255 / 255, 185 / 255}}),
-        drawableLine.fromPoints({x, y, mx, my, nx, ny}, {255 / 255, 255 / 255, 255 / 255, 195 / 255})
+        drawableLine.fromPoints(drawing.getSimpleCurve({x, y}, {nx, ny}, {mx, my}), {255 / 255, 255 / 255, 255 / 255, 195 / 255}),
+        drawableLine.fromPoints({x, y, mx, my, nx, ny}, {255 / 255, 255 / 255, 255 / 255, 40 / 255})
     }
 end
 

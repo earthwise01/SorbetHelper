@@ -5,9 +5,9 @@
         <AssemblyName>SorbetHelper</AssemblyName>
         <RootNamespace>Celeste.Mod.SorbetHelper</RootNamespace>
         <LangVersion>latest</LangVersion>
-        <!--If Celeste.dll is missing, attempt to reference a lib-stripped directory instead-->
-        <CELESTEGAMEPATH Condition="'$(CELESTEGAMEPATH)' == '' And Exists('..\..\Celeste.dll')">..\..</CELESTEGAMEPATH>
-        <CELESTEGAMEPATH Condition="'$(CELESTEGAMEPATH)' == ''">lib-stripped</CELESTEGAMEPATH>
+        <CelestePrefix Condition="'$(CelestePrefix)' == '' And Exists('..\..\Celeste.dll')">..\..</CelestePrefix>
+        <CelestePrefix Condition="'$(CelestePrefix)' == ''">lib-stripped</CelestePrefix>
+        <ZippedFiles>everest.yaml;bin\SorbetHelper.dll;bin\SorbetHelper.pdb;Audio\**\*.*;Dialog\**\*.*;Graphics\**\*.*;Ahorn\**\*.*;Loenn\**\*.*</ZippedFiles>
     </PropertyGroup>
 
     <!--Disable "Copy Local" for all references-->
@@ -19,27 +19,84 @@
     <ItemGroup>
         <PackageReference Include="MonoMod.RuntimeDetour" Version="25.0.2" PrivateAssets="all" ExcludeAssets="runtime" />
         <PackageReference Include="MonoMod.Patcher" Version="25.0.0-prerelease.2" />
+        <PackageReference Include="CelesteAnalyzer" Version="*" />
     </ItemGroup>
 
     <ItemGroup>
-        <Reference Include="$(CELESTEGAMEPATH)\Celeste.dll">
-            <Private>false</Private>
-        </Reference>
-        <Reference Include="$(CELESTEGAMEPATH)\MMHOOK_Celeste.dll">
-            <Private>false</Private>
-        </Reference>
-        <Reference Include="$(CELESTEGAMEPATH)\FNA.dll">
-            <Private>false</Private>
-        </Reference>
+        <PackageReference Include="CelesteMod.Publicizer" Version="*" CelesteAssembly="$(CelestePrefix)\Celeste.dll" />
+        <Reference Include="$(CelestePrefix)\MMHOOK_Celeste.dll" Private="false" />
+        <Reference Include="$(CelestePrefix)\FNA.dll" Private="false" />
     </ItemGroup>
 
-    <Target Name="CopyFiles" AfterTargets="Build">
+    <Target Name="CopyFiles" AfterTargets="Build" Inputs="$(OutputPath)\$(AssemblyName).dll;$(OutputPath)\$(AssemblyName).pdb" Outputs="bin\$(AssemblyName).dll;bin\$(AssemblyName).pdb">
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="bin" />
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).pdb" DestinationFolder="bin" />
+    </Target>
+
+    <Target Name="PackageMod" AfterTargets="CopyFiles" Inputs="$(ZippedFiles)" Outputs="SorbetHelper.zip" Condition="'$(Configuration)' == 'Release'">
+        <ItemGroup>
+            <FilesToPackage Include="$(ZippedFiles)" />
+        </ItemGroup>
+        <PackageMod Files="@(FilesToPackage)" OutputPath="SorbetHelper.zip" />
     </Target>
 
     <PropertyGroup>
         <PathMap>$(MSBuildProjectDirectory)=SorbetHelper/</PathMap>
     </PropertyGroup>
+
+    <!-- Inline task used to create a .zip for the mod -->
+    <UsingTask TaskName="PackageMod"
+               TaskFactory="RoslynCodeTaskFactory"
+               AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >
+        <ParameterGroup>
+            <Files ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+            <OutputPath ParameterType="System.String" Required="true" />
+        </ParameterGroup>
+        <Task>
+            <Using Namespace="System.IO" />
+            <Using Namespace="System.IO.Compression" />
+            <Code Type="Fragment" Language="cs">
+            <![CDATA[
+                var projectDir = @"$(ProjectDir)";
+                projectDir = Uri.UnescapeDataString(projectDir);
+
+                if (File.Exists(OutputPath))
+                    File.Delete(OutputPath);
+
+                using (ZipArchive zip = ZipFile.Open(OutputPath, ZipArchiveMode.Create))
+                {
+                    foreach (var file in Files)
+                    {
+                        string filePath = file.GetMetadata("FullPath");
+                        string entryName = GetRelativePath(projectDir, filePath);
+
+                        zip.CreateEntryFromFile(filePath, entryName);
+                    }
+                }
+
+                string GetRelativePath(string fromPath, string toPath)
+                {
+                    if (string.IsNullOrEmpty(fromPath)) throw new ArgumentNullException(nameof(fromPath));
+                    if (string.IsNullOrEmpty(toPath))   throw new ArgumentNullException(nameof(toPath));
+
+                    Uri fromUri = new Uri(fromPath);
+                    Uri toUri = new Uri(toPath);
+
+                    if (fromUri.Scheme != toUri.Scheme) { return toPath; } // path can't be made relative.
+
+                    Uri relativeUri = fromUri.MakeRelativeUri(toUri);
+                    string relativePath = Uri.UnescapeDataString(relativeUri.ToString());
+
+                    if (toUri.Scheme.Equals("file", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        relativePath = relativePath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                    }
+
+                    return relativePath;
+                }
+            ]]>
+            </Code>
+        </Task>
+    </UsingTask>
 
 </Project>

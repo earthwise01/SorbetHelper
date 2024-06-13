@@ -27,7 +27,6 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public bool allowWavedash;
         public bool dashCornerCorrection;
 
-        public TileGrid tilegrid;
         private Vector2 scale = Vector2.One;
         private Vector2 hitOffset;
         public new bool HasStartedFalling { get; private set; }
@@ -38,16 +37,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public Vector2 direction;
         private readonly FallDashModes fallDashMode;
 
-        private static readonly MethodInfo landParticlesInfo = typeof(FallingBlock).GetMethod("LandParticles", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod);
-        private static readonly MethodInfo playerFallCheckInfo = typeof(FallingBlock).GetMethod("PlayerFallCheck", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod);
-        private static readonly MethodInfo playerWaitCheckInfo = typeof(FallingBlock).GetMethod("PlayerWaitCheck", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod);
-        private void LandParticles() => landParticlesInfo.Invoke(this, []);
-        private bool PlayerFallCheck() => (bool)playerFallCheckInfo.Invoke(this, []);
-        private bool PlayerWaitCheck() => (bool)playerWaitCheckInfo.Invoke(this, []);
-
         public DashFallingBlock(EntityData data, Vector2 offset) : base(data, offset) {
-            // remove the TileGrid and Coroutine added by the vanilla falling block
-            Remove(Get<TileGrid>());
+            // remove the Coroutine added by the vanilla falling block
             Remove(Get<Coroutine>());
 
             shakeSfx = data.Attr("shakeSfx", "event:/game/general/fallblock_shake");
@@ -60,15 +51,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             direction = directionToVector[data.Attr("direction", "down").ToLower()];
             fallDashMode = data.Enum<FallDashModes>("fallDashMode", FallDashModes.Disabled);
 
-            // generate the TileGrid
-            char tile = data.Char("tiletype", '3');
-            int newSeed = Calc.Random.Next();
-            Calc.PushRandom(newSeed);
-            Add(tilegrid = GFX.FGAutotiler.GenerateBox(tile, data.Width / 8, data.Height / 8).TileGrid);
-            Calc.PopRandom();
-            Add(new TileInterceptor(tilegrid, highPriority: false));
             // make the tilegrid invisible since we want to render it manually later
-            tilegrid.Visible = false;
+            tiles.Visible = false;
 
             Add(new Coroutine(Sequence()));
 
@@ -120,26 +104,21 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             }
         }
 
-        public override void OnShake(Vector2 amount) {
-            base.OnShake(amount);
-            tilegrid.Position += amount;
-        }
-
         public override void Render() {
             base.Render();
 
             // TileGrids can't have their scale changed, so we have to render the block manually
-            Vector2 position = Position + tilegrid.Position;
+            Vector2 position = Position + tiles.Position;
 
-            var clip = tilegrid.GetClippedRenderTiles();
+            var clip = tiles.GetClippedRenderTiles();
 
             for (int tx = clip.Left; tx < clip.Right; tx++) {
                 for (int ty = clip.Top; ty < clip.Bottom; ty++) {
-                    Vector2 vec = new Vector2(position.X + tx * tilegrid.TileWidth, position.Y + ty * tilegrid.TileHeight) + (Vector2.One * 4f) + hitOffset;
+                    Vector2 vec = new Vector2(position.X + tx * tiles.TileWidth, position.Y + ty * tiles.TileHeight) + (Vector2.One * 4f) + hitOffset;
                     vec.X = Center.X + (vec.X - Center.X) * scale.X;
                     vec.Y = Center.Y + (vec.Y - Center.Y) * scale.Y;
 
-                    tilegrid.Tiles[tx, ty].DrawCentered(vec, Color.White, scale);
+                    tiles.Tiles[tx, ty].DrawCentered(vec, Color.White, scale);
                 }
             }
         }
@@ -153,7 +132,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             hitOffset.Y = Calc.Approach(hitOffset.Y, 0f, Engine.DeltaTime * 15f);
         }
 
-        private IEnumerator Sequence() {
+        private new IEnumerator Sequence() {
             while (!Triggered && (!fallOnTouch || !PlayerFallCheck()))
                 yield return null;
 
