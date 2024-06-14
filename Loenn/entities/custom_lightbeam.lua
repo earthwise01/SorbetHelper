@@ -78,12 +78,12 @@ function lightBeam.fieldOrder(entity)
     if entity.rainbow == true and entity.useCustomRainbowColors == true then
         fields = {
             "x", "y", "width", "height", "centerX", "centerY", "colors", "gradientSize", "gradientSpeed", "depth", "rotation", "flag", "flagFadeTime",
-            "fadeWhenNear", "fadeOnTransition", "inverted", "noParticles", "rainbow", "useCustomRainbowColors", "singleColor", "loopColors"
+            "inverted", "fadeOnTransition", "rainbow", "useCustomRainbowColors", "noParticles", "fadeWhenNear", "singleColor", "loopColors"
         }
     else
         fields = {
             "x", "y", "width", "height", "color", "depth", "rotation", "flag", "flagFadeTime",
-            "fadeWhenNear", "fadeOnTransition", "inverted", "noParticles", "rainbow", "useCustomRainbowColors", "singleColor"
+            "inverted", "fadeOnTransition", "rainbow", "useCustomRainbowColors", "noParticles", "fadeWhenNear", "singleColor"
         }
     end
     return fields

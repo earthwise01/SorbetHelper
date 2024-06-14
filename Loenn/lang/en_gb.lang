@@ -94,6 +94,7 @@ entities.SorbetHelper/CustomLightbeam.attributes.name.gradientSpeed=Rainbow Grad
 entities.SorbetHelper/CustomLightbeam.attributes.name.colors=Rainbow Colors
 entities.SorbetHelper/CustomLightbeam.attributes.name.centerX=Rainbow Center X
 entities.SorbetHelper/CustomLightbeam.attributes.name.centerY=Rainbow Center Y
+entities.SorbetHelper/CustomLightbeam.attributes.name.loopColors=Loop Rainbow Colors
 entities.SorbetHelper/CustomLightbeam.attributes.name.singleColor=Uniform Rainbow Color
 # ^^^ this might not be an accurate way of saying this but honestly at this point i've given up trying to find anything better.
 
