@@ -26,27 +26,35 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         public static void Load() {
-            On.Celeste.DisplacementRenderer.BeforeRender += onBeforeRender;
+            IL.Celeste.DisplacementRenderer.BeforeRender += modBeforeRender;
         }
 
         public static void Unload() {
-            On.Celeste.DisplacementRenderer.BeforeRender -= onBeforeRender;
+            IL.Celeste.DisplacementRenderer.BeforeRender -= modBeforeRender;
         }
 
-        // probably kinda bad to start the spritebatch again immediatley after it stops but like for some reason using an il hook basically just refused to work?? so thisll have to do i guess (like literally it didnt even crash it just did. absolutely nothing and i  have no freaking clue what i was doing worng)
-        private static void onBeforeRender(On.Celeste.DisplacementRenderer.orig_BeforeRender orig, DisplacementRenderer self, Scene scene) {
-            orig(self, scene);
+        // this took way to long to figure out lmao
+        private static void modBeforeRender(ILContext il) {
+            ILCursor cursor = new ILCursor(il);
 
-            if (scene.Tracker.GetEntities<DisplacementEffectBlocker>().Count != 0) {
-                Color color = new Color(0.5f, 0.5f, 0f, 1f);
-                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, (scene as Level).Camera.Matrix);
+            if (cursor.TryGotoNext(MoveType.After,
+            instr => instr.MatchCall(typeof(Draw), "get_SpriteBatch"),
+            instr => instr.MatchCallvirt<SpriteBatch>("End")) &&
+            cursor.TryGotoPrev(MoveType.AfterLabel, instr => instr.MatchEndfinally())) {
+                Logger.Log("SorbetHelper", $"Injecting check for DisplacementEffectBlocker at {cursor.Index} in CIL code for {cursor.Method.FullName}");
 
-                foreach (DisplacementEffectBlocker entity in scene.Tracker.GetEntities<DisplacementEffectBlocker>()) {
-                    if (!entity.depthAdhering)
-                        Draw.Rect(entity.X, entity.Y, entity.Width, entity.Height, color);
-                }
+                cursor.EmitLdarg1(); // scene
+                cursor.EmitLdloc1(); // color
+                cursor.EmitDelegate(renderDisplacementEffectBlockers);
+            } else {
+                Logger.Log(LogLevel.Error, "SorbetHelper", $"Failed to inject check for DisplacementEffectBlocker in CIL code for {cursor.Method.FullName}");
+            }
+        }
 
-                Draw.SpriteBatch.End();
+        private static void renderDisplacementEffectBlockers(Scene scene, Color color) {
+            foreach (DisplacementEffectBlocker entity in scene.Tracker.GetEntities<DisplacementEffectBlocker>()) {
+                if (!entity.depthAdhering)
+                    Draw.Rect(entity.X, entity.Y, entity.Width, entity.Height, color);
             }
         }
     }
