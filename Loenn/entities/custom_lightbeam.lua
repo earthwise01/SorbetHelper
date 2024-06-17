@@ -37,6 +37,7 @@ lightBeam.placements = {
     },
     {
         name = "rainbowlightbeam",
+        alternativeName = "customlightbeamrainbow",
         data = {
             width = 32,
             height = 24,

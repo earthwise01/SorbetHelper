@@ -68,7 +68,8 @@ entities.SorbetHelper/BigWaterfall.attributes.description.depth=Determines what 
 # tooltips for most of the rainbow related attributes stolen from MaddieHelpingHand
 # https://github.com/maddie480/MaddieHelpingHand/blob/master/Loenn/lang/en_gb.lang#L532
 entities.SorbetHelper/CustomLightbeam.placements.name.customlightbeam=Custom Lightbeam
-entities.SorbetHelper/CustomLightbeam.placements.name.rainbowlightbeam=Custom Lightbeam (Rainbow)
+entities.SorbetHelper/CustomLightbeam.placements.name.rainbowlightbeam=Rainbow Lightbeam
+entities.SorbetHelper/CustomLightbeam.placements.name.customlightbeamrainbow=Custom Lightbeam (Rainbow)
 entities.SorbetHelper/CustomLightbeam.attributes.description.flag=The flag that needs to be set in order for the lightbeam to be activated, leaving this empty causes the lightbeam to always be active.
 entities.SorbetHelper/CustomLightbeam.attributes.description.inverted=When checked, the lightbeam will only be active when the associated flag is disabled rather than only when the associated flag is enabled.
 entities.SorbetHelper/CustomLightbeam.attributes.description.flagFadeTime=The time (in seconds) the lightbeam takes to fade in or out according to the flag.
