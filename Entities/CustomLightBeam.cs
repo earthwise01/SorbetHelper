@@ -205,7 +205,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             base.Update();
         }
 
-        public override void DebugRender(Camera camera) {
+        /* public override void DebugRender(Camera camera) {
             base.DebugRender(camera);
 
             Vector2 baseCornerA = Position - Calc.AngleToVector(rotation, 1f) * (lightWidth / 2f); // would be top left with a rotation of 0f
@@ -218,7 +218,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             Draw.Line(edgeCornerA, edgeCornerB, Color.GreenYellow * 0.5f);
 
             Draw.HollowRect(rectangleLeft - visibilityPadding / 2, rectangleTop - visibilityPadding / 2, rectangleRight - rectangleLeft + visibilityPadding, rectangleBottom - rectangleTop + visibilityPadding, Color.Yellow * 0.5f);
-        }
+        } */
 
         public void BeforeRender() {
             // only update graphics every 3 frames when on camera or when the lightbeam comes on screen
