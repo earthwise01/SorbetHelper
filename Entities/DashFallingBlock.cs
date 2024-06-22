@@ -29,7 +29,6 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         private Vector2 scale = Vector2.One;
         private Vector2 hitOffset;
-        public new bool HasStartedFalling { get; private set; }
 
         private static readonly Dictionary<string, Vector2> directionToVector = new Dictionary<string, Vector2>() {
             {"down", new Vector2(0f, 1f)}, {"up", new Vector2(0f, -1f)}, {"left", new Vector2(-1f, 0f)}, {"right", new Vector2(1f, 0f)}
@@ -61,8 +60,11 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         public DashCollisionResults OnDashCollision(Player player, Vector2 dir) {
             if (!HasStartedFalling && !Triggered) {
+                // gravity helper support
+                bool gravityInverted = GravityHelperImports.IsPlayerInverted?.Invoke() ?? false;
+
                 // make wallbouncing easier if dash corner correction is enabled
-                if ((player.Left >= Right - 4f || player.Right < Left + 4f) && dir.Y == -1 && dashCornerCorrection) {
+                if ((player.Left >= Right - 4f || player.Right < Left + 4f) && dir.Y == (gravityInverted ? 1f : -1f) && dashCornerCorrection) {
                     return DashCollisionResults.NormalCollision;
                 }
 
@@ -89,7 +91,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 );
                 hitOffset = dir * 4.15f;
 
-                if (allowWavedash && dir.Y == 1) {
+                if (allowWavedash && dir.Y == (gravityInverted ? -1f : 1f)) {
                     return DashCollisionResults.NormalCollision;
                 }
                 return DashCollisionResults.Rebound;

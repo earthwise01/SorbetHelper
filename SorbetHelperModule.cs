@@ -1,6 +1,8 @@
 ﻿using System;
 using Monocle;
 using Celeste.Mod.SorbetHelper.Entities;
+using MonoMod;
+using MonoMod.ModInterop;
 
 namespace Celeste.Mod.SorbetHelper {
     public class SorbetHelperModule : EverestModule {
@@ -11,6 +13,8 @@ namespace Celeste.Mod.SorbetHelper {
         }
 
         public override void Load() {
+            typeof(GravityHelperImports).ModInterop();
+
             WingedStrawberryDirectionController.Load();
         }
 
