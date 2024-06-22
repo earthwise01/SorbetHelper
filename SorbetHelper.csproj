@@ -91,7 +91,6 @@
                     {
                         relativePath = relativePath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
                     }
-
                     return relativePath;
                 }
             ]]>
