@@ -16,10 +16,14 @@ namespace Celeste.Mod.SorbetHelper {
             typeof(GravityHelperImports).ModInterop();
 
             WingedStrawberryDirectionController.Load();
+            DisplacementEffectBlocker.Load();
+            DepthAdheringDisplacementRenderHook.Load();
         }
 
         public override void Unload() {
             WingedStrawberryDirectionController.Unload();
+            DisplacementEffectBlocker.Unload();
+            DepthAdheringDisplacementRenderHook.Unload();
         }
     }
 }
