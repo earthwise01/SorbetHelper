@@ -187,11 +187,6 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             // multiply baseAlpha and flagAlpha together to get the actual alpha of the lightbeam.
             alpha = baseAlpha * flagAlpha;
 
-            // updates the hue of the rainbow lightbeam when rainbowSingleColor is enabled, otherwise GetHue is called directly whenever a color is needed.
-            if (rainbow && rainbowSingleColor && level.OnInterval(0.08f, offset)) {
-                color = GetHue(Position);
-            }
-
             // emit particles
             if (visibleOnCamera && !noParticles && alpha >= 0.5f && level.OnInterval(0.8f, offset)) {
                 Vector2 vector3 = Calc.AngleToVector(rotation + (float)Math.PI / 2f, 1f);
@@ -222,7 +217,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         public void BeforeRender() {
             // only update graphics every 3 frames when on camera or when the lightbeam comes on screen
-            if ((!Scene.OnRawInterval(0.05f, offset) || !visibleOnCamera) && visibleOnCamera == wasVisibleOnCamera)
+            if ((!visibleOnCamera || !Scene.OnRawInterval(0.05f, offset)) && visibleOnCamera == wasVisibleOnCamera)
                 return;
 
             RenderToTarget();
@@ -249,6 +244,11 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         private void RenderLightbeam() {
+            // update the hue of the rainbow lightbeam when rainbowSingleColor is enabled, otherwise GetHue is called directly whenever a color is needed.
+            if (rainbow && rainbowSingleColor)
+                color = GetHue(Position);
+
+            // render the lightbeam
             if (rainbow && !rainbowSingleColor) {
                 // draw the base in 4px segments to make a gradient effect
                 for (int i = 0; i < lightWidth; i += rainbowSegmentSize) {
