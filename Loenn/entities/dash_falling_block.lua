@@ -16,7 +16,7 @@ function fallingBlock.placements()
             climbFall = true,
             fallOnStaticMover = false,
             allowWavedash = false,
-            dashCornerCorrection = false,
+            dashCornerCorrection = true,
             direction = "Down",
             fallDashMode = "Disabled",
             width = 8,
@@ -33,6 +33,24 @@ fallingBlock.fieldInformation = {
             return fakeTilesHelper.getTilesOptions()
         end,
         editable = false,
+    },
+    shakeSfx = {
+        options = {
+            "event:/game/general/fallblock_shake",
+            "event:/game/01_forsaken_city/fallblock_ice_shake",
+            "event:/game/03_resort/fallblock_wood_shake",
+            "event:/game/06_reflection/fallblock_boss_shake"
+        },
+        editable = true
+    },
+    impactSfx = {
+        options = {
+            "event:/game/general/fallblock_impact",
+            "event:/game/01_forsaken_city/fallblock_ice_impact",
+            "event:/game/03_resort/fallblock_wood_impact",
+            "event:/game/06_reflection/fallblock_boss_impact"
+        },
+        editable = true
     },
     direction = {
         options = { "Down", "Up", "Left", "Right" },
