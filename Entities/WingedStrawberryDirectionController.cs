@@ -49,90 +49,95 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             ILCursor cursor = new ILCursor(il);
 
             // inject direction nonspecific movement code
-            ILLabel label = cursor.DefineLabel();
+            ILLabel afterVanillaMovementLabel = cursor.DefineLabel();
 
             if (cursor.TryGotoNext(MoveType.After,
-            instr => instr.MatchLdfld<Strawberry>("flyingAway")) &&
+            instr => instr.MatchLdfld<Strawberry>(nameof(Strawberry.flyingAway))) &&
             cursor.TryGotoPrev(MoveType.Before,
-            instr => instr.MatchLdarg(0),
-            instr => instr.MatchLdarg(0),
-            instr => instr.OpCode == OpCodes.Call && ((MethodReference)instr.Operand).Name.Contains("get_Y"))) {
-                Logger.Log("SorbetHelper", $"Injecting custom flight movement at {cursor.Index} in CIL code for {cursor.Method.FullName}");
+            instr => instr.MatchLdarg0(),
+            instr => instr.MatchLdarg0(),
+            instr => instr.MatchCall<Entity>("get_Y"))) {
+                Logger.Log(LogLevel.Verbose, "SorbetHelper", $"Injecting custom flight movement at {cursor.Index} in CIL code for {cursor.Method.FullName}");
 
                 // skip over the vanilla code for moving the berry vertically if a controller exists
-                cursor.Emit(OpCodes.Ldarg_0);
-                cursor.EmitDelegate<Func<Strawberry, bool>>(controllerExists);
-                cursor.Emit(OpCodes.Brtrue, label);
-                cursor.GotoNext(MoveType.After, instr => instr.OpCode == OpCodes.Call && ((MethodReference)instr.Operand).Name.Contains("set_Y"))
-                .MarkLabel(label);
+                cursor.EmitLdarg0();
+                cursor.EmitDelegate(controllerExists);
+                cursor.EmitBrtrue(afterVanillaMovementLabel);
+                cursor.GotoNext(MoveType.After, instr => instr.MatchCall<Entity>("set_Y"))
+                .MarkLabel(afterVanillaMovementLabel);
 
-                cursor.Emit(OpCodes.Ldarg_0);
-                cursor.Emit(OpCodes.Ldarg_0);
-                cursor.Emit(OpCodes.Ldfld, typeof(Strawberry).GetField("flapSpeed", BindingFlags.NonPublic | BindingFlags.Instance));
-                cursor.EmitDelegate<Action<Strawberry, float>>(moveStrawberry);
+                // inject custom movement code
+                cursor.EmitLdarg0();
+                cursor.EmitLdarg0();
+                cursor.EmitLdfld(typeof(Strawberry).GetField(nameof(Strawberry.flapSpeed), BindingFlags.NonPublic | BindingFlags.Instance));
+                cursor.EmitDelegate(moveStrawberry);
+            } else {
+                Logger.Log(LogLevel.Error, "SorbetHelper", $"Failed to inject custom flight movement in CIL code for {cursor.Method.FullName}!");
             }
 
             // inject downwards and horizontal out of room bounds checks.
-            ILLabel label2 = cursor.DefineLabel();
+            ILLabel afterOOBChecksLabel = null;
 
             if (cursor.TryGotoNext(MoveType.Before,
-            instr => instr.MatchLdarg(0),
-            instr => instr.OpCode == OpCodes.Call && ((MethodReference)instr.Operand).Name.Contains("get_Y"))) {
-                Logger.Log("SorbetHelper", $"Injecting additional out of room bounds checks at {cursor.Index} in CIL code for {cursor.Method.FullName}");
+            instr => instr.MatchLdarg0(),
+            instr => instr.MatchCall<Entity>("get_Y"))) {
+                Logger.Log(LogLevel.Verbose, "SorbetHelper", $"Injecting additional out of room bounds checks at {cursor.Index} in CIL code for {cursor.Method.FullName}");
 
-                cursor.Emit(OpCodes.Ldarg_0);
-                // check if the berry flies upwards and if it doesn't, skip past the vanilla code for removing the berry once it flies above the room bounds
-                cursor.EmitDelegate<Func<Strawberry, bool>>(strawberryFliesUp);
-                cursor.Emit(OpCodes.Brfalse, label2);
-                cursor.GotoNext(MoveType.After, instr => instr.OpCode == OpCodes.Call && ((MethodReference)instr.Operand).Name.Contains("RemoveSelf"))
-                .MarkLabel(label2);
-
-                cursor.Emit(OpCodes.Ldarg_0);
-                cursor.EmitDelegate<Action<Strawberry>>(addExtraOutOfBoundsChecks);
+                // use custom oob checks if a controller exists, otheriwse skip past the vanilla code for removing the berry once it flies above the room bounds
+                cursor.EmitLdarg0();
+                cursor.EmitDelegate(addExtraOutOfBoundsChecks);
+                cursor.FindNext(out _, instr => instr.MatchBgeUn(out afterOOBChecksLabel));
+                cursor.EmitBrtrue(afterOOBChecksLabel);
+            } else {
+                Logger.Log(LogLevel.Error, "SorbetHelper", $"Failed to inject additional out of room bounds checks in CIL code for {cursor.Method.FullName}!");
             }
 
             // inject horizontal idle bounds checks alongside the vanilla vertical checks.
             if (cursor.TryGotoNext(MoveType.After,
-            instr => instr.MatchLdcR4(5f),
-            instr => instr.MatchAdd(),
-            instr => instr.OpCode == OpCodes.Call && ((MethodReference)instr.Operand).Name.Contains("set_Y"))) {
-                Logger.Log("SorbetHelper", $"Injecting horizontal idle bounds checks at {cursor.Index} in CIL code for {cursor.Method.FullName}");
+            instr => instr.MatchMul(),
+            instr => instr.MatchCall(typeof(Calc), nameof(Calc.Approach)),
+            instr => instr.MatchStfld<Strawberry>(nameof(Strawberry.flapSpeed)))) {
+                Logger.Log(LogLevel.Verbose, "SorbetHelper", $"Injecting horizontal idle bounds checks at {cursor.Index} in CIL code for {cursor.Method.FullName}");
 
-                cursor.Emit(OpCodes.Ldarg_0);
-                cursor.Emit(OpCodes.Ldarg_0);
-                cursor.Emit(OpCodes.Ldfld, typeof(Strawberry).GetField("start", BindingFlags.NonPublic | BindingFlags.Instance));
-                cursor.EmitDelegate<Action<Strawberry, Vector2>>(addHorizontalIdleBoundsChecks);
+                cursor.EmitLdarg0();
+                cursor.EmitLdarg0();
+                cursor.EmitLdfld(typeof(Strawberry).GetField(nameof(Strawberry.start), BindingFlags.NonPublic | BindingFlags.Instance));
+                cursor.EmitDelegate(addHorizontalIdleBoundsChecks);
+            } else {
+                Logger.Log(LogLevel.Error, "SorbetHelper", $"Failed to inject horizontal idle bounds checks in CIL code for {cursor.Method.FullName}!");
             }
         }
 
         private static bool controllerExists(Entity self) =>
             self.Scene.Tracker.GetEntity<WingedStrawberryDirectionController>() != null;
 
+        // returns true if custom movement was used
         private static void moveStrawberry(Entity self, float flapSpeed) {
             WingedStrawberryDirectionController controller = self.Scene.Tracker.GetEntity<WingedStrawberryDirectionController>();
             if (controller == null)
                 return;
 
-            self.Position += -controller.direction * flapSpeed * Engine.DeltaTime;
+            self.Position += controller.direction * -flapSpeed * Engine.DeltaTime;
         }
 
-        private static bool strawberryFliesUp(Entity self) {
-            WingedStrawberryDirectionController controller = self.Scene.Tracker.GetEntity<WingedStrawberryDirectionController>();
-            return controller == null || controller.movesUp;
-        }
-
-        private static void addExtraOutOfBoundsChecks(Entity self) {
+        // returns true if custom oob check was used
+        private static bool addExtraOutOfBoundsChecks(Entity self) {
             WingedStrawberryDirectionController controller = self.Scene.Tracker.GetEntity<WingedStrawberryDirectionController>();
             if (controller == null)
-                return;
+                return false;
 
             // out of bounds checks are only done for the directions the berry flies towards bc otherwise berries that would fly into the room from offscreen will be removed as soon as they start flying
-            if (controller.movesDown && self.Y > self.SceneAs<Level>().Bounds.Bottom + 16)
+            Rectangle levelBounds = self.SceneAs<Level>().Bounds;
+            if (controller.movesUp && self.Y < levelBounds.Top - 16)
                 self.RemoveSelf();
-            if (controller.movesLeft && self.X < self.SceneAs<Level>().Bounds.Left - 24)
+            else if (controller.movesDown && self.Y > levelBounds.Bottom + 16)
                 self.RemoveSelf();
-            if (controller.movesRight && self.X > self.SceneAs<Level>().Bounds.Right + 24)
+            else if (controller.movesLeft && self.X < levelBounds.Left - 24)
                 self.RemoveSelf();
+            else if (controller.movesRight && self.X > levelBounds.Right + 24)
+                self.RemoveSelf();
+
+            return true;
         }
 
         private static void addHorizontalIdleBoundsChecks(Entity self, Vector2 start) {
@@ -143,7 +148,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
             if (self.X < start.X - 5f)
                 self.X = start.X - 5f;
-            else if (self.Y > start.Y + 5f)
+            else if (self.X > start.X + 5f)
                 self.X = start.X + 5f;
         }
     }
