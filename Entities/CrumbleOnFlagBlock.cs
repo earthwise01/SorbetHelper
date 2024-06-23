@@ -54,8 +54,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             Add(tiles);
             Add(new TileInterceptor(tiles, highPriority: true));
             Add(new LightOcclude());
-            if (CollideCheck<Player>() || (!inverted && level.Session.GetFlag(flag))
-            || (inverted && !level.Session.GetFlag(flag))) {
+            if (CollideCheck<Player>() || level.Session.GetFlag(flag, inverted)) {
                 cutout.Alpha = tiles.Alpha = 0f;
                 Collidable = false;
             }
@@ -65,8 +64,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             base.Update();
 
             if (!string.IsNullOrEmpty(flag)) {
-                if ((!inverted && !SceneAs<Level>().Session.GetFlag(flag))
-                || (inverted && SceneAs<Level>().Session.GetFlag(flag))) {
+                if (!SceneAs<Level>().Session.GetFlag(flag, inverted)) {
                     if (!Collidable && !CollideCheck<Player>()) {
                         Collidable = true;
                         if (playAudio) {

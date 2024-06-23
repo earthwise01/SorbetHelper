@@ -24,8 +24,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             Player player = base.Scene.Tracker.GetEntity<Player>();
 
             if (Collidable && player != null && !string.IsNullOrEmpty(flag)) {
-                if ((!inverted && !SceneAs<Level>().Session.GetFlag(flag))
-                || (inverted && SceneAs<Level>().Session.GetFlag(flag))) {
+                if (!SceneAs<Level>().Session.GetFlag(flag, inverted)) {
                     Collidable = false;
                 }
             }

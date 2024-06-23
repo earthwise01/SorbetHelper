@@ -32,8 +32,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public override void Update() {
             if (!string.IsNullOrEmpty(flag)) {
                 // If the associated flag is disabled (or enabled and the inverted toggle is set) disable the Kill Zone
-                if ((!inverted && !SceneAs<Level>().Session.GetFlag(flag))
-                || (inverted && SceneAs<Level>().Session.GetFlag(flag))) {
+                if (!SceneAs<Level>().Session.GetFlag(flag, inverted)) {
                     Collidable = false;
                 } else if (!Collidable) {
                     Collidable = true;

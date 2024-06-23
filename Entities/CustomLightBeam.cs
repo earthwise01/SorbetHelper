@@ -113,8 +113,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             base.Awake(scene);
             Level level = base.Scene as Level;
 
-            if (!string.IsNullOrEmpty(flag) && ((!inverted && !level.Session.GetFlag(flag))
-            || (inverted && level.Session.GetFlag(flag)))) {
+            if (!string.IsNullOrEmpty(flag) && !level.Session.GetFlag(flag, inverted)) {
                 flagAlpha = 0f;
             } else {
                 flagAlpha = 1f;
@@ -175,8 +174,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             // fade flagAlpha towards either 0f or 1f depending on the flag state.
             if (!string.IsNullOrEmpty(flag)) {
                 float flagTarget;
-                if ((!inverted && !level.Session.GetFlag(flag))
-                || (inverted && level.Session.GetFlag(flag))) {
+                if (!level.Session.GetFlag(flag, inverted)) {
                     flagTarget = 0f;
                 } else {
                     flagTarget = 1f;
