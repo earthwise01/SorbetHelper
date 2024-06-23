@@ -23,7 +23,7 @@ entities.SorbetHelper/ReturnBerry.placements.name.winged=Strawberry (Winged, Wit
 entities.SorbetHelper/ReturnBerry.placements.description.normal=Similar to a Strawberry, but when the player grabs it they are placed into a bubble and moved along a path of nodes.
 entities.SorbetHelper/ReturnBerry.placements.description.winged=Similar to a Strawberry (Winged), but when the player grabs it they are placed into a bubble and moved along a path of nodes.
 entities.SorbetHelper/ReturnBerry.attributes.description.winged=Determines whether the strawberry has wings and attempts to vertically rise offscreen when the player dashes.
-entities.SorbetHelper/ReturnBerry.attributes.description.delay=The delay (in seconds) before the player is placed into a bubble after grabbing the strawberry. (Default= 0.3)
+entities.SorbetHelper/ReturnBerry.attributes.description.delay=The delay (in seconds) before the player is placed into a bubble after grabbing the strawberry. (Default = 0.3)
 entities.SorbetHelper/ReturnBerry.attributes.description.checkpointID=Manually determine what checkpoint section strawberries are visually grouped up in, showing up on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)
 entities.SorbetHelper/ReturnBerry.attributes.description.order=Manually determine what order strawberries are visually placed in on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)
 
@@ -34,7 +34,7 @@ entities.SorbetHelper/DashFallingBlock.attributes.description.climbFall=If the b
 entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnTouch=If the block should fall if it comes in contact with the player, even if they don't dash into it.
 entities.SorbetHelper/DashFallingBlock.attributes.name.fallOnStaticMover=Fall On Static Mover Interact
 entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnStaticMover=If the falling block can be activated by static movers (such as springs) attached to it.
-entities.SorbetHelper/DashFallingBlock.attributes.description.depth=Determines what visual layer the block should be on (higher values mean further behind in the scene, default value is -9000).
+entities.SorbetHelper/DashFallingBlock.attributes.description.depth=Determines what visual layer the block should be on (higher values mean farther behind in the scene, default value is -9000).
 entities.SorbetHelper/DashFallingBlock.attributes.description.shakeSfx=The sound played by the block before it falls.
 entities.SorbetHelper/DashFallingBlock.attributes.description.impactSfx=The sound played by the block either when it lands on the ground or is dashed into.
 entities.SorbetHelper/DashFallingBlock.attributes.description.tiletype=Changes the visual appearance of the falling block.
@@ -53,7 +53,7 @@ entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.inverted=When ch
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.flag=The flag that needs to be set in order for the block to break.
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.showDebris=Determines whether the block spawns debris when it breaks.
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.playAudio=Determines whether the block plays sound effects when breaking/appearing.
-entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.depth=Determines what visual layer the block should be on (higher values mean further behind in the scene, default value is -10010).
+entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.depth=Determines what visual layer the block should be on (higher values mean farther behind in the scene, default value is -10010).
 
 # resizable waterfall
 entities.SorbetHelper/BigWaterfall.placements.name.normal=Resizable Waterfall
@@ -63,7 +63,7 @@ entities.SorbetHelper/BigWaterfall.placements.description.abovefg=A waterfall wh
 entities.SorbetHelper/BigWaterfall.attributes.description.color=The color of the waterfall.
 entities.SorbetHelper/BigWaterfall.attributes.description.ignoreSolids=When checked, the waterfall will ignore any solid objects in its way (e.g. foreground tiles). however, water can still block it.
 entities.SorbetHelper/BigWaterfall.attributes.description.lines=Determines whether the waterfall will have any additional lines for detail, disabling this will make the waterfall appear closer in appearance to a vanilla small waterfall as opposed to a big waterfall.
-entities.SorbetHelper/BigWaterfall.attributes.description.depth=Determines what visual layer the waterfall should be on (higher values mean further behind in the scene, default value is -9999 for the normal placement or -49900 for the above foreground placement).\nNote that this doesn't have any effect on the distortion effect. (meaning even if you set the waterfall to be in the background, the distortion will still exist in the foreground)
+entities.SorbetHelper/BigWaterfall.attributes.description.depth=Determines what visual layer the waterfall should be on (higher values mean farther behind in the scene, default value is -9999 for the normal placement or -49900 for the above foreground placement).
 
 # custom/rainbow lightbeam
 # tooltips for most of the rainbow related attributes stolen from MaddieHelpingHand
@@ -75,7 +75,7 @@ entities.SorbetHelper/CustomLightbeam.attributes.description.flag=The flag that 
 entities.SorbetHelper/CustomLightbeam.attributes.description.inverted=When checked, the lightbeam will only be active when the associated flag is disabled rather than only when the associated flag is enabled.
 entities.SorbetHelper/CustomLightbeam.attributes.description.flagFadeTime=The time (in seconds) the lightbeam takes to fade in or out according to the flag.
 entities.SorbetHelper/CustomLightbeam.attributes.description.rotation=The rotation of the lightbeam.
-entities.SorbetHelper/CustomLightbeam.attributes.description.depth=Determines what visual layer the lightbeam should be on (higher values mean further behind in the scene, default value is -9998).\nDoes not affect the particles.
+entities.SorbetHelper/CustomLightbeam.attributes.description.depth=Determines what visual layer the lightbeam should be on (higher values mean farther behind in the scene, default value is -9998).\nDoes not affect the particles.
 entities.SorbetHelper/CustomLightbeam.attributes.description.noParticles=Determines whether the lightbeam emits particles.
 entities.SorbetHelper/CustomLightbeam.attributes.description.color=The color of the lightbeam.
 entities.SorbetHelper/CustomLightbeam.attributes.description.rainbow=Determines whether the lightbeam is rainbow.
@@ -108,8 +108,8 @@ entities.SorbetHelper/WingedStrawberryDirectionController.attributes.description
 # names probably still kinda suck but i literally cant think of anything better
 entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.entityOnly=Displacement Wrapper (Only Distort Entity) [EXPERIMENTAL]
 entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.distortBehind=Displacement Wrapper (Depth Adhering) [EXPERIMENTAL]
-entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.description.entityOnly=Makes the displacement effects of entities which use any (e.g. water and waterfalls) only affect their entity and nothing else.\nNormal displacement affects everything in its area, no matter the depth.
-entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.description.distortBehind=Makes the displacement effects of entities which use any (e.g. water and waterfalls) only affect their entity and anything behind it.\nNormal displacement affects everything in its area, no matter the depth.
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.description.entityOnly=Makes the displacement effects of entities which use any (e.g. water and waterfalls) only affect their entity and nothing else.\n(for reference vanilla displacement doesn't care about depth and just affects everything touching it)
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.description.distortBehind=Makes the displacement effects of entities which use any (e.g. water and waterfalls) only affect their entity and anything behind it.\n(for reference vanilla displacement doesn't care about depth and just affects everything touching it)
 entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.name.distortBehind=Distort Behind
 entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.description.distortBehind=Whether affected entities should also apply their displacement effects to things behind them.\nDisabling this makes entities only affect themselves.
 # unused
@@ -120,6 +120,6 @@ entities.SorbetHelper/DisplacementEffectBlocker.placements.name.normal=Displacem
 entities.SorbetHelper/DisplacementEffectBlocker.placements.name.depthAdhering=Displacement Effect Blocker (Displacement Wrapper) [EXPERIMENTAL]
 entities.SorbetHelper/DisplacementEffectBlocker.placements.description.normal=Completely blocks the displacement effect produced by entities such as water or waterfalls.
 entities.SorbetHelper/DisplacementEffectBlocker.placements.description.depthAdhering=Blocks the displacement effect produced by entities such as water or waterfalls at a certain depth that are *affected by a Depth Adhering Displacement Wrapper*.
-entities.SorbetHelper/DisplacementEffectBlocker.attributes.description.depth=The depth of the displacement blocker. Any depth adhering displacement attached to an entity with a depth equal to or higher than this will be affected by the blocker.\n(higher values mean further behind in the scene.)
+entities.SorbetHelper/DisplacementEffectBlocker.attributes.description.depth=The depth of the displacement blocker. Any depth adhering displacement attached to an entity with a depth equal to or higher than this will be affected by the blocker.\n(higher values mean farther behind in the scene.)
 
 mods.SorbetHelper.name=Sorbet Helper
