@@ -108,6 +108,7 @@ end
 
 lightBeam.selection = lightBeamHelper.getSelection
 lightBeam.rotate = lightBeamHelper.rotate
+lightBeam.updateResizeSelection = lightBeamHelper.updateResizeSelection
 
 -- lua-ified versions of a couple methods from fna/monocle and the gethue method needed for the gradient effect
 local function clamp(value, min, max)
