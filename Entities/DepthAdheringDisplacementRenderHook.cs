@@ -160,6 +160,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         private static bool renderDepthAdheringRenderHooks(Entity entity) {
+            if (entity.Scene == null) return false;
+
             // the tracker is used here instead of searching through each entity's components as to not something something
             List<Component> list = entity.Scene.Tracker.GetComponents<DepthAdheringDisplacementRenderHook>();
 
