@@ -16,6 +16,8 @@ using ..Ahorn, Maple
     depth::Integer=-9000,
     allowWavedash::Bool=false,
     dashCornerCorrection::Bool=false,
+    direction::String="Down",
+    fallDashMode::String="Disabled",
 )
 
 const placements = Ahorn.PlacementDict(
@@ -40,7 +42,13 @@ Ahorn.editingOptions(entity::DashFallingBlock) = Dict{String, Any}(
         "Snow" => "event:/game/01_forsaken_city/fallblock_ice_impact",
         "Wood" => "event:/game/03_resort/fallblock_wood_impact",
         "Reflection" => "event:/game/06_reflection/fallblock_boss_impact"
-    )
+    ),
+    "direction" => String[
+        "Up", "Down", "Left", "Right"
+    ],
+    "fallDashMode" => String[
+        "Disabled", "Push", "Pull"
+    ]
 )
 
 Ahorn.minimumSize(entity::DashFallingBlock) = 8, 8
@@ -50,6 +58,6 @@ Ahorn.selection(entity::DashFallingBlock) = Ahorn.getEntityRectangle(entity)
 
 Ahorn.renderAbs(ctx::Ahorn.Cairo.CairoContext, entity::DashFallingBlock, room::Maple.Room) = Ahorn.drawTileEntity(ctx, room, entity)
 
-Ahorn.editingOrder(entity::DashFallingBlock) = String["x", "y", "width", "height", "shakeSfx", "impactSfx", "tiletype", "depth", "fallOnTouch", "climbFall", "fallOnStaticMover", "allowWavedash", "dashCornerCorrection"]
+Ahorn.editingOrder(entity::DashFallingBlock) = String["x", "y", "width", "height", "shakeSfx", "impactSfx", "tiletype", "depth", "direction", "fallDashMode", "fallOnTouch", "climbFall", "fallOnStaticMover", "allowWavedash", "dashCornerCorrection"]
 
 end

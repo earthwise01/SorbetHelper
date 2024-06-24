@@ -15,6 +15,7 @@ using Random
     noParticles::Bool=false,
     color::String="CCFFFF",
     rainbow::Bool=false,
+    useCustomRainbowColors::Bool=false,
     colors::String="89E5AE,88E0E0,87A9DD,9887DB,D088E2",
     gradientSize::Number=280.0,
     loopColors::Bool=false,
@@ -24,6 +25,7 @@ using Random
     singleColor::Bool=false,
     fadeWhenNear::Bool=true,
     fadeOnTransition::Bool=true,
+    flagFadeTime::Number=0.25,
 )
 
 function lightbeamFinalizer(entity::CustomLightbeam)
@@ -44,7 +46,7 @@ const placements = Ahorn.PlacementDict(
         Dict{String, Any}(),
         lightbeamFinalizer
     ),
-    "Custom Lightbeam (Rainbow) (Sorbet Helper)" => Ahorn.EntityPlacement(
+    "Rainbow Lightbeam (Sorbet Helper)" => Ahorn.EntityPlacement(
         CustomLightbeam,
         "line",
         Dict{String, Any}(
@@ -55,15 +57,15 @@ const placements = Ahorn.PlacementDict(
 )
 
 Ahorn.editingOrder(entity::CustomLightbeam) = String[
-    "x", "y", "width", "height", "centerX", "centerY", "color", "colors", "gradientSize", "gradientSpeed", "depth", "rotation", "flag",
-    "fadeWhenNear", "fadeOnTransition", "inverted", "noParticles", "rainbow", "loopColors", "singleColor"
+    "x", "y", "width", "height", "color", "centerX", "centerY", "colors", "gradientSize", "gradientSpeed", "depth", "rotation", "flag", "flagFadeTime",
+    "inverted", "fadeOnTransition", "rainbow", "useCustomRainbowColors", "noParticles", "fadeWhenNear", "singleColor", "loopColors"
 ]
 
 function Ahorn.editingIgnored(entity::CustomLightbeam, multiple::Bool=false)
 
     result = String[]
 
-    if get(entity.data, "rainbow", "false")
+    if get(entity.data, "rainbow", false) && get(entity.data, "useCustomRainbowColors", false)
         result = String["color"]
     else
         result = String["colors", "gradientSize", "gradientSpeed", "centerX", "centerY", "singleColor", "loopColors"]
