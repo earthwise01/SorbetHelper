@@ -16,5 +16,20 @@ namespace Celeste.Mod.SorbetHelper {
 
             return rainbowSpinner.GetHue(position);
         }
+
+        public static Color HexToRGBAColor(string hex) {
+            Color color = Calc.HexToColor(hex);
+
+            int num = 0;
+            if (hex.Length >= 1 && hex[0] == '#') {
+                num = 1;
+            }
+            if (hex.Length - num >= 8) {
+                float a = (Calc.HexToByte(hex[num + 6]) * 16 + Calc.HexToByte(hex[num + 7])) / 255f;
+                color *= a;
+            }
+
+            return color;
+        }
     }
 }
