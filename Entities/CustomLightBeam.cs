@@ -73,8 +73,10 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             fadeWhenNear = data.Bool("fadeWhenNear", true);
             fadeOnTransition = data.Bool("fadeOnTransition", true);
 
+            float alpha = Math.Clamp(data.Float("alpha", 1f), 0f, 1f);
+
             noParticles = data.Bool("noParticles", false);
-            color = Calc.HexToColor(data.Attr("color", "CCFFFF"));
+            color = Calc.HexToColor(data.Attr("color", "CCFFFF")) * alpha;
             rainbow = data.Bool("rainbow", false);
             useCustomRainbowColors = data.Bool("useCustomRainbowColors", false);
 
@@ -87,7 +89,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
                 string[] colorsAsStrings = data.Attr("colors", "89E5AE,88E0E0,87A9DD,9887DB,D088E2").Split(',');
                 for (int i = 0; i < colorsAsStrings.Length; i++) {
-                    rainbowColors.Add(Calc.HexToColor(colorsAsStrings[i]));
+                    rainbowColors.Add(Calc.HexToColor(colorsAsStrings[i]) * alpha);
                 }
                 if (rainbowLoopColors) {
                     rainbowColors.Add(rainbowColors[0]);

@@ -78,6 +78,7 @@ entities.SorbetHelper/CustomLightbeam.attributes.description.rotation=The rotati
 entities.SorbetHelper/CustomLightbeam.attributes.description.depth=Determines what visual layer the lightbeam should be on (higher values mean farther behind in the scene, default value is -9998).\nDoes not affect the particles.
 entities.SorbetHelper/CustomLightbeam.attributes.description.noParticles=Determines whether the lightbeam emits particles.
 entities.SorbetHelper/CustomLightbeam.attributes.description.color=The color of the lightbeam.
+entities.SorbetHelper/CustomLightbeam.attributes.description.alpha=The alpha of the lightbeam.
 entities.SorbetHelper/CustomLightbeam.attributes.description.rainbow=Determines whether the lightbeam is rainbow.
 entities.SorbetHelper/CustomLightbeam.attributes.description.useCustomRainbowColors=When checked, overrides the normal rainbow colors (whether vanilla or from a rainbow spinner color controller) with custom ones specified by the lightbeam.\nChanging this requires clicking save changes and reopening this menu for the correct settings to appear.\n(Requires rainbow to be checked)
 # ^^^ might still be able to write this in a cleaner way but this should be good enough at least?
