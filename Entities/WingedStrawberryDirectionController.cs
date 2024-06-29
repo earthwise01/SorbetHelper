@@ -78,7 +78,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 cursor.GotoNext(MoveType.After, instr => instr.MatchCall<Entity>("set_Y"))
                 .MarkLabel(afterVanillaMovementLabel);
             } else {
-                Logger.Log(LogLevel.Error, "SorbetHelper", $"Failed to inject custom flight movement in CIL code for {cursor.Method.FullName}!");
+                Logger.Log(LogLevel.Warn, "SorbetHelper", $"Failed to inject custom flight movement in CIL code for {cursor.Method.FullName}!");
             }
 
             // inject downwards and horizontal out of room bounds checks.
@@ -96,7 +96,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 cursor.FindNext(out _, instr => instr.MatchBgeUn(out afterOOBChecksLabel));
                 cursor.EmitBrtrue(afterOOBChecksLabel);
             } else {
-                Logger.Log(LogLevel.Error, "SorbetHelper", $"Failed to inject additional out of room bounds checks in CIL code for {cursor.Method.FullName}!");
+                Logger.Log(LogLevel.Warn, "SorbetHelper", $"Failed to inject additional out of room bounds checks in CIL code for {cursor.Method.FullName}!");
             }
 
             // inject horizontal idle bounds checks alongside the vanilla vertical checks.
@@ -112,12 +112,16 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 cursor.EmitLdloc(controllerVariable);
                 cursor.EmitDelegate(addHorizontalIdleBoundsChecks);
             } else {
-                Logger.Log(LogLevel.Error, "SorbetHelper", $"Failed to inject horizontal idle bounds checks in CIL code for {cursor.Method.FullName}!");
+                Logger.Log(LogLevel.Warn, "SorbetHelper", $"Failed to inject horizontal idle bounds checks in CIL code for {cursor.Method.FullName}!");
             }
         }
 
-        private static WingedStrawberryDirectionController getController(Entity self) =>
-            self.Scene.Tracker.GetEntity<WingedStrawberryDirectionController>();
+        private static WingedStrawberryDirectionController getController(Entity self) {
+            if (self.Scene == null)
+                return null;
+
+            return self.Scene.Tracker.GetEntity<WingedStrawberryDirectionController>();
+        }
 
         // returns true if custom movement was used
         private static bool moveStrawberry(Entity self, float flapSpeed, WingedStrawberryDirectionController controller) {

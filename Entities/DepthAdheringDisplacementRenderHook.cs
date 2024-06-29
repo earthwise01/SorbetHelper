@@ -11,6 +11,7 @@ using Mono.Cecil.Cil;
 using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
 using Celeste.Mod.Entities;
+using Mono.Cecil;
 
 namespace Celeste.Mod.SorbetHelper.Entities {
 
@@ -142,30 +143,48 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private static void modEntityListRenderExcept(ILContext il) {
             ILCursor cursor = new ILCursor(il);
 
+            VariableDefinition renderHooksList = new(il.Import(typeof(List<Component>)));
+            il.Body.Variables.Add(renderHooksList);
+
+            // get render hook list
+            cursor.EmitLdarg0();
+            cursor.EmitCallvirt(typeof(EntityList).GetMethod("get_Scene"));
+            cursor.EmitDelegate(getRenderHooks);
+            cursor.EmitStloc(renderHooksList);
+
             ILLabel label = cursor.DefineLabel();
 
             if (cursor.TryGotoNext(MoveType.Before,
-              instr => instr.MatchLdloc(1),
+              instr => instr.MatchLdloc1(),
               instr => instr.MatchCallvirt<Entity>("Render"))) {
                 // check if the entity has a DepthAdheringDisplacementRenderHook, if it does skip rendering the entity and render it instead
-                Logger.Log("SorbetHelper", $"Injecting check to render DepthAdheringDisplacementRenderHooks instead of their entity at {cursor.Index} in CIL code for {cursor.Method.FullName}");
-                cursor.Emit(OpCodes.Ldloc_1);
-                cursor.EmitDelegate<Func<Entity, bool>>(renderDepthAdheringRenderHooks);
-                cursor.Emit(OpCodes.Brtrue, label);
+                Logger.Log(LogLevel.Verbose, "SorbetHelper", $"Injecting check to render DepthAdheringDisplacementRenderHooks instead of their entity at {cursor.Index} in CIL code for {cursor.Method.FullName}");
+                cursor.EmitLdloc1();
+                cursor.EmitLdloc(renderHooksList);
+                cursor.EmitDelegate(renderDepthAdheringRenderHooks);
+                cursor.EmitBrtrue(label);
 
                 cursor.GotoNext(MoveType.After, instr => instr.MatchCallvirt<Entity>("Render"));
 
                 cursor.MarkLabel(label);
+            } else {
+                Logger.Log(LogLevel.Warn, "SorbetHelper", $"Failed to inject check to render DepthAdheringDisplacementRenderHooks instead of their entity in CIL code for {cursor.Method.FullName}");
             }
         }
 
-        private static bool renderDepthAdheringRenderHooks(Entity entity) {
-            if (entity.Scene == null) return false;
+        private static List<Component> getRenderHooks(Scene scene) {
+            if (scene == null)
+                return null;
 
             // the tracker is used here instead of searching through each entity's components as to not something something
-            List<Component> list = entity.Scene.Tracker.GetComponents<DepthAdheringDisplacementRenderHook>();
+            return scene.Tracker.GetComponents<DepthAdheringDisplacementRenderHook>();
+        }
 
-            foreach (Component component in list) {
+        private static bool renderDepthAdheringRenderHooks(Entity entity, List<Component> renderHooks) {
+            if (renderHooks == null)
+                return false;
+
+            foreach (Component component in renderHooks) {
                 if (component.Entity == entity) {
                     component.Render();
                     return true;
