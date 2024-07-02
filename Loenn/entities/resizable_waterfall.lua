@@ -32,6 +32,7 @@ resizableWaterfall.ignoredFields = {
 resizableWaterfall.placements = {
     {
         name = "normal",
+        alternativeName = "bigwaterfall",
         data = {
             width = 16,
             color = "87CEFA",
@@ -42,6 +43,7 @@ resizableWaterfall.placements = {
     },
     {
         name = "abovefg",
+        alternativeName = "bigwaterfallabove",
         data = {
             width = 16,
             color = "87CEFA",

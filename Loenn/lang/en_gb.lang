@@ -58,6 +58,9 @@ entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.depth=Determines
 # resizable waterfall
 entities.SorbetHelper/BigWaterfall.placements.name.normal=Resizable Waterfall
 entities.SorbetHelper/BigWaterfall.placements.name.abovefg=Resizable Waterfall (Above Foreground)
+# show in search results for big waterfall
+entities.SorbetHelper/BigWaterfall.placements.name.bigwaterfall=Big Waterfall
+entities.SorbetHelper/BigWaterfall.placements.name.bigwaterfallabove=Big Waterfall (Above Foreground)
 entities.SorbetHelper/BigWaterfall.placements.description.normal=A waterfall which behaves similarly to a vanilla Waterfall, but is also resizable like and closer visually to a vanilla Big Waterfall.
 entities.SorbetHelper/BigWaterfall.placements.description.abovefg=A waterfall which behaves similarly to a vanilla Waterfall, but is also resizable like and closer visually to a vanilla Big Waterfall. Ignores and renders above Foreground Tiles.
 entities.SorbetHelper/BigWaterfall.attributes.description.color=The color of the waterfall.
