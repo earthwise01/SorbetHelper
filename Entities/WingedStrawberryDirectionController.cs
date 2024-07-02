@@ -34,6 +34,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         public WingedStrawberryDirectionController(EntityData data, Vector2 offset) : base(data.Position + offset) {
             direction = directionToVector[data.Attr("direction", "up").ToLower()];
+            direction.Normalize();
         }
 
         public static void Load() {
