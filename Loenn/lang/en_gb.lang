@@ -82,7 +82,7 @@ entities.SorbetHelper/CustomLightbeam.attributes.description.alpha=The alpha of 
 entities.SorbetHelper/CustomLightbeam.attributes.description.rainbow=Determines whether the lightbeam is rainbow.
 entities.SorbetHelper/CustomLightbeam.attributes.description.useCustomRainbowColors=When checked, overrides the normal rainbow colors (whether vanilla or from a rainbow spinner color controller) with custom ones specified by the lightbeam.\nChanging this requires clicking save changes and reopening this menu for the correct settings to appear.\n(Requires rainbow to be checked)
 # ^^^ might still be able to write this in a cleaner way but this should be good enough at least?
-entities.SorbetHelper/CustomLightbeam.attributes.description.colors=The colors the rainbow lightbeam will use, separated by commas.
+entities.SorbetHelper/CustomLightbeam.attributes.description.colors=The colors the rainbow lightbeam will use, separated by commas.\nAlpha can optionally be specifed per color by appending an additional value to it, e.g. 'ffffff80' means white with half opacity.
 entities.SorbetHelper/CustomLightbeam.attributes.description.gradientSize=The distance required to achieve a complete loop across all colors. Vanilla value is 280.
 entities.SorbetHelper/CustomLightbeam.attributes.description.loopColors=Determines how the colors loop. For example, if 3 colors A, B and C are specified:\n- when unchecked, the colors will cycle in the following order: A > B > C > B > A\n- when checked, the colors will cycle in the following order: A > B > C > A > B > C
 entities.SorbetHelper/CustomLightbeam.attributes.description.centerX=The horizontal position of the center of the gradient. Uses "world" coordinates. Vanilla value is 0.
