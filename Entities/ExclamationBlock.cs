@@ -119,7 +119,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                                 Blink();
                             }
                         } else {
-                            Reset();
+                            Break();
                             break;
                         }
                     }
@@ -166,14 +166,14 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public override void Render() {
             base.Render();
 
-            renderNineSlice(Position + hitOffset, nineSlice, (int)Width / 8, (int)Height / 8, scale);
-            exclamationMarkTexture.Draw(Position + new Vector2((int)Width / 2 - 4, (int)Height / 2 - 4));
+            renderNineSlice(Position, nineSlice, (int)Width / 8, (int)Height / 8, scale, hitOffset);
+            exclamationMarkTexture.DrawCentered(Position + new Vector2((int)Width / 2, (int)Height / 2) + hitOffset * scale, Color.White, scale);
         }
 
         public bool Hit() {
             for (int i = 2; i <= base.Width; i += 4) {
                 if (!base.Scene.CollideCheck<Solid>(base.BottomLeft + new Vector2(i, 3f))) {
-                    SceneAs<Level>().Particles.Emit(FallingBlock.P_FallDustB, 1, new Vector2(base.X + i, base.Bottom), Vector2.One * 4f);
+                    //SceneAs<Level>().Particles.Emit(FallingBlock.P_FallDustB, 1, new Vector2(base.X + i, base.Bottom), Vector2.One * 4f);
                     SceneAs<Level>().Particles.Emit(FallingBlock.P_FallDustA, 1, new Vector2(base.X + i, base.Bottom), Vector2.One * 4f);
                 }
             }
@@ -184,10 +184,18 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             return true;
         }
 
-        private void Reset() {
+        public void Break() {
             foreach (EmptyBlock block in segments) {
                 if (block is null)
                     continue;
+
+                for (int x = 0; x < block.Width / 8; x++) {
+                    for (int y = 0; y < block.Height / 8; y++) {
+                        float direction = Calc.Random.NextFloat(MathF.PI / 2f) + MathF.PI / 4f;
+                        SceneAs<Level>().Particles.Emit(Player.P_SummitLandB, 1, block.Position + new Vector2(x * 8, y * 8) + Vector2.One * 4f, Vector2.One * 2f, Color.White * 0.75f, direction);
+                    }
+                }
+
                 block.Visible = block.Collidable = false;
                 block.Position = targets[0];
             }
@@ -215,14 +223,14 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             }
         }
 
-        protected internal static void renderNineSlice(Vector2 position, MTexture[,] nineSlice, int width, int height, Vector2 scale, float alpha = 1f) {
+        protected internal static void renderNineSlice(Vector2 position, MTexture[,] nineSlice, int width, int height, Vector2 scale, Vector2 offset, float alpha = 1f) {
             Vector2 center = position + new Vector2(width * 8f / 2f, height * 8f / 2f);
 
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
                     int textureX = x < width - 1 ? Math.Min(x, 1) : 2;
                     int textureY = y < height - 1 ? Math.Min(y, 1) : 2;
-                    Vector2 tilePosition = position + new Vector2(x * 8, y * 8) + new Vector2(4, 4);
+                    Vector2 tilePosition = position + new Vector2(x * 8, y * 8) + new Vector2(4, 4) + offset;
                     tilePosition = center + ((tilePosition - center) * scale);
 
                     nineSlice[textureX, textureY].DrawCentered(tilePosition, Color.White * alpha);
@@ -277,10 +285,10 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public override void Render() {
             base.Render();
 
-            ExclamationBlock.renderNineSlice(Position + hitOffset, nineSlice, (int)Width / 8, (int)Height / 8, scale);
+            ExclamationBlock.renderNineSlice(Position, nineSlice, (int)Width / 8, (int)Height / 8, scale, hitOffset);
 
             if (flashOpacity > 0f) {
-                ExclamationBlock.renderNineSlice(Position + hitOffset, flashNineSlice, (int)Width / 8, (int)Height / 8, scale, flashOpacity);
+                ExclamationBlock.renderNineSlice(Position, flashNineSlice, (int)Width / 8, (int)Height / 8, scale, hitOffset, flashOpacity);
             }
         }
 
