@@ -13,7 +13,8 @@ exclamationBlock.placements = {
         height = 24,
         moveSpeed = 128.0,
         autoExtend = false,
-        activeTime = 3.0
+        activeTime = 3.0,
+        canRefreshTimer = true,
     }
 }
 

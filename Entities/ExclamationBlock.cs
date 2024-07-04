@@ -5,38 +5,23 @@ using Monocle;
 using Microsoft.Xna.Framework;
 using Celeste.Mod.Entities;
 using System.Linq;
+using System.Collections;
 
 namespace Celeste.Mod.SorbetHelper.Entities {
 
-    /*
-        todo:
-        cleanup/rewrite. like this works mostly kinda not rlly but theres probably stuff i can make cleaner and easier to add onto later
-        remove/improve/replace the stupid flashing effect to make it less Bad
-        add custom pathing (preferably in a way that isnt extremely jank)
-        More(tm)
-
-        idk this is mostly just a proof of concept rn theres still like a lot either just done weirdly i think or not even implemented asdkfjaksdf
-    */
-
     [CustomEntity("SorbetHelper/ExclamationBlock")]
     public class ExclamationBlock : Solid {
-        public enum States {
-            Idle,
-            ReadyToExtend,
-            Extending
-        }
 
-        public States activationState;
+        // variables for tracking the current state of the block
+        private float activationBuffer;
         private int amountExtended;
+        private int targetExtended;
         private float activeTimer;
-
-        private MTexture[,] nineSlice;
-        private MTexture exclamationMarkTexture;
         private Vector2 scale = Vector2.One;
         private Vector2 hitOffset;
 
-        private float activationBuffer;
-        public bool ShouldActivate {
+        // properties
+        public bool Extend {
             get {
                 bool value = activationBuffer > 0f;
                 activationBuffer = 0f;
@@ -46,41 +31,56 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 activationBuffer = value ? 0.125f : 0f;
             }
         }
-        public bool Extended => amountExtended > 0;
+        // true when fully extended and timer refresh is off
+        private bool IsEmptyBlock => targetExtended >= segmentCount && !canRefreshTimer;
 
+        // the thing which doesnt change technically but useful idk words moment im tired
         private readonly EmptyBlock[] segments;
         private readonly Vector2[] targets;
         private readonly int segmentCount;
+        private readonly MTexture[,] activeNineSlice;
+        private readonly MTexture[,] emptyNineSlice;
+        private readonly MTexture exclamationMarkTexture, emptyExclamationMarkTexture;
 
+        // editor facing settings
         private readonly float moveSpeed;
         private readonly bool autoExtend;
         private readonly float activeTime;
+        private readonly bool canRefreshTimer;
 
         public ExclamationBlock(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, data.Height, false) {
-            activationState = States.Idle;
-
             moveSpeed = data.Float("moveSpeed", 128f);
             autoExtend = data.Bool("autoExtend", false);
             activeTime = data.Float("activeTime", 3f);
+            canRefreshTimer = data.Bool("canRefreshTimer", false);
 
-            nineSlice = new MTexture[3, 3];
-            MTexture texture = GFX.Game["objects/SorbetHelper/exclamationBlock/activeBlock"];
+            activeNineSlice = Utils.CreateNineSlice(GFX.Game["objects/SorbetHelper/exclamationBlock/activeBlock"], 8, 8);
+            emptyNineSlice = Utils.CreateNineSlice(GFX.Game["objects/SorbetHelper/exclamationBlock/emptyBlock"], 8, 8);
             exclamationMarkTexture = GFX.Game["objects/SorbetHelper/exclamationBlock/exclamationMark"];
+            emptyExclamationMarkTexture = GFX.Game["objects/SorbetHelper/exclamationBlock/emptyExclamationMark"];
 
-            for (int x = 0; x < 3; x++) {
-                for (int y = 0; y < 3; y++) {
-                    nineSlice[x, y] = texture.GetSubtexture(x * 8, y * 8, 8, 8);
-                }
-            }
-
-            segments = [null, new(Position, (int)Width, (int)Height), new(Position, (int)Width, (int)Height)];
-            targets = [Position, Position + new Vector2(Width, 0f), Position + new Vector2(Width * 2f, 0f)];
+            // i need to make this like. actually customizable and not hardcoded lmao
+            segments = [null, new(Position, (int)Width, (int)Height), new(Position, (int)Width, (int)Height), new(Position, (int)Width, (int)Height)];
+            targets = [Position, Position + new Vector2(Width, 0f), Position + new Vector2(Width * 2f, 0f), Position + new Vector2(Width * 2f, -Height)];
             segmentCount = segments.Length - 1;
 
             OnDashCollide = OnDashCollision;
+            Add(new Coroutine(Sequence()));
+            Add(new Coroutine(BlinkRoutine()));
         }
 
-        public DashCollisionResults OnDashCollision(Player player, Vector2 direction) {
+        public DashCollisionResults OnDashCollision(Player player, Vector2 dir) {
+            // don't activate the block if it's in empty block mode
+            if (IsEmptyBlock)
+                return DashCollisionResults.NormalCollision;
+
+            // gravity helper support
+            bool gravityInverted = GravityHelperImports.IsPlayerInverted?.Invoke() ?? false;
+            // make wallbouncing easier
+            if ((player.Left >= Right - 4f || player.Right < Left + 4f) && dir.Y == (gravityInverted ? 1f : -1f))
+                return DashCollisionResults.NormalCollision;
+
+            // activate the block
             Hit();
 
             return DashCollisionResults.Rebound;
@@ -89,10 +89,12 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public override void Added(Scene scene) {
             base.Added(scene);
 
+            // add blocks in reverse order for correct depth when rendered
             for (int i = segments.Length - 1; i > 0; i--) {
                 EmptyBlock block = segments[i];
                 if (block is null)
                     continue;
+
                 Scene.Add(block);
                 block.Visible = block.Collidable = false;
             }
@@ -104,70 +106,81 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             // ease scale and hitOffset towards their default values
             scale.X = Calc.Approach(scale.X, 1f, Engine.DeltaTime * 2f);
             scale.Y = Calc.Approach(scale.Y, 1f, Engine.DeltaTime * 2f);
-            hitOffset.X = Calc.Approach(hitOffset.X, 0f, Engine.DeltaTime * 15f);
-            hitOffset.Y = Calc.Approach(hitOffset.Y, 0f, Engine.DeltaTime * 15f);
+            hitOffset.X = Calc.Approach(hitOffset.X, 0f, Engine.DeltaTime * 14f);
+            hitOffset.Y = Calc.Approach(hitOffset.Y, 0f, Engine.DeltaTime * 14f);
 
             activationBuffer -= Engine.DeltaTime;
+        }
 
-            switch (activationState) {
-                case States.Idle:
-                    if (Extended) {
-                        if (activeTimer > 0f) {
-                            activeTimer -= Engine.DeltaTime;
+        public IEnumerator Sequence() {
+            while (true) {
+                // check if the block should extend/update timer
+                if (Extend) {
+                    if (amountExtended == 0 || canRefreshTimer)
+                        activeTimer = activeTime;
 
-                            if (activeTimer <= 1f && Scene.OnInterval(1f / 3f)) {
-                                Blink();
-                            }
-                        } else {
-                            Break();
-                            break;
-                        }
-                    }
+                    targetExtended = autoExtend ? segmentCount : targetExtended + 1;
+                }
 
-                    if (ShouldActivate) {
-                        activationState = States.ReadyToExtend;
-                    }
+                // extending
+                while (amountExtended < targetExtended) {
+                    int extendingIndex = amountExtended + 1;
 
-                    break;
-                case States.ReadyToExtend:
-                    activeTimer = activeTime;
-
-                    if (amountExtended >= segmentCount) {
-                        activationState = States.Idle;
+                    // cancel extension if it exceeds the amount of segments
+                    if (extendingIndex > segmentCount) {
+                        targetExtended = segmentCount;
                         break;
                     }
 
-                    EmptyBlock block = segments[amountExtended + 1];
+                    EmptyBlock block = segments[extendingIndex];
                     block.Position = targets[amountExtended];
                     block.Visible = block.Collidable = true;
 
-                    activationState = States.Extending;
-
-                    // immediately start extending instead of waiting until the next frame
-                    goto case States.Extending;
-                case States.Extending:
-                    EmptyBlock block1 = segments[amountExtended + 1];
-                    Vector2 target = targets[amountExtended + 1];
-
-                    block1.MoveTowardsX(target.X, moveSpeed * Engine.DeltaTime);
-                    block1.MoveTowardsY(target.Y, moveSpeed * Engine.DeltaTime);
-
-                    // reached target, increase amount extended and either return to idle or extend again
-                    if (block1.Position == target) {
-                        amountExtended++;
-                        activationState = autoExtend ? States.ReadyToExtend : States.Idle;
-                        break;
+                    Vector2 target = targets[extendingIndex];
+                    while (!MoveTowards(block, target, moveSpeed * Engine.DeltaTime)) {
+                        yield return null;
                     }
 
-                    break;
+                    // reached target
+                    amountExtended += 1;
+
+                    yield return null;
+                }
+
+                // idle
+                if (amountExtended > 0) {
+                    if (activeTimer > 0f) {
+                        activeTimer -= Engine.DeltaTime;
+                    } else {
+                        Break();
+                    }
+                }
+
+                yield return null;
+            }
+        }
+
+        public IEnumerator BlinkRoutine() {
+            // literally just updates the blink effect before the block disappears
+            while (true) {
+                while (activeTimer > 0f && activeTimer < 2f) {
+                    Blink();
+                    yield return 0.5f;
+                }
+                yield return null;
             }
         }
 
         public override void Render() {
             base.Render();
 
-            renderNineSlice(Position, nineSlice, (int)Width / 8, (int)Height / 8, scale, hitOffset);
-            exclamationMarkTexture.DrawCentered(Position + new Vector2((int)Width / 2, (int)Height / 2) + hitOffset * scale, Color.White, scale);
+            if (targetExtended < segmentCount || canRefreshTimer) {
+                Utils.RenderNineSlice(Position + hitOffset, activeNineSlice, (int)Width / 8, (int)Height / 8, scale);
+                exclamationMarkTexture.DrawCentered(Position + new Vector2((int)Width / 2, (int)Height / 2) + hitOffset * scale, Color.White, scale);
+            } else {
+                Utils.RenderNineSlice(Position + hitOffset, emptyNineSlice, (int)Width / 8, (int)Height / 8, scale);
+                emptyExclamationMarkTexture.DrawCentered(Position + new Vector2((int)Width / 2, (int)Height / 2) + hitOffset * scale, Color.White, scale);
+            }
         }
 
         public bool Hit() {
@@ -178,7 +191,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 }
             }
 
-            ShouldActivate = true;
+            Extend = true;
             Bounce();
 
             return true;
@@ -189,8 +202,13 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 if (block is null)
                     continue;
 
+                // spawn dust particles
                 for (int x = 0; x < block.Width / 8; x++) {
                     for (int y = 0; y < block.Height / 8; y++) {
+                        // only have a 1/4th chance of actually creating a particle
+                        if (Calc.Random.NextSingle() >= 0.25f)
+                            continue;
+
                         float direction = Calc.Random.NextFloat(MathF.PI / 2f) + MathF.PI / 4f;
                         SceneAs<Level>().Particles.Emit(Player.P_SummitLandB, 1, block.Position + new Vector2(x * 8, y * 8) + Vector2.One * 4f, Vector2.One * 2f, Color.White * 0.75f, direction);
                     }
@@ -201,6 +219,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             }
 
             amountExtended = 0;
+            targetExtended = 0;
             activationBuffer = 0f;
             activeTimer = 0f;
         }
@@ -214,8 +233,9 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         private void Bounce() {
-            scale = new Vector2(0.8f, 0.8f);
-            hitOffset = Vector2.UnitY * -3f;
+            scale = new Vector2(0.75f, 0.75f);
+            hitOffset = new Vector2(0f, -4f);
+
             foreach (EmptyBlock block in segments) {
                 if (block is null)
                     continue;
@@ -223,82 +243,59 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             }
         }
 
-        protected internal static void renderNineSlice(Vector2 position, MTexture[,] nineSlice, int width, int height, Vector2 scale, Vector2 offset, float alpha = 1f) {
-            Vector2 center = position + new Vector2(width * 8f / 2f, height * 8f / 2f);
+        private static bool MoveTowards(Platform self, Vector2 target, float amount) {
+            Vector2 pos = Calc.Approach(self.Position, target, amount);
+            self.MoveTo(pos);
+            return self.Position == target;
+        }
 
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    int textureX = x < width - 1 ? Math.Min(x, 1) : 2;
-                    int textureY = y < height - 1 ? Math.Min(y, 1) : 2;
-                    Vector2 tilePosition = position + new Vector2(x * 8, y * 8) + new Vector2(4, 4) + offset;
-                    tilePosition = center + ((tilePosition - center) * scale);
+        public class EmptyBlock : Solid {
+            private readonly MTexture[,] nineSlice;
+            private readonly MTexture[,] flashNineSlice;
 
-                    nineSlice[textureX, textureY].DrawCentered(tilePosition, Color.White * alpha);
+            private Vector2 scale = Vector2.One;
+            private Vector2 hitOffset;
+            private float flashOpacity;
+
+            private const float XBounceScale = 0.7f;
+            private const float YBounceScale = 0.8f;
+            private const float XBounceOffset = 0f;
+            private const float YBounceOffset = -6f;
+
+            public EmptyBlock(Vector2 position, int width, int height) : base(position, width, height, false) {
+                base.Depth = -8999;
+
+                nineSlice = Utils.CreateNineSlice(GFX.Game["objects/SorbetHelper/exclamationBlock/emptyBlock"], 8, 8);
+                flashNineSlice = Utils.CreateNineSlice(GFX.Game["objects/SorbetHelper/exclamationBlock/flash"], 8, 8);
+            }
+
+            public override void Update() {
+                base.Update();
+
+                scale.X = Calc.Approach(scale.X, 1f, Engine.DeltaTime * Math.Abs(XBounceScale) * 4f);
+                scale.Y = Calc.Approach(scale.Y, 1f, Engine.DeltaTime * Math.Abs(YBounceScale) * 4f);
+                hitOffset.X = Calc.Approach(hitOffset.X, 0f, Engine.DeltaTime * Math.Abs(XBounceOffset) * 4f);
+                hitOffset.Y = Calc.Approach(hitOffset.Y, 0f, Engine.DeltaTime * Math.Abs(YBounceOffset) * 4f);
+
+                if (flashOpacity > 0f) {
+                    flashOpacity -= Engine.DeltaTime * 6f;
                 }
             }
-        }
-    }
 
-    public class EmptyBlock : Solid {
+            public override void Render() {
+                base.Render();
 
-        private MTexture[,] nineSlice;
-        private MTexture[,] flashNineSlice;
-        private Vector2 scale = Vector2.One;
-        private Vector2 hitOffset;
-
-        private float flashOpacity;
-
-        public EmptyBlock(Vector2 position, int width, int height) : base(position, width, height, false) {
-            base.Depth = -8999;
-
-            nineSlice = new MTexture[3, 3];
-            flashNineSlice = new MTexture[3, 3];
-            MTexture texture = GFX.Game["objects/SorbetHelper/exclamationBlock/emptyBlock"];
-            MTexture flashTexture = GFX.Game["objects/SorbetHelper/exclamationBlock/flash"];
-
-            for (int x = 0; x < 3; x++) {
-                for (int y = 0; y < 3; y++) {
-                    nineSlice[x, y] = texture.GetSubtexture(x * 8, y * 8, 8, 8);
-                }
+                Utils.RenderNineSlice(Position + hitOffset, nineSlice, flashNineSlice, flashOpacity, (int)Width / 8, (int)Height / 8, scale);
             }
 
-            for (int x = 0; x < 3; x++) {
-                for (int y = 0; y < 3; y++) {
-                    flashNineSlice[x, y] = flashTexture.GetSubtexture(x * 8, y * 8, 8, 8);
-                }
+            public void Blink() {
+                flashOpacity = 1f;
             }
-        }
 
-        public override void Update() {
-            base.Update();
-
-            scale.X = Calc.Approach(scale.X, 1f, Engine.DeltaTime * 0.7f * 4f);
-            scale.Y = Calc.Approach(scale.Y, 1f, Engine.DeltaTime * 0.8f * 4f);
-            hitOffset.X = Calc.Approach(hitOffset.X, 0f, Engine.DeltaTime * 6f * 4f);
-            hitOffset.Y = Calc.Approach(hitOffset.Y, 0f, Engine.DeltaTime * 6f * 4f);
-
-            if (flashOpacity > 0f) {
-                flashOpacity -= Engine.DeltaTime * 6f;
+            public void Bounce() {
+                scale = new Vector2(XBounceScale, YBounceScale);
+                hitOffset = new Vector2(XBounceOffset, YBounceOffset);
             }
-        }
-
-        public override void Render() {
-            base.Render();
-
-            ExclamationBlock.renderNineSlice(Position, nineSlice, (int)Width / 8, (int)Height / 8, scale, hitOffset);
-
-            if (flashOpacity > 0f) {
-                ExclamationBlock.renderNineSlice(Position, flashNineSlice, (int)Width / 8, (int)Height / 8, scale, hitOffset, flashOpacity);
-            }
-        }
-
-        public void Blink() {
-            flashOpacity = 1f;
-        }
-
-        public void Bounce() {
-            scale = new Vector2(0.7f, 0.8f);
-            hitOffset = new Vector2(0f, -6f);
         }
     }
 }
