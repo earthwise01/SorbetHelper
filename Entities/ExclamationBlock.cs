@@ -4,6 +4,7 @@ using Celeste;
 using Monocle;
 using Microsoft.Xna.Framework;
 using Celeste.Mod.Entities;
+using System.Linq;
 
 namespace Celeste.Mod.SorbetHelper.Entities {
 
@@ -31,6 +32,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         private MTexture[,] nineSlice;
         private MTexture exclamationMarkTexture;
+        private Vector2 scale = Vector2.One;
+        private Vector2 hitOffset;
 
         private float activationBuffer;
         public bool ShouldActivate {
@@ -78,14 +81,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         public DashCollisionResults OnDashCollision(Player player, Vector2 direction) {
-            for (int i = 2; i <= base.Width; i += 4) {
-                if (!base.Scene.CollideCheck<Solid>(base.BottomLeft + new Vector2(i, 3f))) {
-                    SceneAs<Level>().Particles.Emit(FallingBlock.P_FallDustB, 1, new Vector2(base.X + i, base.Bottom), Vector2.One * 4f);
-                    SceneAs<Level>().Particles.Emit(FallingBlock.P_FallDustA, 1, new Vector2(base.X + i, base.Bottom), Vector2.One * 4f);
-                }
-            }
-
-            ShouldActivate = true;
+            Hit();
 
             return DashCollisionResults.Rebound;
         }
@@ -93,14 +89,23 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public override void Added(Scene scene) {
             base.Added(scene);
 
-            foreach (EmptyBlock block in segments) {
-                if (block is null) continue;
+            for (int i = segments.Length - 1; i > 0; i--) {
+                EmptyBlock block = segments[i];
+                if (block is null)
+                    continue;
                 Scene.Add(block);
+                block.Visible = block.Collidable = false;
             }
         }
 
         public override void Update() {
             base.Update();
+
+            // ease scale and hitOffset towards their default values
+            scale.X = Calc.Approach(scale.X, 1f, Engine.DeltaTime * 2f);
+            scale.Y = Calc.Approach(scale.Y, 1f, Engine.DeltaTime * 2f);
+            hitOffset.X = Calc.Approach(hitOffset.X, 0f, Engine.DeltaTime * 15f);
+            hitOffset.Y = Calc.Approach(hitOffset.Y, 0f, Engine.DeltaTime * 15f);
 
             activationBuffer -= Engine.DeltaTime;
 
@@ -158,9 +163,31 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             }
         }
 
+        public override void Render() {
+            base.Render();
+
+            renderNineSlice(Position + hitOffset, nineSlice, (int)Width / 8, (int)Height / 8, scale);
+            exclamationMarkTexture.Draw(Position + new Vector2((int)Width / 2 - 4, (int)Height / 2 - 4));
+        }
+
+        public bool Hit() {
+            for (int i = 2; i <= base.Width; i += 4) {
+                if (!base.Scene.CollideCheck<Solid>(base.BottomLeft + new Vector2(i, 3f))) {
+                    SceneAs<Level>().Particles.Emit(FallingBlock.P_FallDustB, 1, new Vector2(base.X + i, base.Bottom), Vector2.One * 4f);
+                    SceneAs<Level>().Particles.Emit(FallingBlock.P_FallDustA, 1, new Vector2(base.X + i, base.Bottom), Vector2.One * 4f);
+                }
+            }
+
+            ShouldActivate = true;
+            Bounce();
+
+            return true;
+        }
+
         private void Reset() {
             foreach (EmptyBlock block in segments) {
-                if (block is null) continue;
+                if (block is null)
+                    continue;
                 block.Visible = block.Collidable = false;
                 block.Position = targets[0];
             }
@@ -170,26 +197,35 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             activeTimer = 0f;
         }
 
-        public override void Render() {
-            base.Render();
-
-            renderNineSlice(Position, nineSlice, (int)Width / 8, (int)Height / 8);
-            exclamationMarkTexture.Draw(Position + new Vector2((int)Width / 2 - 4, (int)Height / 2 - 4));
-        }
-
         private void Blink() {
             foreach (EmptyBlock block in segments) {
-                if (block is null) continue;
+                if (block is null)
+                    continue;
                 block.Blink();
             }
         }
 
-        protected internal static void renderNineSlice(Vector2 position, MTexture[,] nineSlice, int width, int height, float alpha = 1f) {
+        private void Bounce() {
+            scale = new Vector2(0.8f, 0.8f);
+            hitOffset = Vector2.UnitY * -3f;
+            foreach (EmptyBlock block in segments) {
+                if (block is null)
+                    continue;
+                block.Bounce();
+            }
+        }
+
+        protected internal static void renderNineSlice(Vector2 position, MTexture[,] nineSlice, int width, int height, Vector2 scale, float alpha = 1f) {
+            Vector2 center = position + new Vector2(width * 8f / 2f, height * 8f / 2f);
+
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
                     int textureX = x < width - 1 ? Math.Min(x, 1) : 2;
                     int textureY = y < height - 1 ? Math.Min(y, 1) : 2;
-                    nineSlice[textureX, textureY].DrawCentered(position + new Vector2(x * 8, y * 8) + new Vector2(4, 4), Color.White * alpha);
+                    Vector2 tilePosition = position + new Vector2(x * 8, y * 8) + new Vector2(4, 4);
+                    tilePosition = center + ((tilePosition - center) * scale);
+
+                    nineSlice[textureX, textureY].DrawCentered(tilePosition, Color.White * alpha);
                 }
             }
         }
@@ -199,6 +235,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         private MTexture[,] nineSlice;
         private MTexture[,] flashNineSlice;
+        private Vector2 scale = Vector2.One;
+        private Vector2 hitOffset;
 
         private float flashOpacity;
 
@@ -226,6 +264,11 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public override void Update() {
             base.Update();
 
+            scale.X = Calc.Approach(scale.X, 1f, Engine.DeltaTime * 0.7f * 4f);
+            scale.Y = Calc.Approach(scale.Y, 1f, Engine.DeltaTime * 0.8f * 4f);
+            hitOffset.X = Calc.Approach(hitOffset.X, 0f, Engine.DeltaTime * 6f * 4f);
+            hitOffset.Y = Calc.Approach(hitOffset.Y, 0f, Engine.DeltaTime * 6f * 4f);
+
             if (flashOpacity > 0f) {
                 flashOpacity -= Engine.DeltaTime * 6f;
             }
@@ -234,15 +277,20 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public override void Render() {
             base.Render();
 
-            ExclamationBlock.renderNineSlice(Position, nineSlice, (int)Width / 8, (int)Height / 8);
+            ExclamationBlock.renderNineSlice(Position + hitOffset, nineSlice, (int)Width / 8, (int)Height / 8, scale);
 
             if (flashOpacity > 0f) {
-                ExclamationBlock.renderNineSlice(Position, flashNineSlice, (int)Width / 8, (int)Height / 8, flashOpacity);
+                ExclamationBlock.renderNineSlice(Position + hitOffset, flashNineSlice, (int)Width / 8, (int)Height / 8, scale, flashOpacity);
             }
         }
 
         public void Blink() {
             flashOpacity = 1f;
+        }
+
+        public void Bounce() {
+            scale = new Vector2(0.7f, 0.8f);
+            hitOffset = new Vector2(0f, -6f);
         }
     }
 }
