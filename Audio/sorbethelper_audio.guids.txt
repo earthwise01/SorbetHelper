@@ -1,0 +1,6 @@
+{e60632b7-f9f1-42d9-b3c9-3cec741b475b} event:/sorbethelper/sfx/exclamationblock_blink
+{79ef69d8-734f-4d85-93d7-f8eb72848205} event:/sorbethelper/sfx/exclamationblock_break
+{ce8c0736-ffcc-45b4-a380-1075bba93475} event:/sorbethelper/sfx/exclamationblock_extended
+{c0d6bcd2-17ba-485a-9250-61d807170e9a} event:/sorbethelper/sfx/exclamationblock_extending
+{8bcd9e08-a84f-405c-826c-0b997a6c54f4} event:/sorbethelper/sfx/exclamationblock_hit
+{8b90b7a9-dfa1-42c5-8169-a7407dbf6600} bank:/sorbethelper_audio

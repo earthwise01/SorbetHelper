@@ -25,5 +25,9 @@ namespace Celeste.Mod.SorbetHelper {
             DisplacementEffectBlocker.Unload();
             DepthAdheringDisplacementRenderHook.Unload();
         }
+
+        public override void Initialize() {
+            ExclamationBlock.Intitialize();
+        }
     }
 }

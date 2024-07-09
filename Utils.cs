@@ -57,7 +57,7 @@ namespace Celeste.Mod.SorbetHelper {
                     tilePosition = center + ((tilePosition - center) * scale);
 
                     nineSlice[textureX, textureY].DrawCentered(tilePosition, Color.White);
-                    if (overlayNineSlice != null && overlayNineSliceFade > 0f) overlayNineSlice[textureX, textureY].DrawCentered(tilePosition, Color.White * overlayNineSliceFade);
+                    if (overlayNineSlice is not null && overlayNineSliceFade > 0f) overlayNineSlice[textureX, textureY].DrawCentered(tilePosition, Color.White * overlayNineSliceFade);
                 }
             }
         }
