@@ -15,6 +15,7 @@ exclamationBlock.placements = {
         autoExtend = false,
         activeTime = 3.0,
         canRefreshTimer = true,
+        path = "right,right,up,up,left"
     }
 }
 

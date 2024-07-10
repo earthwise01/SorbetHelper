@@ -25,6 +25,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private bool CanActivate => targetExtended < segmentCount || canRefreshTimer;
         private bool NeedsToExtend => amountExtended < targetExtended;
 
+        private readonly Directions[] path;
         private readonly EmptyBlock[] segments;
         private readonly Vector2[] targets;
         private readonly int segmentCount;
@@ -40,6 +41,13 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         public static ParticleType P_SmashDust { get; private set; }
 
+        private enum Directions {
+            Up, Down, Left, Right
+        };
+        private static readonly Dictionary<Directions, Vector2> directionToVector = new() {
+            {Directions.Up, new Vector2(0f, -1f)}, {Directions.Down, new Vector2(0f, 1f)}, {Directions.Left, new Vector2(-1f, 0f)}, {Directions.Right, new Vector2(1f, 0f)}
+        };
+
         public ExclamationBlock(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, data.Height, false) {
             moveSpeed = data.Float("moveSpeed", 128f);
             autoExtend = data.Bool("autoExtend", false);
@@ -52,9 +60,19 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             emptyExclamationMarkTexture = GFX.Game["objects/SorbetHelper/exclamationBlock/emptyExclamationMark"];
             SurfaceSoundIndex = SurfaceIndex.Girder;
 
-            // i need to make this like. actually customizable and not hardcoded lmao
-            segments = [null, new(Position, (int)Width, (int)Height), new(Position, (int)Width, (int)Height), new(Position, (int)Width, (int)Height)];
-            targets = [Position, Position + new Vector2(Width, 0f), Position + new Vector2(Width * 2f, 0f), Position + new Vector2(Width * 2f, -Height)];
+            List<Directions> pathList = [];
+            foreach (string direction in data.Attr("path", "right,right,up,up,left").Split(',', StringSplitOptions.TrimEntries)) {
+                if (Enum.TryParse(direction, true, out Directions actualDirection)) {
+                    pathList.Add(actualDirection);
+                }
+            }
+            pathList.Insert(0, pathList.Count > 0 ? pathList[0] : Directions.Right);
+            path = pathList.ToArray();
+
+            segments = new EmptyBlock[path.Length];
+            for (int i = 0; i < segments.Length; i++) {
+                segments[i] = new EmptyBlock(Position, Width, Height);
+            }
             segmentCount = segments.Length - 1;
 
             OnDashCollide = OnDashCollision;
@@ -114,7 +132,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                     if (amountExtended == 0 || canRefreshTimer)
                         activeTimer = activeTime;
 
-                    targetExtended = autoExtend ? segmentCount : targetExtended + 1;
+                    targetExtended = Math.Clamp(autoExtend ? segmentCount : targetExtended + 1, 0, segmentCount);
 
                     if (NeedsToExtend)
                         extendingSound.Play("event:/sorbethelper/sfx/exclamationblock_extending");
@@ -131,11 +149,18 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                     }
 
                     EmptyBlock block = segments[extendingIndex];
-                    block.Position = targets[amountExtended];
                     block.Active = block.Visible = block.Collidable = true;
+                    Vector2 start = segments[extendingIndex - 1].Position;
+                    Vector2 target = start + directionToVector[path[extendingIndex]] * new Vector2(block.Width, block.Height);
+                    block.Position = start;
 
-                    Vector2 target = targets[extendingIndex];
-                    while (!block.MoveTowards(target, moveSpeed * Engine.DeltaTime)) {
+                    float timeToExtend = (target - start).Length() / moveSpeed;
+                    float progress = 0f;
+                    while (block.Position != target) {
+                        progress += Engine.DeltaTime;
+                        float lerp = Calc.ClampedMap(progress, 0f, timeToExtend);
+                        block.MoveTo(Vector2.Lerp(start, target, lerp));
+
                         yield return null;
                     }
 
@@ -203,7 +228,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                     continue;
 
                 block.Break();
-                block.Position = targets[0];
+                block.Position = Position;
             }
 
             Audio.Play("event:/sorbethelper/sfx/exclamationblock_break", Position);
@@ -278,74 +303,60 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 ColorMode = ParticleType.ColorModes.Fade
             };
         }
+    }
 
-        public class EmptyBlock : Solid {
-            private readonly MTexture[,] nineSlice;
-            private readonly MTexture[,] flashNineSlice;
+    public class EmptyBlock : Solid {
+        private readonly MTexture[,] nineSlice;
+        private readonly MTexture[,] flashNineSlice;
 
-            private Vector2 scale = Vector2.One;
-            private Vector2 hitOffset;
-            private float flashOpacity;
-            private Vector2 floatPos;
+        private Vector2 scale = Vector2.One;
+        private Vector2 hitOffset;
+        private float flashOpacity;
 
-            public EmptyBlock(Vector2 position, int width, int height) : base(position, width, height, false) {
-                base.Depth = -8999;
+        public EmptyBlock(Vector2 position, float width, float height) : base(position, width, height, false) {
+            base.Depth = -8999;
 
-                nineSlice = Utils.CreateNineSlice(GFX.Game["objects/SorbetHelper/exclamationBlock/emptyBlock"], 8, 8);
-                flashNineSlice = Utils.CreateNineSlice(GFX.Game["objects/SorbetHelper/exclamationBlock/flash"], 8, 8);
-                SurfaceSoundIndex = SurfaceIndex.Girder;
+            nineSlice = Utils.CreateNineSlice(GFX.Game["objects/SorbetHelper/exclamationBlock/emptyBlock"], 8, 8);
+            flashNineSlice = Utils.CreateNineSlice(GFX.Game["objects/SorbetHelper/exclamationBlock/flash"], 8, 8);
+            SurfaceSoundIndex = SurfaceIndex.Girder;
+        }
+
+        public override void Update() {
+            base.Update();
+
+            // deltatime is multiplied with the values set in Bounce() so that they all take the same time to reset to normal
+            scale.X = Calc.Approach(scale.X, 1f, Engine.DeltaTime * 0.7f * 4f);
+            scale.Y = Calc.Approach(scale.Y, 1f, Engine.DeltaTime * 0.8f * 4f);
+            hitOffset.X = Calc.Approach(hitOffset.X, 0f, Engine.DeltaTime * 0f * 4f);
+            hitOffset.Y = Calc.Approach(hitOffset.Y, 0f, Engine.DeltaTime * 6f * 4f);
+
+            if (flashOpacity > 0f) {
+                flashOpacity -= Engine.DeltaTime * 6f;
             }
+        }
 
-            public override void Update() {
-                base.Update();
+        public override void Render() {
+            base.Render();
 
-                // deltatime is multiplied with the values set in Bounce() so that they all take the same time to reset to normal
-                scale.X = Calc.Approach(scale.X, 1f, Engine.DeltaTime * 0.7f * 4f);
-                scale.Y = Calc.Approach(scale.Y, 1f, Engine.DeltaTime * 0.8f * 4f);
-                hitOffset.X = Calc.Approach(hitOffset.X, 0f, Engine.DeltaTime * 0f * 4f);
-                hitOffset.Y = Calc.Approach(hitOffset.Y, 0f, Engine.DeltaTime * 6f * 4f);
+            Utils.RenderNineSlice(Position + hitOffset, nineSlice, flashNineSlice, flashOpacity, (int)Width / 8, (int)Height / 8, scale);
+        }
 
-                if (flashOpacity > 0f) {
-                    flashOpacity -= Engine.DeltaTime * 6f;
-                }
-            }
+        public void Break() {
+            SceneAs<Level>().Particles.Emit(Player.P_SummitLandB, Math.Max((int)(Width / 8) * (int)(Height / 8) / 5 * 2, 3), Center, new Vector2(Width / 2, Height / 2), Color.White * 0.75f, MathF.PI / 2f, MathF.PI / 6f);
 
-            public override void Render() {
-                base.Render();
+            Active = Visible = Collidable = false;
+            flashOpacity = 0f;
+            scale = Vector2.One;
+            hitOffset = Vector2.Zero;
+        }
 
-                Utils.RenderNineSlice(Position + hitOffset, nineSlice, flashNineSlice, flashOpacity, (int)Width / 8, (int)Height / 8, scale);
-            }
+        public void Blink() {
+            flashOpacity = 1f;
+        }
 
-            public bool MoveTowards(Vector2 target, float amount) {
-                Vector2 pos = Position + floatPos;
-
-                pos = Calc.Approach(pos, target, amount);
-
-                // need to store the decimal value bc otherwise it breaks at slow speeds since MoveTo rounds when moving
-                floatPos.X = pos.X - MathF.Round(pos.X);
-                floatPos.Y = pos.Y - MathF.Round(pos.Y);
-
-                MoveTo(pos);
-                return Position == target;
-            }
-
-            public void Break() {
-                SceneAs<Level>().Particles.Emit(Player.P_SummitLandB, (int)(Width / 8) * (int)(Height / 8) / 5 * 2, Center, new Vector2(Width / 2, Height / 2), Color.White * 0.75f, MathF.PI / 2f, MathF.PI / 6f);
-
-                Active = Visible = Collidable = false;
-                flashOpacity = 0f;
-                scale = Vector2.One;
-                hitOffset = Vector2.Zero;
-            }
-
-            public void Blink() {
-                flashOpacity = 1f;
-            }
-
-            public void Bounce() {
-                scale = new Vector2(0.7f, 0.8f);
-                hitOffset = new Vector2(0f, -6f);
-            }
+        public void Bounce() {
+            scale = new Vector2(0.7f, 0.8f);
+            hitOffset = new Vector2(0f, -6f);
         }
     }
 }
