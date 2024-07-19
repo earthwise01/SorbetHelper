@@ -1,6 +1,7 @@
 {e60632b7-f9f1-42d9-b3c9-3cec741b475b} event:/sorbethelper/sfx/exclamationblock_blink
 {79ef69d8-734f-4d85-93d7-f8eb72848205} event:/sorbethelper/sfx/exclamationblock_break
-{ce8c0736-ffcc-45b4-a380-1075bba93475} event:/sorbethelper/sfx/exclamationblock_extended
-{c0d6bcd2-17ba-485a-9250-61d807170e9a} event:/sorbethelper/sfx/exclamationblock_extending
+{ce8c0736-ffcc-45b4-a380-1075bba93475} event:/sorbethelper/sfx/exclamationblock_extend
+{ad4baf8c-33e9-4431-b56a-7d5d8c0c3c0b} event:/sorbethelper/sfx/exclamationblock_extend_loop
 {8bcd9e08-a84f-405c-826c-0b997a6c54f4} event:/sorbethelper/sfx/exclamationblock_hit
+{bcddbae5-2a02-4a23-ab2c-8d85196e4857} event:/sorbethelper/sfx/exclamationblock_extend_finish
 {8b90b7a9-dfa1-42c5-8169-a7407dbf6600} bank:/sorbethelper_audio

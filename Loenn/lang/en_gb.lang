@@ -104,6 +104,20 @@ entities.SorbetHelper/CustomLightbeam.attributes.name.loopColors=Loop Rainbow Co
 entities.SorbetHelper/CustomLightbeam.attributes.name.singleColor=Uniform Rainbow Color
 # ^^^ this might not be an accurate way of saying this but honestly at this point i've given up trying to find anything better.
 
+# exclamation block
+entities.SorbetHelper/ExclamationBlock.placements.name.exclamationBlock=Exclamation Mark Block
+entities.SorbetHelper/ExclamationBlock.attributes.name.activeTime=Time Active
+entities.SorbetHelper/ExclamationBlock.attributes.name.moveSpeed=Speed
+entities.SorbetHelper/ExclamationBlock.attributes.name.extendTo=Extend To
+entities.SorbetHelper/ExclamationBlock.attributes.description.moveSpeed=The speed (in pixels per second) at which the block extends.
+entities.SorbetHelper/ExclamationBlock.attributes.description.activeTime=The time (in seconds) the block stays active for after extending.
+entities.SorbetHelper/ExclamationBlock.attributes.description.canRefreshTimer=Whether hitting the block when it is already extended refreshes its timer.
+entities.SorbetHelper/ExclamationBlock.attributes.description.pauseTimerWhileExtending=Whether the timer should pause whilst the block is extending.
+entities.SorbetHelper/ExclamationBlock.attributes.description.canWavedash=Whether it is possible to wavedash on top of the block.
+entities.SorbetHelper/ExclamationBlock.attributes.description.extendTo=Comma seperated list of node indexes the block should extend to, e.g. "1,2,3".\nCan also be set to "NextBlock" to make the block extend one at a time or left blank for a full extension.
+entities.SorbetHelper/ExclamationBlock.attributes.description.spriteDirectory=The directory the block should search in for textures.
+entities.SorbetHelper/ExclamationBlock.attributes.description.drawOutline=Whether the block has an outline.
+
 # winged strawberry direction controller
 entities.SorbetHelper/WingedStrawberryDirectionController.placements.name.wingedStrawberryController=Winged Strawberry Direction Controller
 entities.SorbetHelper/WingedStrawberryDirectionController.attributes.description.direction=The direction winged strawberries in the room will fly.
