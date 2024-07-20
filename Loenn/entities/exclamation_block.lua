@@ -21,6 +21,7 @@ exclamationBlock.placements = {
         canRefreshTimer = false,
         pauseTimerWhileExtending = true,
         canWavedash = false,
+        attachStaticMovers = true,
         extendTo = "1,2,3",
         spriteDirectory = "objects/SorbetHelper/exclamationBlock",
         drawOutline = true,
@@ -39,7 +40,7 @@ exclamationBlock.fieldInformation = {
 }
 
 exclamationBlock.fieldOrder = {
-    "x", "y", "width", "height", "moveSpeed", "activeTime", "spriteDirectory", "extendTo", "drawOutline", "canWavedash", "pauseTimerWhileExtending", "canRefreshTimer"
+    "x", "y", "width", "height", "moveSpeed", "activeTime", "spriteDirectory", "extendTo", "drawOutline", "canWavedash", "pauseTimerWhileExtending", "canRefreshTimer", "attachStaticMovers"
 }
 
 local ninePatchOptions = {

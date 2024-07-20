@@ -43,6 +43,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private readonly bool canRefreshTimer;
         private readonly bool pauseTimerWhileExtending;
         private readonly bool canWavedash;
+        private readonly bool attachStaticMovers;
         private readonly bool drawOutline;
 
         public bool VisibleOnCamera { get; private set; } = true;
@@ -55,6 +56,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             canRefreshTimer = data.Bool("canRefreshTimer", false);
             pauseTimerWhileExtending = data.Bool("pauseTimerWhileExtending", true);
             canWavedash = data.Bool("canWavedash", false);
+            attachStaticMovers = data.Bool("attachStaticMovers", true);
             spriteDirectory = data.Attr("spriteDirectory", "objects/SorbetHelper/exclamationBlock");
             drawOutline = data.Bool("drawOutline", true);
             smashParticleColor = Calc.HexToColor("ffd12e") * 0.75f;
@@ -115,7 +117,14 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
             List<EmptyBlock> segments = [];
             for (int i = 0; i < nodes.Count; i++) {
-                segments.Add(new EmptyBlock(Position, Width, Height, spriteDirectory));
+                EmptyBlock block = new EmptyBlock(Position, Width, Height, spriteDirectory);
+
+                segments.Add(block);
+
+                if (attachStaticMovers) {
+                    block.StaticMoverAttachPosition = nodes[i];
+                    block.AllowStaticMovers = true;
+                }
             }
             segmentCount = segments.Count - 1;
 
@@ -153,7 +162,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
             foreach (EmptyBlock block in segments) {
                 Scene.Add(block);
-                block.Visible = block.Collidable = false;
+                block.Disappear();
             }
 
             if (drawOutline)
@@ -163,6 +172,12 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public override void Removed(Scene scene) {
             scene.Remove(outlineRenderer);
             outlineRenderer = null;
+
+            foreach (EmptyBlock block in segments) {
+                block.RemoveSelf();
+            }
+            segments.Clear();
+
             base.Removed(scene);
         }
 
@@ -224,8 +239,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                     EmptyBlock block = segments[extendingIndex];
                     Vector2 start = nodes[extendingIndex - 1];
                     Vector2 target = nodes[extendingIndex];
-                    block.Position = start;
-                    block.Visible = block.Collidable = true;
+                    block.MoveToNaive(start);
+                    block.Appear();
                     Audio.Play("event:/sorbethelper/sfx/exclamationblock_extend", block.Center, "index", Math.Clamp(12 * (amountExtended - 1) / Math.Max(segmentCount - 1, 1), 0, 12));
 
                     float timeToExtend = (target - start).Length() / moveSpeed;
@@ -322,7 +337,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
             foreach (EmptyBlock block in segments) {
                 block.Break(particleCount);
-                block.Position = Position;
+                block.MoveToNaive(Position);
             }
 
             amountExtended = 0;
@@ -438,15 +453,34 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public Vector2 Offset => offset + Shake;
         private float flashOpacity;
 
+        public Vector2 StaticMoverAttachPosition;
         public bool VisibleOnCamera { get; private set; } = true;
 
         public EmptyBlock(Vector2 position, float width, float height, string directory) : base(position, width, height, false) {
             base.Depth = -8999;
+            StaticMoverAttachPosition = Position;
+            AllowStaticMovers = false;
 
             nineSlice = Utils.CreateNineSlice(GFX.Game[$"{directory}/emptyBlock"], 8, 8);
             flashNineSlice = Utils.CreateNineSlice(GFX.Game[$"{directory}/flash"], 8, 8);
             SurfaceSoundIndex = SurfaceIndex.Girder;
             Add(new LightOcclude());
+        }
+
+        public override void Awake(Scene scene) {
+            if (StaticMoverAttachPosition != Position && AllowStaticMovers) {
+                Vector2 actualPosition = Position;
+                Position = StaticMoverAttachPosition;
+
+                base.Awake(scene);
+
+                MoveToNaive(actualPosition);
+            } else {
+                base.Awake(scene);
+            }
+
+            if (!Collidable)
+                DisableStaticMovers();
         }
 
         public override void Update() {
@@ -471,14 +505,31 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 Utils.RenderNineSlice(Position + offset + Shake, nineSlice, flashNineSlice, flashOpacity, (int)Width / 8, (int)Height / 8, scale);
         }
 
+        public void Appear() {
+            Visible = Collidable = true;
+            EnableStaticMovers();
+
+            // spawn a few particles around static movers so they just dont pop into existence (as abruptly at least,,)
+            foreach (StaticMover staticMover in staticMovers) {
+                if (staticMover.Entity.Visible)
+                    SceneAs<Level>().ParticlesFG.Emit(ParticleTypes.VentDust, Math.Max((int)(Width / 8) * (int)(Height / 8) / 5 * 2, 2), staticMover.Entity.Center, new Vector2(staticMover.Entity.Width / 2, staticMover.Entity.Height / 2), Color.WhiteSmoke, 0f, MathF.PI * 2f);
+            }
+        }
+
+        public void Disappear() {
+            Visible = Collidable = false;
+            DisableStaticMovers();
+
+            flashOpacity = 0f;
+            scale = Vector2.One;
+            offset = Vector2.Zero;
+        }
+
         public void Break(int particleCount) {
             if (Visible && VisibleOnCamera)
                 SceneAs<Level>().Particles.Emit(Player.P_SummitLandB, particleCount, Center, new Vector2(Width / 2, Height / 2), Color.White * 0.75f, MathF.PI / 2f, MathF.PI / 6f);
 
-            Visible = Collidable = false;
-            flashOpacity = 0f;
-            scale = Vector2.One;
-            offset = Vector2.Zero;
+            Disappear();
         }
 
         public void Blink() {
