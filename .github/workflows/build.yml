@@ -30,9 +30,9 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build SorbetHelper.csproj --configuration Release --no-restore
+      run: dotnet build Source/SorbetHelper.csproj --configuration Release --no-restore
       env:
-        CELESTEGAMEPATH: ${{ github.workspace }}/lib-stripped
+        CelestePrefix: ${{ github.workspace }}/lib-stripped
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v3.1.2

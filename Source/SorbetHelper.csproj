@@ -5,9 +5,9 @@
         <AssemblyName>SorbetHelper</AssemblyName>
         <RootNamespace>Celeste.Mod.SorbetHelper</RootNamespace>
         <LangVersion>latest</LangVersion>
-        <CelestePrefix Condition="'$(CelestePrefix)' == '' And Exists('..\..\Celeste.dll')">..\..</CelestePrefix>
+        <CelestePrefix Condition="'$(CelestePrefix)' == '' And Exists('..\..\..\Celeste.dll')">..\..\..</CelestePrefix>
         <CelestePrefix Condition="'$(CelestePrefix)' == ''">lib-stripped</CelestePrefix>
-        <ZippedFiles>everest.yaml;bin\SorbetHelper.dll;bin\SorbetHelper.pdb;Audio\**\*.*;Dialog\**\*.*;Graphics\**\*.*;Ahorn\**\*.*;Loenn\**\*.*</ZippedFiles>
+        <ZippedFiles>..\everest.yaml;..\bin\**\*.*;..\Audio\**\*.*;..\Dialog\**\*.*;..\Graphics\**\*.*;..\Ahorn\**\*.*;..\Loenn\**\*.*</ZippedFiles>
     </PropertyGroup>
 
     <!--Disable "Copy Local" for all references-->
@@ -28,16 +28,16 @@
         <Reference Include="$(CelestePrefix)\FNA.dll" Private="false" />
     </ItemGroup>
 
-    <Target Name="CopyFiles" AfterTargets="Build" Inputs="$(OutputPath)\$(AssemblyName).dll;$(OutputPath)\$(AssemblyName).pdb" Outputs="bin\$(AssemblyName).dll;bin\$(AssemblyName).pdb">
-        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="bin" />
-        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).pdb" DestinationFolder="bin" />
+    <Target Name="CopyFiles" AfterTargets="Build" Inputs="$(OutputPath)\$(AssemblyName).dll;$(OutputPath)\$(AssemblyName).pdb" Outputs="..\bin\$(AssemblyName).dll;..\bin\$(AssemblyName).pdb">
+        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="..\bin" />
+        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).pdb" DestinationFolder="..\bin" />
     </Target>
 
-    <Target Name="PackageMod" AfterTargets="CopyFiles" Inputs="$(ZippedFiles)" Outputs="SorbetHelper.zip" Condition="'$(Configuration)' == 'Release'">
+    <Target Name="PackageMod" AfterTargets="CopyFiles" Inputs="$(ZippedFiles)" Outputs="..\SorbetHelper.zip" Condition="'$(Configuration)' == 'Release'">
         <ItemGroup>
             <FilesToPackage Include="$(ZippedFiles)" />
         </ItemGroup>
-        <PackageMod Files="@(FilesToPackage)" OutputPath="SorbetHelper.zip" />
+        <PackageMod Files="@(FilesToPackage)" OutputPath="..\SorbetHelper.zip" />
     </Target>
 
     <PropertyGroup>
@@ -57,7 +57,7 @@
             <Using Namespace="System.IO.Compression" />
             <Code Type="Fragment" Language="cs">
             <![CDATA[
-                var projectDir = @"$(ProjectDir)";
+                var projectDir = Path.Combine(@"$(ProjectDir)", ".."); // Go one level up, since we're inside the 'Source' directory
                 projectDir = Uri.UnescapeDataString(projectDir);
 
                 if (File.Exists(OutputPath))
@@ -91,6 +91,7 @@
                     {
                         relativePath = relativePath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
                     }
+
                     return relativePath;
                 }
             ]]>

@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SorbetHelper", "SorbetHelper.csproj", "{3B1C2E6E-D483-4B97-94C4-17F0C6619B0B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SorbetHelper", "Source\SorbetHelper.csproj", "{3B1C2E6E-D483-4B97-94C4-17F0C6619B0B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
