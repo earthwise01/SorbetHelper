@@ -1,13 +1,12 @@
 using System;
-using System.Collections.Generic;
-using Celeste;
-using Monocle;
-using Microsoft.Xna.Framework;
-using Celeste.Mod.Entities;
-using System.Linq;
 using System.Collections;
-using FMOD;
-using FMOD.Studio;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Xna.Framework;
+using Monocle;
+using Celeste;
+using Celeste.Mod.Entities;
+using Celeste.Mod.SorbetHelper.Utils;
 
 namespace Celeste.Mod.SorbetHelper.Entities {
 
@@ -61,8 +60,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             drawOutline = data.Bool("drawOutline", true);
             smashParticleColor = Calc.HexToColor("ffd12e") * 0.75f;
 
-            activeNineSlice = Utils.CreateNineSlice(GFX.Game[$"{spriteDirectory}/activeBlock"], 8, 8);
-            emptyNineSlice = Utils.CreateNineSlice(GFX.Game[$"{spriteDirectory}/emptyBlock"], 8, 8);
+            activeNineSlice = Util.CreateNineSlice(GFX.Game[$"{spriteDirectory}/activeBlock"], 8, 8);
+            emptyNineSlice = Util.CreateNineSlice(GFX.Game[$"{spriteDirectory}/emptyBlock"], 8, 8);
             exclamationMarkTexture = GFX.Game[$"{spriteDirectory}/exclamationMark"];
             emptyExclamationMarkTexture = GFX.Game[$"{spriteDirectory}/emptyExclamationMark"];
             SurfaceSoundIndex = SurfaceIndex.Girder;
@@ -291,10 +290,10 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 return;
 
             if (CanActivate) {
-                Utils.RenderNineSlice(Position + Offset, activeNineSlice, (int)Width / 8, (int)Height / 8, scale);
+                Util.RenderNineSlice(Position + Offset, activeNineSlice, (int)Width / 8, (int)Height / 8, scale);
                 exclamationMarkTexture.DrawCentered(Center + Offset, Color.White, scale);
             } else {
-                Utils.RenderNineSlice(Position + Offset, emptyNineSlice, (int)Width / 8, (int)Height / 8, scale);
+                Util.RenderNineSlice(Position + Offset, emptyNineSlice, (int)Width / 8, (int)Height / 8, scale);
                 emptyExclamationMarkTexture.DrawCentered(Center + Offset, Color.White, scale);
             }
         }
@@ -461,8 +460,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             StaticMoverAttachPosition = Position;
             AllowStaticMovers = false;
 
-            nineSlice = Utils.CreateNineSlice(GFX.Game[$"{directory}/emptyBlock"], 8, 8);
-            flashNineSlice = Utils.CreateNineSlice(GFX.Game[$"{directory}/flash"], 8, 8);
+            nineSlice = Util.CreateNineSlice(GFX.Game[$"{directory}/emptyBlock"], 8, 8);
+            flashNineSlice = Util.CreateNineSlice(GFX.Game[$"{directory}/flash"], 8, 8);
             SurfaceSoundIndex = SurfaceIndex.Girder;
             Add(new LightOcclude());
         }
@@ -502,7 +501,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             base.Render();
 
             if (VisibleOnCamera)
-                Utils.RenderNineSlice(Position + offset + Shake, nineSlice, flashNineSlice, flashOpacity, (int)Width / 8, (int)Height / 8, scale);
+                Util.RenderNineSlice(Position + offset + Shake, nineSlice, flashNineSlice, flashOpacity, (int)Width / 8, (int)Height / 8, scale);
         }
 
         public void Appear() {

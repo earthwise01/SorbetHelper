@@ -1,14 +1,16 @@
-using Celeste;
-using Microsoft.Xna.Framework;
-using Monocle;
-using MonoMod.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using Microsoft.Xna.Framework;
+using Monocle;
+using Celeste;
+using Celeste.Mod.SorbetHelper.Entities;
+using MonoMod.Utils;
 
-namespace Celeste.Mod.SorbetHelper {
-    public class Utils {
+namespace Celeste.Mod.SorbetHelper.Utils {
+
+    public static class Util {
         private static CrystalStaticSpinner rainbowSpinner;
         public static Color GetRainbowHue(Scene scene, Vector2 position) {
             rainbowSpinner ??= new CrystalStaticSpinner(Vector2.Zero, false, CrystalColor.Rainbow);

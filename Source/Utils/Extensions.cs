@@ -1,12 +1,10 @@
 using System;
-using Celeste;
 using Microsoft.Xna.Framework;
 using Monocle;
+using Celeste;
 
-namespace Celeste.Mod.SorbetHelper {
-    internal static class Extensions {
-
-        // general utilities
+namespace Celeste.Mod.SorbetHelper.Utils {
+    public static class Extensions {
         public static bool GetFlag(this Session session, string flag, bool inverted) =>
             session.GetFlag(flag) != inverted;
 

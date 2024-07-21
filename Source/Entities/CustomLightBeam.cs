@@ -1,10 +1,10 @@
-using Celeste.Mod.Entities;
-using Celeste;
+using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
-using System;
-using System.Collections.Generic;
+using Celeste.Mod.Entities;
+using Celeste.Mod.SorbetHelper.Utils;
 
 namespace Celeste.Mod.SorbetHelper.Entities {
 
@@ -76,7 +76,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             float alpha = Math.Clamp(data.Float("alpha", 1f), 0f, 1f);
 
             noParticles = data.Bool("noParticles", false);
-            color = Utils.HexToRGBAColor(data.Attr("color", "CCFFFF")) * alpha;
+            color = Util.HexToRGBAColor(data.Attr("color", "CCFFFF")) * alpha;
             rainbow = data.Bool("rainbow", false);
             useCustomRainbowColors = data.Bool("useCustomRainbowColors", false);
 
@@ -89,7 +89,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
                 string[] colorsAsStrings = data.Attr("colors", "89E5AE,88E0E0,87A9DD,9887DB,D088E2").Split(',');
                 for (int i = 0; i < colorsAsStrings.Length; i++) {
-                    rainbowColors.Add(Utils.HexToRGBAColor(colorsAsStrings[i]) * alpha);
+                    rainbowColors.Add(Util.HexToRGBAColor(colorsAsStrings[i]) * alpha);
                 }
                 if (rainbowLoopColors) {
                     rainbowColors.Add(rainbowColors[0]);
@@ -280,7 +280,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private Color GetHue(Vector2 position) {
             // use vanilla/rainbow spinner color controller colors by default
             if (!useCustomRainbowColors)
-                return Utils.GetRainbowHue(Scene, position);
+                return Util.GetRainbowHue(Scene, position);
 
             // stolen from MaddieHelpingHand's RainbowSpinnerColorController
             // https://github.com/maddie480/MaddieHelpingHand/blob/master/Entities/RainbowSpinnerColorController.cs#L311
