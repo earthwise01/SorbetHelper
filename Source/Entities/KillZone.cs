@@ -1,8 +1,8 @@
-using Celeste.Mod.Entities;
-using Celeste;
+using System;
 using Microsoft.Xna.Framework;
 using Monocle;
-using System;
+using Celeste.Mod.Entities;
+using Celeste.Mod.SorbetHelper.Utils;
 
 namespace Celeste.Mod.SorbetHelper.Entities {
 

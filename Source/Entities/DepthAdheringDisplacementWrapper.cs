@@ -5,13 +5,9 @@ using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
-using MonoMod;
-using MonoMod.Cil;
-using Mono.Cecil.Cil;
-using Mono.Cecil;
-using MonoMod.RuntimeDetour;
-using MonoMod.Utils;
 using Celeste.Mod.Entities;
+using Celeste.Mod.SorbetHelper.Utils;
+using Celeste.Mod.SorbetHelper.Components;
 
 namespace Celeste.Mod.SorbetHelper.Entities {
 

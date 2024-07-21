@@ -5,8 +5,9 @@ using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
-using MonoMod.Utils;
 using Celeste.Mod.Entities;
+using Celeste.Mod.SorbetHelper.Utils;
+using MonoMod.Utils;
 
 namespace Celeste.Mod.SorbetHelper.Entities {
 
@@ -17,7 +18,6 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         private readonly char tileType;
         private readonly bool blendIn;
-
         private readonly string flag;
         private readonly bool inverted;
         private readonly bool playAudio;
@@ -31,6 +31,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             playAudio = data.Bool("playAudio", true);
             showDebris = data.Bool("showDebris", true);
             blendIn = data.Bool("blendin", true);
+
             SurfaceSoundIndex = SurfaceIndex.TileToIndex[tileType];
             Add(cutout = new EffectCutout());
         }
@@ -54,6 +55,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             Add(tiles);
             Add(new TileInterceptor(tiles, highPriority: true));
             Add(new LightOcclude());
+
             if (CollideCheck<Player>() || level.Session.GetFlag(flag, inverted)) {
                 cutout.Alpha = tiles.Alpha = 0f;
                 Collidable = false;
@@ -82,13 +84,14 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         public virtual void Break() {
-            if (!Collidable || base.Scene == null) {
+            if (!Collidable || base.Scene == null)
                 return;
-            }
-            if (playAudio) {
+
+            if (playAudio)
                 Audio.Play(SFX.game_10_quake_rockbreak, Position);
-            }
+
             Collidable = false;
+
             if (showDebris) {
                 for (int i = 0; i < base.Width / 8f; i++) {
                     for (int j = 0; j < base.Height / 8f; j++) {
@@ -98,6 +101,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                     }
                 }
             }
+
             cutout.Alpha = tiles.Alpha = 0f;
         }
     }

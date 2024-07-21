@@ -1,11 +1,11 @@
-using Celeste.Mod.Entities;
-using Celeste;
-using Microsoft.Xna.Framework;
-using Monocle;
+using System;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
-using MonoMod.Utils;
+using Microsoft.Xna.Framework;
+using Monocle;
+using Celeste.Mod.Entities;
+using Celeste.Mod.SorbetHelper.Utils;
 
 namespace Celeste.Mod.SorbetHelper.Entities {
 
@@ -43,6 +43,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private IEnumerator NodeRoutine(Player player) {
             if (delay > 0f)
                 yield return delay;
+
             // If the player is still alive, put them in the CassetteFly state
             if (!player.Dead) {
                 Audio.Play("event:/game/general/cassette_bubblereturn", SceneAs<Level>().Camera.Position + new Vector2(160f, 90f));

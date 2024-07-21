@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.Xna.Framework;
 using Monocle;
-using MonoMod.Utils;
 using Celeste.Mod.Entities;
+using Celeste.Mod.SorbetHelper.Utils;
 
 namespace Celeste.Mod.SorbetHelper.Entities {
 

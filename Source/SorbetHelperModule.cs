@@ -1,6 +1,8 @@
 ﻿using System;
 using Monocle;
+using Celeste.Mod.SorbetHelper.Utils;
 using Celeste.Mod.SorbetHelper.Entities;
+using Celeste.Mod.SorbetHelper.Components;
 using MonoMod;
 using MonoMod.ModInterop;
 

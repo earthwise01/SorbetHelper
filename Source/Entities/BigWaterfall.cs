@@ -5,8 +5,8 @@ using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
-using MonoMod.Utils;
 using Celeste.Mod.Entities;
+using MonoMod.Utils;
 
 namespace Celeste.Mod.SorbetHelper.Entities {
 
@@ -107,7 +107,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         public override void Render() {
-            if (!visibleOnCamera) return;
+            if (!visibleOnCamera)
+                return;
 
             if (water == null || water.TopSurface == null) {
                 Draw.Rect(base.X, base.Y, width, height, fillColor);
