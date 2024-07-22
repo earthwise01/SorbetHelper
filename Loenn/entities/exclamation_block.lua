@@ -26,7 +26,9 @@ exclamationBlock.placements = {
             disableFriction = false,
             extendTo = "1,2,3",
             spriteDirectory = "objects/SorbetHelper/exclamationBlock",
-            drawOutline = true
+            drawOutline = true,
+            outlineColor = "3d0200",
+            smashParticleColor = "ffd12e",
         }
     },
     {
@@ -43,7 +45,9 @@ exclamationBlock.placements = {
             disableFriction = true,
             extendTo = "1,2,3",
             spriteDirectory = "objects/SorbetHelper/exclamationBlock",
-            drawOutline = true
+            drawOutline = true,
+            outlineColor = "3d0200",
+            smashParticleColor = "ffd12e",
        }
     },
 }
@@ -53,14 +57,43 @@ exclamationBlock.fieldInformation = {
         options = { "NextBlock" },
         editable = true
     },
+    canWavedash = {
+        fieldType = "sorbetHelper.boolean_with_padding",
+        paddingWidth = 3,
+        padLeft = true
+    },
+    attachStaticMovers = {
+        fieldType = "sorbetHelper.boolean_with_padding",
+        paddingWidth = 2,
+        padLeft = true
+    },
     spriteDirectory = {
         options = { "objects/SorbetHelper/exclamationBlock" },
         editable = true
     },
+    drawOutline = {
+        fieldType = "sorbetHelper.boolean_with_padding",
+        paddingWidth = 1
+    },
+    outlineColor = {
+        fieldType = "color",
+        allowXNAColors = false
+    },
+    smashParticleColor = {
+        fieldType = "color",
+        allowXNAColors = false
+    },
 }
 
 exclamationBlock.fieldOrder = {
-    "x", "y", "width", "height", "moveSpeed", "activeTime", "spriteDirectory", "extendTo", "drawOutline", "canWavedash", "pauseTimerWhileExtending", "canRefreshTimer", "attachStaticMovers"
+    "x", "y",
+    "width", "height",
+    "spriteDirectory", "moveSpeed",
+    "outlineColor", "activeTime",
+    "smashParticleColor", "extendTo",
+    "drawOutline", "pauseTimerWhileExtending", "canRefreshTimer",
+    "attachStaticMovers", "disableFriction",
+    "canWavedash",
 }
 
 local ninePatchOptions = {

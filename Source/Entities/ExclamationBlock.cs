@@ -35,6 +35,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private readonly string spriteDirectory;
         private readonly MTexture[,] activeNineSlice, emptyNineSlice;
         private readonly MTexture exclamationMarkTexture, emptyExclamationMarkTexture;
+        private readonly Color outlineColor;
         private readonly Color smashParticleColor;
         private ExclamationBlockOutlineRenderer outlineRenderer;
 
@@ -61,7 +62,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             disableFriction = data.Bool("disableFriction", false);
             spriteDirectory = data.Attr("spriteDirectory", "objects/SorbetHelper/exclamationBlock");
             drawOutline = data.Bool("drawOutline", true);
-            smashParticleColor = Calc.HexToColor("ffd12e") * 0.75f;
+            outlineColor = data.HexColor("outlineColor", Calc.HexToColor("3d0200"));
+            smashParticleColor = data.HexColor("smashParticleColor", Calc.HexToColor("ffd12e")) * 0.75f;
 
             activeNineSlice = Util.CreateNineSlice(GFX.Game[$"{spriteDirectory}/activeBlock"], 8, 8);
             emptyNineSlice = Util.CreateNineSlice(GFX.Game[$"{spriteDirectory}/emptyBlock"], 8, 8);
@@ -170,8 +172,13 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 block.Disappear();
             }
 
-            if (drawOutline)
-                Scene.Add(outlineRenderer = new ExclamationBlockOutlineRenderer(this, Calc.HexToColor("3d0200"), Calc.HexToColor("161021")));
+            if (drawOutline) {
+                // force the use of the default empty color if the outline is set to the default
+                // kinda hacky but it works and is easier to deal with editor side hopefully
+                Color emptyColor = outlineColor != Calc.HexToColor("3d0200") ? outlineColor : Calc.HexToColor("161021");
+
+                Scene.Add(outlineRenderer = new ExclamationBlockOutlineRenderer(this, outlineColor, emptyColor));
+            }
         }
 
         public override void Removed(Scene scene) {

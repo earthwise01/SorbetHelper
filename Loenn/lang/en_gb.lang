@@ -119,11 +119,13 @@ entities.SorbetHelper/ExclamationBlock.attributes.description.canRefreshTimer=Wh
 entities.SorbetHelper/ExclamationBlock.attributes.description.pauseTimerWhileExtending=Whether the timer should pause whilst the block is extending.
 entities.SorbetHelper/ExclamationBlock.attributes.description.canWavedash=Whether it is possible to wavedash on top of the block.
 entities.SorbetHelper/ExclamationBlock.attributes.description.attachStaticMovers=Whether static movers should attempt to attach to the block(s).
+entities.SorbetHelper/ExclamationBlock.attributes.description.disableFriction=Makes the blocks extend from behind the previous ones rather than in front, and as a result not move riders unless pushing them.\nInconsistent with most vanilla mechanics but more accurate to the original SM3DW inspiration and might resolve some liftboost jank when changing directions.
 entities.SorbetHelper/ExclamationBlock.attributes.description.extendTo=Comma seperated list of node indexes the block should extend to, e.g. "1,2,3".\nCan also be set to "NextBlock" to make the block extend one at a time or left blank for a full extension.
 entities.SorbetHelper/ExclamationBlock.attributes.description.spriteDirectory=The directory the block should search in for textures.
 # the visual change is actually completely seperate to the gp one but since theyre intentionally triggered by the same toggle pretending one causes the other is fine i think
-entities.SorbetHelper/ExclamationBlock.attributes.description.disableFriction=Makes the blocks extend from behind the previous ones rather than in front, and as a result not move riders unless pushing them.\nInconsistent with most vanilla mechanics but more accurate to the original SM3DW inspiration and might resolve some liftboost jank when changing directions.
 entities.SorbetHelper/ExclamationBlock.attributes.description.drawOutline=Whether the block has an outline.
+entities.SorbetHelper/ExclamationBlock.attributes.description.outlineColor=The color of the block's outline.
+entities.SorbetHelper/ExclamationBlock.attributes.description.smashParticleColor=The color of the particles that appear when the block is activated.
 
 # winged strawberry direction controller
 entities.SorbetHelper/WingedStrawberryDirectionController.placements.name.wingedStrawberryController=Winged Strawberry Direction Controller
