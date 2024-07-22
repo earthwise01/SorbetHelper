@@ -20,12 +20,14 @@ namespace Celeste.Mod.SorbetHelper {
             WingedStrawberryDirectionController.Load();
             DisplacementEffectBlocker.Load();
             DepthAdheringDisplacementRenderHook.Load();
+            DisableFrictionComponent.Load();
         }
 
         public override void Unload() {
             WingedStrawberryDirectionController.Unload();
             DisplacementEffectBlocker.Unload();
             DepthAdheringDisplacementRenderHook.Unload();
+            DisableFrictionComponent.Unload();
         }
 
         public override void Initialize() {

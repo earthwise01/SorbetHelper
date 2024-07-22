@@ -10,22 +10,42 @@ exclamationBlock.nodeLimits = {1, -1}
 exclamationBlock.nodeLineRenderType = "line"
 exclamationBlock.nodeLineRenderOffset = {0, 0}
 exclamationBlock.nodeTexture = "objects/SorbetHelper/exclamationBlock/nodeMarker"
-exclamationBlock.minimumSize = {16, 16}
+exclamationBlock.warnBelowSize = {16, 16}
 exclamationBlock.placements = {
-    name = "exclamationBlock",
-    data = {
-        width = 16,
-        height = 16,
-        moveSpeed = 160.0,
-        activeTime = 5.0,
-        canRefreshTimer = false,
-        pauseTimerWhileExtending = true,
-        canWavedash = false,
-        attachStaticMovers = true,
-        extendTo = "1,2,3",
-        spriteDirectory = "objects/SorbetHelper/exclamationBlock",
-        drawOutline = true,
-    }
+    {
+        name = "exclamationBlockNormal",
+        data = {
+            width = 16,
+            height = 16,
+            moveSpeed = 160.0,
+            activeTime = 5.0,
+            canRefreshTimer = false,
+            pauseTimerWhileExtending = true,
+            canWavedash = false,
+            attachStaticMovers = true,
+            disableFriction = false,
+            extendTo = "1,2,3",
+            spriteDirectory = "objects/SorbetHelper/exclamationBlock",
+            drawOutline = true
+        }
+    },
+    {
+        name = "exclamationBlockDisableFriction",
+        data = {
+            width = 16,
+            height = 16,
+            moveSpeed = 160.0,
+            activeTime = 5.0,
+            canRefreshTimer = false,
+            pauseTimerWhileExtending = true,
+            canWavedash = false,
+            attachStaticMovers = true,
+            disableFriction = true,
+            extendTo = "1,2,3",
+            spriteDirectory = "objects/SorbetHelper/exclamationBlock",
+            drawOutline = true
+       }
+    },
 }
 
 exclamationBlock.fieldInformation = {

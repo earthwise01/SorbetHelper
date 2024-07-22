@@ -7,6 +7,7 @@ using Monocle;
 using Celeste;
 using Celeste.Mod.Entities;
 using Celeste.Mod.SorbetHelper.Utils;
+using Celeste.Mod.SorbetHelper.Components;
 
 namespace Celeste.Mod.SorbetHelper.Entities {
 
@@ -43,6 +44,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private readonly bool pauseTimerWhileExtending;
         private readonly bool canWavedash;
         private readonly bool attachStaticMovers;
+        private readonly bool disableFriction;
         private readonly bool drawOutline;
 
         public bool VisibleOnCamera { get; private set; } = true;
@@ -56,6 +58,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             pauseTimerWhileExtending = data.Bool("pauseTimerWhileExtending", true);
             canWavedash = data.Bool("canWavedash", false);
             attachStaticMovers = data.Bool("attachStaticMovers", true);
+            disableFriction = data.Bool("disableFriction", false);
             spriteDirectory = data.Attr("spriteDirectory", "objects/SorbetHelper/exclamationBlock");
             drawOutline = data.Bool("drawOutline", true);
             smashParticleColor = Calc.HexToColor("ffd12e") * 0.75f;
@@ -117,6 +120,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             List<EmptyBlock> segments = [];
             for (int i = 0; i < nodes.Count; i++) {
                 EmptyBlock block = new EmptyBlock(Position, Width, Height, spriteDirectory);
+                if (disableFriction)
+                    block.Add(new DisableFrictionComponent());
 
                 segments.Add(block);
 
@@ -159,7 +164,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public override void Added(Scene scene) {
             base.Added(scene);
 
-            foreach (EmptyBlock block in segments) {
+            // adds segments in reverse order if disable friction is true for Visual Clarity(tm) (i think) (hopefully)
+            foreach (EmptyBlock block in disableFriction ? segments.GetReverseEnumerator() : segments) {
                 Scene.Add(block);
                 block.Disappear();
             }
@@ -511,7 +517,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             // spawn a few particles around static movers so they just dont pop into existence (as abruptly at least,,)
             foreach (StaticMover staticMover in staticMovers) {
                 if (staticMover.Entity.Visible)
-                    SceneAs<Level>().ParticlesFG.Emit(ParticleTypes.VentDust, Math.Max((int)(Width / 8) * (int)(Height / 8) / 5 * 2, 2), staticMover.Entity.Center, new Vector2(staticMover.Entity.Width / 2, staticMover.Entity.Height / 2), Color.WhiteSmoke, 0f, MathF.PI * 2f);
+                    SceneAs<Level>().ParticlesFG.Emit(ParticleTypes.VentDust, (int)Math.Max(Math.Max(staticMover.Entity.Width, staticMover.Entity.Height) / 6f, 2f), staticMover.Entity.Center, new Vector2(staticMover.Entity.Width / 2, staticMover.Entity.Height / 2), Color.WhiteSmoke, 0f, MathF.PI * 2f);
             }
         }
 

@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Monocle;
 using Celeste;
@@ -27,6 +29,12 @@ namespace Celeste.Mod.SorbetHelper.Utils {
         public static void Emit(this ParticleSystem self, ParticleType type, int amount, Vector2 position, Vector2 positionRange, Color color, float direction, float directionRange) {
             for (int i = 0; i < amount; i++) {
                 self.Emit(type, Calc.Random.Range(position - positionRange, position + positionRange), color, Calc.Random.Range(direction - directionRange, direction + directionRange));
+            }
+        }
+
+        public static IEnumerable<T> GetReverseEnumerator<T>(this IList<T> items) {
+            for (int i = items.Count - 1; i >= 0; i--) {
+                yield return items[i];
             }
         }
     }
