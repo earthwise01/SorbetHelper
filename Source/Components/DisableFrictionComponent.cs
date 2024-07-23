@@ -37,7 +37,7 @@ namespace Celeste.Mod.SorbetHelper.Components {
                 cursor.EmitLdarg0();
                 cursor.EmitDelegate(frictionCheck);
             } else {
-                Logger.Log(LogLevel.Warn, "SorbetHelper", $"Failed to inject check to disable friction at in CIL code for {cursor.Method.FullName}!");
+                Logger.Log(LogLevel.Warn, "SorbetHelper", $"Failed to inject check to disable friction in CIL code for {cursor.Method.FullName}!");
             }
         }
 

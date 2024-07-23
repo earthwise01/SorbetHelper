@@ -8,10 +8,15 @@ using Celeste;
 using Celeste.Mod.Entities;
 using Celeste.Mod.SorbetHelper.Utils;
 using Celeste.Mod.SorbetHelper.Components;
+using MonoMod.Cil;
+using MonoMod.RuntimeDetour;
+using System.Reflection;
+using MonoMod.Utils;
 
 namespace Celeste.Mod.SorbetHelper.Entities {
 
     [CustomEntity("SorbetHelper/ExclamationBlock")]
+    [Tracked]
     public class ExclamationBlock : Solid {
         private float activationBuffer;
         private int amountExtended;
@@ -35,6 +40,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private readonly string spriteDirectory;
         private readonly MTexture[,] activeNineSlice, emptyNineSlice;
         private readonly MTexture exclamationMarkTexture, emptyExclamationMarkTexture;
+        private readonly bool drawOutline;
         private readonly Color outlineColor;
         private readonly Color smashParticleColor;
         private ExclamationBlockOutlineRenderer outlineRenderer;
@@ -46,7 +52,9 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private readonly bool canWavedash;
         private readonly bool attachStaticMovers;
         private readonly bool disableFriction;
-        private readonly bool drawOutline;
+        private readonly bool dashActivated = true;
+        private readonly bool jumpActivated = false; // todo: implement jump activation (basically just how it works in Mario(tm))
+        private readonly bool explodeActivated = true;
 
         public bool VisibleOnCamera { get; private set; } = true;
 
@@ -60,6 +68,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             canWavedash = data.Bool("canWavedash", false);
             attachStaticMovers = data.Bool("attachStaticMovers", true);
             disableFriction = data.Bool("disableFriction", false);
+
             spriteDirectory = data.Attr("spriteDirectory", "objects/SorbetHelper/exclamationBlock");
             drawOutline = data.Bool("drawOutline", true);
             outlineColor = data.HexColor("outlineColor", Calc.HexToColor("3d0200"));
@@ -143,7 +152,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             if (player.StateMachine.State == Player.StRedDash)
                 player.StateMachine.State = Player.StNormal;
 
-            if (!CanActivate)
+            if (!CanActivate || !dashActivated)
                 return DashCollisionResults.NormalCollision;
 
             // gravity helper support
@@ -322,6 +331,9 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         public void Hit(Vector2 dir) {
+            if (!CanActivate)
+                return;
+
             SmashParticles(dir.Perpendicular());
             SmashParticles(-dir.Perpendicular());
             Bounce();
@@ -423,6 +435,132 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 Color2 = Calc.HexToColor("ffffff") * 0.5f,
                 ColorMode = ParticleType.ColorModes.Fade
             };
+        }
+
+        private static ILHook seekerRegenerateCoroutineHook;
+
+        internal static void Load() {
+            On.Celeste.Seeker.SlammedIntoWall += onSeekerSlammedIntoWall;
+            seekerRegenerateCoroutineHook = new ILHook(
+                typeof(Seeker).GetMethod("RegenerateCoroutine", BindingFlags.NonPublic | BindingFlags.Instance).GetStateMachineTarget(),
+                modSeekerRegenerateCoroutine
+            );
+            IL.Celeste.Puffer.Explode += modPufferExplode;
+            IL.Celeste.Platform.MoveHExactCollideSolids += modPlatformMoveHExactCollideSolids;
+            IL.Celeste.Platform.MoveVExactCollideSolids += modPlatformMoveVExactCollideSolids;
+        }
+
+        internal static void Unload() {
+            On.Celeste.Seeker.SlammedIntoWall -= onSeekerSlammedIntoWall;
+            seekerRegenerateCoroutineHook.Dispose();
+            IL.Celeste.Puffer.Explode -= modPufferExplode;
+            IL.Celeste.Platform.MoveHExactCollideSolids -= modPlatformMoveHExactCollideSolids;
+            IL.Celeste.Platform.MoveVExactCollideSolids -= modPlatformMoveVExactCollideSolids;
+        }
+
+        private static void onSeekerSlammedIntoWall(On.Celeste.Seeker.orig_SlammedIntoWall orig, Seeker self, CollisionData data) {
+            if (data.Hit is ExclamationBlock exclamationBlock) {
+                exclamationBlock.Hit(data.Direction);
+            }
+            orig(self, data);
+        }
+
+        private static void modSeekerRegenerateCoroutine(ILContext il) {
+            ILCursor cursor = new ILCursor(il);
+            int seekerVariable = 1;
+
+            if (cursor.TryGotoNext(MoveType.Before,
+            instr => instr.MatchLdloc(out seekerVariable),
+            instr => instr.MatchCallOrCallvirt<Entity>("CollideFirst"),
+            instr => instr.MatchStloc(out _))) {
+                Logger.Log(LogLevel.Verbose, "SorbetHelper", $"Injecting code to make seeker explosions activate exclamation mark blocks at {cursor.Index} in CIL code for {cursor.Method.Name}");
+
+                cursor.EmitLdloc(seekerVariable);
+                cursor.EmitDelegate(makePuffersAndSeekersActivateExclamationBlocks);
+            } else {
+                Logger.Log(LogLevel.Warn, "SorbetHelper", $"Failed to inject code to make seeker explosions activate exclamation mark blocks in CIL code for {cursor.Method.Name}!");
+            }
+        }
+
+        private static void modPufferExplode(ILContext il) {
+            ILCursor cursor = new ILCursor(il);
+            int pufferVariable = 0;
+
+            if (cursor.TryGotoNext(MoveType.Before,
+            instr => instr.MatchLdarg(out pufferVariable),
+            instr => instr.MatchCallOrCallvirt<Entity>("CollideFirst"),
+            instr => instr.MatchStloc(out _))) {
+                Logger.Log(LogLevel.Verbose, "SorbetHelper", $"Injecting code to make puffer explosions activate exclamation mark blocks at {cursor.Index} in CIL code for {cursor.Method.Name}");
+
+                cursor.EmitLdarg0();
+                cursor.EmitDelegate(makePuffersAndSeekersActivateExclamationBlocks);
+            } else {
+                Logger.Log(LogLevel.Warn, "SorbetHelper", $"Failed to inject code to make puffer explosions activate exclamation mark blocks in CIL code for {cursor.Method.Name}!");
+            }
+        }
+
+        private static void makePuffersAndSeekersActivateExclamationBlocks(Entity self) {
+            foreach (ExclamationBlock exclamationBlock in self.Scene.Tracker.GetEntities<ExclamationBlock>()) {
+                if (exclamationBlock.explodeActivated && self.CollideCheck(exclamationBlock)) {
+                    exclamationBlock.Hit((exclamationBlock.Center - self.Position).FourWayNormal());
+                }
+            }
+        }
+
+        private static void modPlatformMoveHExactCollideSolids(ILContext il) {
+            ILCursor cursor = new ILCursor(il) {
+                Index = -1
+            };
+
+            if (cursor.TryGotoPrev(MoveType.After,
+            instr => instr.MatchLdarg(out _),
+            instr => instr.MatchLdloc(out _),
+            instr => instr.MatchCallOrCallvirt<Platform>("MoveHExact"))) {
+                Logger.Log(LogLevel.Verbose, "SorbetHelper", $"Injecting code to make horizontal falling blocks/kevins/etc activate exclamation mark blocks at {cursor.Index} in CIL code for {cursor.Method.Name}");
+
+                cursor.EmitLdloc3(); // collided solid
+                cursor.EmitLdloc1(); // direction sign
+                cursor.EmitLdarg2(); // breakDashBlocks
+                cursor.EmitDelegate(makeHorizontalMovingPlatformsActiveExclamationBlocks);
+            } else {
+                Logger.Log(LogLevel.Warn, "SorbetHelper", $"Failed to inject code to make horizontal falling blocks/kevins/etc activate exclamation mark blocks in CIL code for {cursor.Method.Name}");
+            }
+        }
+
+        private static void modPlatformMoveVExactCollideSolids(ILContext il) {
+            ILCursor cursor = new ILCursor(il) {
+                Index = -1
+            };
+
+            if (cursor.TryGotoPrev(MoveType.After,
+            instr => instr.MatchLdarg(out _),
+            instr => instr.MatchLdloc(out _),
+            instr => instr.MatchCallOrCallvirt<Platform>("MoveVExact"))) {
+                Logger.Log(LogLevel.Verbose, "SorbetHelper", $"Injecting code to make vertical falling blocks/kevins/etc activate exclamation mark blocks at {cursor.Index} in CIL code for {cursor.Method.Name}");
+
+                cursor.EmitLdloc3(); // collided solid
+                cursor.EmitLdloc1(); // direction sign
+                cursor.EmitLdarg2(); // breakDashBlocks
+                cursor.EmitDelegate(makeVerticalMovingPlatformsActiveExclamationBlocks);
+            } else {
+                Logger.Log(LogLevel.Warn, "SorbetHelper", $"Failed to inject code to make vertical falling blocks/kevins/etc activate exclamation mark blocks in CIL code for {cursor.Method.Name}");
+            }
+        }
+
+        private static void makeHorizontalMovingPlatformsActiveExclamationBlocks(Platform collided, int directionSign, bool breakDashBlocks) {
+            if (breakDashBlocks) {
+                if (collided is not null && collided is ExclamationBlock exclamationBlock) {
+                    exclamationBlock.Hit(Vector2.UnitX * directionSign);
+                }
+            }
+        }
+
+        private static void makeVerticalMovingPlatformsActiveExclamationBlocks(Platform collided, int directionSign, bool breakDashBlocks) {
+            if (breakDashBlocks) {
+                if (collided is not null && collided is ExclamationBlock exclamationBlock) {
+                    exclamationBlock.Hit(Vector2.UnitY * directionSign);
+                }
+            }
         }
 
         private class ExclamationBlockOutlineRenderer : Entity {
