@@ -3,6 +3,7 @@ using Monocle;
 using Celeste.Mod.SorbetHelper.Utils;
 using Celeste.Mod.SorbetHelper.Entities;
 using Celeste.Mod.SorbetHelper.Components;
+using Celeste.Mod.SorbetHelper.Backdrops;
 using MonoMod;
 using MonoMod.ModInterop;
 
@@ -20,12 +21,14 @@ namespace Celeste.Mod.SorbetHelper {
             WingedStrawberryDirectionController.Load();
             DisplacementEffectBlocker.Load();
             DepthAdheringDisplacementRenderHook.Load();
+            FGStylegroundOverHUDRenderer.Load();
         }
 
         public override void Unload() {
             WingedStrawberryDirectionController.Unload();
             DisplacementEffectBlocker.Unload();
             DepthAdheringDisplacementRenderHook.Unload();
+            FGStylegroundOverHUDRenderer.Unload();
         }
     }
 }
