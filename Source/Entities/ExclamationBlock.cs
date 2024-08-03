@@ -22,6 +22,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private int amountExtended;
         private int targetExtended;
         private float activeTimer;
+        private float liftboostLeniencyTimer;
+        private Vector2 previousDirection;
         private Vector2 scale = Vector2.One;
         private Vector2 offset;
         public Vector2 Scale => scale;
@@ -53,7 +55,6 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private readonly bool attachStaticMovers;
         private readonly bool disableFriction;
         private readonly bool dashActivated = true;
-        private readonly bool jumpActivated = false; // todo: implement jump activation (basically just how it works in Mario(tm))
         private readonly bool explodeActivated = true;
 
         public bool VisibleOnCamera { get; private set; } = true;
@@ -236,17 +237,21 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                     activationBuffer = 0f;
 
                     targetExtended = Math.Clamp(targetNodes.Count != 0 ? targetNodes.Find(node => { return node > amountExtended; }) : targetExtended + 1, 0, segmentCount);
-
-                    if (Extending) {
-                        extendingSound.Position = Vector2.Zero;
-                        extendingSound.Play("event:/sorbethelper/sfx/exclamationblock_extend_loop");
-                        // might mess with these values a bit more later idk
-                        SceneAs<Level>().Shake(0.15f);
-                        yield return 0.15f;
-                    }
                 }
 
-                // extending
+                // prepare to extend if needed
+                if (Extending) {
+                    // set liftboost leniency timer when the block starts extending so that the first block to extend always uses it's own direction and doesn't include a 3 frame leniency window with a likely incorrect direction
+                    // couldve maybe just. set the direction to be correct here but im lazy and this works so
+                    liftboostLeniencyTimer = 0f;
+                    extendingSound.Position = Vector2.Zero;
+                    extendingSound.Play("event:/sorbethelper/sfx/exclamationblock_extend_loop");
+                    // might mess with these values a bit more later idk
+                    SceneAs<Level>().Shake(0.15f);
+                    yield return 0.15f;
+                }
+
+                // extending loop
                 while (Extending) {
                     int extendingIndex = amountExtended + 1;
 
@@ -264,17 +269,24 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                     block.Appear();
                     Audio.Play("event:/sorbethelper/sfx/exclamationblock_extend", block.Center, "index", Math.Clamp(12 * (amountExtended - 1) / Math.Max(segmentCount - 1, 1), 0, 12));
 
+                    Vector2 direction = (target - start).SafeNormalize();
                     float timeToExtend = (target - start).Length() / moveSpeed;
                     float progress = 0f;
                     while (block.Position != target) {
                         yield return null;
+
                         progress += Engine.DeltaTime;
                         float lerp = Calc.ClampedMap(progress, 0f, timeToExtend);
-                        block.MoveTo(Vector2.Lerp(start, target, lerp));
+                        block.MoveTo(Vector2.Lerp(start, target, lerp), (liftboostLeniencyTimer > 0f ? previousDirection : direction) * moveSpeed);
                         extendingSound.Position = block.Position - Position;
+                        if (liftboostLeniencyTimer > 0f)
+                            liftboostLeniencyTimer -= Engine.DeltaTime;
                     }
 
                     // finished extending
+                    // keep previous liftboost direction stored to allow for some leniency when jumping off the block when its changing directions
+                    previousDirection = direction;
+                    liftboostLeniencyTimer = 0.05f;
                     // don't set amount extended if the timer already ran out to prevent breaking the block twice
                     if (activeTimer > 0f)
                         amountExtended = extendingIndex;
@@ -368,6 +380,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             targetExtended = 0;
             activationBuffer = 0f;
             activeTimer = 0f;
+            liftboostLeniencyTimer = 0f;
         }
 
         private void Blink() {
