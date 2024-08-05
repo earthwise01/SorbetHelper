@@ -131,7 +131,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
             List<EmptyBlock> segments = [];
             for (int i = 0; i < nodes.Count; i++) {
-                EmptyBlock block = new EmptyBlock(Position, Width, Height, spriteDirectory);
+                EmptyBlock block = new EmptyBlock(Position, Width, Height, spriteDirectory, fromExclamationBlock: true);
                 if (disableFriction)
                     block.Add(new DisableFrictionComponent());
 
@@ -159,7 +159,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             // gravity helper support
             bool gravityInverted = GravityHelperImports.IsPlayerInverted?.Invoke() ?? false;
             // make wallbouncing easier
-            if ((player.Left >= Right - 4f || player.Right < Left + 4f) && dir.Y == (gravityInverted ? 1f : -1f)) {
+            if (player.DashDir.X == 0 && (player.Left >= Right - 4f || player.Right < Left + 4f) && dir.Y == (gravityInverted ? 1f : -1f)) {
                 return DashCollisionResults.NormalCollision;
             }
 
@@ -188,6 +188,15 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 Color emptyColor = outlineColor != Calc.HexToColor("3d0200") ? outlineColor : Calc.HexToColor("161021");
 
                 Scene.Add(outlineRenderer = new ExclamationBlockOutlineRenderer(this, outlineColor, emptyColor));
+            }
+        }
+
+        public override void Awake(Scene scene) {
+            base.Awake(scene);
+
+            // call awake on each block in the correct order to make sure static movers attach correctly
+            foreach (EmptyBlock block in segments) {
+                block.orig_Awake(scene);
             }
         }
 
@@ -609,6 +618,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
     public class EmptyBlock : Solid {
         private readonly MTexture[,] nineSlice, flashNineSlice;
+        private readonly bool fromExclamationBlock;
 
         private Vector2 scale = Vector2.One;
         private Vector2 offset;
@@ -619,10 +629,11 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public Vector2 StaticMoverAttachPosition;
         public bool VisibleOnCamera { get; private set; } = true;
 
-        public EmptyBlock(Vector2 position, float width, float height, string directory) : base(position, width, height, false) {
+        public EmptyBlock(Vector2 position, float width, float height, string directory, bool fromExclamationBlock = false) : base(position, width, height, false) {
             base.Depth = -8999;
             StaticMoverAttachPosition = Position;
             AllowStaticMovers = false;
+            this.fromExclamationBlock = fromExclamationBlock;
 
             nineSlice = Util.CreateNineSlice(GFX.Game[$"{directory}/emptyBlock"], 8, 8);
             flashNineSlice = Util.CreateNineSlice(GFX.Game[$"{directory}/flash"], 8, 8);
@@ -631,6 +642,12 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         }
 
         public override void Awake(Scene scene) {
+            // don't automatically call awake so that static movers get attached in the correct order
+            if (!fromExclamationBlock)
+                orig_Awake(scene);
+        }
+
+        public void orig_Awake(Scene scene) {
             if (StaticMoverAttachPosition != Position && AllowStaticMovers) {
                 Vector2 actualPosition = Position;
                 Position = StaticMoverAttachPosition;
