@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 using Celeste.Mod.Entities;
 using Celeste.Mod.SorbetHelper.Utils;
+using System.Runtime.InteropServices;
 
 namespace Celeste.Mod.SorbetHelper.Entities {
 
@@ -23,7 +24,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         protected readonly Vector2 node;
 
-        protected Color currentColor;
+        protected Color fillColor;
         protected Vector2 scale = Vector2.One;
         protected Vector2 offset;
         public Vector2 Scale => scale;
@@ -49,6 +50,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public bool VisibleOnCamera { get; private set; } = true;
 
         protected readonly ParticleType P_RecoloredFire;
+        protected readonly ParticleType P_Activate;
 
         public GateBlock(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, data.Height, safe: false) {
             if (data.Nodes.Length > 0) {
@@ -75,7 +77,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             icon.Add("spin", "", 0.1f, "spin");
             icon.Play("spin");
             icon.Rate = 0f;
-            icon.Color = currentColor = inactiveColor;
+            icon.Color = fillColor = inactiveColor;
             icon.Position = iconOffset = new Vector2(data.Width / 2f, data.Height / 2f);
             icon.CenterOrigin();
             Add(finishIconScaleWiggler = Wiggler.Create(0.5f, 4f, f => {
@@ -88,6 +90,12 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             P_RecoloredFire = new ParticleType(TouchSwitch.P_Fire) {
                 Color = finishColor
             };
+
+            P_Activate = new(Seeker.P_HitWall) {
+                Color = inactiveColor,
+                Color2 = Color.Lerp(inactiveColor, Color.White, 0.75f),
+                ColorMode = ParticleType.ColorModes.Blink,
+            };
         }
 
         public void Activate() {
@@ -96,6 +104,11 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             if (!string.IsNullOrEmpty(onActivateFlag)) {
                 SceneAs<Level>().Session.SetFlag(onActivateFlag);
             }
+        }
+
+        public override void Added(Scene scene) {
+            base.Added(scene);
+            GateBlockOutlineRenderer.TryCreateRenderer(scene);
         }
 
         public override void Awake(Scene scene) {
@@ -131,6 +144,10 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             icon.Scale = iconScale;
         }
 
+        public virtual void RenderOutline() {
+            // outline rendering should be implemented per gate block type
+        }
+
         public IEnumerator Sequence(Vector2 node) {
             Vector2 start = Position;
 
@@ -145,7 +162,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             if (shakeTime > 0f) {
                 StartShaking(shakeTime);
                 while (icon.Rate < 1f) {
-                    icon.Color = currentColor = Color.Lerp(inactiveColor, activeColor, icon.Rate);
+                    icon.Color = fillColor = Color.Lerp(inactiveColor, activeColor, icon.Rate);
                     icon.Rate += Engine.DeltaTime / shakeTime;
                     yield return null;
                 }
@@ -241,7 +258,11 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             Audio.Play(finishedSound, Position);
             StartShaking(0.2f);
             while (icon.Rate > 0f) {
-                icon.Color = currentColor = Color.Lerp(activeColor, finishColor, 1f - icon.Rate);
+                icon.Color = Color.Lerp(activeColor, finishColor, 1f - icon.Rate);
+                // darken finished fill color a bit
+                Color darkFinishColor = new((int)(finishColor.R * 0.725f), (int)(finishColor.G * 0.725f), (int)(finishColor.B * 0.825f), 255);
+                fillColor = Color.Lerp(activeColor, darkFinishColor, 1f - icon.Rate);
+
                 icon.Rate -= Engine.DeltaTime * 4f;
                 yield return null;
             }
@@ -259,6 +280,39 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 }
             }
             Collidable = collidableBackup;
+        }
+
+
+        // i love stealing vanilla code peaceline
+        public void ActivateParticles() {
+            Vector2 dir = node - Position;
+
+            float direction = Calc.Angle(dir);
+            Vector2 position;
+            Vector2 positionRange;
+            int num;
+
+            dir = dir.FourWayNormal();
+            if (dir == Vector2.UnitX) {
+                position = CenterRight - Vector2.UnitX;
+                positionRange = Vector2.UnitY * (Height - 2f) * 0.5f;
+                num = (int)(Height / 8f) * 4;
+            } else if (dir == -Vector2.UnitX) {
+                position = CenterLeft + Vector2.UnitX;
+                positionRange = Vector2.UnitY * (Height - 2f) * 0.5f;
+                num = (int)(Height / 8f) * 4;
+            } else if (dir == Vector2.UnitY) {
+                position = BottomCenter - Vector2.UnitY;
+                positionRange = Vector2.UnitX * (Width - 2f) * 0.5f;
+                num = (int)(Width / 8f) * 4;
+            } else {
+                position = TopCenter + Vector2.UnitY;
+                positionRange = Vector2.UnitX * (Width - 2f) * 0.5f;
+                num = (int)(Width / 8f) * 4;
+            }
+            num += 2;
+
+            (Scene as Level).Particles.Emit(P_Activate, num, position, positionRange, direction);
         }
 
         protected void DrawNineSlice(MTexture texture, Color color) {
@@ -291,5 +345,38 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         private bool InView(Camera camera) =>
             X < camera.Right + 16f && X + Width > camera.Left - 16f && Y < camera.Bottom + 16f && Y + Height > camera.Top - 16f;
+
+        [Tracked]
+        private class GateBlockOutlineRenderer : Entity {
+            private static bool rendererJustCreated = false;
+
+            public GateBlockOutlineRenderer() : base() {
+                Depth = 1;
+                Tag = Tags.Global | Tags.Persistent;
+            }
+
+            public override void Render() {
+                var blocks = Scene.Tracker.GetEntities<GateBlock>();
+
+                foreach (GateBlock block in blocks) {
+                    if (block.Visible && block.VisibleOnCamera) {
+                        block.RenderOutline();
+                    }
+                }
+            }
+
+            public override void Awake(Scene scene) {
+                base.Awake(scene);
+
+                rendererJustCreated = false;
+            }
+
+            public static void TryCreateRenderer(Scene scene) {
+                if (!rendererJustCreated && scene.Tracker.GetEntities<GateBlockOutlineRenderer>().Count == 0) {
+                    scene.Add(new GateBlockOutlineRenderer());
+                    rendererJustCreated = true;
+                }
+            }
+        }
     }
 }

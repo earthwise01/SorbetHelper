@@ -28,8 +28,6 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         private float activationFlash;
 
-        private readonly ParticleType P_Activate;
-
         public DashGateBlock(EntityData data, Vector2 offset) : base(data, offset) {
             allowWavedash = data.Bool("allowWavedash", false);
             dashCornerCorrection = data.Bool("dashCornerCorrection", false);
@@ -57,12 +55,6 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             lightsTexture = GFX.Game[$"objects/{blockSprite}_lights"];
 
             OnDashCollide = OnDashed;
-
-            P_Activate = new(Seeker.P_HitWall) {
-                Color = inactiveColor,
-                Color2 = Color.Lerp(inactiveColor, Color.White, 0.75f),
-                ColorMode = ParticleType.ColorModes.Blink,
-            };
         }
 
         public DashCollisionResults OnDashed(Player player, Vector2 dir) {
@@ -79,7 +71,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
                 // fancy effects and stuff
                 if (smoke)
-                    ActivateParticles(node - Position);
+                    ActivateParticles();
                 activationFlash = 1f;
                 (Scene as Level).DirectionalShake(dir);
                 scale = new Vector2(
@@ -115,50 +107,22 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             if (!VisibleOnCamera)
                 return;
 
-            // outline
-            Vector2 scaledTopLeft = Center + Offset - (new Vector2(Collider.Width / 2f, Collider.Height / 2f) * Scale);
-            float scaledWidth = Collider.Width * Scale.X;
-            float scaledHeight = Collider.Height * Scale.Y;
-            Draw.Rect(scaledTopLeft - Vector2.UnitY, scaledWidth, scaledHeight + 2, Color.Black);
-            Draw.Rect(scaledTopLeft - Vector2.UnitX, scaledWidth + 2, scaledHeight, Color.Black);
-
             // main block
             // might maybe try and do shader stuff or smth to try and make the lights look less plain? but idk this still looks okay i think
             DrawNineSlice(mainTexture, Color.White);
-            DrawNineSlice(lightsTexture, Color.Lerp(currentColor, Color.White, activationFlash * 0.4f));
+            DrawNineSlice(lightsTexture, Color.Lerp(fillColor, Color.White, activationFlash * 0.4f));
 
             // render icon
             base.Render();
         }
 
-        // i love stealing vanilla code peaceline
-        public void ActivateParticles(Vector2 dir) {
-            float direction = Calc.Angle(dir);
-            Vector2 position;
-            Vector2 positionRange;
-            int num;
+        public override void RenderOutline() {
+            Vector2 scaledTopLeft = Center + Offset - (new Vector2(Collider.Width / 2f, Collider.Height / 2f) * Scale);
+            float scaledWidth = Collider.Width * Scale.X;
+            float scaledHeight = Collider.Height * Scale.Y;
 
-            dir = dir.FourWayNormal();
-            if (dir == Vector2.UnitX) {
-                position = CenterRight - Vector2.UnitX;
-                positionRange = Vector2.UnitY * (Height - 2f) * 0.5f;
-                num = (int)(Height / 8f) * 4;
-            } else if (dir == -Vector2.UnitX) {
-                position = CenterLeft + Vector2.UnitX;
-                positionRange = Vector2.UnitY * (Height - 2f) * 0.5f;
-                num = (int)(Height / 8f) * 4;
-            } else if (dir == Vector2.UnitY) {
-                position = BottomCenter - Vector2.UnitY;
-                positionRange = Vector2.UnitX * (Width - 2f) * 0.5f;
-                num = (int)(Width / 8f) * 4;
-            } else {
-                position = TopCenter + Vector2.UnitY;
-                positionRange = Vector2.UnitX * (Width - 2f) * 0.5f;
-                num = (int)(Width / 8f) * 4;
-            }
-            num += 2;
-
-            (Scene as Level).Particles.Emit(P_Activate, num, position, positionRange, direction);
+            Draw.Rect(scaledTopLeft - Vector2.UnitY, scaledWidth, scaledHeight + 2, Color.Black);
+            Draw.Rect(scaledTopLeft - Vector2.UnitX, scaledWidth + 2, scaledHeight, Color.Black);
         }
     }
 }

@@ -22,21 +22,26 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             moveOnGrab = data.Bool("moveOnGrab", true);
             moveOnStaticMover = data.Bool("moveOnStaticMoverInteract", false);
 
-            string blockSprite = data.Attr("blockSprite", "moveBlock/base");
+            string blockSprite = data.Attr("blockSprite", "SorbetHelper/gateblock/touch/block");
             mainTexture = GFX.Game[$"objects/{blockSprite}"];
         }
 
         public override void OnStaticMoverTrigger(StaticMover sm) {
             if (!Triggered && moveOnStaticMover) {
                 Activate();
+                if (smoke)
+                    ActivateParticles();
                 Audio.Play("event:/game/general/fallblock_shake", Position);
                 Audio.Play("event:/game/04_cliffside/arrowblock_activate", Center);
             }
         }
 
         public override void Update() {
+            // maybe kinda messy but i dont rlly care enough to try and fix it rn
             if (!Triggered && ((moveOnGrab && HasPlayerRider()) || (!moveOnGrab && HasPlayerOnTop()))) {
                 Activate();
+                if (smoke)
+                    ActivateParticles();
                 Audio.Play("event:/game/general/fallblock_shake", Position);
                 Audio.Play("event:/game/04_cliffside/arrowblock_activate", Center);
             }
@@ -48,18 +53,16 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             if (!VisibleOnCamera)
                 return;
 
-            // outline
-            Vector2 scaledTopLeft = Center + Offset - (new Vector2(Collider.Width / 2f, Collider.Height / 2f) * Scale);
-            float scaledWidth = Collider.Width * Scale.X;
-            float scaledHeight = Collider.Height * Scale.Y;
-            Draw.Rect(scaledTopLeft - Vector2.One, scaledWidth + 2, scaledHeight + 2, Color.Black);
-
             // main block
-            Draw.Rect(scaledTopLeft + Vector2.One, scaledWidth - 2, scaledHeight - 2, currentColor);
+            Draw.Rect(Position + Offset + new Vector2(2f, 2f), Collider.Width - 4f, Collider.Height - 4f, fillColor);
             DrawNineSlice(mainTexture, Color.White);
 
             // render icon
             base.Render();
+        }
+
+        public override void RenderOutline() {
+            Draw.Rect(Position + Offset - new Vector2(1f, 1f), Collider.Width + 2f, Collider.Height + 2f, Color.Black);
         }
     }
 }
