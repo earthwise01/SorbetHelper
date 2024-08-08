@@ -126,4 +126,54 @@ entities.SorbetHelper/DisplacementEffectBlocker.placements.description.normal=Co
 entities.SorbetHelper/DisplacementEffectBlocker.placements.description.depthAdhering=Blocks the displacement effect produced by entities such as water or waterfalls at a certain depth that are *affected by a Depth Adhering Displacement Wrapper*.
 entities.SorbetHelper/DisplacementEffectBlocker.attributes.description.depth=The depth of the displacement blocker. Any depth adhering displacement attached to an entity with a depth equal to or higher than this will be affected by the blocker.\n(higher values mean farther behind in the scene.)
 
+# dash gate block
+# most tooltips stolen from maddie's helping hand
+# https://github.com/maddie480/MaddieHelpingHand/blob/1297e45c72dbf27972e8396139406dd55e65c227/Loenn/lang/en_gb.lang#L194
+entities.SorbetHelper/DashGateBlock.placements.name.normal=Gate Block (Dash Activated)
+entities.SorbetHelper/DashGateBlock.placements.name.normalaltname=Kevin Switch Gate
+entities.SorbetHelper/DashGateBlock.attributes.description.inactiveColor=The color of the block when not triggered yet.
+entities.SorbetHelper/DashGateBlock.attributes.description.activeColor=The color of the block while moving.
+entities.SorbetHelper/DashGateBlock.attributes.description.finishColor=The color of the block when it has reached its destination.
+entities.SorbetHelper/DashGateBlock.attributes.description.blockSprite=The texture path for the block.\nSee Graphics/Atlases/Gameplay/objects/SorbetHelper/gateblock/dash/ in SorbetHelper.zip for how the files should be organised.
+entities.SorbetHelper/DashGateBlock.attributes.description.iconSprite=The texture path for the icon in the center of the block.
+entities.SorbetHelper/DashGateBlock.attributes.description.shakeTime=The time (in seconds) the block spends shaking before starting to move. Default value is 0.5 seconds.
+entities.SorbetHelper/DashGateBlock.attributes.description.moveTime=The time (in seconds) the block takes to move to its destination after shaking. Default value is 1.8 seconds.
+entities.SorbetHelper/DashGateBlock.attributes.description.moveEased=Whether the block should slow down before reaching its final position. If unchecked, the block will move at constant speed.
+# entities.SorbetHelper/DashGateBlock.attributes.description.persistent=If enabled, the block will stay activated even if the player dies or changes rooms.\nThe block will also set a flag when it is enabled: [flagName]_gate[entityID]
+# entities.SorbetHelper/DashGateBlock.attributes.description.allowReturn=Whether the block should return to its original position if the flag is turned off. Only works if the block is persistent.
+entities.SorbetHelper/DashGateBlock.attributes.description.moveSound=The sound played by the gate when it starts moving.
+entities.SorbetHelper/DashGateBlock.attributes.description.finishedSound=The sound played by the gate when it is done moving.
+entities.SorbetHelper/DashGateBlock.attributes.description.smoke=Whether the block should emit smoke when reaching its final position.
+entities.SorbetHelper/DashGateBlock.attributes.description.allowWavedash=Whether it is possible to wavedash on top of the block.
+entities.SorbetHelper/DashGateBlock.attributes.name.dashCornerCorrection=Easier Wallbounce
+entities.SorbetHelper/DashGateBlock.attributes.description.dashCornerCorrection=Makes wallbouncing off of the block less precise (by allowing it up to 4 pixels deep into the block horizontally, dashing from the bottom).
+entities.SorbetHelper/DashGateBlock.attributes.name.axes=Dashable Axes
+entities.SorbetHelper/DashGateBlock.attributes.description.axes=Determines which sides of the block can be dashed into.
+entities.SorbetHelper/DashGateBlock.attributes.name.linkTag=Flag On Activate
+entities.SorbetHelper/DashGateBlock.attributes.description.linkTag=An optional session flag to enable when the block activates.
+
+# touch gate block
+# most tooltips stolen from maddie's helping hand
+# https://github.com/maddie480/MaddieHelpingHand/blob/1297e45c72dbf27972e8396139406dd55e65c227/Loenn/lang/en_gb.lang#L194
+entities.SorbetHelper/TouchGateBlock.placements.name.normal=Gate Block (Touch Activated)
+entities.SorbetHelper/TouchGateBlock.placements.name.normalaltname=Move Block Switch Gate
+entities.SorbetHelper/TouchGateBlock.attributes.description.inactiveColor=The color of the block when not triggered yet.
+entities.SorbetHelper/TouchGateBlock.attributes.description.activeColor=The color of the block while moving.
+entities.SorbetHelper/TouchGateBlock.attributes.description.finishColor=The color of the block when it has reached its destination.
+entities.SorbetHelper/TouchGateBlock.attributes.description.blockSprite=The texture path for the block.\nSee Graphics/Atlases/Gameplay/objects/SorbetHelper/gateblock/dash/ in SorbetHelper.zip for how the files should be organised.
+entities.SorbetHelper/TouchGateBlock.attributes.description.iconSprite=The texture path for the icon in the center of the block.
+entities.SorbetHelper/TouchGateBlock.attributes.description.shakeTime=The time (in seconds) the block spends shaking before starting to move. Default value is 0.5 seconds.
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveTime=The time (in seconds) the block takes to move to its destination after shaking. Default value is 1.8 seconds.
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveEased=Whether the block should slow down before reaching its final position. If unchecked, the block will move at constant speed.
+# entities.SorbetHelper/TouchGateBlock.attributes.description.persistent=If enabled, the block will stay activated even if the player dies or changes rooms.\nThe block will also set a flag when it is enabled: [flagName]_gate[entityID]
+# entities.SorbetHelper/TouchGateBlock.attributes.description.allowReturn=Whether the block should return to its original position if the flag is turned off. Only works if the block is persistent.
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveSound=The sound played by the gate when it starts moving.
+entities.SorbetHelper/TouchGateBlock.attributes.description.finishedSound=The sound played by the gate when it is done moving.
+entities.SorbetHelper/TouchGateBlock.attributes.description.smoke=Whether the block should emit smoke when reaching its final position.
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnGrab=Whether the block should be activated if the player climbs on its sides.
+entities.SorbetHelper/TouchGateBlock.attributes.name.moveOnStaticMover=Static Mover Activated
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnStaticMover=Whether the block can be activated by static movers (such as springs) attached to it.
+entities.SorbetHelper/TouchGateBlock.attributes.name.linkTag=Flag On Activate
+entities.SorbetHelper/TouchGateBlock.attributes.description.linkTag=An optional session flag to enable when the block activates.
+
 mods.SorbetHelper.name=Sorbet Helper

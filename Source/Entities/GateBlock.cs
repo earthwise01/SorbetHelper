@@ -352,7 +352,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
             public GateBlockOutlineRenderer() : base() {
                 Depth = 1;
-                Tag = Tags.Global | Tags.Persistent;
+                Tag = Tags.Persistent;
             }
 
             public override void Render() {
