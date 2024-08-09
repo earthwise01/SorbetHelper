@@ -130,7 +130,7 @@ entities.SorbetHelper/DisplacementEffectBlocker.attributes.description.depth=The
 # most tooltips stolen from maddie's helping hand
 # https://github.com/maddie480/MaddieHelpingHand/blob/1297e45c72dbf27972e8396139406dd55e65c227/Loenn/lang/en_gb.lang#L194
 entities.SorbetHelper/DashGateBlock.placements.name.normal=Gate Block (Dash Activated)
-entities.SorbetHelper/DashGateBlock.placements.name.normalaltname=Kevin Switch Gate
+entities.SorbetHelper/DashGateBlock.placements.name.normalaltname=Switch Gate (Activate On Dash)
 entities.SorbetHelper/DashGateBlock.attributes.description.inactiveColor=The color of the block when not triggered yet.
 entities.SorbetHelper/DashGateBlock.attributes.description.activeColor=The color of the block while moving.
 entities.SorbetHelper/DashGateBlock.attributes.description.finishColor=The color of the block when it has reached its destination.
@@ -156,7 +156,7 @@ entities.SorbetHelper/DashGateBlock.attributes.description.linkTag=An optional s
 # most tooltips stolen from maddie's helping hand
 # https://github.com/maddie480/MaddieHelpingHand/blob/1297e45c72dbf27972e8396139406dd55e65c227/Loenn/lang/en_gb.lang#L194
 entities.SorbetHelper/TouchGateBlock.placements.name.normal=Gate Block (Touch Activated)
-entities.SorbetHelper/TouchGateBlock.placements.name.normalaltname=Move Block Switch Gate
+entities.SorbetHelper/TouchGateBlock.placements.name.normalaltname=Switch Gate (Activate On Touch)
 entities.SorbetHelper/TouchGateBlock.attributes.description.inactiveColor=The color of the block when not triggered yet.
 entities.SorbetHelper/TouchGateBlock.attributes.description.activeColor=The color of the block while moving.
 entities.SorbetHelper/TouchGateBlock.attributes.description.finishColor=The color of the block when it has reached its destination.
