@@ -21,14 +21,20 @@ namespace Celeste.Mod.SorbetHelper {
             WingedStrawberryDirectionController.Load();
             DisplacementEffectBlocker.Load();
             DepthAdheringDisplacementRenderHook.Load();
-            FGStylegroundOverHUDRenderer.Load();
+            StylegroundOverHudRenderer.Load();
         }
 
         public override void Unload() {
             WingedStrawberryDirectionController.Unload();
             DisplacementEffectBlocker.Unload();
             DepthAdheringDisplacementRenderHook.Unload();
-            FGStylegroundOverHUDRenderer.Unload();
+            StylegroundOverHudRenderer.Unload();
+        }
+
+        public override void PrepareMapDataProcessors(MapDataFixup context) {
+            base.PrepareMapDataProcessors(context);
+
+            context.Add<SorbetHelperMapDataProcessor>();
         }
     }
 }
