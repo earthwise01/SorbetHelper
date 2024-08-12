@@ -11,8 +11,19 @@ namespace Celeste.Mod.SorbetHelper {
     public class SorbetHelperModule : EverestModule {
         public static SorbetHelperModule Instance;
 
+        public static bool ExtendedVariantsLoaded { get; private set; }
+
         public SorbetHelperModule() {
             Instance = this;
+        }
+
+        public override void Initialize() {
+            base.Initialize();
+
+            ExtendedVariantsLoaded = Everest.Loader.DependencyLoaded(new EverestModuleMetadata {
+                Name = "ExtendedVariantMode",
+                Version = new Version(0, 38, 0)
+            });
         }
 
         public override void Load() {
