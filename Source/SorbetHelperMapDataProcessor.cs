@@ -10,20 +10,19 @@ using System.Collections.Generic;
 namespace Celeste.Mod.SorbetHelper {
     public class SorbetHelperMapDataProcessor : EverestMapDataProcessor {
 
-        // might modify this at some point to allow using settings from the controller but just checking if one exists works fine for now
-        public static Dictionary<int, List<AreaMode>> LevelsWithStylegroundOverHudControllers { get; private set; } = [];
-        public static bool LevelContainsStylegroundOverHudController(int areaKey, AreaMode areaMode) {
-            if (LevelsWithStylegroundOverHudControllers.TryGetValue(areaKey, out var modesWithController)) {
-                return modesWithController.Contains(areaMode);
-            }
-
-            return false;
-        }
+        // honestly idk why im doing it this way and probably shouldve just. made this a Regular Entity but having it map wide is kinda neat and its also just kinda an excuse to mess with map data processors
+        public static Dictionary<(int, AreaMode), StylegroundOverHudRenderer.StylegroundOverHudControllerData> StylegroundOverHudControllers { get; private set; } = [];
 
         public override Dictionary<string, Action<BinaryPacker.Element>> Init() {
             void stylegroundOverHudControllerHandler(BinaryPacker.Element entityData) {
-                if (!LevelsWithStylegroundOverHudControllers[AreaKey.ID].Contains(AreaKey.Mode)) {
-                    LevelsWithStylegroundOverHudControllers[AreaKey.ID].Add(AreaKey.Mode);
+                if (!StylegroundOverHudControllers.ContainsKey((AreaKey.ID, AreaKey.Mode))) {
+                    var controller = new StylegroundOverHudRenderer.StylegroundOverHudControllerData {
+                        PauseUpdate = entityData.AttrInt("pauseBehavior", 0) == 1,
+                        DisableWhenPaused = entityData.AttrInt("pauseBehavior", 0) == 2
+                    };
+
+                    StylegroundOverHudControllers[(AreaKey.ID, AreaKey.Mode)] = controller;
+
                     Logger.Log(LogLevel.Verbose, "SorbetHelper", $"[MapDataProcessor] found a StylegroundOverHudController in {AreaKey.SID} ({AreaKey.Mode})!");
                 }
             }
@@ -36,12 +35,8 @@ namespace Celeste.Mod.SorbetHelper {
         }
 
         public override void Reset() {
-            // add entry for level if it doesn't exist yet
-            if (!LevelsWithStylegroundOverHudControllers.ContainsKey(AreaKey.ID))
-                LevelsWithStylegroundOverHudControllers[AreaKey.ID] = [];
-
             // reset whether or not the level contains a controller
-            LevelsWithStylegroundOverHudControllers[AreaKey.ID].Remove(AreaKey.Mode);
+            StylegroundOverHudControllers.Remove((AreaKey.ID, AreaKey.Mode));
         }
 
         public override void End() {

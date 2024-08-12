@@ -11,33 +11,36 @@ using MonoMod.Cil;
 namespace Celeste.Mod.SorbetHelper.Backdrops {
 
     // thank you to StyleMaskHelper which i referenced quite a bit while making this bc i have no clue what im doing still asdfsadf
+    // maybe this should just be an entity instead of a weird hacky renderer thing idk
     public class StylegroundOverHudRenderer : Renderer {
         public const string Tag = "sorbetHelper_drawAboveHud";
-        public static bool LevelHasController(Level level) => SorbetHelperMapDataProcessor.LevelContainsStylegroundOverHudController(level.Session.Area.ID, level.Session.Area.Mode);
-        private readonly BackdropRenderer backdropRenderer = new();
+
+        public struct StylegroundOverHudControllerData {
+            public bool PauseUpdate;
+            public bool DisableWhenPaused;
+        }
+        public static bool LevelHasController(Level level) => SorbetHelperMapDataProcessor.StylegroundOverHudControllers.ContainsKey((level.Session.Area.ID, level.Session.Area.Mode));
+        public static StylegroundOverHudControllerData GetControllerSettings(Level level) => SorbetHelperMapDataProcessor.StylegroundOverHudControllers[(level.Session.Area.ID, level.Session.Area.Mode)];
+
+        private readonly BackdropRenderer BackdropRenderer = new();
         private readonly List<Backdrop> Backdrops = [];
+        private StylegroundOverHudControllerData Settings;
         private static VirtualRenderTarget Buffer;
 
         private static StylegroundOverHudRenderer Instance;
 
-        private struct LevelUpscaleData {
-            public Matrix scaleMatrix;
-            public Vector2 paddingOffset;
-            public Vector2 zoomFocusOffset;
-            public float scale = 1f;
-
-            public LevelUpscaleData() { }
-        }
-
-        private static LevelUpscaleData upscaleData = new();
+        private Matrix scaleMatrix;
+        private Vector2 paddingOffset;
+        private Vector2 zoomFocusOffset;
+        private float scale = 1f;
 
         public void DrawToBuffer(Scene scene) {
             Level level = scene as Level;
-            backdropRenderer.Backdrops = Backdrops;
-            if (!level.Paused)
-                backdropRenderer.Update(level);
+            BackdropRenderer.Backdrops = Backdrops;
+            if (!level.Paused || Settings.PauseUpdate)
+                BackdropRenderer.Update(level);
 
-            backdropRenderer.BeforeRender(level);
+            BackdropRenderer.BeforeRender(level);
 
             Buffer ??= VirtualContent.CreateRenderTarget("sorbethelper_stylegrounds_above_hud_buffer", GameplayBuffers.Level.Width, GameplayBuffers.Level.Height);
 
@@ -45,7 +48,7 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
             gd.SetRenderTarget(Buffer);
             gd.Clear(Color.Transparent);
 
-            backdropRenderer.Render(level);
+            BackdropRenderer.Render(level);
         }
 
         private static void DisposeBuffer() {
@@ -70,8 +73,8 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
 
             // doesn't support colorgrades currently since those seem to cause bad weird issues :< with any sort of partial transparency
             // going to look into maybe trying to rewrite a celeste-accurate version that. doesn't break but that might take a bit so this is Good Enough for now i hope
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, upscaleData.scaleMatrix);
-            Draw.SpriteBatch.Draw(Buffer, upscaleData.zoomFocusOffset + upscaleData.paddingOffset, Buffer.Bounds, Color.White * ExtendedVariantsCompat.ForegroundEffectOpacity, 0f, upscaleData.zoomFocusOffset, upscaleData.scale, spriteEffect, 0f);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, scaleMatrix);
+            Draw.SpriteBatch.Draw(Buffer, zoomFocusOffset + paddingOffset, Buffer.Bounds, Color.White * ExtendedVariantsCompat.ForegroundEffectOpacity, 0f, zoomFocusOffset, scale, spriteEffect, 0f);
             Draw.SpriteBatch.End();
         }
 
@@ -90,7 +93,7 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
                 foreach (string tag in backdrop.Tags) {
                     if (tag == Tag) {
                         Backdrops.Insert(0, backdrop);
-                        backdrop.Renderer = backdropRenderer;
+                        backdrop.Renderer = BackdropRenderer;
                         origBackdrops.RemoveAt(i);
                     }
                 }
@@ -119,7 +122,9 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
                 if (Instance is not null)
                     level.Remove(Instance);
 
-                Instance = new();
+                Instance = new() {
+                    Settings = GetControllerSettings(level)
+                };
                 Instance.ConsumeStylegrounds(level);
 
                 level.Add(Instance);
@@ -136,8 +141,9 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
         }
 
         private static void modLevelRender(ILContext il) {
-            ILCursor cursor = new(il);
-            cursor.Index = -1;
+            ILCursor cursor = new(il) {
+                Index = -1
+            };
 
             // grab upscaling locals
             if (!cursor.TryGotoPrev(MoveType.After, instr => instr.MatchLdnull(), instr => instr.MatchCallOrCallvirt<GraphicsDevice>("SetRenderTarget"))) {
@@ -184,26 +190,51 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
 
             // actually do the thing
             cursor.Index = -1;
-            if (cursor.TryGotoPrev(MoveType.After, instr => instr.MatchLdfld<Level>("HudRenderer"), instr => instr.MatchLdarg0(), instr => instr.MatchCallOrCallvirt<Renderer>("Render"))) {
-                Logger.Log(LogLevel.Verbose, "SorbetHelper", $"[StylegroundAboveHudRenderer] injecting above hud rendering at {cursor.Index} in CIL code for {cursor.Method.Name}!");
-                // update upscale data (honestly i probably could just put the locals directly into render but doing it this way helps(?) if i want to be able to maybe force the styleground to go behind the hud instead or smth idk)
-                cursor.EmitLdloc(matrixLocal);
-                cursor.EmitLdloc(paddingLocal);
-                cursor.EmitLdloc(zoomFocusLocal);
-                cursor.EmitLdloc(scaleLocal);
-                cursor.EmitDelegate(updateUpscaleData);
 
-                // render stylegrounds
-                cursor.EmitLdarg0();
-                cursor.EmitDelegate(renderInLevelRender);
-            } else {
-                Logger.Log(LogLevel.Warn, "SorbetHelper", $"[StylegroundAboveHudRenderer] ilhook error! failed to inject above hud rendering in CIL code for {cursor.Method.Name}!");
+            if (!cursor.TryGotoPrev(MoveType.AfterLabel, instr => instr.MatchLdarg0(), instr => instr.MatchLdfld<Level>("SubHudRenderer"))) {
+                Logger.Log(LogLevel.Warn, "SorbetHelper", $"[StylegroundAboveHudRenderer] ilhook error! failed to inject below hud rendering in CIL code for {cursor.Method.Name}!");
+                return;
             }
 
+            Logger.Log(LogLevel.Verbose, "SorbetHelper", $"[StylegroundAboveHudRenderer] injecting below hud rendering at {cursor.Index} in CIL code for {cursor.Method.Name}!");
+
+            // update upscale data
+            cursor.EmitLdloc(matrixLocal);
+            cursor.EmitLdloc(paddingLocal);
+            cursor.EmitLdloc(zoomFocusLocal);
+            cursor.EmitLdloc(scaleLocal);
+            cursor.EmitDelegate(updateUpscaleData);
+
+            // render stylegrounds (when paused and with disable when paused enabled)
+            cursor.EmitLdarg0();
+            cursor.EmitDelegate(renderBehind);
+
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<Level>("HudRenderer"), instr => instr.MatchLdarg0(), instr => instr.MatchCallOrCallvirt<Renderer>("Render"))) {
+                Logger.Log(LogLevel.Warn, "SorbetHelper", $"[StylegroundAboveHudRenderer] ilhook error! failed to inject above hud rendering in CIL code for {cursor.Method.Name}!");
+                return;
+            }
+
+            Logger.Log(LogLevel.Verbose, "SorbetHelper", $"[StylegroundAboveHudRenderer] injecting above hud rendering at {cursor.Index} in CIL code for {cursor.Method.Name}!");
+
+            // render stylegrounds
+            cursor.EmitLdarg0();
+            cursor.EmitDelegate(renderAbove);
         }
 
-        private static void renderInLevelRender(Level self) {
-            Instance?.Render(self);
+        private static void renderBehind(Level self) {
+            if (Instance is null || !Instance.Settings.DisableWhenPaused || !self.Paused)
+                return;
+
+            renderStylegrounds(self);
+        }
+
+        private static void renderAbove(Level self) {
+            if (Instance is not null && (!Instance.Settings.DisableWhenPaused || !self.Paused))
+                renderStylegrounds(self);
+        }
+
+        private static void renderStylegrounds(Level self) {
+            Instance.Render(self);
 
             // i dont know why im putting this here (might remove idk) but better to be safe ig
             if (LevelHasController(self) && Instance is null && self.OnRawInterval(0.1f))
@@ -211,10 +242,13 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
         }
 
         private static void updateUpscaleData(Matrix scaleMatrix, Vector2 paddingOffset, Vector2 zoomFocusOffset, float scale) {
-            upscaleData.scaleMatrix = scaleMatrix;
-            upscaleData.paddingOffset = paddingOffset;
-            upscaleData.zoomFocusOffset = zoomFocusOffset;
-            upscaleData.scale = scale;
+            if (Instance is null)
+                return;
+
+            Instance.scaleMatrix = scaleMatrix;
+            Instance.paddingOffset = paddingOffset;
+            Instance.zoomFocusOffset = zoomFocusOffset;
+            Instance.scale = scale;
         }
 
         private static bool LogMissingLocalError(int localIndex, string name, string methodName) {
@@ -224,6 +258,16 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
             }
 
             return false;
+        }
+
+        // entity that deletes itself upon loading
+        // this only exists to make the [LoadLevel] Failed loading entity SorbetHelper/StylegroundOverHudController thing shut up because the controller is only used to get settings for and check whether to enable the renderer
+        // probably a better way to do this maybe but as is the case with literally everything else in this mod it Works(tm) which means it is Good Enough(tm)
+        [CustomEntity("SorbetHelper/StylegroundOverHudController")]
+        private class DummyEntity : Entity {
+            public override void Added(Scene scene) {
+                RemoveSelf();
+            }
         }
     }
 }
