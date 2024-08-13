@@ -19,16 +19,25 @@ namespace Celeste.Mod.SorbetHelper.Components {
         public class LightCoverDecalRegistryHandler : DecalRegistryHandler {
             public override string Name => "sorbetHelper_lightCover";
 
+            private int minDepth, maxDepth;
+
             public override void ApplyTo(Decal decal) {
-                decal.Add(new LightCoverComponent());
+                decal.Add(new LightCoverComponent(minDepth, maxDepth));
             }
 
             public override void Parse(XmlAttributeCollection xml) {
-
+                // defaults to make only decals above the player cover light
+                minDepth = Get(xml, "minimumDepth", int.MinValue);
+                maxDepth = Get(xml, "maximumDepth", -1);
             }
         }
 
-        public LightCoverComponent() : base(false, true) { }
+        private readonly int minDepth, maxDepth;
+
+        public LightCoverComponent(int minDepth, int maxDepth) : base(false, true) {
+            this.minDepth = minDepth;
+            this.maxDepth = maxDepth;
+        }
 
         internal static void Load() {
             DecalRegistry.AddPropertyHandler<LightCoverDecalRegistryHandler>();
@@ -41,7 +50,7 @@ namespace Celeste.Mod.SorbetHelper.Components {
         }
 
         private static void modLightingRendererBeforeRender(ILContext il) {
-            ILCursor cursor = new ILCursor(il) {
+            ILCursor cursor = new(il) {
                 Index = -1
             };
 
@@ -64,9 +73,12 @@ namespace Celeste.Mod.SorbetHelper.Components {
             SorbetHelperModule.AlphaMaskShader.Parameters["mask_color"].SetValue(level.Lighting.BaseColor.ToVector4());
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, SorbetHelperModule.AlphaMaskShader, level.Camera.Matrix);
 
-            foreach (Component component in toRender) {
-                if (component.Visible && component.Entity.Visible) {
-                    component.Entity.Render();
+            foreach (var component in toRender) {
+                var entity = component.Entity;
+                var lightCover = component as LightCoverComponent;
+
+                if (lightCover.Visible && entity.Visible && entity.Depth >= lightCover.minDepth && entity.Depth <= lightCover.maxDepth) {
+                    entity.Render();
                 }
             }
 
