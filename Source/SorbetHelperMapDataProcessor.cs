@@ -1,11 +1,10 @@
 using System;
+using System.Collections.Generic;
 using Monocle;
 using Celeste.Mod.SorbetHelper.Utils;
 using Celeste.Mod.SorbetHelper.Entities;
 using Celeste.Mod.SorbetHelper.Components;
 using Celeste.Mod.SorbetHelper.Backdrops;
-using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
 
 namespace Celeste.Mod.SorbetHelper {
     public class SorbetHelperMapDataProcessor : EverestMapDataProcessor {

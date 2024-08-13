@@ -2,15 +2,16 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Xml;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 using Celeste;
-using Celeste.Mod.SorbetHelper.Entities;
+using Celeste.Mod.Registry.DecalRegistryHandlers;
+using Celeste.Mod.SorbetHelper.Utils;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
-using Celeste.Mod.Registry.DecalRegistryHandlers;
-using System.Xml;
+
 
 namespace Celeste.Mod.SorbetHelper.Components {
 
@@ -73,6 +74,7 @@ namespace Celeste.Mod.SorbetHelper.Components {
             SorbetHelperModule.AlphaMaskShader.Parameters["mask_color"].SetValue(level.Lighting.BaseColor.ToVector4());
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, SorbetHelperModule.AlphaMaskShader, level.Camera.Matrix);
 
+            // this probably absolutely Sucks for performance but im too tired to think about optimisation right now :<
             foreach (var component in toRender) {
                 var entity = component.Entity;
                 var lightCover = component as LightCoverComponent;

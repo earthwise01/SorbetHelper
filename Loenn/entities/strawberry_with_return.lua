@@ -41,6 +41,7 @@ end
 return_berry.placements = {
     {
         name = "normal",
+        alternativeName = "normalalt",
         placementType = "point",
         data = {
             winged = false,
@@ -55,6 +56,7 @@ return_berry.placements = {
     },
     {
         name = "winged",
+        alternativeName = "wingedalt",
         placementType = "point",
         data = {
             winged = true,
