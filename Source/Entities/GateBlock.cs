@@ -66,8 +66,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             inactiveColor = Calc.HexToColor(data.Attr("inactiveColor", "5FCDE4"));
             activeColor = Calc.HexToColor(data.Attr("activeColor", "FFFFFF"));
             finishColor = Calc.HexToColor(data.Attr("finishColor", "F141DF"));
-            moveSound = data.Attr("moveSound", "event:/game/general/touchswitch_gate_open");
-            finishedSound = data.Attr("finishedSound", "event:/game/general/touchswitch_gate_finish");
+            moveSound = data.Attr("moveSound", "event:/sorbethelper/sfx/gateblock_open");
+            finishedSound = data.Attr("finishedSound", "event:/sorbethelper/sfx/gateblock_finish");
 
             string iconSprite = data.Attr("iconSprite", "switchgate/icon");
 

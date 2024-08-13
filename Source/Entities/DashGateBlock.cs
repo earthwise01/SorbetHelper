@@ -80,7 +80,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 );
                 offset = dir * 4.15f;
                 Audio.Play("event:/game/04_cliffside/arrowblock_activate", Center);
-                Audio.Play("event:/game/06_reflection/crushblock_activate", Center);
+                Audio.Play("event:/sorbethelper/sfx/gateblock_dash_hit", Center);
                 Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
 
                 if (allowWavedash && dir.Y == (gravityInverted ? -1f : 1f)) {
