@@ -7,3 +7,5 @@
   OptionalDependencies:
     - Name: GravityHelper
       Version: 1.2.0
+    - Name: ExtendedVariantMode
+      Version: 0.38.0
