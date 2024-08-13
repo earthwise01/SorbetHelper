@@ -1,0 +1,4 @@
+{63f58200-0b2c-439c-a6e2-60f07fd99f05} event:/sorbethelper/sfx/gateblock_finish
+{6441f099-ebba-43df-b6d6-6b6726114b8e} event:/sorbethelper/sfx/gateblock_open
+{4d234f07-4e54-4978-a532-0da1b5bad9fe} event:/sorbethelper/sfx/gateblock_dash_hit
+{8b90b7a9-dfa1-42c5-8169-a7407dbf6600} bank:/sorbethelper_audio
