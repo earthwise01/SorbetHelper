@@ -11,7 +11,6 @@ using MonoMod.Cil;
 namespace Celeste.Mod.SorbetHelper.Backdrops {
 
     // thank you to StyleMaskHelper which i referenced quite a bit while making this bc i have no clue what im doing still asdfsadf
-    // maybe this should just be an entity instead of a weird hacky renderer thing idk
     public class StylegroundOverHudRenderer : Renderer {
         public const string Tag = "sorbetHelper_drawAboveHud";
 
@@ -22,48 +21,70 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
         public static bool LevelHasController(Level level) => SorbetHelperMapDataProcessor.StylegroundOverHudControllers.ContainsKey((level.Session.Area.ID, level.Session.Area.Mode));
         public static StylegroundOverHudControllerData GetControllerSettings(Level level) => SorbetHelperMapDataProcessor.StylegroundOverHudControllers[(level.Session.Area.ID, level.Session.Area.Mode)];
 
+        private static StylegroundOverHudRenderer Instance;
+        private StylegroundOverHudControllerData Settings;
+
         private readonly BackdropRenderer BackdropRenderer = new();
         private readonly List<Backdrop> Backdrops = [];
-        private StylegroundOverHudControllerData Settings;
         private static VirtualRenderTarget Buffer;
 
-        private static StylegroundOverHudRenderer Instance;
+        private readonly List<Backdrop> AdditiveBackdrops = [];
+        private static readonly List<VirtualRenderTarget> AdditiveBuffers = [];
+        private static bool additiveRenderingJankHookEnabled = false;
 
         private Matrix scaleMatrix;
         private Vector2 paddingOffset;
         private Vector2 zoomFocusOffset;
         private float scale = 1f;
 
-        public void DrawToBuffer(Scene scene) {
+        public void DrawToBuffers(Scene scene) {
             Level level = scene as Level;
-            BackdropRenderer.Backdrops = Backdrops;
-            if (!level.Paused || Settings.PauseUpdate)
-                BackdropRenderer.Update(level);
 
-            BackdropRenderer.BeforeRender(level);
+            // additive blendmode backdrops
+            if (AdditiveBackdrops.Count > 0) {
+                BackdropRenderer.Backdrops = AdditiveBackdrops;
+                if (!level.Paused || Settings.PauseUpdate)
+                    BackdropRenderer.Update(level);
 
-            Buffer ??= VirtualContent.CreateRenderTarget("sorbethelper_stylegrounds_above_hud_buffer", GameplayBuffers.Level.Width, GameplayBuffers.Level.Height);
+                BackdropRenderer.BeforeRender(level);
 
-            GraphicsDevice gd = Engine.Instance.GraphicsDevice;
-            gd.SetRenderTarget(Buffer);
-            gd.Clear(Color.Transparent);
+                additiveRenderingJankHookEnabled = true;
+                BackdropRenderer.Render(level);
+                additiveRenderingJankHookEnabled = false;
+            }
 
-            BackdropRenderer.Render(level);
+            // normal backdrops
+            if (Backdrops.Count > 0) {
+                BackdropRenderer.Backdrops = Backdrops;
+                if (!level.Paused || Settings.PauseUpdate)
+                    BackdropRenderer.Update(level);
+
+                BackdropRenderer.BeforeRender(level);
+
+                Buffer ??= VirtualContent.CreateRenderTarget("sorbethelper_stylegrounds_above_hud_buffer", GameplayBuffers.Level.Width, GameplayBuffers.Level.Height);
+
+                Engine.Instance.GraphicsDevice.SetRenderTarget(Buffer);
+                Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
+
+                BackdropRenderer.Render(level);
+            }
         }
 
-        private static void DisposeBuffer() {
+        private static void DisposeBuffers() {
             Buffer?.Dispose();
             Buffer = null;
+
+            for (int i = 0; i < AdditiveBuffers.Count; i++) {
+                AdditiveBuffers[i]?.Dispose();
+            }
+            AdditiveBuffers.Clear();
         }
 
         public override void BeforeRender(Scene scene) {
-            DrawToBuffer(scene);
+            DrawToBuffers(scene);
         }
 
         public override void Render(Scene scene) {
-            if (Backdrops.Count <= 0 || Buffer is null)
-                return;
-
             SpriteEffects spriteEffect = SpriteEffects.None;
             if (SaveData.Instance.Assists.MirrorMode)
                 spriteEffect |= SpriteEffects.FlipHorizontally;
@@ -71,17 +92,32 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
             if (ExtendedVariantsCompat.UpsideDown)
                 spriteEffect |= SpriteEffects.FlipVertically;
 
-            // doesn't support colorgrades currently since those seem to cause bad weird issues :< with any sort of partial transparency
-            // going to look into maybe trying to rewrite a celeste-accurate version that. doesn't break but that might take a bit so this is Good Enough for now i hope
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, scaleMatrix);
-            Draw.SpriteBatch.Draw(Buffer, zoomFocusOffset + paddingOffset, Buffer.Bounds, Color.White * ExtendedVariantsCompat.ForegroundEffectOpacity, 0f, zoomFocusOffset, scale, spriteEffect, 0f);
-            Draw.SpriteBatch.End();
+            // regular backdrops
+            if (Backdrops.Count > 0 && Buffer is not null) {
+                // doesn't support colorgrades currently since those seem to cause bad weird issues :< with any sort of partial transparency
+                // going to look into maybe trying to rewrite a celeste-accurate version that. doesn't break but that might take a bit so this is Good Enough for now i hope
+                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, scaleMatrix);
+                Draw.SpriteBatch.Draw(Buffer, zoomFocusOffset + paddingOffset, Buffer.Bounds, Color.White * ExtendedVariantsCompat.ForegroundEffectOpacity, 0f, zoomFocusOffset, scale, spriteEffect, 0f);
+                Draw.SpriteBatch.End();
+            }
+
+            // additive blending backdrops
+            if (AdditiveBackdrops.Count > 0) {
+                // funnily enough this isn't fully accurately compatible with extended variants foreground effect opacity, since that doesnt seem to do anything special to handle additive blending
+                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, scaleMatrix);
+                for (int i = 0; i < AdditiveBackdrops.Count; i++) {
+                    var buffer = AdditiveBuffers[i];
+                    if (buffer is not null && AdditiveBackdrops[i].Visible)
+                        Draw.SpriteBatch.Draw(buffer, zoomFocusOffset + paddingOffset, Buffer.Bounds, Color.White * ExtendedVariantsCompat.ForegroundEffectOpacity, 0f, zoomFocusOffset, scale, spriteEffect, 0f);
+                }
+                Draw.SpriteBatch.End();
+            }
         }
 
         private void ConsumeStylegrounds(Level level) {
             ConsumeStylegrounds(level.Foreground.Backdrops);
             ConsumeStylegrounds(level.Background.Backdrops);
-            Logger.Log(LogLevel.Info, "SorbetHelper", "[StylegroundOverHudRenderer] consumed stylegrounds!");
+            Logger.Log(LogLevel.Verbose, "SorbetHelper", "[StylegroundOverHudRenderer] consumed stylegrounds!");
         }
 
         private void ConsumeStylegrounds(List<Backdrop> origBackdrops) {
@@ -92,7 +128,16 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
 
                 foreach (string tag in backdrop.Tags) {
                     if (tag == Tag) {
-                        Backdrops.Insert(0, backdrop);
+                        if (backdrop is Parallax parallax && parallax.BlendState == BlendState.Additive) {
+                            // handle additive parallax
+                            parallax.BlendState = BlendState.AlphaBlend;
+                            AdditiveBackdrops.Insert(0, parallax);
+                            AdditiveBuffers.Insert(0, null);
+                        } else {
+                            // handle all other backdrops
+                            Backdrops.Insert(0, backdrop);
+                        }
+
                         backdrop.Renderer = BackdropRenderer;
                         origBackdrops.RemoveAt(i);
                     }
@@ -103,6 +148,7 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
         internal static void Load() {
             On.Celeste.Level.End += onLevelEnd;
             IL.Celeste.Level.Render += modLevelRender;
+            IL.Celeste.BackdropRenderer.Render += modBackdropRendererRender;
 
             Everest.Events.Level.OnLoadLevel += onLoadLevelEvent;
         }
@@ -110,13 +156,14 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
         internal static void Unload() {
             On.Celeste.Level.End -= onLevelEnd;
             IL.Celeste.Level.Render -= modLevelRender;
+            IL.Celeste.BackdropRenderer.Render -= modBackdropRendererRender;
 
             Everest.Events.Level.OnLoadLevel -= onLoadLevelEvent;
         }
 
         private static void onLoadLevelEvent(Level level, Player.IntroTypes introType, bool isFromLoader) {
             if (LevelHasController(level) && (isFromLoader || Instance is null || !level.RendererList.Renderers.Contains(Instance))) {
-                DisposeBuffer();
+                DisposeBuffers();
 
                 // idk if this does anything or not but if the instance isn't null then make sure it isn't in the rendererlist
                 if (Instance is not null)
@@ -134,10 +181,45 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
         private static void onLevelEnd(On.Celeste.Level.orig_End orig, Level level) {
             orig(level);
 
-            // if (Engine.NextScene is LevelExit || Engine.NextScene is OverworldLoader || Engine.NextScene is LevelLoader) {
-            DisposeBuffer();
+            DisposeBuffers();
             Instance = null;
-            // }
+        }
+
+        private static void modBackdropRendererRender(ILContext il) {
+            ILCursor cursor = new(il);
+
+            VariableDefinition loopCounterVariable = new(il.Import(typeof(int)));
+            il.Body.Variables.Add(loopCounterVariable);
+
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<Backdrop>("Visible"))) {
+                Logger.Log(LogLevel.Warn, "SorbetHelper", "[StylegroundAboveHudRenderer] ilhook error! failed to find loop start in CIL code for {cursor.Method.Name}!");
+            }
+
+            Logger.Log(LogLevel.Verbose, "SorbetHelper", "[StylegroundAboveHudRenderer] injecting janky buffer swapping for additive backdrops at {cursor.Index} in CIL code for {cursor.Method.Name}!");
+
+            cursor.EmitDup();
+            cursor.EmitLdarg0();
+            cursor.EmitLdloca(loopCounterVariable);
+            cursor.EmitDelegate(backdropRenderLoopAdditiveBlendBufferSwap);
+        }
+
+        private static void backdropRenderLoopAdditiveBlendBufferSwap(bool backdropVisible, BackdropRenderer self, ref int i) {
+            if (!additiveRenderingJankHookEnabled)
+                return;
+
+            if (backdropVisible) {
+                if (i >= AdditiveBuffers.Count) {
+                    Logger.Log(LogLevel.Warn, "SorbetHelper", $"[StylegroundOverHudRenderer] error! additive blending buffer {i} is out of range!");
+                } else {
+                    self.EndSpritebatch();
+
+                    AdditiveBuffers[i] ??= VirtualContent.CreateRenderTarget("sorbethelper_stylegrounds_above_hud_buffer_additive_" + i, GameplayBuffers.Level.Width, GameplayBuffers.Level.Height);
+                    Engine.Graphics.GraphicsDevice.SetRenderTarget(AdditiveBuffers[i]);
+                    Engine.Graphics.GraphicsDevice.Clear(Color.Transparent);
+                }
+            }
+
+            i++;
         }
 
         private static void modLevelRender(ILContext il) {
@@ -147,7 +229,7 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
 
             // grab upscaling locals
             if (!cursor.TryGotoPrev(MoveType.After, instr => instr.MatchLdnull(), instr => instr.MatchCallOrCallvirt<GraphicsDevice>("SetRenderTarget"))) {
-                Logger.Log(LogLevel.Warn, "SorbetHelper", "[StylegroundAboveHudRenderer] ilhook error! failed to find where hd rendering starts!");
+                Logger.Log(LogLevel.Warn, "SorbetHelper", "[StylegroundAboveHudRenderer] ilhook error! failed to find where hd rendering starts in CIL code for {cursor.Method.Name}!");
             }
 
             int matrixLocal = -1;

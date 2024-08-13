@@ -15,16 +15,14 @@ namespace Celeste.Mod.SorbetHelper {
 
         public override Dictionary<string, Action<BinaryPacker.Element>> Init() {
             void stylegroundOverHudControllerHandler(BinaryPacker.Element entityData) {
-                if (!StylegroundOverHudControllers.ContainsKey((AreaKey.ID, AreaKey.Mode))) {
-                    var controller = new StylegroundOverHudRenderer.StylegroundOverHudControllerData {
-                        PauseUpdate = entityData.AttrInt("pauseBehavior", 0) == 1,
-                        DisableWhenPaused = entityData.AttrInt("pauseBehavior", 0) == 2
-                    };
+                var controller = new StylegroundOverHudRenderer.StylegroundOverHudControllerData {
+                    PauseUpdate = entityData.AttrInt("pauseBehavior", 0) == 1,
+                    DisableWhenPaused = entityData.AttrInt("pauseBehavior", 0) == 2
+                };
 
-                    StylegroundOverHudControllers[(AreaKey.ID, AreaKey.Mode)] = controller;
+                StylegroundOverHudControllers[(AreaKey.ID, AreaKey.Mode)] = controller;
 
-                    Logger.Log(LogLevel.Verbose, "SorbetHelper", $"[MapDataProcessor] found a StylegroundOverHudController in {AreaKey.SID} ({AreaKey.Mode})!");
-                }
+                Logger.Log(LogLevel.Verbose, "SorbetHelper", $"[MapDataProcessor] found a StylegroundOverHudController in {AreaKey.SID} ({AreaKey.Mode})!");
             }
 
             return new Dictionary<string, Action<BinaryPacker.Element>> {
