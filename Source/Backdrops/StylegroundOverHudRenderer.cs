@@ -316,11 +316,7 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
         }
 
         private static void renderStylegrounds(Level self) {
-            Instance.Render(self);
-
-            // i dont know why im putting this here (might remove idk) but better to be safe ig
-            if (LevelHasController(self) && Instance is null && self.OnRawInterval(0.1f))
-                Logger.Log(LogLevel.Error, "SorbetHelper", "[StylegroundAboveHudRenderer] error! the styleground above hud renderer instance is (somehow) null. if you see this message at all please report this thx!");
+            Instance?.Render(self);
         }
 
         private static void updateUpscaleData(Matrix scaleMatrix, Vector2 paddingOffset, Vector2 zoomFocusOffset, float scale) {
