@@ -22,8 +22,11 @@ namespace Celeste.Mod.SorbetHelper.Entities {
     public class GateBlock : Solid {
         public bool Triggered { get; private set; }
 
-        protected readonly Vector2 node;
+        protected readonly int entityId;
+        protected Vector2 start;
+        protected Vector2 node;
 
+        protected bool atNode;
         protected Color fillColor;
         protected Vector2 scale = Vector2.One;
         protected Vector2 offset;
@@ -45,12 +48,15 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         protected readonly float shakeTime;
         protected readonly float moveTime;
         protected readonly bool moveEased;
+        protected readonly bool allowReturn;
+        protected readonly bool persistent;
         protected readonly string onActivateFlag;
 
         public bool VisibleOnCamera { get; private set; } = true;
 
         protected readonly ParticleType P_RecoloredFire;
         protected readonly ParticleType P_Activate;
+        protected readonly ParticleType P_ActivateReturn;
 
         public GateBlock(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, data.Height, safe: false) {
             if (data.Nodes.Length > 0) {
@@ -60,6 +66,9 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             shakeTime = data.Float("shakeTime", 0.5f);
             moveTime = data.Float("moveTime", 1.8f);
             moveEased = data.Bool("moveEased", true);
+            allowReturn = data.Bool("allowReturn", false);
+            persistent = data.Bool("persistent", false);
+            entityId = data.ID;
             onActivateFlag = data.Attr("linkTag", "");
 
             smoke = data.Bool("smoke", true);
@@ -96,6 +105,11 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 Color2 = Color.Lerp(inactiveColor, Color.White, 0.75f),
                 ColorMode = ParticleType.ColorModes.Blink,
             };
+            P_ActivateReturn = new(P_Activate) {
+                Color = finishColor,
+                Color2 = Color.Lerp(finishColor, Color.White, 0.75f),
+                ColorMode = ParticleType.ColorModes.Blink,
+            };
         }
 
         public void Activate() {
@@ -113,7 +127,29 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         public override void Awake(Scene scene) {
             base.Awake(scene);
-            Add(new Coroutine(Sequence(node)));
+            start = Position;
+
+            if (persistent && SceneAs<Level>().Session.GetFlag("flag_sorbetHelper_gateBlock_persistent_" + entityId)) {
+                atNode = true;
+
+                if (allowReturn)
+                    Add(new Coroutine(BackAndForthSequence()));
+                else
+                    Triggered = true;
+
+                MoveTo(node);
+                icon.Rate = 0f;
+                icon.SetAnimationFrame(0);
+                icon.Color = finishColor;
+                fillColor = allowReturn ? finishColor : new((int)(finishColor.R * 0.7f), (int)(finishColor.G * 0.67f), (int)(finishColor.B * 0.8f), 255);
+            } else {
+                atNode = false;
+
+                if (allowReturn)
+                    Add(new Coroutine(BackAndForthSequence()));
+                else
+                    Add(new Coroutine(Sequence()));
+            }
         }
 
         public override void Update() {
@@ -148,12 +184,43 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             // outline rendering should be implemented per gate block type
         }
 
-        public IEnumerator Sequence(Vector2 node) {
-            Vector2 start = Position;
+        // (somewhat) stolen from maddie helping hand
+        private IEnumerator BackAndForthSequence() {
+            while (true) {
+                IEnumerator seq = Sequence();
 
+                while (seq.MoveNext()) {
+                    yield return seq.Current;
+                }
+            }
+        }
+
+        public IEnumerator Sequence() {
+            Vector2 moveFrom = Position;
+            Vector2 moveTo;
+            Color fromColor, toColor;
+
+            if (!atNode) {
+                moveTo = node;
+
+                fromColor = inactiveColor;
+                toColor = finishColor;
+            } else {
+                moveTo = start;
+
+                fromColor = finishColor;
+                toColor = inactiveColor;
+            }
+            // darken finished no return fill color a bit
+            Color toFillColorNoReturn = new((int)(toColor.R * 0.7f), (int)(toColor.G * 0.67f), (int)(toColor.B * 0.8f), 255);
+
+            // wait until triggered
             while (!Triggered) {
                 yield return null;
             }
+
+            if (persistent)
+                SceneAs<Level>().Session.SetFlag("flag_sorbetHelper_gateBlock_persistent_" + entityId, !atNode);
 
             yield return 0.1f;
 
@@ -162,11 +229,12 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             if (shakeTime > 0f) {
                 StartShaking(shakeTime);
                 while (icon.Rate < 1f) {
-                    icon.Color = fillColor = Color.Lerp(inactiveColor, activeColor, icon.Rate);
+                    icon.Color = fillColor = Color.Lerp(fromColor, activeColor, icon.Rate);
                     icon.Rate += Engine.DeltaTime / shakeTime;
                     yield return null;
                 }
             } else {
+                icon.Color = fillColor = activeColor;
                 icon.Rate = 1f;
             }
 
@@ -176,7 +244,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             int particleAt = 0;
             Tween moveTween = Tween.Create(Tween.TweenMode.Oneshot, moveEased ? Ease.CubeOut : null, moveTime + (moveEased ? 0.2f : 0f), start: true);
             moveTween.OnUpdate = tweenArg => {
-                MoveTo(Vector2.Lerp(start, node, tweenArg.Eased));
+                MoveTo(Vector2.Lerp(moveFrom, moveTo, tweenArg.Eased));
                 if (Scene.OnInterval(0.1f)) {
                     particleAt++;
                     particleAt %= 2;
@@ -202,7 +270,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             Collidable = false;
 
             // collide dust particles on the left
-            if (node.X <= start.X) {
+            if (moveTo.X <= moveFrom.X) {
                 Vector2 add = new Vector2(0f, 2f);
                 for (int tileY = 0; tileY < Height / 8f; tileY++) {
                     Vector2 collideAt = new Vector2(Left - 1f, Top + 4f + (tileY * 8));
@@ -215,7 +283,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             }
 
             // collide dust particles on the right
-            if (node.X >= start.X) {
+            if (moveTo.X >= moveFrom.X) {
                 Vector2 add = new Vector2(0f, 2f);
                 for (int tileY = 0; tileY < Height / 8f; tileY++) {
                     Vector2 collideAt = new Vector2(Right + 1f, Top + 4f + (tileY * 8));
@@ -228,7 +296,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             }
 
             // collide dust particles on the top
-            if (node.Y <= start.Y) {
+            if (moveTo.Y <= moveFrom.Y) {
                 Vector2 add = new Vector2(2f, 0f);
                 for (int tileX = 0; tileX < Width / 8f; tileX++) {
                     Vector2 collideAt = new Vector2(Left + 4f + (tileX * 8), Top - 1f);
@@ -241,7 +309,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             }
 
             // collide dust particles on the bottom
-            if (node.Y >= start.Y) {
+            if (moveTo.Y >= moveFrom.Y) {
                 Vector2 add = new Vector2(2f, 0f);
                 for (int tileX = 0; tileX < Width / 8f; tileX++) {
                     Vector2 collideAt = new Vector2(Left + 4f + (tileX * 8), Bottom + 1f);
@@ -258,10 +326,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             Audio.Play(finishedSound, Position);
             StartShaking(0.2f);
             while (icon.Rate > 0f) {
-                icon.Color = Color.Lerp(activeColor, finishColor, 1f - icon.Rate);
-                // darken finished fill color a bit
-                Color darkFinishColor = new((int)(finishColor.R * 0.725f), (int)(finishColor.G * 0.725f), (int)(finishColor.B * 0.825f), 255);
-                fillColor = Color.Lerp(activeColor, darkFinishColor, 1f - icon.Rate);
+                icon.Color = Color.Lerp(activeColor, toColor, 1f - icon.Rate);
+                fillColor = Color.Lerp(activeColor, allowReturn ? toColor : toFillColorNoReturn, 1f - icon.Rate);
 
                 icon.Rate -= Engine.DeltaTime * 4f;
                 yield return null;
@@ -276,16 +342,22 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             if (!Scene.CollideCheck<Solid>(Center) && smoke) {
                 for (int i = 0; i < 32; i++) {
                     float angle = Calc.Random.NextFloat((float)Math.PI * 2f);
-                    SceneAs<Level>().ParticlesFG.Emit(P_RecoloredFire, Position + iconOffset + Calc.AngleToVector(angle, 4f), angle);
+                    SceneAs<Level>().ParticlesFG.Emit(P_RecoloredFire, Position + iconOffset + Calc.AngleToVector(angle, 4f), toColor, angle);
                 }
             }
             Collidable = collidableBackup;
+
+            atNode = !atNode;
+            if (allowReturn)
+                Triggered = false;
         }
 
 
         // i love stealing vanilla code peaceline
         public void ActivateParticles() {
-            Vector2 dir = node - Position;
+            Vector2 dir = node - start;
+            if (atNode)
+                dir = -dir;
 
             float direction = Calc.Angle(dir);
             Vector2 position;
@@ -312,7 +384,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             }
             num += 2;
 
-            (Scene as Level).Particles.Emit(P_Activate, num, position, positionRange, direction);
+            (Scene as Level).Particles.Emit(atNode ? P_ActivateReturn : P_Activate, num, position, positionRange, direction);
         }
 
         protected void DrawNineSlice(MTexture texture, Color color) {

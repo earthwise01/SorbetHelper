@@ -34,6 +34,8 @@ dashGateBlock.placements = {
             shakeTime = 0.5,
             moveTime = 1.8,
             moveEased = true,
+            persistent = false,
+            allowReturn = false,
             axes = "Both",
             allowWavedash = false,
             dashCornerCorrection = false,
@@ -42,7 +44,7 @@ dashGateBlock.placements = {
     }
 }
 
-dashGateBlock.fieldOrder = {"x", "y", "width", "height", "inactiveColor", "activeColor", "finishColor", "moveSound", "blockSprite", "finishedSound", "iconSprite", "shakeTime", "axes", "moveTime", "linkTag", "moveEased", "persistent",  "smoke", "allowWavedash", "dashCornerCorrection"}
+dashGateBlock.fieldOrder = {"x", "y", "width", "height", "inactiveColor", "activeColor", "finishColor", "moveSound", "blockSprite", "finishedSound", "iconSprite", "shakeTime", "axes", "moveTime", "linkTag", "moveEased", "allowReturn", "allowWavedash", "dashCornerCorrection", "smoke", "persistent"}
 
 dashGateBlock.fieldInformation = {
     inactiveColor = {
