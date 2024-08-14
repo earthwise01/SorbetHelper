@@ -21,6 +21,13 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             fastKill = data.Bool("fastKill", false);
         }
 
+        public override void Awake(Scene scene) {
+            base.Awake(scene);
+
+            if (!string.IsNullOrEmpty(flag) && !SceneAs<Level>().Session.GetFlag(flag, inverted))
+                Collidable = false;
+        }
+
         public void OnCollide(Player player) {
             if (fastKill) {
                 player.Die(Vector2.Zero);
