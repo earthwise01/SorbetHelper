@@ -15,21 +15,23 @@ namespace Celeste.Mod.SorbetHelper.Utils {
 
     // ext vars doesn't seem to have actual modinterop but akdjsf im putting this in this file anyways bc it still fits
     public static class ExtendedVariantsCompat {
+        private static bool GetUpsideDown() => (bool)ExtendedVariantsModule.Instance.TriggerManager.GetCurrentVariantValue(Variant.UpsideDown);
         public static bool UpsideDown {
             get {
                 if (!ExtendedVariantsLoaded)
                     return false;
 
-                return (bool)ExtendedVariantsModule.Instance.TriggerManager.GetCurrentVariantValue(Variant.UpsideDown);
+                return GetUpsideDown();
             }
         }
 
+        private static float GetForegroundEffectOpacity() => (float)ExtendedVariantsModule.Instance.TriggerManager.GetCurrentVariantValue(Variant.ForegroundEffectOpacity);
         public static float ForegroundEffectOpacity {
             get {
                 if (!ExtendedVariantsLoaded)
                     return 1f;
 
-                return (float)ExtendedVariantsModule.Instance.TriggerManager.GetCurrentVariantValue(Variant.ForegroundEffectOpacity);
+                return GetForegroundEffectOpacity();
             }
         }
     }
