@@ -55,9 +55,9 @@ namespace Celeste.Mod.SorbetHelper.Components {
             GameplayRenderer.End();
 
             if (entityBuffer == null)
-                entityBuffer = VirtualContent.CreateRenderTarget("depth-adhering-displacement-render-hook-entity-buffer", 320, 180);
+                entityBuffer = VirtualContent.CreateRenderTarget("depth-adhering-displacement-render-hook-entity-buffer", GameplayBuffers.Gameplay.Width, GameplayBuffers.Gameplay.Height);
             if (displacementMapBuffer == null)
-                displacementMapBuffer = VirtualContent.CreateRenderTarget("depth-adhering-displacement-render-hook-displacementmap-buffer", 320, 180);
+                displacementMapBuffer = VirtualContent.CreateRenderTarget("depth-adhering-displacement-render-hook-displacementmap-buffer", GameplayBuffers.Gameplay.Width, GameplayBuffers.Gameplay.Height);
 
             Engine.Instance.GraphicsDevice.SetRenderTarget(entityBuffer);
             Engine.Instance.GraphicsDevice.Clear(Color.Transparent);

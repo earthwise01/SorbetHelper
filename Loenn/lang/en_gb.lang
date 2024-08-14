@@ -20,8 +20,8 @@ entities.SorbetHelper/KillZone.attributes.description.fastKill=When checked, the
 # Strawberry (With Node Based Return)
 entities.SorbetHelper/ReturnBerry.placements.name.normal=Strawberry (With Noded Return)
 entities.SorbetHelper/ReturnBerry.placements.name.winged=Strawberry (Winged, With Noded Return)
-entities.SorbetHelper/ReturnBerry.placements.name.normalalt=Strawberry (With Node Based Return)
-entities.SorbetHelper/ReturnBerry.placements.name.wingedalt=Strawberry (Winged, With Node Based Return)
+entities.SorbetHelper/ReturnBerry.placements.name.normalalt=Strawberry (With Node Based Return) (Return Berry) (Strawberry With Return)
+entities.SorbetHelper/ReturnBerry.placements.name.wingedalt=Strawberry (Winged, With Node Based Return) (Return Berry) (Winged Strawberry With Return)
 entities.SorbetHelper/ReturnBerry.placements.description.normal=Similar to a Strawberry, but when the player grabs it they are placed into a bubble and moved along a path of nodes.
 entities.SorbetHelper/ReturnBerry.placements.description.winged=Similar to a Strawberry (Winged), but when the player grabs it they are placed into a bubble and moved along a path of nodes.
 entities.SorbetHelper/ReturnBerry.attributes.description.winged=Determines whether the strawberry has wings and attempts to vertically rise offscreen when the player dashes.
@@ -59,10 +59,10 @@ entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.depth=Determines
 
 # resizable waterfall
 entities.SorbetHelper/BigWaterfall.placements.name.normal=Resizable Waterfall
-entities.SorbetHelper/BigWaterfall.placements.name.abovefg=Resizable Waterfall (Above Foreground)
+entities.SorbetHelper/BigWaterfall.placements.name.abovefg=Resizable Waterfall (Above Solids)
 # show in search results for big waterfall
 entities.SorbetHelper/BigWaterfall.placements.name.bigwaterfall=Big Waterfall
-entities.SorbetHelper/BigWaterfall.placements.name.bigwaterfallabove=Big Waterfall (Above Foreground)
+entities.SorbetHelper/BigWaterfall.placements.name.bigwaterfallabove=Big Waterfall (Above Foreground) Resizable Waterfall (Above Foreground)
 entities.SorbetHelper/BigWaterfall.placements.description.normal=A waterfall which behaves similarly to a vanilla Waterfall, but is also resizable like and closer visually to a vanilla Big Waterfall.
 entities.SorbetHelper/BigWaterfall.placements.description.abovefg=A waterfall which behaves similarly to a vanilla Waterfall, but is also resizable like and closer visually to a vanilla Big Waterfall. Ignores and renders above Foreground Tiles.
 entities.SorbetHelper/BigWaterfall.attributes.description.color=The color of the waterfall.
@@ -122,8 +122,11 @@ entities.SorbetHelper/StylegroundOverHudController.attributes.description._instr
 
 # depth adhering displacement wrapper
 # names probably still kinda suck but i literally cant think of anything better
-entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.entityOnly=Displacement Wrapper (Only Distort Entity)
-entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.distortBehind=Displacement Wrapper (Depth Adhering)
+# update: renamed from displacement wrappers to displacement depth fixers which i think im actually somewhat happy with,,
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.entityOnly=Displacement Depth Fixer (Only Distort Entity)
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.distortBehind=Displacement Depth Fixer
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.entityOnlyAlt=Depth Adhering Displacement Wrapper (Only Distort Entity)
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.distortBehindAlt=Depth Adhering Displacement Wrapper (Depth Adhering)
 entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.description.entityOnly=Makes the displacement effects of entities which use any (e.g. water and waterfalls) only affect their entity and nothing else.\n(for reference vanilla displacement doesn't care about depth and just affects everything touching it)
 entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.description.distortBehind=Makes the displacement effects of entities which use any (e.g. water and waterfalls) only affect their entity and anything behind it.\n(for reference vanilla displacement doesn't care about depth and just affects everything touching it)
 entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.name.distortBehind=Distort Behind
@@ -133,9 +136,9 @@ entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.description.on
 
 # displacement blocker
 entities.SorbetHelper/DisplacementEffectBlocker.placements.name.normal=Displacement Effect Blocker
-entities.SorbetHelper/DisplacementEffectBlocker.placements.name.depthAdhering=Displacement Effect Blocker (Displacement Wrapper)
+entities.SorbetHelper/DisplacementEffectBlocker.placements.name.depthAdhering=Displacement Effect Blocker (for Displacement Depth Fixer)
 entities.SorbetHelper/DisplacementEffectBlocker.placements.description.normal=Completely blocks the displacement effect produced by entities such as water or waterfalls.
-entities.SorbetHelper/DisplacementEffectBlocker.placements.description.depthAdhering=Blocks the displacement effect produced by entities such as water or waterfalls at a certain depth that are *affected by a Depth Adhering Displacement Wrapper*.
+entities.SorbetHelper/DisplacementEffectBlocker.placements.description.depthAdhering=Blocks the displacement effect produced by entities such as water or waterfalls at a certain depth that are *affected by a Displacement Depth Fixer*.
 entities.SorbetHelper/DisplacementEffectBlocker.attributes.description.depth=The depth of the displacement blocker. Any depth adhering displacement attached to an entity with a depth equal to or higher than this will be affected by the blocker.\n(higher values mean farther behind in the scene.)
 
 # dash gate block
