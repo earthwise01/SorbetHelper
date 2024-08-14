@@ -16,12 +16,19 @@ struct vertex_output
     float2 uv       : TEXCOORD0;
 };
 
-static const float4 transparent = float4(0.0, 0.0, 0.0, 0.0);
-float4 mask_color = float4(1.0, 1.0, 1.0, 1.0);
+uniform float4 mask_color = float4(1.0, 1.0, 1.0, 1.0);
 
 float4 pixel_shader(vertex_output input) : COLOR
 {
-    float4 input_color = tex2D(normal_sampler, input.uv);
+    float4 input_color = tex2D(normal_sampler, input.uv) * input.color;
+
+    return mask_color * input_color.wwww;
+}
+
+// unused
+float4 pixel_shader_no_transparency(vertex_output input) : COLOR
+{
+    float4 input_color = tex2D(normal_sampler, input.uv) * input.color;
 
     if (input_color.w > 0.0)
     {
@@ -29,7 +36,7 @@ float4 pixel_shader(vertex_output input) : COLOR
     }
     else
     {
-        return transparent;
+        return mask_color * 0.0;
     }
 }
 
