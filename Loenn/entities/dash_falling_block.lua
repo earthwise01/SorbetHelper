@@ -17,8 +17,10 @@ function fallingBlock.placements()
             fallOnStaticMover = false,
             allowWavedash = false,
             dashCornerCorrection = true,
+            breakDashBlocks = true,
             direction = "Down",
             fallDashMode = "Disabled",
+            dashActivated = true,
             width = 8,
             height = 8
         }
@@ -62,6 +64,6 @@ fallingBlock.fieldInformation = {
     }
 }
 
-fallingBlock.fieldOrder = {"x", "y", "width", "height", "shakeSfx", "impactSfx", "tiletype", "depth", "direction", "fallDashMode", "fallOnTouch", "climbFall", "fallOnStaticMover", "allowWavedash", "dashCornerCorrection"}
+fallingBlock.fieldOrder = {"x", "y", "width", "height", "shakeSfx", "impactSfx", "tiletype", "depth", "direction", "fallDashMode", "fallOnTouch", "climbFall", "allowWavedash", "dashCornerCorrection", "fallOnStaticMover", "dashActivated", "breakDashBlocks"}
 
 return fallingBlock

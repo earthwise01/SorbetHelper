@@ -27,6 +27,8 @@ namespace Celeste.Mod.SorbetHelper {
                 Name = "ExtendedVariantMode",
                 Version = new Version(0, 38, 0)
             });
+
+            DashFallingBlock.Initialize();
         }
 
         public override void Load() {
