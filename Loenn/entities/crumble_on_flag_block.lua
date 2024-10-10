@@ -35,7 +35,7 @@ local fieldInfo = {
 }
 block.fieldInformation = fakeTilesHelper.addTileFieldInformation(fieldInfo, "tiletype")
 block.fieldOrder = {
-    "x", "y", "width", "height", "depth", "fadeInTime", "flag", "tiletype", "inverted", "blendin", "showDebris", "playAudio", "destroyAttached"
+    "x", "y", "width", "height", "depth", "fadeInTime", "flag", "tiletype", "playAudio", "destroyAttached", "blendin", "showDebris", "inverted"
 }
 
 block.sprite = fakeTilesHelper.getEntitySpriteFunction("tiletype", "blendin")
