@@ -14,6 +14,8 @@ using ..Ahorn, Maple
     flag::String="",
     inverted::Bool=false,
     depth::Integer=-10010,
+    destroyAttached::Bool=false,
+    fadeInTime::Number=1.0,
 )
 
 const placements = Ahorn.PlacementDict(

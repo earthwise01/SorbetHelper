@@ -51,13 +51,17 @@ entities.SorbetHelper/DashFallingBlock.attributes.description.dashActivated=Dete
 
 # crumble on flag block
 entities.SorbetHelper/CrumbleOnFlagBlock.placements.name.crumble_on_flag_block=Crumble On Flag Block
+entities.SorbetHelper/CrumbleOnFlagBlock.placements.name.crumble_wall_on_flag=Crumble Wall On Flag
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.blendin=Blends the block in with the walls it touches, making it less apparent.
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.tiletype=Determines the visual appearance of the block.
-entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.inverted=When checked, the block will only be visible when the associated flag is disabled rather than only when the associated flag is enabled.
+entities.SorbetHelper/CrumbleOnFlagBlock.attributes.name.inverted=Invert Flag
+entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.inverted=When checked, the block will break when the flag is disabled, rather than when it is enabled.
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.flag=The flag that needs to be set in order for the block to break.
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.showDebris=Determines whether the block spawns debris when it breaks.
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.playAudio=Determines whether the block plays sound effects when breaking/appearing.
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.depth=Determines what visual layer the block should be on (higher values mean farther behind in the scene, default value is -10010).
+entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.destroyAttached=Whether objects such as spikes that are attached to the block should be affected as well.
+entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.fadeInTime=How long (in seconds) the block takes to visually fade back in when (re)appearing.
 
 # resizable waterfall
 entities.SorbetHelper/BigWaterfall.placements.name.normal=Resizable Waterfall
