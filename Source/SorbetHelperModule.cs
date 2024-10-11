@@ -40,6 +40,7 @@ namespace Celeste.Mod.SorbetHelper {
             MovingBlockHittable.Load();
             LightCoverComponent.Load();
             StylegroundOverHudRenderer.Load();
+            ParallaxHiResSnow.Load();
         }
 
         public override void Unload() {
@@ -49,6 +50,7 @@ namespace Celeste.Mod.SorbetHelper {
             MovingBlockHittable.Unload();
             LightCoverComponent.Unload();
             StylegroundOverHudRenderer.Unload();
+            ParallaxHiResSnow.Unload();
         }
 
         public override void PrepareMapDataProcessors(MapDataFixup context) {

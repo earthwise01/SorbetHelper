@@ -197,4 +197,35 @@ entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnStaticMover=Wh
 entities.SorbetHelper/TouchGateBlock.attributes.name.linkTag=Flag On Activate
 entities.SorbetHelper/TouchGateBlock.attributes.description.linkTag=An optional session flag to enable when the block activates.
 
+# -- effects/backdrops --
+
+# parallax hires snow
+style.effects.SorbetHelper/ParallaxHiResSnow.name=Parallax Hi-Res Snow (Customizable)
+style.effects.SorbetHelper/ParallaxHiResSnow.description.color=The color of the particles.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.alpha=The opacity of the particles, between 0 (translucent) and 1 (opaque).
+style.effects.SorbetHelper/ParallaxHiResSnow.description.additive=How much additive blending the particles should use, between 0 (not additive) and 1 (fully additive).
+style.effects.SorbetHelper/ParallaxHiResSnow.description.texturePath=The texture the particles should use.\nNote that unlike most other stylegrounds, this is relative to the Overworld Atlas instead of the Gameplay Atlas.\nThis means any custom textures need to be placed at e.g. "yourmod/Graphics/Atlases/Overworld/yourname/yourmod/customsnow".\nVanilla textures are 256x256 pixels.
+style.effects.SorbetHelper/ParallaxHiResSnow.attribute.randomRotation=Rotate Texture
+style.effects.SorbetHelper/ParallaxHiResSnow.description.randomRotation=Whether the particles should be rotated randomly.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.fadeTowardsForeground=Whether the particles should fade out slightly as they get closer to the foreground.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.directionX=Determines how strongly and in which direction the particles should move horizontally.\nNegative values will move the particles to the left while positive values will move them to the right.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.directionY=Determines how strongly and in which direction the particles should move vertically.\nNegative values will move the particles upwards while positive values will move them downwards.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.minScale=Determines how large the farthest particles should be.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.maxScale=Determines how large the closest particles should be.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.minSpeed=Determines how fast the farthest particles should move.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.maxSpeed=Determines how fast the closest particles should move.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.minScrollX=Determines the amount of horizontal parallax the farthest particles should have.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.minScrollY=Determines the amount of vertical parallax the farthest particles should have.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.maxScrollX=Determines the amount of horizontal parallax the closest particles should have.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.maxScrollY=Determines the amount of vertical parallax the closest particles should have.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.sineAmplitude=Determines how tall the sine movement of the particles is.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.sineFrequency=Determines how fast the sine movement of the particles is.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.particleCount=How many particles there are.
+style.effects.SorbetHelper/ParallaxHiResSnow.attribute.fadeInOut=Fade In/Out
+style.effects.SorbetHelper/ParallaxHiResSnow.description.fadeInOut=Whether the effect should fade in/out when changing visibility (e.g. when transitioning to a different room or toggling its flag).
+style.effects.SorbetHelper/ParallaxHiResSnow.attribute.fadex=Fade X
+style.effects.SorbetHelper/ParallaxHiResSnow.attribute.fadey=Fade Y
+style.effects.SorbetHelper/ParallaxHiResSnow.description.fadex=Advanced horizontal fading zones.\nFormat is "FromPosition-ToPosition,FromAlpha-ToAlpha". Example "n500-500,1-0".\nNegative numbers in position are denoted with "n" rather than minus. Position numbers are in pixels and use map coordinates.\nMultiple zones can be set up by using ":" as separator.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.fadey=Advanced vertical fading zones.\nFormat is "FromPosition-ToPosition,FromAlpha-ToAlpha". Example "n500-500,1-0".\nNegative numbers in position are denoted with "n" rather than minus. Position numbers are in pixels and use map coordinates.\nMultiple zones can be set up by using ":" as separator.
+
 mods.SorbetHelper.name=Sorbet Helper
