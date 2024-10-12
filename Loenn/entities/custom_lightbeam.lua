@@ -66,6 +66,14 @@ lightBeam.placements = {
 }
 
 lightBeam.fieldInformation = {
+    colors = {
+        fieldType = "list",
+        elementOptions = {
+            fieldType = "color",
+            allowXNAColors = false,
+            showAlpha = true,
+        }
+    },
     color = {
         fieldType = "color",
         allowXNAColors = false
@@ -223,7 +231,7 @@ function lightBeam.getSpritesRainbow(room, entity, colors, onlyBase)
     -- Shallowcopy so we can change the alpha later
     --local color = table.shallowcopy(colors[1] or { 0.8, 1.0, 1.0, 0.4 })
     local sprites = {}
-    local x, y = entity.x, entity.y
+    local x, y = entity.x + room.x, entity.y + room.y
 
     local theta = math.rad(entity.rotation or 0)
     local width = entity.width or 32
