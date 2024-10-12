@@ -184,12 +184,19 @@ public class ParallaxHiResSnow : Backdrop {
 
             var particles = Backdrop.particles;
             var texture = Backdrop.particleTexture;
+            var color = Backdrop.Color * Backdrop.visibleFade * Backdrop.cameraFade * ExtendedVariantsCompat.ForegroundEffectOpacity;
             var additiveMultiplier = 1f - Backdrop.AdditiveBlend;
-            var color = Backdrop.Color * Backdrop.visibleFade * Backdrop.cameraFade;
 
-            // silly but keeps the scale consistent when using a watchtower
             var level = Scene as Level;
             var matrix = Matrix.Identity;
+
+            // mirror mode
+            if (SaveData.Instance.Assists.MirrorMode)
+                matrix *= Matrix.CreateScale(-1f, 1f, 1f) * Matrix.CreateTranslation(Engine.Width, 0f, 0f);
+            if (ExtendedVariantsCompat.UpsideDown)
+                matrix *= Matrix.CreateScale(1f, -1f, 1f) * Matrix.CreateTranslation(0f, Engine.Height, 0f);
+
+            // watchtower/etc edge padding
             if (level.ScreenPadding != 0f) {
                 float paddingScale = (320f - level.ScreenPadding * 2f) / 320f;
                 Vector2 paddingOffset = new(level.ScreenPadding, level.ScreenPadding * 0.5625f);
