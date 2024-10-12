@@ -57,12 +57,22 @@ same as a vanilla killbox but with the added ability to able be flag-toggleable.
 ### Kill Zone
 kills Madeline on contact, optionally flag-toggleable.
 
+## **Styleground Effects**
+
+### Parallax Hi-Res Snow
+an adaptation of the hi-res snow seen in the title screen/prologue start + end cutscenes/etc into a general effect usable in maps.<br>
+scrolls with the camera and is also highly customizable.
+
+### Spiral Stars
+variation of the falling stars effect from ch2 that instead spirals inwards towards the center.<br>
+decently customizable.
+
 ## **Decal Registry**
 
 ### `sorbetHelper_lightCover`
 makes decals block/cover any light touching them
 
-has 2 optional attributes, `maximumDepth(int)` and `minimumDepth(int)`, which determine the range of decal depths that are affected, and default to `-1` and `-2147483648`<sup>(the minimum value for an int)</sup> respectively (which makes only decals above madeline get affected since madeline is at depth `0`, and lower depths mean closer to the camera).
+has 2 optional attributes, `maximumDepth(int)` and `minimumDepth(int)`, which determine the range of decal depths that are affected, and default to `-1` and `-2147483648`<sup>(the lowest possible depth)</sup> respectively (which makes only decals above madeline get affected since madeline is at depth `0`, and lower depths mean closer to the camera).
 
 e.g. this makes decals with a depth anywhere in the range of `-100` to `-100000` (including `-100` and `-100000`) cover any light touching them
 ```xml
@@ -71,7 +81,7 @@ e.g. this makes decals with a depth anywhere in the range of `-100` to `-100000`
 </decal>
 ```
 
-differs from the vanilla `lightOcclude` attribute in that it 1. fully covers the decal, rather than an arbitrary rectangle, 2. doesn't "block" light but instead covers it, and, 3. doesn't stop working if a light source goes inside it (such as the player spotlight). <sup>(also 4. its probably decently worse for performance but shhh)</sup>
+differs from the vanilla `lightOcclude` attribute in that it 1. fully covers the decal, rather than an arbitrary rectangle, 2. doesn't "block" light but instead covers it, and, 3. doesn't stop working if a light source goes inside it (such as the player spotlight).
 
 ## Special Thanks
 **maddie480**: code + tooltips for the customisable rainbow effect and settings from rainbow spinner color controllers which was stolen for rainbow lightbeams, and code + tooltips from flag switch gates which gate blocks are *heavily* based off<br>
