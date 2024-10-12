@@ -20,6 +20,7 @@ lightBeam.placements = {
             rotation = 0.0,
             depth = -9998,
             noParticles = false,
+            texture = "util/lightbeam",
             color = "CCFFFF",
             alpha = 1.0,
             rainbow = false,
@@ -47,6 +48,7 @@ lightBeam.placements = {
             rotation = 0.0,
             depth = -9998,
             noParticles = false,
+            texture = "util/lightbeam",
             color = "CCFFFF",
             alpha = 1.0,
             rainbow = true,
@@ -92,12 +94,12 @@ function lightBeam.fieldOrder(entity)
     local fields = {}
     if entity.rainbow == true and entity.useCustomRainbowColors == true then
         fields = {
-            "x", "y", "width", "height", "centerX", "centerY", "colors", "gradientSize", "gradientSpeed", "alpha", "depth", "rotation", "flag", "flagFadeTime",
+            "x", "y", "width", "height", "colors", "centerX", "gradientSize", "centerY", "gradientSpeed", "alpha", "depth", "rotation", "flag", "flagFadeTime", "texture",
             "inverted", "fadeOnTransition", "rainbow", "useCustomRainbowColors", "noParticles", "fadeWhenNear", "singleColor", "loopColors"
         }
     else
         fields = {
-            "x", "y", "width", "height", "color", "alpha", "depth", "rotation", "flag", "flagFadeTime",
+            "x", "y", "width", "height", "color", "alpha", "depth", "rotation", "flag", "flagFadeTime", "texture",
             "inverted", "fadeOnTransition", "rainbow", "useCustomRainbowColors", "noParticles", "fadeWhenNear", "singleColor"
         }
     end

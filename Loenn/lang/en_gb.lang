@@ -8,13 +8,14 @@
 entities.SorbetHelper/FlagToggledKillbox.placements.name.flag_toggled_killbox=Flag Toggled Killbox
 entities.SorbetHelper/FlagToggledKillbox.placements.description.flag_toggled_killbox=Same as the vanilla Killbox entity, however it can also be flag toggled.
 entities.SorbetHelper/FlagToggledKillbox.attributes.description.flag=The flag that needs to be set in order for the killbox to be activated.
-entities.SorbetHelper/FlagToggledKillbox.attributes.description.inverted=When checked, the killbox will only be active when the associated flag is disabled rather than only when the associated flag is enabled.
+entities.SorbetHelper/FlagToggledKillbox.attributes.description.inverted=When checked, the killbox will be active only when the flag is disabled, rather than when it is enabled.
 
 # Kill Zone
 entities.SorbetHelper/KillZone.placements.name.killzone=Kill Zone
 entities.SorbetHelper/KillZone.placements.description.killzone=Kills the player on contact, can also be flag toggled.
 entities.SorbetHelper/KillZone.attributes.description.flag=The flag that needs to be set in order for the kill zone to be activated, leaving this empty causes the kill zone to always be active.
-entities.SorbetHelper/KillZone.attributes.description.inverted=When checked, the kill zone will only be active when the associated flag is disabled rather than only when the associated flag is enabled.
+entities.SorbetHelper/KillZone.attributes.name.inverted=Invert Flag
+entities.SorbetHelper/KillZone.attributes.description.inverted=When checked, the kill zone will be active only when the flag is disabled, rather than when it is enabled.
 entities.SorbetHelper/KillZone.attributes.description.fastKill=When checked, the player will die instantly upon touching the kill zone rather than getting knocked back a bit first.
 
 # Strawberry (With Node Based Return)
@@ -82,12 +83,14 @@ entities.SorbetHelper/BigWaterfall.attributes.description.depth=Determines what 
 entities.SorbetHelper/CustomLightbeam.placements.name.customlightbeam=Custom Lightbeam
 entities.SorbetHelper/CustomLightbeam.placements.name.rainbowlightbeam=Rainbow Lightbeam
 entities.SorbetHelper/CustomLightbeam.placements.name.customlightbeamrainbow=Custom Lightbeam (Rainbow)
-entities.SorbetHelper/CustomLightbeam.attributes.description.flag=The flag that needs to be set in order for the lightbeam to be activated, leaving this empty causes the lightbeam to always be active.
-entities.SorbetHelper/CustomLightbeam.attributes.description.inverted=When checked, the lightbeam will only be active when the associated flag is disabled rather than only when the associated flag is enabled.
+entities.SorbetHelper/CustomLightbeam.attributes.description.flag=The flag that needs to be set in order for the lightbeam to be activated. Leaving this empty causes the lightbeam to always be active.
+entities.SorbetHelper/CustomLightbeam.attributes.name.inverted=Invert Flag
+entities.SorbetHelper/CustomLightbeam.attributes.description.inverted=When checked, the lightbeam will be active only when the flag is disabled, rather than when it is enabled.
 entities.SorbetHelper/CustomLightbeam.attributes.description.flagFadeTime=The time (in seconds) the lightbeam takes to fade in or out according to the flag.
 entities.SorbetHelper/CustomLightbeam.attributes.description.rotation=The rotation of the lightbeam.
 entities.SorbetHelper/CustomLightbeam.attributes.description.depth=Determines what visual layer the lightbeam should be on (higher values mean farther behind in the scene, default value is -9998).\nDoes not affect the particles.
 entities.SorbetHelper/CustomLightbeam.attributes.description.noParticles=Determines whether the lightbeam emits particles.
+entities.SorbetHelper/CustomLightbeam.attributes.description.texture=The texture of the lightbeam. Vanilla texture is 'util/lightbeam'.
 entities.SorbetHelper/CustomLightbeam.attributes.description.color=The color of the lightbeam.
 entities.SorbetHelper/CustomLightbeam.attributes.description.alpha=The alpha of the lightbeam.
 entities.SorbetHelper/CustomLightbeam.attributes.description.rainbow=Determines whether the lightbeam is rainbow.

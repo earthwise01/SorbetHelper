@@ -50,11 +50,12 @@ placements.entities.SorbetHelper/BigWaterfall.tooltips.depth=Determines what vis
 # tooltips for most of the rainbow related attributes stolen from MaddieHelpingHand
 # https://github.com/maddie480/MaddieHelpingHand/blob/master/Loenn/lang/en_gb.lang#L532
 placements.entities.SorbetHelper/CustomLightbeam.tooltips.flag=The flag that needs to be set in order for the lightbeam to be activated, leaving this empty causes the lightbeam to always be active.
-placements.entities.SorbetHelper/CustomLightbeam.tooltips.inverted=When checked, the lightbeam will only be active when the associated flag is disabled rather than only when the associated flag is enabled.
-placements.entities.SorbetHelper/CustomLightbeam.tooltips.flagFadeTime=The time (in seconds) the lightbeam takes to fade in or out according to the flag.
+placements.entities.SorbetHelper/CustomLightbeam.names.inverted=Invert Flag
+placements.entities.SorbetHelper/CustomLightbeam.tooltips.inverted=When checked, the lightbeam will be active only when the flag is disabled, rather than when it is enabled.placements.entities.SorbetHelper/CustomLightbeam.tooltips.flagFadeTime=The time (in seconds) the lightbeam takes to fade in or out according to the flag.
 placements.entities.SorbetHelper/CustomLightbeam.tooltips.rotation=The rotation of the lightbeam.
 placements.entities.SorbetHelper/CustomLightbeam.tooltips.depth=Determines what visual layer the lightbeam should be on (higher values mean farther behind in the scene, default value is -9998).\nDoes not affect the particles.
 placements.entities.SorbetHelper/CustomLightbeam.tooltips.noParticles=Determines whether the lightbeam emits particles.
+placements.entities.SorbetHelper/CustomLightbeam.tooltips.texture=The texture of the lightbeam. Vanilla texture is 'util/lightbeam'.
 placements.entities.SorbetHelper/CustomLightbeam.tooltips.color=The color of the lightbeam.
 placements.entities.SorbetHelper/CustomLightbeam.tooltips.alpha=The alpha of the lightbeam.
 placements.entities.SorbetHelper/CustomLightbeam.tooltips.rainbow=Determines whether the lightbeam is rainbow.
