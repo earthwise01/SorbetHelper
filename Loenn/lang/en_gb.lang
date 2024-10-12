@@ -218,14 +218,33 @@ style.effects.SorbetHelper/ParallaxHiResSnow.description.minScrollX=Determines t
 style.effects.SorbetHelper/ParallaxHiResSnow.description.minScrollY=Determines the amount of vertical parallax the farthest particles should have.
 style.effects.SorbetHelper/ParallaxHiResSnow.description.maxScrollX=Determines the amount of horizontal parallax the closest particles should have.
 style.effects.SorbetHelper/ParallaxHiResSnow.description.maxScrollY=Determines the amount of vertical parallax the closest particles should have.
-style.effects.SorbetHelper/ParallaxHiResSnow.description.sineAmplitude=Determines how tall the sine movement of the particles is.
-style.effects.SorbetHelper/ParallaxHiResSnow.description.sineFrequency=Determines how fast the sine movement of the particles is.
-style.effects.SorbetHelper/ParallaxHiResSnow.description.particleCount=How many particles there are.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.sineAmplitude=How tall the sine movement of the particles is.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.sineFrequency=How fast the sine movement of the particles is.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.particleCount=The number of particles the effect should have.
 style.effects.SorbetHelper/ParallaxHiResSnow.attribute.fadeInOut=Fade In/Out
 style.effects.SorbetHelper/ParallaxHiResSnow.description.fadeInOut=Whether the effect should fade in/out when changing visibility (e.g. when transitioning to a different room or toggling its flag).
 style.effects.SorbetHelper/ParallaxHiResSnow.attribute.fadex=Fade X
 style.effects.SorbetHelper/ParallaxHiResSnow.attribute.fadey=Fade Y
 style.effects.SorbetHelper/ParallaxHiResSnow.description.fadex=Advanced horizontal fading zones.\nFormat is "FromPosition-ToPosition,FromAlpha-ToAlpha". Example "n500-500,1-0".\nNegative numbers in position are denoted with "n" rather than minus. Position numbers are in pixels and use map coordinates.\nMultiple zones can be set up by using ":" as separator.
 style.effects.SorbetHelper/ParallaxHiResSnow.description.fadey=Advanced vertical fading zones.\nFormat is "FromPosition-ToPosition,FromAlpha-ToAlpha". Example "n500-500,1-0".\nNegative numbers in position are denoted with "n" rather than minus. Position numbers are in pixels and use map coordinates.\nMultiple zones can be set up by using ":" as separator.
+
+# dream spiral stars
+style.effects.SorbetHelper/SpiralStars.name=Spiral Stars
+style.effects.SorbetHelper/SpiralStars.attribute.spritePath=Sprite Directory
+style.effects.SorbetHelper/SpiralStars.description.spritePath=The directory containing the star sprites.
+style.effects.SorbetHelper/SpiralStars.description.colors=The colors the stars should be tinted, separated by commas.
+style.effects.SorbetHelper/SpiralStars.description.backgroundColor=The color of the background. Set its alpha to 0 to disable.
+style.effects.SorbetHelper/SpiralStars.description.starCount=The number of stars the effect should have.
+style.effects.SorbetHelper/SpiralStars.attribute.trailLength=Trail Count
+style.effects.SorbetHelper/SpiralStars.description.trailLength=How long the trail for each star is.\nCan have a large impact on performance since the total amount of textures drawn is equal to starCount * trailCount.
+style.effects.SorbetHelper/SpiralStars.description.centerX=The X position of the effect's center.
+style.effects.SorbetHelper/SpiralStars.description.centerY=The Y position of the effect's center.
+style.effects.SorbetHelper/SpiralStars.attribute.spawnRadius=Outer Radius
+style.effects.SorbetHelper/SpiralStars.attribute.centerRadius=Inner Radius
+style.effects.SorbetHelper/SpiralStars.description.spawnRadius=Determines how far away (in pixels) from the center the stars should spawn.
+style.effects.SorbetHelper/SpiralStars.description.centerRadius=Determines how close (in pixels) to the center the stars need to be before they start to shrink and fade out.
+style.effects.SorbetHelper/SpiralStars.description.speed=The speed (in pixels / second) at which the stars will move towards the center.\nNegative values will make the stars move away from the center instead.
+style.effects.SorbetHelper/SpiralStars.description.rotationSpeed=The speed (in degrees / second) at which the stars will rotate around the center.
+
 
 mods.SorbetHelper.name=Sorbet Helper

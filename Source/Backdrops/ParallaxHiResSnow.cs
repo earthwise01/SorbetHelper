@@ -166,11 +166,11 @@ public class ParallaxHiResSnow : Backdrop {
             Backdrop = backdrop;
 
             Tag = global::Celeste.Tags.Global | TagsExt.SubHUD;
-            Depth = Depths.FormationSequences; // doesn't really matter but just in case it gets used with other subhud stuff :p
+            Depth = 2000000; // doesn't really matter but just in case it gets used with other subhud stuff :p
         }
 
         public override void Render() {
-            if (!Backdrop.Visible || Backdrop.cameraFade <= 0f)
+            if (!Backdrop.Visible)
                 return;
 
             // float num = Calc.Clamp(Backdrop.Direction.Length(), 0f, 20f);
