@@ -30,7 +30,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public Vector2 Offset => offset + Shake;
 
         private const float activationBufferTime = 0.15f;
-        public bool CanActivate => targetExtended < segmentCount || canRefreshTimer;
+        public bool CanActivate => targetExtended < segmentCount || (canRefreshTimer && !pauseTimerWhileExtending);
         public bool Extending => amountExtended < targetExtended;
 
         private List<EmptyBlock> segments;
