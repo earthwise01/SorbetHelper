@@ -21,17 +21,23 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             fastKill = data.Bool("fastKill", false);
         }
 
+        public override void Awake(Scene scene) {
+            base.Awake(scene);
+
+            if (!string.IsNullOrEmpty(flag) && !SceneAs<Level>().Session.GetFlag(flag, inverted))
+                Collidable = false;
+        }
+
         public void OnCollide(Player player) {
-            if (fastKill) {
+            if (fastKill)
                 player.Die(Vector2.Zero);
-                return;
-            }
-            player.Die((player.Position - Position).SafeNormalize());
+            else
+                player.Die((player.Position - Center).SafeNormalize());
         }
 
         public override void Update() {
             if (!string.IsNullOrEmpty(flag)) {
-                // If the associated flag is disabled (or enabled and the inverted toggle is set) disable the Kill Zone
+                // If the associated flag is disabled (or enabled and the inverted toggle is set), disable the kill zone
                 if (!SceneAs<Level>().Session.GetFlag(flag, inverted)) {
                     Collidable = false;
                 } else if (!Collidable) {

@@ -13,6 +13,7 @@ using Random
     rotation::Integer=0,
     depth::Integer=-9998,
     noParticles::Bool=false,
+    texture::String="util/lightbeam",
     color::String="CCFFFF",
     alpha::Number=1.0,
     rainbow::Bool=false,
@@ -58,7 +59,7 @@ const placements = Ahorn.PlacementDict(
 )
 
 Ahorn.editingOrder(entity::CustomLightbeam) = String[
-    "x", "y", "width", "height", "color", "centerX", "centerY", "colors", "gradientSize", "gradientSpeed", "alpha", "depth", "rotation", "flag", "flagFadeTime",
+    "x", "y", "width", "height", "color", "centerX", "centerY", "colors", "gradientSize", "gradientSpeed", "alpha", "depth", "rotation", "flag", "flagFadeTime", "texture",
     "inverted", "fadeOnTransition", "rainbow", "useCustomRainbowColors", "noParticles", "fadeWhenNear", "singleColor", "loopColors"
 ]
 

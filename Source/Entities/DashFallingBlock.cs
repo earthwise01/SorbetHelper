@@ -6,10 +6,11 @@ using Microsoft.Xna.Framework;
 using Monocle;
 using Celeste.Mod.Entities;
 using Celeste.Mod.SorbetHelper.Utils;
+using Celeste.Mod.SorbetHelper.Components;
 
 namespace Celeste.Mod.SorbetHelper.Entities {
 
-    [Tracked(false)]
+    [TrackedAs(typeof(FallingBlock))]
     [CustomEntity("SorbetHelper/DashFallingBlock")]
     public class DashFallingBlock : FallingBlock {
 
@@ -22,10 +23,11 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         private readonly string shakeSfx;
         private readonly string impactSfx;
-        public bool fallOnTouch;
-        public bool fallOnStaticMover;
-        public bool allowWavedash;
-        public bool dashCornerCorrection;
+        private readonly bool fallOnTouch;
+        private readonly bool fallOnStaticMover;
+        private readonly bool allowWavedash;
+        private readonly bool dashCornerCorrection;
+        private readonly bool breakDashBlocks;
 
         private Vector2 scale = Vector2.One;
         private Vector2 hitOffset;
@@ -33,8 +35,10 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private static readonly Dictionary<string, Vector2> directionToVector = new Dictionary<string, Vector2>() {
             {"down", new Vector2(0f, 1f)}, {"up", new Vector2(0f, -1f)}, {"left", new Vector2(-1f, 0f)}, {"right", new Vector2(1f, 0f)}
         };
-        public Vector2 direction;
+        public Vector2 Direction;
         private readonly FallDashModes fallDashMode;
+
+        public static ParticleType P_HitFallDust { get; private set; }
 
         public DashFallingBlock(EntityData data, Vector2 offset) : base(data, offset) {
             // remove the Coroutine added by the vanilla falling block
@@ -46,16 +50,22 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             fallOnStaticMover = data.Bool("fallOnStaticMover", false);
             allowWavedash = data.Bool("allowWavedash", false);
             dashCornerCorrection = data.Bool("dashCornerCorrection", false);
-            base.Depth = data.Int("depth", base.Depth);
-            direction = directionToVector[data.Attr("direction", "down").ToLower()];
-            fallDashMode = data.Enum<FallDashModes>("fallDashMode", FallDashModes.Disabled);
+            breakDashBlocks = data.Bool("breakDashBlocks", true);
+            Depth = data.Int("depth", Depth);
+            Direction = directionToVector[data.Attr("direction", "down").ToLower()];
+            fallDashMode = data.Enum("fallDashMode", FallDashModes.Disabled);
 
             // make the tilegrid invisible since we want to render it manually later
             tiles.Visible = false;
 
             Add(new Coroutine(Sequence()));
 
-            OnDashCollide = OnDashCollision;
+            // allows disabling dash activation
+            if (data.Bool("dashActivated", true))
+                OnDashCollide = OnDashCollision;
+
+            // i was going to use a moving block hittable component before i remembered that. right TrackedAs is a Thing i can just use that asdfasd (+ having falling blocks trigger other falling blocks is neat maybe but inconsistent with vanilla)
+            // Add(new MovingBlockHittable(OnMovingBlockHit));
         }
 
         public DashCollisionResults OnDashCollision(Player player, Vector2 dir) {
@@ -70,19 +80,19 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
                 // if the falling block is set to move in the direction of madeline's dash, update the direction accordingly
                 if (fallDashMode != FallDashModes.Disabled) {
-                    direction = fallDashMode == FallDashModes.Pull ? -dir : dir;
+                    Direction = fallDashMode == FallDashModes.Pull ? -dir : dir;
                 }
 
                 // trigger the block
                 (Scene as Level).DirectionalShake(dir);
                 Triggered = true;
-                Audio.Play(impactSfx, base.Center);
+                Audio.Play(impactSfx, Center);
 
                 // emit the dust particles and update the scale and hitOffset
-                for (int i = 2; i <= base.Width; i += 4) {
-                    if (!base.Scene.CollideCheck<Solid>(base.BottomLeft + new Vector2(i, 3f))) {
-                        SceneAs<Level>().Particles.Emit(P_FallDustB, 1, new Vector2(base.X + i, base.Bottom), Vector2.One * 4f);
-                        SceneAs<Level>().Particles.Emit(P_FallDustA, 1, new Vector2(base.X + i, base.Bottom), Vector2.One * 4f);
+                for (int i = 2; i <= Width; i += 4) {
+                    if (!Scene.CollideCheck<Solid>(BottomLeft + new Vector2(i, 3f))) {
+                        SceneAs<Level>().Particles.Emit(P_HitFallDust, 1, new Vector2(X + i, Bottom), Vector2.One * 4f);
+                        SceneAs<Level>().Particles.Emit(P_FallDustA, 1, new Vector2(X + i, Bottom), Vector2.One * 4f);
                     }
                 }
                 scale = new Vector2(
@@ -152,12 +162,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 }
 
                 StopShaking();
-                for (int i = 2; i < Width; i += 4) {
-                    if (Scene.CollideCheck<Solid>(TopLeft + new Vector2(i, -2f)))
-                        SceneAs<Level>().Particles.Emit(P_FallDustA, 2, new Vector2(X + i, Y), Vector2.One * 4f, (float)Math.PI / 2f);
-
-                    SceneAs<Level>().Particles.Emit(P_FallDustB, 2, new Vector2(X + i, Y), Vector2.One * 4f);
-                }
+                DirectionalShakeParticles();
 
                 float speed = 0f;
                 float maxSpeed = 160f;
@@ -165,16 +170,16 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                     Level level = SceneAs<Level>();
                     speed = Calc.Approach(speed, maxSpeed, 500f * Engine.DeltaTime);
 
-                    if (MoveVCollideSolids(speed * direction.Y * Engine.DeltaTime, thruDashBlocks: true))
+                    if (MoveVCollideSolids(speed * Direction.Y * Engine.DeltaTime, thruDashBlocks: breakDashBlocks))
                         break;
 
-                    if (MoveHCollideSolids(speed * direction.X * Engine.DeltaTime, thruDashBlocks: true))
+                    if (MoveHCollideSolids(speed * Direction.X * Engine.DeltaTime, thruDashBlocks: breakDashBlocks))
                         break;
 
                     // checks whether the falling block fell out of bounds
                     // all of these checks are done on any dash falling block regardless of its direction so hopefully that wont break anything somewhere
                     if (Top > level.Bounds.Bottom + 16 || Bottom < level.Bounds.Top - 16 || Right < level.Bounds.Left - 16 || Left > level.Bounds.Right + 16 ||
-                    ((Top > level.Bounds.Bottom - 1 || Bottom < level.Bounds.Top + 1 || Right < level.Bounds.Left + 1 || Left > level.Bounds.Right - 1) && CollideCheck<Solid>(Position + direction))) {
+                    ((Top > level.Bounds.Bottom - 1 || Bottom < level.Bounds.Top + 1 || Right < level.Bounds.Left + 1 || Left > level.Bounds.Right - 1) && CollideCheck<Solid>(Position + Direction))) {
                         Collidable = Visible = false;
                         yield return 0.2f;
 
@@ -196,19 +201,109 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
                 Audio.Play(impactSfx, base.BottomCenter);
                 Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
-                SceneAs<Level>().DirectionalShake(direction, 0.3f);
+                SceneAs<Level>().DirectionalShake(Direction, 0.3f);
                 StartShaking();
-                LandParticles();
+                DirectionalLandParticles();
                 yield return 0.2f;
                 StopShaking();
 
-                if (CollideCheck<SolidTiles>(Position + direction))
+                if (CollideCheck<SolidTiles>(Position + Direction))
                     break;
-                while (CollideCheck<Platform>(Position + direction))
+                while (CollideCheck<Platform>(Position + Direction))
                     yield return 0.1f;
             }
 
             Safe = true;
+        }
+
+        public void DirectionalShakeParticles() {
+            Vector2 dir = Direction.FourWayNormal();
+
+            switch (dir) {
+                case { X: 1f }:
+                    for (int i = 2; i < Height; i += 4) {
+                        if (Scene.CollideCheck<Solid>(TopLeft + new Vector2(-2f, i)))
+                            SceneAs<Level>().Particles.Emit(P_FallDustA, 2, new Vector2(X + 2f, Y + i), Vector2.One * 4f, 0f);
+
+                        SceneAs<Level>().Particles.Emit(P_FallDustB, 2, new Vector2(X + 2f, Y + i), Vector2.One * 4f, 0.1f);
+                    }
+                    break;
+                case { X: -1f }:
+                    for (int i = 2; i < Height; i += 4) {
+                        if (Scene.CollideCheck<Solid>(TopRight + new Vector2(2f, i)))
+                            SceneAs<Level>().Particles.Emit(P_FallDustA, 2, new Vector2(Right - 2f, Y + i), Vector2.One * 4f, MathF.PI);
+
+                        SceneAs<Level>().Particles.Emit(P_FallDustB, 2, new Vector2(Right - 2f, Y + i), Vector2.One * 4f, MathF.PI - 0.1f);
+                    }
+                    break;
+                case { Y: -1f }:
+                    for (int i = 2; i < Width; i += 4) {
+                        if (Scene.CollideCheck<Solid>(BottomLeft + new Vector2(i, 2f)))
+                            SceneAs<Level>().Particles.Emit(P_FallDustA, 2, new Vector2(X + i, Bottom - 4f), Vector2.One * 4f, -MathF.PI / 2f);
+
+                        SceneAs<Level>().Particles.Emit(P_FallDustB, 2, new Vector2(X + i, Bottom - 2f), Vector2.One * 4f);
+                    }
+                    break;
+                default:
+                    for (int i = 2; i < Width; i += 4) {
+                        if (Scene.CollideCheck<Solid>(TopLeft + new Vector2(i, -2f)))
+                            SceneAs<Level>().Particles.Emit(P_FallDustA, 2, new Vector2(X + i, Y), Vector2.One * 4f, MathF.PI / 2f);
+
+                        SceneAs<Level>().Particles.Emit(P_FallDustB, 2, new Vector2(X + i, Y), Vector2.One * 4f);
+                    }
+                    break;
+            }
+        }
+
+        public void DirectionalLandParticles() {
+            Vector2 dir = Direction.FourWayNormal();
+
+            ParticleType P_DirectionalLandDust = new(P_LandDust) {
+                Acceleration = dir * -30f
+            };
+
+            switch (dir) {
+                case { X: 1f }:
+                    for (int i = 2; i <= Height; i += 4) {
+                        if (Scene.CollideCheck<Solid>(TopLeft + new Vector2(3f, i))) {
+                            SceneAs<Level>().ParticlesFG.Emit(P_FallDustA, 1, new Vector2(Right, Y + i), Vector2.One * 4f, 0f);
+                            float direction = i >= Height / 2f ? MathF.PI / 2f : -MathF.PI / 2f;
+                            SceneAs<Level>().ParticlesFG.Emit(P_DirectionalLandDust, 1, new Vector2(Right, Y + i), Vector2.One * 4f, direction);
+                        }
+                    }
+                    break;
+                case { X: -1f }:
+                    for (int i = 2; i <= Height; i += 4) {
+                        if (Scene.CollideCheck<Solid>(TopLeft + new Vector2(-3f, i))) {
+                            SceneAs<Level>().ParticlesFG.Emit(P_FallDustA, 1, new Vector2(X, Y + i), Vector2.One * 4f, 0f);
+                            float direction = i >= Height / 2f ? MathF.PI / 2f : -MathF.PI / 2f;
+                            SceneAs<Level>().ParticlesFG.Emit(P_DirectionalLandDust, 1, new Vector2(X, Y + i), Vector2.One * 4f, direction);
+                        }
+                    }
+                    break;
+                case { Y: -1f }:
+                    for (int i = 2; i <= Width; i += 4) {
+                        if (Scene.CollideCheck<Solid>(TopLeft + new Vector2(i, -3f))) {
+                            SceneAs<Level>().ParticlesFG.Emit(P_FallDustA, 1, new Vector2(X + i, Y), Vector2.One * 4f, -MathF.PI / 2f);
+                            float direction = i >= Width / 2f ? 0f : MathF.PI;
+                            SceneAs<Level>().ParticlesFG.Emit(P_DirectionalLandDust, 1, new Vector2(X + i, Y), Vector2.One * 4f, direction);
+                        }
+                    }
+                    break;
+                default:
+                    LandParticles();
+                    break;
+            }
+        }
+
+        internal static void Initialize() {
+            P_HitFallDust = new(P_FallDustB) {
+                SpeedMin = 18f,
+                SpeedMax = 24f,
+                LifeMin = 0.4f,
+                LifeMax = 0.55f,
+                Acceleration = Vector2.UnitY * 15f
+            };
         }
     }
 }

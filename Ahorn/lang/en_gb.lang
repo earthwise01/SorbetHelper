@@ -37,6 +37,8 @@ placements.entities.SorbetHelper/CrumbleOnFlagBlock.tooltips.flag=The flag that 
 placements.entities.SorbetHelper/CrumbleOnFlagBlock.tooltips.showDebris=Determines whether the block spawns debris when it breaks.
 placements.entities.SorbetHelper/CrumbleOnFlagBlock.tooltips.playAudio=Determines whether the block plays sound effects when breaking/appearing.
 placements.entities.SorbetHelper/CrumbleOnFlagBlock.tooltips.depth=Determines what visual layer the block should be on (higher values mean farther behind in the scene, default value is -10010).
+placements.entities.SorbetHelper/CrumbleOnFlagBlock.tooltips.destroyAttached=Whether objects such as spikes that are attached to the block should be affected as well.
+placements.entities.SorbetHelper/CrumbleOnFlagBlock.tooltips.fadeInTime=How long (in seconds) the block takes to visually fade back in when (re)appearing.
 
 # resizable waterfall
 placements.entities.SorbetHelper/BigWaterfall.tooltips.color=The color of the waterfall.
@@ -48,11 +50,12 @@ placements.entities.SorbetHelper/BigWaterfall.tooltips.depth=Determines what vis
 # tooltips for most of the rainbow related attributes stolen from MaddieHelpingHand
 # https://github.com/maddie480/MaddieHelpingHand/blob/master/Loenn/lang/en_gb.lang#L532
 placements.entities.SorbetHelper/CustomLightbeam.tooltips.flag=The flag that needs to be set in order for the lightbeam to be activated, leaving this empty causes the lightbeam to always be active.
-placements.entities.SorbetHelper/CustomLightbeam.tooltips.inverted=When checked, the lightbeam will only be active when the associated flag is disabled rather than only when the associated flag is enabled.
-placements.entities.SorbetHelper/CustomLightbeam.tooltips.flagFadeTime=The time (in seconds) the lightbeam takes to fade in or out according to the flag.
+placements.entities.SorbetHelper/CustomLightbeam.names.inverted=Invert Flag
+placements.entities.SorbetHelper/CustomLightbeam.tooltips.inverted=When checked, the lightbeam will be active only when the flag is disabled, rather than when it is enabled.placements.entities.SorbetHelper/CustomLightbeam.tooltips.flagFadeTime=The time (in seconds) the lightbeam takes to fade in or out according to the flag.
 placements.entities.SorbetHelper/CustomLightbeam.tooltips.rotation=The rotation of the lightbeam.
 placements.entities.SorbetHelper/CustomLightbeam.tooltips.depth=Determines what visual layer the lightbeam should be on (higher values mean farther behind in the scene, default value is -9998).\nDoes not affect the particles.
 placements.entities.SorbetHelper/CustomLightbeam.tooltips.noParticles=Determines whether the lightbeam emits particles.
+placements.entities.SorbetHelper/CustomLightbeam.tooltips.texture=The texture of the lightbeam. Vanilla texture is 'util/lightbeam'.
 placements.entities.SorbetHelper/CustomLightbeam.tooltips.color=The color of the lightbeam.
 placements.entities.SorbetHelper/CustomLightbeam.tooltips.alpha=The alpha of the lightbeam.
 placements.entities.SorbetHelper/CustomLightbeam.tooltips.rainbow=Determines whether the lightbeam is rainbow.

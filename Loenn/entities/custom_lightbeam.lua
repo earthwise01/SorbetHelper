@@ -20,6 +20,7 @@ lightBeam.placements = {
             rotation = 0.0,
             depth = -9998,
             noParticles = false,
+            texture = "util/lightbeam",
             color = "CCFFFF",
             alpha = 1.0,
             rainbow = false,
@@ -47,6 +48,7 @@ lightBeam.placements = {
             rotation = 0.0,
             depth = -9998,
             noParticles = false,
+            texture = "util/lightbeam",
             color = "CCFFFF",
             alpha = 1.0,
             rainbow = true,
@@ -66,6 +68,14 @@ lightBeam.placements = {
 }
 
 lightBeam.fieldInformation = {
+    colors = {
+        fieldType = "list",
+        elementOptions = {
+            fieldType = "color",
+            allowXNAColors = false,
+            showAlpha = true,
+        }
+    },
     color = {
         fieldType = "color",
         allowXNAColors = false
@@ -84,12 +94,12 @@ function lightBeam.fieldOrder(entity)
     local fields = {}
     if entity.rainbow == true and entity.useCustomRainbowColors == true then
         fields = {
-            "x", "y", "width", "height", "centerX", "centerY", "colors", "gradientSize", "gradientSpeed", "alpha", "depth", "rotation", "flag", "flagFadeTime",
+            "x", "y", "width", "height", "colors", "centerX", "gradientSize", "centerY", "gradientSpeed", "alpha", "depth", "rotation", "flag", "flagFadeTime", "texture",
             "inverted", "fadeOnTransition", "rainbow", "useCustomRainbowColors", "noParticles", "fadeWhenNear", "singleColor", "loopColors"
         }
     else
         fields = {
-            "x", "y", "width", "height", "color", "alpha", "depth", "rotation", "flag", "flagFadeTime",
+            "x", "y", "width", "height", "color", "alpha", "depth", "rotation", "flag", "flagFadeTime", "texture",
             "inverted", "fadeOnTransition", "rainbow", "useCustomRainbowColors", "noParticles", "fadeWhenNear", "singleColor"
         }
     end
@@ -223,7 +233,7 @@ function lightBeam.getSpritesRainbow(room, entity, colors, onlyBase)
     -- Shallowcopy so we can change the alpha later
     --local color = table.shallowcopy(colors[1] or { 0.8, 1.0, 1.0, 0.4 })
     local sprites = {}
-    local x, y = entity.x, entity.y
+    local x, y = entity.x + room.x, entity.y + room.y
 
     local theta = math.rad(entity.rotation or 0)
     local width = entity.width or 32

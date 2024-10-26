@@ -47,7 +47,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         private float timer = Calc.Random.NextFloat(1000f);
 
-        private readonly MTexture beamTexture = GFX.Game["util/lightbeam"];
+        private readonly MTexture beamTexture;
 
         private VirtualRenderTarget lightbeamTarget;
         private Matrix targetMatrix;
@@ -75,6 +75,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
             float alpha = Math.Clamp(data.Float("alpha", 1f), 0f, 1f);
 
+            beamTexture = GFX.Game[data.Attr("texture", "util/lightbeam")];
             noParticles = data.Bool("noParticles", false);
             color = Util.HexToRGBAColor(data.Attr("color", "CCFFFF")) * alpha;
             rainbow = data.Bool("rainbow", false);
@@ -126,6 +127,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             }
 
             // initialize render target and matrix
+            // whY did i do this   huhh?? what was i thinking
             lightbeamTarget ??= VirtualContent.CreateRenderTarget("sorbet-custom-lightbeam", (int)(rectangleRight - rectangleLeft + visibilityPadding), (int)(rectangleBottom - rectangleTop + visibilityPadding));
             Vector2 offset = Calc.AngleToVector(rotation - (float)Math.PI / 2f, lightLength) / 2f;
             targetMatrix = Matrix.CreateTranslation(-Position.X + lightbeamTarget.Width / 2f, -Position.Y + lightbeamTarget.Height / 2f, 0f) * Matrix.CreateTranslation(offset.X, offset.Y, 0f);

@@ -8,18 +8,21 @@
 entities.SorbetHelper/FlagToggledKillbox.placements.name.flag_toggled_killbox=Flag Toggled Killbox
 entities.SorbetHelper/FlagToggledKillbox.placements.description.flag_toggled_killbox=Same as the vanilla Killbox entity, however it can also be flag toggled.
 entities.SorbetHelper/FlagToggledKillbox.attributes.description.flag=The flag that needs to be set in order for the killbox to be activated.
-entities.SorbetHelper/FlagToggledKillbox.attributes.description.inverted=When checked, the killbox will only be active when the associated flag is disabled rather than only when the associated flag is enabled.
+entities.SorbetHelper/FlagToggledKillbox.attributes.description.inverted=When checked, the killbox will be active only when the flag is disabled, rather than when it is enabled.
 
 # Kill Zone
 entities.SorbetHelper/KillZone.placements.name.killzone=Kill Zone
 entities.SorbetHelper/KillZone.placements.description.killzone=Kills the player on contact, can also be flag toggled.
 entities.SorbetHelper/KillZone.attributes.description.flag=The flag that needs to be set in order for the kill zone to be activated, leaving this empty causes the kill zone to always be active.
-entities.SorbetHelper/KillZone.attributes.description.inverted=When checked, the kill zone will only be active when the associated flag is disabled rather than only when the associated flag is enabled.
+entities.SorbetHelper/KillZone.attributes.name.inverted=Invert Flag
+entities.SorbetHelper/KillZone.attributes.description.inverted=When checked, the kill zone will be active only when the flag is disabled, rather than when it is enabled.
 entities.SorbetHelper/KillZone.attributes.description.fastKill=When checked, the player will die instantly upon touching the kill zone rather than getting knocked back a bit first.
 
 # Strawberry (With Node Based Return)
-entities.SorbetHelper/ReturnBerry.placements.name.normal=Strawberry (With Node Based Return)
-entities.SorbetHelper/ReturnBerry.placements.name.winged=Strawberry (Winged, With Node Based Return)
+entities.SorbetHelper/ReturnBerry.placements.name.normal=Strawberry (With Noded Return)
+entities.SorbetHelper/ReturnBerry.placements.name.winged=Strawberry (Winged, With Noded Return)
+entities.SorbetHelper/ReturnBerry.placements.name.normalalt=Strawberry (With Node Based Return) (Return Berry) (Strawberry With Return)
+entities.SorbetHelper/ReturnBerry.placements.name.wingedalt=Strawberry (Winged, With Node Based Return) (Return Berry) (Winged Strawberry With Return)
 entities.SorbetHelper/ReturnBerry.placements.description.normal=Similar to a Strawberry, but when the player grabs it they are placed into a bubble and moved along a path of nodes.
 entities.SorbetHelper/ReturnBerry.placements.description.winged=Similar to a Strawberry (Winged), but when the player grabs it they are placed into a bubble and moved along a path of nodes.
 entities.SorbetHelper/ReturnBerry.attributes.description.winged=Determines whether the strawberry has wings and attempts to vertically rise offscreen when the player dashes.
@@ -31,8 +34,8 @@ entities.SorbetHelper/ReturnBerry.attributes.description.order=Manually determin
 entities.SorbetHelper/DashFallingBlock.placements.name.falling_block=Dash Falling Block
 entities.SorbetHelper/DashFallingBlock.placements.description.falling_block=A falling block that only gets activated once the player dashes into it.
 entities.SorbetHelper/DashFallingBlock.attributes.description.climbFall=If the block should fall if the player climbs on its sides.\nDoes nothing unless Fall On Touch is enabled.
-entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnTouch=If the block should fall if it comes in contact with the player, even if they don't dash into it.
-entities.SorbetHelper/DashFallingBlock.attributes.name.fallOnStaticMover=Fall On Static Mover Interact
+entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnTouch=If the block can be triggered in the same ways as a regular falling block, even if not dashed into.
+entities.SorbetHelper/DashFallingBlock.attributes.name.fallOnStaticMover=Static Mover Triggered
 entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnStaticMover=If the falling block can be activated by static movers (such as springs) attached to it.
 entities.SorbetHelper/DashFallingBlock.attributes.description.depth=Determines what visual layer the block should be on (higher values mean farther behind in the scene, default value is -9000).
 entities.SorbetHelper/DashFallingBlock.attributes.description.shakeSfx=The sound played by the block before it falls.
@@ -41,26 +44,32 @@ entities.SorbetHelper/DashFallingBlock.attributes.description.tiletype=Changes t
 entities.SorbetHelper/DashFallingBlock.attributes.description.allowWavedash=If it is possible to wavedash on top of the block.
 entities.SorbetHelper/DashFallingBlock.attributes.name.dashCornerCorrection=Easier Wallbounce
 entities.SorbetHelper/DashFallingBlock.attributes.description.dashCornerCorrection=Makes wallbouncing off of the block less precise (by allowing it up to 4 pixels deep into the block horizontally, dashing from the bottom).
-entities.SorbetHelper/DashFallingBlock.attributes.description.direction=The direction the falling block will fall.
+entities.SorbetHelper/DashFallingBlock.attributes.description.breakDashBlocks=Whether the falling block can break dash blocks.
+entities.SorbetHelper/DashFallingBlock.attributes.description.direction=The direction the falling block will fall towards.
 entities.SorbetHelper/DashFallingBlock.attributes.name.fallDashMode=Fall Towards Dash Direction
 entities.SorbetHelper/DashFallingBlock.attributes.description.fallDashMode=Whether the direction the falling block will fall towards is determined by the direction it was dashed into from.\nOverrides the normal direction setting when enabled.
+entities.SorbetHelper/DashFallingBlock.attributes.description.dashActivated=Determines whether the block can be activated by dashing into it, disabling this effectively turns it into a regular falling block (but with some more customizabilty).
 
 # crumble on flag block
 entities.SorbetHelper/CrumbleOnFlagBlock.placements.name.crumble_on_flag_block=Crumble On Flag Block
+entities.SorbetHelper/CrumbleOnFlagBlock.placements.name.crumble_wall_on_flag=Crumble Wall On Flag
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.blendin=Blends the block in with the walls it touches, making it less apparent.
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.tiletype=Determines the visual appearance of the block.
-entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.inverted=When checked, the block will only be visible when the associated flag is disabled rather than only when the associated flag is enabled.
+entities.SorbetHelper/CrumbleOnFlagBlock.attributes.name.inverted=Invert Flag
+entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.inverted=When checked, the block will break when the flag is disabled, rather than when it is enabled.
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.flag=The flag that needs to be set in order for the block to break.
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.showDebris=Determines whether the block spawns debris when it breaks.
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.playAudio=Determines whether the block plays sound effects when breaking/appearing.
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.depth=Determines what visual layer the block should be on (higher values mean farther behind in the scene, default value is -10010).
+entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.destroyAttached=Whether objects such as spikes that are attached to the block should be affected as well.
+entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.fadeInTime=How long (in seconds) the block takes to visually fade back in when (re)appearing.
 
 # resizable waterfall
 entities.SorbetHelper/BigWaterfall.placements.name.normal=Resizable Waterfall
-entities.SorbetHelper/BigWaterfall.placements.name.abovefg=Resizable Waterfall (Above Foreground)
+entities.SorbetHelper/BigWaterfall.placements.name.abovefg=Resizable Waterfall (Above Solids)
 # show in search results for big waterfall
 entities.SorbetHelper/BigWaterfall.placements.name.bigwaterfall=Big Waterfall
-entities.SorbetHelper/BigWaterfall.placements.name.bigwaterfallabove=Big Waterfall (Above Foreground)
+entities.SorbetHelper/BigWaterfall.placements.name.bigwaterfallabove=Big Waterfall (Above Foreground) Resizable Waterfall (Above Foreground)
 entities.SorbetHelper/BigWaterfall.placements.description.normal=A waterfall which behaves similarly to a vanilla Waterfall, but is also resizable like and closer visually to a vanilla Big Waterfall.
 entities.SorbetHelper/BigWaterfall.placements.description.abovefg=A waterfall which behaves similarly to a vanilla Waterfall, but is also resizable like and closer visually to a vanilla Big Waterfall. Ignores and renders above Foreground Tiles.
 entities.SorbetHelper/BigWaterfall.attributes.description.color=The color of the waterfall.
@@ -74,12 +83,14 @@ entities.SorbetHelper/BigWaterfall.attributes.description.depth=Determines what 
 entities.SorbetHelper/CustomLightbeam.placements.name.customlightbeam=Custom Lightbeam
 entities.SorbetHelper/CustomLightbeam.placements.name.rainbowlightbeam=Rainbow Lightbeam
 entities.SorbetHelper/CustomLightbeam.placements.name.customlightbeamrainbow=Custom Lightbeam (Rainbow)
-entities.SorbetHelper/CustomLightbeam.attributes.description.flag=The flag that needs to be set in order for the lightbeam to be activated, leaving this empty causes the lightbeam to always be active.
-entities.SorbetHelper/CustomLightbeam.attributes.description.inverted=When checked, the lightbeam will only be active when the associated flag is disabled rather than only when the associated flag is enabled.
+entities.SorbetHelper/CustomLightbeam.attributes.description.flag=The flag that needs to be set in order for the lightbeam to be activated. Leaving this empty causes the lightbeam to always be active.
+entities.SorbetHelper/CustomLightbeam.attributes.name.inverted=Invert Flag
+entities.SorbetHelper/CustomLightbeam.attributes.description.inverted=When checked, the lightbeam will be active only when the flag is disabled, rather than when it is enabled.
 entities.SorbetHelper/CustomLightbeam.attributes.description.flagFadeTime=The time (in seconds) the lightbeam takes to fade in or out according to the flag.
 entities.SorbetHelper/CustomLightbeam.attributes.description.rotation=The rotation of the lightbeam.
 entities.SorbetHelper/CustomLightbeam.attributes.description.depth=Determines what visual layer the lightbeam should be on (higher values mean farther behind in the scene, default value is -9998).\nDoes not affect the particles.
 entities.SorbetHelper/CustomLightbeam.attributes.description.noParticles=Determines whether the lightbeam emits particles.
+entities.SorbetHelper/CustomLightbeam.attributes.description.texture=The texture of the lightbeam. Vanilla texture is 'util/lightbeam'.
 entities.SorbetHelper/CustomLightbeam.attributes.description.color=The color of the lightbeam.
 entities.SorbetHelper/CustomLightbeam.attributes.description.alpha=The alpha of the lightbeam.
 entities.SorbetHelper/CustomLightbeam.attributes.description.rainbow=Determines whether the lightbeam is rainbow.
@@ -131,10 +142,23 @@ entities.SorbetHelper/ExclamationBlock.attributes.description.smashParticleColor
 entities.SorbetHelper/WingedStrawberryDirectionController.placements.name.wingedStrawberryController=Winged Strawberry Direction Controller
 entities.SorbetHelper/WingedStrawberryDirectionController.attributes.description.direction=The direction winged strawberries in the room will fly.
 
+# styleground over hud controller
+entities.SorbetHelper/StylegroundOverHudController.placements.name.stylegroundOverHud=Stylegrounds Above HUD Controller
+entities.SorbetHelper/StylegroundOverHudController.placements.name.altname=Styleground Over GUI Controller
+entities.SorbetHelper/StylegroundOverHudController.attributes.description.pauseBehavior=How pausing should affect the stylegrounds.\n\nDisable When Paused-\n    The stylegrounds will pause, and appear behind the pause menu.\nUpdate When Paused-\n    The stylegrounds will appear above the pause menu and continue updating.\nPause Above-\n    The stylegrounds will pause, but still appear above the pause menu.
+# probably maybe could've put this on like the gb or github page or a wiki or smth but fancy loenn plugins are cool :3 and its probably useful to have the instructions in editor rather than on some random page (even if theyre pretty simple i think)
+# also sadfsadf i wish i wasnt so "rambly" but hopefully this is still useful and not just annoying to anyone trying to use the controller,,
+entities.SorbetHelper/StylegroundOverHudController.attributes.name._instructionsButton=Usage Instructions
+entities.SorbetHelper/StylegroundOverHudController.attributes.description._instructionsButton=hi! i wanted to put this somewhere decently visible so here's a rough overview on how to use this controller\n\n~~~ the Important Stuff ~~~\n- you only need *one controller per map*! so as long as you have one even just like. sitting in the corner of a random filler room or something, the controller should be enabled.\n- once you have a controller somewhere, in order for your stylegrounds to actually appear above the hud, you'll need to add 'sorbetHelper_drawAboveHud' into their tag fields.\n- you're done! any stylegrounds with that tag should now be rendering on top of input prompts, textboxes, etc.\n\n~~~ some additional info/random stuff ~~~\n- currently, above hud stylegrounds will be unaffected by colorgrades due to Technical Limitations.\n\n- additive blendmode stylegrounds are supported, but pls note that also due to Technical Limitations, will always render above non-additive stylegrounds.\n\n- the controller will disable its effect on stylegrounds if the game is paused, but this can be changed to either keep them above or make them completely unaffected by pausing.\n  see the tooltip as well, but in the end it probably mostly comes down to personal preference abt what'd work best for your stylegrounds, though i would vaugely suggest:\n    'Disable When Paused' for consistency with vanilla or if your stylegrounds are decently busy in general/might cover up too much of the pause menu.\n    'Update When Paused' if your stylegrounds have at least some movement, aren't insanely busy and you want maximum *atmosphere and immersion* or something.\n    'Pause Above' if you still want the stylegrounds above the pause menu, but don't have moving stylegrounds or find the stylegrounds moving while paused weird/distracting.
+# currently additive blend mode stylegrounds doesn't work properly, and colorgrading doesn't have any effect on affected stylegrounds due to technical limitations.\ni'm still looking to see if i can get them working but if i do theres a good chance there'll probably be some sort of jank (at least on the code side).\n\nby default the controller will disable itself when the game is paused.\nthis can be adjusted to either stop the stylegrounds from pausing altogether, or to keep them pausing but still render them above the pause menu.\nsee the tooltip as well but personally: use Update When Paused if your stylegrounds have some movement, aren't insanely busy and you want ~maximum atmosphere~, and,\nuse Disable When Paused otherwise or if your stylegrounds are kinda busy and would cover too much of the pause menu. (or just, yknow, try all 3 and see which you prefer idk)
+
 # depth adhering displacement wrapper
 # names probably still kinda suck but i literally cant think of anything better
-entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.entityOnly=Displacement Wrapper (Only Distort Entity) [EXPERIMENTAL]
-entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.distortBehind=Displacement Wrapper (Depth Adhering) [EXPERIMENTAL]
+# update: renamed from displacement wrappers to displacement depth fixers which i think im actually somewhat happy with,,
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.entityOnly=Displacement Depth Fixer (Only Distort Entity)
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.distortBehind=Displacement Depth Fixer
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.entityOnlyAlt=Depth Adhering Displacement Wrapper (Only Distort Entity)
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.distortBehindAlt=Depth Adhering Displacement Wrapper (Depth Adhering)
 entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.description.entityOnly=Makes the displacement effects of entities which use any (e.g. water and waterfalls) only affect their entity and nothing else.\n(for reference vanilla displacement doesn't care about depth and just affects everything touching it)
 entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.description.distortBehind=Makes the displacement effects of entities which use any (e.g. water and waterfalls) only affect their entity and anything behind it.\n(for reference vanilla displacement doesn't care about depth and just affects everything touching it)
 entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.name.distortBehind=Distort Behind
@@ -144,9 +168,109 @@ entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.description.on
 
 # displacement blocker
 entities.SorbetHelper/DisplacementEffectBlocker.placements.name.normal=Displacement Effect Blocker
-entities.SorbetHelper/DisplacementEffectBlocker.placements.name.depthAdhering=Displacement Effect Blocker (Displacement Wrapper) [EXPERIMENTAL]
+entities.SorbetHelper/DisplacementEffectBlocker.placements.name.depthAdhering=Displacement Effect Blocker (for Displacement Depth Fixer)
 entities.SorbetHelper/DisplacementEffectBlocker.placements.description.normal=Completely blocks the displacement effect produced by entities such as water or waterfalls.
-entities.SorbetHelper/DisplacementEffectBlocker.placements.description.depthAdhering=Blocks the displacement effect produced by entities such as water or waterfalls at a certain depth that are *affected by a Depth Adhering Displacement Wrapper*.
+entities.SorbetHelper/DisplacementEffectBlocker.placements.description.depthAdhering=Blocks the displacement effect produced by entities such as water or waterfalls at a certain depth that are *affected by a Displacement Depth Fixer*.
 entities.SorbetHelper/DisplacementEffectBlocker.attributes.description.depth=The depth of the displacement blocker. Any depth adhering displacement attached to an entity with a depth equal to or higher than this will be affected by the blocker.\n(higher values mean farther behind in the scene.)
+
+# dash gate block
+# most tooltips stolen from maddie's helping hand
+# https://github.com/maddie480/MaddieHelpingHand/blob/1297e45c72dbf27972e8396139406dd55e65c227/Loenn/lang/en_gb.lang#L194
+entities.SorbetHelper/DashGateBlock.placements.name.normal=Dash Gate Block
+entities.SorbetHelper/DashGateBlock.placements.name.normalaltname=Gate Block (Dash Activated) (Activate On Dash)
+entities.SorbetHelper/DashGateBlock.attributes.description.inactiveColor=The color of the block when not triggered yet.
+entities.SorbetHelper/DashGateBlock.attributes.description.activeColor=The color of the block while moving.
+entities.SorbetHelper/DashGateBlock.attributes.description.finishColor=The color of the block when it has reached its destination.
+entities.SorbetHelper/DashGateBlock.attributes.description.blockSprite=The texture path for the block.\nSee Graphics/Atlases/Gameplay/objects/SorbetHelper/gateblock/dash/ in SorbetHelper.zip for how the files should be organised.
+entities.SorbetHelper/DashGateBlock.attributes.description.iconSprite=The texture path for the icon in the center of the block.
+entities.SorbetHelper/DashGateBlock.attributes.description.shakeTime=The time (in seconds) the block spends shaking before starting to move. Default value is 0.5 seconds.
+entities.SorbetHelper/DashGateBlock.attributes.description.moveTime=The time (in seconds) the block takes to move to its destination after shaking. Default value is 1.8 seconds.
+entities.SorbetHelper/DashGateBlock.attributes.description.moveEased=Whether the block should slow down before reaching its final position. If unchecked, the block will move at constant speed.
+entities.SorbetHelper/DashGateBlock.attributes.description.allowReturn=Whether the block will cycle between its start position and node if activated multiple times.
+entities.SorbetHelper/DashGateBlock.attributes.description.persistent=If enabled, the block will stay activated even if the player dies or changes rooms.
+entities.SorbetHelper/DashGateBlock.attributes.description.moveSound=The sound played by the gate when it starts moving.
+entities.SorbetHelper/DashGateBlock.attributes.description.finishedSound=The sound played by the gate when it is done moving.
+entities.SorbetHelper/DashGateBlock.attributes.description.smoke=Whether the block should emit smoke when reaching its final position.
+entities.SorbetHelper/DashGateBlock.attributes.description.allowWavedash=Whether it is possible to wavedash on top of the block.
+entities.SorbetHelper/DashGateBlock.attributes.name.dashCornerCorrection=Easier Wallbounce
+entities.SorbetHelper/DashGateBlock.attributes.description.dashCornerCorrection=Makes wallbouncing off of the block less precise (by allowing it up to 4 pixels deep into the block horizontally, dashing from the bottom).
+entities.SorbetHelper/DashGateBlock.attributes.name.axes=Dashable Axes
+entities.SorbetHelper/DashGateBlock.attributes.description.axes=Determines which sides of the block can be dashed into.
+entities.SorbetHelper/DashGateBlock.attributes.name.linkTag=Flag On Activate
+entities.SorbetHelper/DashGateBlock.attributes.description.linkTag=An optional session flag to enable when the block activates.
+
+# touch gate block
+# most tooltips stolen from maddie's helping hand
+# https://github.com/maddie480/MaddieHelpingHand/blob/1297e45c72dbf27972e8396139406dd55e65c227/Loenn/lang/en_gb.lang#L194
+entities.SorbetHelper/TouchGateBlock.placements.name.normal=Touch Gate Block
+entities.SorbetHelper/TouchGateBlock.placements.name.normalaltname=Gate Block (Touch Activated) (Activate On Touch)
+entities.SorbetHelper/TouchGateBlock.attributes.description.inactiveColor=The color of the block when not triggered yet.
+entities.SorbetHelper/TouchGateBlock.attributes.description.activeColor=The color of the block while moving.
+entities.SorbetHelper/TouchGateBlock.attributes.description.finishColor=The color of the block when it has reached its destination.
+entities.SorbetHelper/TouchGateBlock.attributes.description.blockSprite=The texture path for the block.\nSee Graphics/Atlases/Gameplay/objects/SorbetHelper/gateblock/dash/ in SorbetHelper.zip for how the files should be organised.
+entities.SorbetHelper/TouchGateBlock.attributes.description.iconSprite=The texture path for the icon in the center of the block.
+entities.SorbetHelper/TouchGateBlock.attributes.description.shakeTime=The time (in seconds) the block spends shaking before starting to move. Default value is 0.5 seconds.
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveTime=The time (in seconds) the block takes to move to its destination after shaking. Default value is 1.8 seconds.
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveEased=Whether the block should slow down before reaching its final position. If unchecked, the block will move at constant speed.
+entities.SorbetHelper/TouchGateBlock.attributes.description.allowReturn=Whether the block will cycle between its start position and node if activated multiple times.
+entities.SorbetHelper/TouchGateBlock.attributes.description.persistent=If enabled, the block will stay activated even if the player dies or changes rooms.
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveSound=The sound played by the gate when it starts moving.
+entities.SorbetHelper/TouchGateBlock.attributes.description.finishedSound=The sound played by the gate when it is done moving.
+entities.SorbetHelper/TouchGateBlock.attributes.description.smoke=Whether the block should emit smoke when reaching its final position.
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnGrab=Whether the block should be activated if the player climbs on its sides.
+entities.SorbetHelper/TouchGateBlock.attributes.name.moveOnStaticMover=Static Mover Activated
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnStaticMover=Whether the block can be activated by static movers (such as springs) attached to it.
+entities.SorbetHelper/TouchGateBlock.attributes.name.linkTag=Flag On Activate
+entities.SorbetHelper/TouchGateBlock.attributes.description.linkTag=An optional session flag to enable when the block activates.
+
+# -- effects/backdrops --
+
+# parallax hires snow
+style.effects.SorbetHelper/ParallaxHiResSnow.name=Parallax Hi-Res Snow (Customizable)
+style.effects.SorbetHelper/ParallaxHiResSnow.description.color=The color of the particles.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.alpha=The opacity of the particles, between 0 (translucent) and 1 (opaque).
+style.effects.SorbetHelper/ParallaxHiResSnow.description.additive=How much additive blending the particles should use, between 0 (not additive) and 1 (fully additive).
+style.effects.SorbetHelper/ParallaxHiResSnow.description.texturePath=The texture the particles should use.\nNote that unlike most other stylegrounds, this is relative to the Overworld Atlas instead of the Gameplay Atlas.\nThis means any custom textures need to be placed at e.g. "yourmod/Graphics/Atlases/Overworld/yourname/yourmod/customsnow".\nVanilla textures are 256x256 pixels.
+style.effects.SorbetHelper/ParallaxHiResSnow.attribute.randomRotation=Rotate Texture
+style.effects.SorbetHelper/ParallaxHiResSnow.description.randomRotation=Whether the particles should be rotated randomly.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.fadeTowardsForeground=Whether the particles should fade out slightly as they get closer to the foreground.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.directionX=Determines how strongly and in which direction the particles should move horizontally.\nNegative values will move the particles to the left while positive values will move them to the right.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.directionY=Determines how strongly and in which direction the particles should move vertically.\nNegative values will move the particles upwards while positive values will move them downwards.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.minScale=Determines how large the farthest particles should be.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.maxScale=Determines how large the closest particles should be.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.minSpeed=Determines how fast the farthest particles should move.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.maxSpeed=Determines how fast the closest particles should move.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.minScrollX=Determines the amount of horizontal parallax the farthest particles should have.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.minScrollY=Determines the amount of vertical parallax the farthest particles should have.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.maxScrollX=Determines the amount of horizontal parallax the closest particles should have.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.maxScrollY=Determines the amount of vertical parallax the closest particles should have.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.sineAmplitude=How tall the sine movement of the particles is.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.sineFrequency=How fast the sine movement of the particles is.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.particleCount=The number of particles the effect should have.
+style.effects.SorbetHelper/ParallaxHiResSnow.attribute.fadeInOut=Fade In/Out
+style.effects.SorbetHelper/ParallaxHiResSnow.description.fadeInOut=Whether the effect should fade in/out when changing visibility (e.g. when transitioning to a different room or toggling its flag).
+style.effects.SorbetHelper/ParallaxHiResSnow.attribute.fadex=Fade X
+style.effects.SorbetHelper/ParallaxHiResSnow.attribute.fadey=Fade Y
+style.effects.SorbetHelper/ParallaxHiResSnow.description.fadex=Advanced horizontal fading zones.\nFormat is "FromPosition-ToPosition,FromAlpha-ToAlpha". Example "n500-500,1-0".\nNegative numbers in position are denoted with "n" rather than minus. Position numbers are in pixels and use map coordinates.\nMultiple zones can be set up by using ":" as separator.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.fadey=Advanced vertical fading zones.\nFormat is "FromPosition-ToPosition,FromAlpha-ToAlpha". Example "n500-500,1-0".\nNegative numbers in position are denoted with "n" rather than minus. Position numbers are in pixels and use map coordinates.\nMultiple zones can be set up by using ":" as separator.
+
+# dream spiral stars
+style.effects.SorbetHelper/SpiralStars.name=Spiral Stars
+style.effects.SorbetHelper/SpiralStars.attribute.spritePath=Sprite Directory
+style.effects.SorbetHelper/SpiralStars.description.spritePath=The directory containing the star sprites.
+style.effects.SorbetHelper/SpiralStars.description.colors=The colors the stars should be tinted, separated by commas.
+style.effects.SorbetHelper/SpiralStars.description.backgroundColor=The color of the background. Set its alpha to 0 to disable.
+style.effects.SorbetHelper/SpiralStars.description.starCount=The number of stars the effect should have.
+style.effects.SorbetHelper/SpiralStars.attribute.trailLength=Trail Count
+style.effects.SorbetHelper/SpiralStars.description.trailLength=How long the trail for each star is.\nCan have a large impact on performance since the total amount of textures drawn is equal to starCount * trailCount.
+style.effects.SorbetHelper/SpiralStars.description.centerX=The X position of the effect's center.
+style.effects.SorbetHelper/SpiralStars.description.centerY=The Y position of the effect's center.
+style.effects.SorbetHelper/SpiralStars.attribute.spawnRadius=Outer Radius
+style.effects.SorbetHelper/SpiralStars.attribute.centerRadius=Inner Radius
+style.effects.SorbetHelper/SpiralStars.description.spawnRadius=Determines how far away (in pixels) from the center the stars should spawn.
+style.effects.SorbetHelper/SpiralStars.description.centerRadius=Determines how close (in pixels) to the center the stars need to be before they start to shrink and fade out.
+style.effects.SorbetHelper/SpiralStars.description.speed=The speed (in pixels / second) at which the stars will move towards the center.\nNegative values will make the stars move away from the center instead.
+style.effects.SorbetHelper/SpiralStars.description.rotationSpeed=The speed (in degrees / second) at which the stars will rotate around the center.
+
 
 mods.SorbetHelper.name=Sorbet Helper

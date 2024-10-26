@@ -5,6 +5,7 @@ depthAdheringDisplacementWrapper.depth = -15000
 depthAdheringDisplacementWrapper.placements = {
     {
         name = "entityOnly",
+        alternativeName = "entityOnlyAlt",
         data = {
             width = 8,
             height = 8,
@@ -14,6 +15,7 @@ depthAdheringDisplacementWrapper.placements = {
     },
     {
         name = "distortBehind",
+        alternativeName = "distortBehindAlt",
         data = {
             width = 8,
             height = 8,

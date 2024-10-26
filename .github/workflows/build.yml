@@ -47,3 +47,4 @@ jobs:
           Dialog/**/*
           Graphics/**/*
           Loenn/**/*
+          Effects/**/*.fxb
