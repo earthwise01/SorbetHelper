@@ -84,6 +84,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             GenerateNodes(data.NodesWithPosition(offset), data.Attr("extendTo", "NextBlock").ToLower());
 
             OnDashCollide = OnDashed;
+            Add(new MovingBlockHittable(Hit));
             Add(new Coroutine(Sequence()));
             Add(blinkRoutine = new Coroutine(BlinkRoutine()) { Active = false } ); // manually updated so that it pauses when the block is extending
             Add(extendingSound = new SoundSource());
@@ -468,16 +469,12 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 modSeekerRegenerateCoroutine
             );
             IL.Celeste.Puffer.Explode += modPufferExplode;
-            IL.Celeste.Platform.MoveHExactCollideSolids += modPlatformMoveHExactCollideSolids;
-            IL.Celeste.Platform.MoveVExactCollideSolids += modPlatformMoveVExactCollideSolids;
         }
 
         internal static void Unload() {
             On.Celeste.Seeker.SlammedIntoWall -= onSeekerSlammedIntoWall;
             seekerRegenerateCoroutineHook.Dispose();
             IL.Celeste.Puffer.Explode -= modPufferExplode;
-            IL.Celeste.Platform.MoveHExactCollideSolids -= modPlatformMoveHExactCollideSolids;
-            IL.Celeste.Platform.MoveVExactCollideSolids -= modPlatformMoveVExactCollideSolids;
         }
 
         private static void onSeekerSlammedIntoWall(On.Celeste.Seeker.orig_SlammedIntoWall orig, Seeker self, CollisionData data) {
@@ -525,62 +522,6 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             foreach (ExclamationBlock exclamationBlock in self.Scene.Tracker.GetEntities<ExclamationBlock>()) {
                 if (exclamationBlock.explodeActivated && self.CollideCheck(exclamationBlock)) {
                     exclamationBlock.Hit((exclamationBlock.Center - self.Position).FourWayNormal());
-                }
-            }
-        }
-
-        private static void modPlatformMoveHExactCollideSolids(ILContext il) {
-            ILCursor cursor = new ILCursor(il) {
-                Index = -1
-            };
-
-            if (cursor.TryGotoPrev(MoveType.After,
-            instr => instr.MatchLdarg(out _),
-            instr => instr.MatchLdloc(out _),
-            instr => instr.MatchCallOrCallvirt<Platform>("MoveHExact"))) {
-                Logger.Log(LogLevel.Verbose, "SorbetHelper", $"Injecting code to make horizontal falling blocks/kevins/etc activate exclamation mark blocks at {cursor.Index} in CIL code for {cursor.Method.Name}");
-
-                cursor.EmitLdloc3(); // collided solid
-                cursor.EmitLdloc1(); // direction sign
-                cursor.EmitLdarg2(); // breakDashBlocks
-                cursor.EmitDelegate(makeHorizontalMovingPlatformsActiveExclamationBlocks);
-            } else {
-                Logger.Log(LogLevel.Warn, "SorbetHelper", $"Failed to inject code to make horizontal falling blocks/kevins/etc activate exclamation mark blocks in CIL code for {cursor.Method.Name}");
-            }
-        }
-
-        private static void modPlatformMoveVExactCollideSolids(ILContext il) {
-            ILCursor cursor = new ILCursor(il) {
-                Index = -1
-            };
-
-            if (cursor.TryGotoPrev(MoveType.After,
-            instr => instr.MatchLdarg(out _),
-            instr => instr.MatchLdloc(out _),
-            instr => instr.MatchCallOrCallvirt<Platform>("MoveVExact"))) {
-                Logger.Log(LogLevel.Verbose, "SorbetHelper", $"Injecting code to make vertical falling blocks/kevins/etc activate exclamation mark blocks at {cursor.Index} in CIL code for {cursor.Method.Name}");
-
-                cursor.EmitLdloc3(); // collided solid
-                cursor.EmitLdloc1(); // direction sign
-                cursor.EmitLdarg2(); // breakDashBlocks
-                cursor.EmitDelegate(makeVerticalMovingPlatformsActiveExclamationBlocks);
-            } else {
-                Logger.Log(LogLevel.Warn, "SorbetHelper", $"Failed to inject code to make vertical falling blocks/kevins/etc activate exclamation mark blocks in CIL code for {cursor.Method.Name}");
-            }
-        }
-
-        private static void makeHorizontalMovingPlatformsActiveExclamationBlocks(Platform collided, int directionSign, bool breakDashBlocks) {
-            if (breakDashBlocks) {
-                if (collided is not null && collided is ExclamationBlock exclamationBlock) {
-                    exclamationBlock.Hit(Vector2.UnitX * directionSign);
-                }
-            }
-        }
-
-        private static void makeVerticalMovingPlatformsActiveExclamationBlocks(Platform collided, int directionSign, bool breakDashBlocks) {
-            if (breakDashBlocks) {
-                if (collided is not null && collided is ExclamationBlock exclamationBlock) {
-                    exclamationBlock.Hit(Vector2.UnitY * directionSign);
                 }
             }
         }
