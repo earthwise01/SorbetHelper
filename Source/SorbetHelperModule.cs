@@ -37,7 +37,7 @@ namespace Celeste.Mod.SorbetHelper {
             WingedStrawberryDirectionController.Load();
             DisplacementEffectBlocker.Load();
             DepthAdheringDisplacementRenderHook.Load();
-            MovingBlockHittable.Load();
+            MovingPlatformHittable.Load();
             ExplodeHittable.Load();
             LightCoverComponent.Load();
             StylegroundOverHudRenderer.Load();
@@ -48,7 +48,7 @@ namespace Celeste.Mod.SorbetHelper {
             WingedStrawberryDirectionController.Unload();
             DisplacementEffectBlocker.Unload();
             DepthAdheringDisplacementRenderHook.Unload();
-            MovingBlockHittable.Unload();
+            MovingPlatformHittable.Unload();
             ExplodeHittable.Unload();
             LightCoverComponent.Unload();
             StylegroundOverHudRenderer.Unload();
