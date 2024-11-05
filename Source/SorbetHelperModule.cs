@@ -38,6 +38,7 @@ namespace Celeste.Mod.SorbetHelper {
             DisplacementEffectBlocker.Load();
             DepthAdheringDisplacementRenderHook.Load();
             MovingBlockHittable.Load();
+            ExplodeHittable.Load();
             LightCoverComponent.Load();
             StylegroundOverHudRenderer.Load();
             ParallaxHiResSnow.Load();
@@ -48,6 +49,7 @@ namespace Celeste.Mod.SorbetHelper {
             DisplacementEffectBlocker.Unload();
             DepthAdheringDisplacementRenderHook.Unload();
             MovingBlockHittable.Unload();
+            ExplodeHittable.Unload();
             LightCoverComponent.Unload();
             StylegroundOverHudRenderer.Unload();
             ParallaxHiResSnow.Unload();
