@@ -8,6 +8,7 @@ effect.defaultData = {
     speed = 70,
     rotationSpeed = -40,
     trailLength = 8,
+    trailDelay = 0.0167,
     starCount = 100,
     spritePath = "bgs/02/stars",
     centerX = 160,
@@ -20,7 +21,8 @@ effect.fieldOrder = {
     "only", "exclude", "tag", "flag", 
     "spritePath", "colors", "backgroundColor", "notflag",
     "starCount", "centerX", "spawnRadius", "speed",
-    "trailLength", "centerY", "centerRadius", "rotationSpeed"
+    "trailLength", "centerY", "centerRadius", "rotationSpeed",
+    "trailDelay"
 }
 
 effect.fieldInformation = {

@@ -21,9 +21,8 @@ public class SpiralStars : Backdrop {
         public float Scale;
         public Vector2 Position;
 
-        public List<Vector2> TrailPositions = [];
-        public List<float> TrailScales = [];
-        public List<int> TrailFrames = [];
+        public readonly record struct Trail(Vector2 Position, float Scale, int FrameIndex);
+        public List<Trail> Trails = [];
     }
 
     private readonly List<List<MTexture>> textures;
@@ -39,6 +38,7 @@ public class SpiralStars : Backdrop {
     private readonly float eventHorizonDistance;
     private readonly float spawningDistance;
     private readonly int trailLength;
+    private readonly float trailDelay;
 
     public SpiralStars(BinaryPacker.Element data) : base() {
         center = new(data.AttrFloat("centerX", 160f), data.AttrFloat("centerY", 90f));
@@ -48,6 +48,7 @@ public class SpiralStars : Backdrop {
         eventHorizonDistance = data.AttrFloat("centerRadius", 70f);
         spawningDistance = data.AttrFloat("spawnRadius", 190f);
         trailLength = data.AttrInt("trailLength", 8);
+        trailDelay = data.AttrFloat("trailDelay", 1f / 60f);
 
         string spritePath = data.Attr("spritePath", "bgs/02/stars");
         textures =
@@ -77,7 +78,7 @@ public class SpiralStars : Backdrop {
                 Distance = Calc.Random.NextFloat(190f),
             };
 
-            UpdateStar(star, false);
+            UpdateStar(star);
 
             stars[i] = star;
         }
@@ -85,16 +86,13 @@ public class SpiralStars : Backdrop {
 
     public override void Update(Scene scene) {
         base.Update(scene);
-        // bit sillyy but makes the trails explode *slightly* less on different game speeds (keyword slightly, fast game speeds still look awful but its better than before at least)
-        // might look into seeing if there's a better way to do the trails in general later idk
-        bool updateTrails = scene.OnInterval(Engine.RawDeltaTime);
 
         foreach (var star in stars) {
             star.Distance = Mod(star.Distance - Engine.DeltaTime * speed, spawningDistance + 1);
             star.Angle += Engine.DeltaTime * rotationSpeed;
             star.AnimationTimer += Engine.DeltaTime;
 
-            UpdateStar(star, updateTrails);
+            UpdateStar(star);
         }
     }
 
@@ -105,17 +103,18 @@ public class SpiralStars : Backdrop {
         foreach (var star in stars) {
             var textureSet = textures[star.TextureSet];
 
-            for (int j = 0; j < star.TrailPositions.Count; j++) {
-                float trailScale = star.TrailScales[j];
+            for (int j = 0; j < star.Trails.Count; j++) {
+                var trail = star.Trails[j];
+                float trailScale = trail.Scale;
 
-                textureSet[star.TrailFrames[j]].Draw(star.TrailPositions[j], textureCenter, star.Color * trailScale * trailAlphas[j], trailScale);
+                textureSet[trail.FrameIndex].Draw(trail.Position, textureCenter, star.Color * trailScale * trailAlphas[j], trailScale);
             }
 
             textureSet[star.FrameIndex].Draw(star.Position, textureCenter, star.Color * star.Scale, star.Scale);
         }
     }
 
-    private void UpdateStar(Star star, bool createTrail) {
+    private void UpdateStar(Star star) {
         Vector2 position = center + Calc.AngleToVector(star.Angle, star.Distance);
         float scale = Math.Clamp(star.Distance / eventHorizonDistance, 0f, 1f);
 
@@ -123,23 +122,30 @@ public class SpiralStars : Backdrop {
         int frameIndex = (int)((Math.Sin(star.AnimationTimer) + 1.0) / 2.0 * list.Count);
         frameIndex %= list.Count;
 
-        if (createTrail && trailLength > 0) {
-            if (star.TrailPositions.Count >= trailLength)
-                star.TrailPositions.RemoveAt(star.TrailPositions.Count - 1);
-            star.TrailPositions.Insert(0, star.Position);
-
-            if (star.TrailScales.Count >= trailLength)
-                star.TrailScales.RemoveAt(star.TrailScales.Count - 1);
-            star.TrailScales.Insert(0, star.Scale);
-
-            if (star.TrailFrames.Count >= trailLength)
-                star.TrailFrames.RemoveAt(star.TrailFrames.Count - 1);
-            star.TrailFrames.Insert(0, star.FrameIndex);
+        if (trailLength > 0) {
+            star.Trails.Clear();
+            for (int i = 1; i <= trailLength; i++) {
+                star.Trails.Add(GetTrailWithTimeOffset(star, i * -trailDelay));
+            }
         }
 
         star.Position = position;
         star.Scale = scale;
         star.FrameIndex = frameIndex;
+    }
+
+    private Star.Trail GetTrailWithTimeOffset(Star star, float timeOffset) {
+        float distance = Mod(star.Distance - timeOffset * speed, spawningDistance + 1);
+        float angle = star.Angle + timeOffset * rotationSpeed;
+
+        Vector2 position = center + Calc.AngleToVector(angle, distance);
+        float scale = Math.Clamp(distance / eventHorizonDistance, 0f, 1f);
+
+        List<MTexture> list = textures[star.TextureSet];
+        int frameIndex = (int)((Math.Sin(star.AnimationTimer + timeOffset) + 1.0) / 2.0 * list.Count);
+        frameIndex %= list.Count;
+
+        return new(position, scale, frameIndex);
     }
 
     private static float Mod(float x, float m) {
