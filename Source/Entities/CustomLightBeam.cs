@@ -77,7 +77,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
             beamTexture = GFX.Game[data.Attr("texture", "util/lightbeam")];
             noParticles = data.Bool("noParticles", false);
-            color = Util.HexToRGBAColor(data.Attr("color", "CCFFFF")) * alpha;
+            color = Util.HexToColorWithAlphaNonPremult(data.Attr("color", "CCFFFF")) * alpha;
             rainbow = data.Bool("rainbow", false);
             useCustomRainbowColors = data.Bool("useCustomRainbowColors", false);
 
@@ -90,7 +90,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
                 string[] colorsAsStrings = data.Attr("colors", "89E5AE,88E0E0,87A9DD,9887DB,D088E2").Split(',');
                 for (int i = 0; i < colorsAsStrings.Length; i++) {
-                    rainbowColors.Add(Util.HexToRGBAColor(colorsAsStrings[i]) * alpha);
+                    rainbowColors.Add(Util.HexToColorWithAlphaNonPremult(colorsAsStrings[i]) * alpha);
                 }
                 if (rainbowLoopColors) {
                     rainbowColors.Add(rainbowColors[0]);

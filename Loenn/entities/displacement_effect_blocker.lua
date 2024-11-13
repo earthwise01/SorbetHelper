@@ -1,13 +1,23 @@
 local displacementEffectBlocker = {}
 
 displacementEffectBlocker.name = "SorbetHelper/DisplacementEffectBlocker"
-displacementEffectBlocker.depth = -15000
+displacementEffectBlocker.depth = -55000
 displacementEffectBlocker.placements = {
     {
         name = "normal",
         data = {
             width = 8,
             height = 8,
+            waterOnly = false,
+            depthAdhering = false,
+        }
+    },
+    {
+        name = "waterOnly",
+        data = {
+            width = 8,
+            height = 8,
+            waterOnly = true,
             depthAdhering = false,
         }
     },
@@ -16,6 +26,7 @@ displacementEffectBlocker.placements = {
         data = {
             width = 8,
             height = 8,
+            waterOnly = false,
             depth = 0,
             depthAdhering = true,
         }
@@ -37,7 +48,7 @@ displacementEffectBlocker.fieldInformation = {
     }
 }
 
-displacementEffectBlocker.fillColor = {225 / 255, 245 / 255, 100 / 255, 0.3}
-displacementEffectBlocker.borderColor = {240 / 255, 210 / 255, 170 / 255, 0.6}
+displacementEffectBlocker.fillColor = {225 / 255, 245 / 255, 100 / 255, 0.25}
+displacementEffectBlocker.borderColor = {240 / 255, 210 / 255, 170 / 255, 0.5}
 
 return displacementEffectBlocker

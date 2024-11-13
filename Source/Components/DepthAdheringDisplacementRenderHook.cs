@@ -9,6 +9,8 @@ using Celeste;
 using Celeste.Mod.SorbetHelper.Entities;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
+using System.Linq;
+using Celeste.Mod.SorbetHelper.Utils;
 
 namespace Celeste.Mod.SorbetHelper.Components {
 
@@ -54,10 +56,7 @@ namespace Celeste.Mod.SorbetHelper.Components {
 
             GameplayRenderer.End();
 
-            if (entityBuffer == null)
-                entityBuffer = VirtualContent.CreateRenderTarget("depth-adhering-displacement-render-hook-entity-buffer", GameplayBuffers.Gameplay.Width, GameplayBuffers.Gameplay.Height);
-            if (displacementMapBuffer == null)
-                displacementMapBuffer = VirtualContent.CreateRenderTarget("depth-adhering-displacement-render-hook-displacementmap-buffer", GameplayBuffers.Gameplay.Width, GameplayBuffers.Gameplay.Height);
+            CheckBuffers();
 
             Engine.Instance.GraphicsDevice.SetRenderTarget(entityBuffer);
             Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
@@ -74,7 +73,7 @@ namespace Celeste.Mod.SorbetHelper.Components {
             GameplayRenderer.End();
 
             // displacement map rendering stuff
-            Color displacementBgColor = new Color(0.5f, 0.5f, 0f, 1f);
+            Color displacementBgColor = DisplacementEffectBlocker.NoDisplacementColor;
 
             Engine.Graphics.GraphicsDevice.SetRenderTarget(displacementMapBuffer);
             Engine.Graphics.GraphicsDevice.Clear(displacementBgColor);
@@ -84,12 +83,25 @@ namespace Celeste.Mod.SorbetHelper.Components {
             renderDisplacement();
 
             // support for displacement effect blockers
-            foreach (DisplacementEffectBlocker entity in Scene.Tracker.GetEntities<DisplacementEffectBlocker>()) {
-                if (entity.depthAdhering && entity.Depth <= Entity.Depth)
+            foreach (var entity in Scene.Tracker.GetEntities<DisplacementEffectBlocker>()) {
+                if (entity is DisplacementEffectBlocker {DepthAdhering: true, WaterOnly: false} && entity.Depth <= Entity.Depth) {
                     Draw.Rect(entity.X, entity.Y, entity.Width, entity.Height, displacementBgColor);
+                }
             }
 
             Draw.SpriteBatch.End();
+
+            // water only displacement blockers
+            var waterBlockers = Scene.Tracker.GetEntities<DisplacementEffectBlocker>().Where(entity => entity is DisplacementEffectBlocker { DepthAdhering: true, WaterOnly: true } && entity.Depth <= Entity.Depth);
+            if (waterBlockers.Any()) {
+                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, DisplacementEffectBlocker.WaterDisplacementBlockerBlendState, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, camera.Matrix);
+
+                foreach (var entity in waterBlockers) {
+                    Draw.Rect(entity.Position, entity.Width, entity.Height, DisplacementEffectBlocker.NoWaterDisplacementMultColor);
+                }
+
+                Draw.SpriteBatch.End();
+            }
 
             Engine.Instance.GraphicsDevice.SetRenderTarget(GameplayBuffers.Gameplay);
             // if distortBehind is enabled, clear the gameplay buffer first before drawing the result (since in this case it also already includes a copy of the gameplay buffer alongside the entity)
@@ -119,6 +131,13 @@ namespace Celeste.Mod.SorbetHelper.Components {
         public override void Removed(Entity entity) {
             Dispose();
             base.Removed(entity);
+        }
+
+        private void CheckBuffers() {
+            entityBuffer ??= VirtualContent.CreateRenderTarget("depth-adhering-displacement-render-hook-entity-buffer", Util.GameplayBufferWidth, Util.GameplayBufferHeight);
+            displacementMapBuffer ??= VirtualContent.CreateRenderTarget("depth-adhering-displacement-render-hook-displacementmap-buffer", Util.GameplayBufferWidth, Util.GameplayBufferHeight);
+            Util.CheckResizeBuffer(entityBuffer);
+            Util.CheckResizeBuffer(displacementMapBuffer);
         }
 
         private void Dispose() {

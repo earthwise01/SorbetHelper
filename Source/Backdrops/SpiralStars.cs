@@ -64,7 +64,7 @@ public class SpiralStars : Backdrop {
             trailAlphas[j] = 0.7f * (1f - (float)j / (float)trailAlphas.Length);
         }
 
-        backgroundColor = Util.HexToRGBAColor(data.Attr("backgroundColor", "00000000"));
+        backgroundColor = Util.HexToColorWithAlphaNonPremult(data.Attr("backgroundColor", "00000000"));
         var colors = data.Attr("colors", "ffffff").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(Calc.HexToColor).ToArray();
 
         int starCount = data.AttrInt("starCount", 100);
@@ -75,7 +75,7 @@ public class SpiralStars : Backdrop {
                 TextureSet = Calc.Random.Next(textures.Count),
                 Color = colors[Calc.Random.Next(colors.Length)],
                 Angle = Calc.Random.NextAngle(),
-                Distance = Calc.Random.NextFloat(190f),
+                Distance = Calc.Random.NextFloat(spawningDistance),
             };
 
             UpdateStar(star);
@@ -98,7 +98,9 @@ public class SpiralStars : Backdrop {
 
     public override void Render(Scene scene) {
         if (backgroundColor.A > 0)
-            Draw.Rect(-1f, -1f, Celeste.GameWidth + 2f, Celeste.GameHeight + 2f, backgroundColor);
+            Draw.Rect(-1f, -1f, Util.GameplayBufferWidth + 2f, Util.GameplayBufferHeight + 2f, backgroundColor);
+
+        Vector2 zoomCenterOffset = Util.ZoomCenterOffset;
 
         foreach (var star in stars) {
             var textureSet = textures[star.TextureSet];
@@ -107,10 +109,10 @@ public class SpiralStars : Backdrop {
                 var trail = star.Trails[j];
                 float trailScale = trail.Scale;
 
-                textureSet[trail.FrameIndex].Draw(trail.Position, textureCenter, star.Color * trailScale * trailAlphas[j], trailScale);
+                textureSet[trail.FrameIndex].Draw(trail.Position + zoomCenterOffset, textureCenter, star.Color * trailScale * trailAlphas[j], trailScale);
             }
 
-            textureSet[star.FrameIndex].Draw(star.Position, textureCenter, star.Color * star.Scale, star.Scale);
+            textureSet[star.FrameIndex].Draw(star.Position + zoomCenterOffset, textureCenter, star.Color * star.Scale, star.Scale);
         }
     }
 

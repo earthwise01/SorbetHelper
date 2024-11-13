@@ -8,51 +8,83 @@ using Monocle;
 using Celeste.Mod.Entities;
 using Celeste.Mod.SorbetHelper.Utils;
 using MonoMod.Cil;
+using System.Linq;
 
 namespace Celeste.Mod.SorbetHelper.Entities {
 
     [Tracked]
     [CustomEntity("SorbetHelper/DisplacementEffectBlocker")]
     public class DisplacementEffectBlocker : Entity {
-        public readonly bool depthAdhering;
+        public readonly bool DepthAdhering;
+        public readonly bool WaterOnly;
+
+        public static readonly Color NoDisplacementColor = new(0.5f, 0.5f, 0.0f, 1.0f);
+        public static readonly Color NoWaterDisplacementMultColor = new(1.0f, 1.0f, 0.0f, 1.0f);
+        public static readonly BlendState WaterDisplacementBlockerBlendState = new() {
+            Name = "DisplacementEffectBlocker.WaterDisplacementBlocker",
+            ColorSourceBlend = Blend.Zero,
+            AlphaSourceBlend = Blend.Zero,
+            ColorDestinationBlend = Blend.SourceColor,
+            AlphaDestinationBlend = Blend.One
+        };
 
         public DisplacementEffectBlocker(EntityData data, Vector2 offset) : base(data.Position + offset) {
-            base.Collider = new Hitbox(data.Width, data.Height);
-            depthAdhering = data.Bool("depthAdhering", false);
+            Collider = new Hitbox(data.Width, data.Height);
+            DepthAdhering = data.Bool("depthAdhering", false);
+            WaterOnly = data.Bool("waterOnly", true); // breaking change but eh whateverr
             Depth = data.Int("depth", 0);
         }
 
         public static void Load() {
-            IL.Celeste.DisplacementRenderer.BeforeRender += modBeforeRender;
+            IL.Celeste.DisplacementRenderer.BeforeRender += IL_BeforeRender;
         }
 
         public static void Unload() {
-            IL.Celeste.DisplacementRenderer.BeforeRender -= modBeforeRender;
+            IL.Celeste.DisplacementRenderer.BeforeRender -= IL_BeforeRender;
         }
 
-        // this took way to long to figure out lmao
-        private static void modBeforeRender(ILContext il) {
-            ILCursor cursor = new ILCursor(il);
+        private static void IL_BeforeRender(ILContext il) {
+            ILCursor cursor = new(il) {
+                Index = -1
+            };
 
-            if (cursor.TryGotoNext(MoveType.After,
-            instr => instr.MatchCall(typeof(Draw), "get_SpriteBatch"),
-            instr => instr.MatchCallvirt<SpriteBatch>("End")) &&
-            cursor.TryGotoPrev(MoveType.AfterLabel, instr => instr.MatchEndfinally())) {
-                Logger.Log("SorbetHelper", $"Injecting check for DisplacementEffectBlocker at {cursor.Index} in CIL code for {cursor.Method.FullName}");
+            if (!cursor.TryGotoPrev(MoveType.Before, instr => instr.MatchCallvirt<SpriteBatch>("End"))) {
+                Logger.Log(LogLevel.Error, "SorbetHelper", $"failed to inject check for full DisplacementEffectBlockers in CIL code for {cursor.Method.Name}!");
+                return;
+            }
 
-                cursor.EmitLdarg1(); // scene
-                cursor.EmitLdloc1(); // color
-                cursor.EmitDelegate(renderDisplacementEffectBlockers);
-            } else {
-                Logger.Log(LogLevel.Error, "SorbetHelper", $"Failed to inject check for DisplacementEffectBlocker in CIL code for {cursor.Method.FullName}");
+            Logger.Log("SorbetHelper", $"injecting check for full DisplacementEffectBlockers at {cursor.Index} in CIL code for {cursor.Method.Name}");
+            cursor.EmitLdarg1();
+            cursor.EmitDelegate(renderFullBlockers);
+
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<SpriteBatch>("End"))) {
+                Logger.Log(LogLevel.Error, "SorbetHelper", $"failed to inject check for water DisplacementEffectBlockers in CIL code for {cursor.Method.Name}!");
+                return;
+            }
+
+            Logger.Log("SorbetHelper", $"injecting check for water DisplacementEffectBlockers at {cursor.Index} in CIL code for {cursor.Method.Name}");
+            cursor.EmitLdarg1();
+            cursor.EmitDelegate(renderWaterBlockers);
+        }
+
+        private static void renderFullBlockers(Scene scene) {
+            foreach (var entity in scene.Tracker.GetEntities<DisplacementEffectBlocker>()) {
+                if (entity is DisplacementEffectBlocker {DepthAdhering: false, WaterOnly: false}) {
+                    Draw.Rect(entity.Position, entity.Width, entity.Height, NoDisplacementColor);
+                }
             }
         }
 
-        private static void renderDisplacementEffectBlockers(Scene scene, Color color) {
-            foreach (DisplacementEffectBlocker entity in scene.Tracker.GetEntities<DisplacementEffectBlocker>()) {
-                if (!entity.depthAdhering)
-                    Draw.Rect(entity.X, entity.Y, entity.Width, entity.Height, color);
+        private static void renderWaterBlockers(Scene scene) {
+            var waterBlockers = scene.Tracker.GetEntities<DisplacementEffectBlocker>().Where(entity => entity is DisplacementEffectBlocker {DepthAdhering: false, WaterOnly: true});
+            if (!waterBlockers.Any())
+                return;
+
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, WaterDisplacementBlockerBlendState, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, (scene as Level).Camera.Matrix);
+            foreach (var entity in waterBlockers) {
+                Draw.Rect(entity.Position, entity.Width, entity.Height, NoWaterDisplacementMultColor);
             }
+            Draw.SpriteBatch.End();
         }
     }
 }

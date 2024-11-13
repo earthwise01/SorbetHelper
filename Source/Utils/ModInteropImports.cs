@@ -35,4 +35,9 @@ namespace Celeste.Mod.SorbetHelper.Utils {
             }
         }
     }
+
+    [ModImportName("ExtendedCameraDynamics")]
+    public static class ExtendedCameraDynamicsImports {
+        public static Func<bool> ExtendedCameraHooksEnabled;
+    }
 }

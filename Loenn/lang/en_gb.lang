@@ -66,16 +66,16 @@ entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.fadeInTime=How l
 
 # resizable waterfall
 entities.SorbetHelper/BigWaterfall.placements.name.normal=Resizable Waterfall
-entities.SorbetHelper/BigWaterfall.placements.name.abovefg=Resizable Waterfall (Above Solids)
+entities.SorbetHelper/BigWaterfall.placements.name.abovefg=Resizable Waterfall (Above Tiles)
 # show in search results for big waterfall
 entities.SorbetHelper/BigWaterfall.placements.name.bigwaterfall=Big Waterfall
-entities.SorbetHelper/BigWaterfall.placements.name.bigwaterfallabove=Big Waterfall (Above Foreground) Resizable Waterfall (Above Foreground)
+entities.SorbetHelper/BigWaterfall.placements.name.bigwaterfallabove=Big Waterfall (Above Foreground) Resizable Waterfall (Above Foreground Above Solids)
 entities.SorbetHelper/BigWaterfall.placements.description.normal=A waterfall which behaves similarly to a vanilla Waterfall, but is also resizable like and closer visually to a vanilla Big Waterfall.
 entities.SorbetHelper/BigWaterfall.placements.description.abovefg=A waterfall which behaves similarly to a vanilla Waterfall, but is also resizable like and closer visually to a vanilla Big Waterfall. Ignores and renders above Foreground Tiles.
 entities.SorbetHelper/BigWaterfall.attributes.description.color=The color of the waterfall.
-entities.SorbetHelper/BigWaterfall.attributes.description.ignoreSolids=When checked, the waterfall will ignore any solid objects in its way (e.g. foreground tiles). however, water can still block it.
+entities.SorbetHelper/BigWaterfall.attributes.description.ignoreSolids=When checked, the waterfall will ignore any solid objects in its way (e.g. foreground tiles). Water can still block it.
 entities.SorbetHelper/BigWaterfall.attributes.description.lines=Determines whether the waterfall will have any additional lines for detail, disabling this will make the waterfall appear closer in appearance to a vanilla small waterfall as opposed to a big waterfall.
-entities.SorbetHelper/BigWaterfall.attributes.description.depth=Determines what visual layer the waterfall should be on (higher values mean farther behind in the scene, default value is -9999 for the normal placement or -49900 for the above foreground placement).
+entities.SorbetHelper/BigWaterfall.attributes.description.depth=Determines what visual layer the waterfall should be on (higher values mean farther behind in the scene, default value is -9999 for the normal placement or -49900 for the above solids placement).\nNote that this on its own will not affect the wavy displacement effect.
 
 # custom/rainbow lightbeam
 # tooltips for most of the rainbow related attributes stolen from MaddieHelpingHand
@@ -144,17 +144,32 @@ entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.description.di
 entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.description.onlyCollideTopLeft=Makes it so that the wrapper needs to be touching the top left corner of entities in order to affect them.\nAllows for more precision when choosing which entities to affect when there are many close together, although at the cost of being less intuitive.
 
 # displacement blocker
-entities.SorbetHelper/DisplacementEffectBlocker.placements.name.normal=Displacement Effect Blocker
+entities.SorbetHelper/DisplacementEffectBlocker.placements.name.normal=Displacement Effect Blocker (Full)
+entities.SorbetHelper/DisplacementEffectBlocker.placements.name.waterOnly=Displacement Effect Blocker (Waves Only)
 entities.SorbetHelper/DisplacementEffectBlocker.placements.name.depthAdhering=Displacement Effect Blocker (for Displacement Depth Fixer)
-entities.SorbetHelper/DisplacementEffectBlocker.placements.description.normal=Completely blocks the displacement effect produced by entities such as water or waterfalls.
+entities.SorbetHelper/DisplacementEffectBlocker.placements.description.normal=Completely blocks the displacement effect produced by entities such as water or waterfalls, along with stuff like the burst offset effects from Madeline dashing or pulsing strawberries.
+entities.SorbetHelper/DisplacementEffectBlocker.placements.description.waterOnly=Completely blocks the displacement effect produced by entities such as water or waterfalls.
 entities.SorbetHelper/DisplacementEffectBlocker.placements.description.depthAdhering=Blocks the displacement effect produced by entities such as water or waterfalls at a certain depth that are *affected by a Displacement Depth Fixer*.
-entities.SorbetHelper/DisplacementEffectBlocker.attributes.description.depth=The depth of the displacement blocker. Any depth adhering displacement attached to an entity with a depth equal to or higher than this will be affected by the blocker.\n(higher values mean farther behind in the scene.)
+entities.SorbetHelper/DisplacementEffectBlocker.attributes.name.waterOnly=Waves Only
+entities.SorbetHelper/DisplacementEffectBlocker.attributes.description.waterOnly=Whether the displacement blocker should only affect the wavy displacement from water, etc.\nDisabling this makes offset displacement like the burst effect from Madeline dashing or pulsing strawberries etc. also get blocked.
+entities.SorbetHelper/DisplacementEffectBlocker.attributes.description.depth=The depth of the displacement blocker. Any entity affected by a displacement depth fixer with a depth equal to or higher than this will be affected by the blocker.\n(higher values mean farther behind in the scene.)
+
+# displacement area
+entities.SorbetHelper/DisplacementEffectArea.placements.name.normal=Displacement Effect Area
+entities.SorbetHelper/DisplacementEffectArea.placements.name.depthAdhering=Displacement Effect Area (Supports Depth)
+entities.SorbetHelper/DisplacementEffectArea.attributes.description.horizontalDisplacement=The horizontal displacement amount.\nRanges from -1.0 (leftwards displacement) to 1.0 (rightwards displacement), with 0.0 resulting in no displacement.
+entities.SorbetHelper/DisplacementEffectArea.attributes.description.verticalDisplacement=The vertical displacement amount.\nRanges from -1.0 (upwards displacement) to 1.0 (downwards displacement), with 0.0 resulting in no displacement.
+entities.SorbetHelper/DisplacementEffectArea.attributes.description.waterDisplacement=The water displacement amount.\nRanges from 0.0 to 1.0, values closer to 1.0 result in faster waves.\nWater uses 0.25, small waterfalls use 0.8, big waterfalls use 1.0, and heatwaves use 0.1.
+entities.SorbetHelper/DisplacementEffectArea.attributes.description.alpha=The overall strength of the displacement.
+entities.SorbetHelper/DisplacementEffectArea.attributes.description.depth=The visual depth the effect should be applied at (using the power of depth adhering displacement).
 
 # dash gate block
 # most tooltips stolen from maddie's helping hand
 # https://github.com/maddie480/MaddieHelpingHand/blob/1297e45c72dbf27972e8396139406dd55e65c227/Loenn/lang/en_gb.lang#L194
-entities.SorbetHelper/DashGateBlock.placements.name.normal=Dash Gate Block
-entities.SorbetHelper/DashGateBlock.placements.name.normalaltname=Gate Block (Dash Activated) (Activate On Dash)
+entities.SorbetHelper/DashGateBlock.placements.name.Both=Dash Gate Block (Both)
+entities.SorbetHelper/DashGateBlock.placements.name.Horizontal=Dash Gate Block (Horizontal)
+entities.SorbetHelper/DashGateBlock.placements.name.Vertical=Dash Gate Block (Vertical)
+entities.SorbetHelper/DashGateBlock.placements.name.kevinswitchgate=Kevin Switch Gate
 entities.SorbetHelper/DashGateBlock.attributes.description.inactiveColor=The color of the block when not triggered yet.
 entities.SorbetHelper/DashGateBlock.attributes.description.activeColor=The color of the block while moving.
 entities.SorbetHelper/DashGateBlock.attributes.description.finishColor=The color of the block when it has reached its destination.
@@ -210,6 +225,7 @@ style.effects.SorbetHelper/ParallaxHiResSnow.description.additive=How much addit
 style.effects.SorbetHelper/ParallaxHiResSnow.description.texturePath=The texture the particles should use.\nNote that unlike most other stylegrounds, this is relative to the Overworld Atlas instead of the Gameplay Atlas.\nThis means any custom textures need to be placed at e.g. "yourmod/Graphics/Atlases/Overworld/yourname/yourmod/customsnow".\nVanilla textures are 256x256 pixels.
 style.effects.SorbetHelper/ParallaxHiResSnow.attribute.randomRotation=Rotate Texture
 style.effects.SorbetHelper/ParallaxHiResSnow.description.randomRotation=Whether the particles should be rotated randomly.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.speedStretching=Whether the particles should get stretched out if the length of the effect's direction is greater than 1.\nOverrides Rotate Texture when active.
 style.effects.SorbetHelper/ParallaxHiResSnow.description.fadeTowardsForeground=Whether the particles should fade out slightly as they get closer to the foreground.
 style.effects.SorbetHelper/ParallaxHiResSnow.description.directionX=Determines how strongly and in which direction the particles should move horizontally.\nNegative values will move the particles to the left while positive values will move them to the right.
 style.effects.SorbetHelper/ParallaxHiResSnow.description.directionY=Determines how strongly and in which direction the particles should move vertically.\nNegative values will move the particles upwards while positive values will move them downwards.

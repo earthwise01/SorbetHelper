@@ -21,6 +21,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             base.Collider = new Hitbox(data.Width, data.Height);
             distortBehind = data.Bool("distortBehind");
             onlyCollideTopLeft = data.Bool("onlyCollideTopLeft");
+            Depth = Depths.Top;
         }
 
         public override void Awake(Scene scene) {
@@ -28,7 +29,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
             foreach (DisplacementRenderHook component in CollideAllByComponentNullHitboxBackup<DisplacementRenderHook>()) {
                 component.Entity.Add(new DepthAdheringDisplacementRenderHook(component.Entity.Render, component.RenderDisplacement, distortBehind));
-                component.Entity.Remove(component);
+                component.RemoveSelf();
             }
 
             RemoveSelf();
@@ -40,7 +41,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             waterfalls depth adhering displacement which is. hopefully obvious why that'd be a Not Great idea.
         */
         private List<T> CollideAllByComponentNullHitboxBackup<T>() where T : Component {
-            List<T> list = new List<T>();
+            List<T> list = [];
 
             foreach (Component item in Scene.Tracker.Components[typeof(T)]) {
                 Entity entity = item.Entity;

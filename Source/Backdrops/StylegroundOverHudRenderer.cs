@@ -61,7 +61,8 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
 
                 BackdropRenderer.BeforeRender(level);
 
-                Buffer ??= VirtualContent.CreateRenderTarget("sorbethelper_stylegrounds_above_hud_buffer", GameplayBuffers.Level.Width, GameplayBuffers.Level.Height);
+                Buffer ??= VirtualContent.CreateRenderTarget("sorbethelper_stylegrounds_above_hud_buffer", Util.GameplayBufferWidth, Util.GameplayBufferHeight);
+                Util.CheckResizeBuffer(Buffer);
 
                 Engine.Instance.GraphicsDevice.SetRenderTarget(Buffer);
                 Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
@@ -192,10 +193,10 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
             il.Body.Variables.Add(loopCounterVariable);
 
             if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<Backdrop>("Visible"))) {
-                Logger.Log(LogLevel.Warn, "SorbetHelper", "[StylegroundAboveHudRenderer] ilhook error! failed to find loop start in CIL code for {cursor.Method.Name}!");
+                Logger.Log(LogLevel.Warn, "SorbetHelper", $"[StylegroundAboveHudRenderer] ilhook error! failed to find loop start in CIL code for {cursor.Method.Name}!");
             }
 
-            Logger.Log(LogLevel.Verbose, "SorbetHelper", "[StylegroundAboveHudRenderer] injecting janky buffer swapping for additive backdrops at {cursor.Index} in CIL code for {cursor.Method.Name}!");
+            Logger.Log(LogLevel.Verbose, "SorbetHelper", $"[StylegroundAboveHudRenderer] injecting janky buffer swapping for additive backdrops at {cursor.Index} in CIL code for {cursor.Method.Name}!");
 
             cursor.EmitDup();
             cursor.EmitLdarg0();
@@ -213,7 +214,9 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
                 } else {
                     self.EndSpritebatch();
 
-                    AdditiveBuffers[i] ??= VirtualContent.CreateRenderTarget("sorbethelper_stylegrounds_above_hud_buffer_additive_" + i, GameplayBuffers.Level.Width, GameplayBuffers.Level.Height);
+                    AdditiveBuffers[i] ??= VirtualContent.CreateRenderTarget("sorbethelper_stylegrounds_above_hud_buffer_additive_" + i, Util.GameplayBufferWidth, Util.GameplayBufferHeight);
+                    Util.CheckResizeBuffer(AdditiveBuffers[i]);
+
                     Engine.Graphics.GraphicsDevice.SetRenderTarget(AdditiveBuffers[i]);
                     Engine.Graphics.GraphicsDevice.Clear(Color.Transparent);
                 }
@@ -223,25 +226,24 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
         }
 
         private static void modLevelRender(ILContext il) {
-            ILCursor cursor = new(il) {
-                Index = -1
-            };
+            ILCursor cursor = new(il);
+
+            // apparently celestenet  broke a similar cursor.goto in functionalzoomout so to be safe im removing this and just hoping nobody added another matrix createscale
+            // i dont think it actually matters here since this is applied on game load and not level enter but idkk whatever
+            // if (!cursor.TryGotoPrev(MoveType.After, instr => instr.MatchLdnull(), instr => instr.MatchCallOrCallvirt<GraphicsDevice>("SetRenderTarget"))) {
+            //     Logger.Log(LogLevel.Warn, "SorbetHelper", $"[StylegroundAboveHudRenderer] ilhook error! failed to find where hd rendering starts in CIL code for {cursor.Method.Name}!");
+            // }
 
             // grab upscaling locals
-            if (!cursor.TryGotoPrev(MoveType.After, instr => instr.MatchLdnull(), instr => instr.MatchCallOrCallvirt<GraphicsDevice>("SetRenderTarget"))) {
-                Logger.Log(LogLevel.Warn, "SorbetHelper", "[StylegroundAboveHudRenderer] ilhook error! failed to find where hd rendering starts in CIL code for {cursor.Method.Name}!");
-            }
-
             int matrixLocal = -1;
             int paddingLocal = -1;
             int zoomFocusLocal = -1;
             int scaleLocal = -1;
 
             // matrix
-            cursor.TryGotoNext(instr => instr.MatchCall<Matrix>("CreateScale"),
-                instr => instr.MatchLdsfld<Engine>("ScreenMatrix"),
-                instr => true,
-                instr => instr.MatchStloc(out matrixLocal));
+            if (cursor.TryGotoNext(instr => instr.MatchCall<Matrix>("CreateScale"))) {
+                cursor.TryGotoNext(instr => instr.MatchStloc(out matrixLocal));
+            }
 
             if (LogMissingLocalError(matrixLocal, "matrix", cursor.Method.Name))
                 return;

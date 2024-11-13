@@ -33,6 +33,7 @@ namespace Celeste.Mod.SorbetHelper {
 
         public override void Load() {
             typeof(GravityHelperImports).ModInterop();
+            typeof(ExtendedCameraDynamicsImports).ModInterop();
 
             WingedStrawberryDirectionController.Load();
             DisplacementEffectBlocker.Load();

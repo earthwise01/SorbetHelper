@@ -16,10 +16,18 @@ dashGateBlock.depth = 0
 dashGateBlock.nodeLimits = {1, 1}
 dashGateBlock.nodeLineRenderType = false
 dashGateBlock.warnBelowSize = {16, 16}
-dashGateBlock.placements = {
-    {
-        name = "normal",
-        alternativeName = "normalaltname",
+
+local axes = {
+    "Both",
+    "Horizontal",
+    "Vertical",
+}
+
+dashGateBlock.placements = {}
+for k,v in ipairs(axes) do
+    table.insert(dashGateBlock.placements, {
+        name = v,
+        alternativeName = "kevinswitchgate",
         data = {
             width = 16,
             height = 16,
@@ -36,13 +44,13 @@ dashGateBlock.placements = {
             moveEased = true,
             persistent = false,
             allowReturn = false,
-            axes = "Both",
+            axes = v,
             allowWavedash = false,
             dashCornerCorrection = false,
             linkTag = "" -- this is flag on activate in editor
         }
-    }
-}
+    })
+end
 
 dashGateBlock.fieldOrder = {"x", "y", "width", "height", "inactiveColor", "activeColor", "finishColor", "moveSound", "blockSprite", "finishedSound", "iconSprite", "shakeTime", "axes", "moveTime", "linkTag", "moveEased", "allowReturn", "allowWavedash", "dashCornerCorrection", "smoke", "persistent"}
 
@@ -70,11 +78,7 @@ dashGateBlock.fieldInformation = {
         editable = true
     },
     axes = {
-        options = {
-            "Both",
-            "Horizontal",
-            "Vertical",
-        },
+        options = axes,
         editable = false
     },
 }
