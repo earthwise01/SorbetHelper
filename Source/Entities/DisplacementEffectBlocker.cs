@@ -31,7 +31,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         public DisplacementEffectBlocker(EntityData data, Vector2 offset) : base(data.Position + offset) {
             Collider = new Hitbox(data.Width, data.Height);
             DepthAdhering = data.Bool("depthAdhering", false);
-            WaterOnly = data.Bool("waterOnly", true); // breaking change but eh whateverr
+            WaterOnly = data.Bool("waterOnly", false);
             Depth = data.Int("depth", 0);
         }
 
