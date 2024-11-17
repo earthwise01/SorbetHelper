@@ -124,7 +124,7 @@ public class ParallaxHiResSnow : Backdrop {
             cameraFade *= FadeY.Value(level.Camera.Y + Util.CameraHeight / 2f);
 
         // bwehh
-        var cameraPosLarge = (level.Camera.Position + Util.ZoomCenterOffset) * UpscaleAmount;
+        var cameraPosLarge = (level.Camera.Position.Floor() + Util.ZoomCenterOffset) * UpscaleAmount;
 
         for (int i = 0; i < particles.Length; i++) {
             ref var particle = ref particles[i];
