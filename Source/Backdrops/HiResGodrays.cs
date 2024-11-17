@@ -77,8 +77,9 @@ public class HiResGodrays : Backdrop {
     private readonly bool TexStartRotated;
     private readonly float TexMinRotate, TexMaxRotate;
 
+    private readonly int rayCount;
     private readonly Ray[] rays;
-    private readonly VertexPositionColor[] vertices;
+    private VertexPositionColor[] vertices;
     private int vertexCount;
 
     private void Reset() {
@@ -117,7 +118,7 @@ public class HiResGodrays : Backdrop {
         TexMinRotate = data.AttrFloat("textureMinRotate", -22.5f) * Calc.DegToRad;
         TexMaxRotate = data.AttrFloat("textureMaxRotate", 22.5f) * Calc.DegToRad;
 
-        var rayCount = data.AttrInt("rayCount", 6);
+        rayCount = data.AttrInt("rayCount", 6);
         rays = new Ray[rayCount];
         vertices = new VertexPositionColor[rayCount * 6];
         Reset();
@@ -143,6 +144,12 @@ public class HiResGodrays : Backdrop {
 
         float alpha = visibleFade * cameraFade * ExtendedVariantsCompat.ForegroundEffectOpacity;
 
+        // resize vertex buffer for zoom out if needed,
+        int visibleScreens = (int)Math.Ceiling((Util.CameraWidth + OffscreenPadding * 2f) / (320f + OffscreenPadding * 2f));
+        int expectedBufferLength = rayCount * 6 * visibleScreens * visibleScreens;
+        if (!UsingTextureParticles && vertices.Length != expectedBufferLength)
+            vertices = new VertexPositionColor[expectedBufferLength];
+
         var cameraPos = level.Camera.Position.Floor();
         var player = level.Tracker.GetEntity<Player>();
 
@@ -167,42 +174,49 @@ public class HiResGodrays : Backdrop {
             ray.RenderPosition = new Vector2(renderX, renderY);
 
             var rayAlpha = Ease.CubeInOut(Calc.Clamp(((percent < 0.5f) ? percent : (1f - percent)) * 2f, 0f, 1f)) * alpha;
-            if (FadeNearPlayer && player != null) {
-                float playerDistance = (ray.RenderPosition + cameraPos - player.Position).Length();
-                if (playerDistance < 64f) {
-                    rayAlpha *= 0.25f + 0.75f * (playerDistance / 64f);
-                }
-            }
             ray.RenderColor = ray.Color * rayAlpha;
 
             if (UsingTextureParticles)
                 continue;
 
-            // zooommmm,,,, ,,,,
-            // ??????
+            float rayWidth = ray.Width;
+            float rayLength = ray.Length;
 
-            float width = ray.Width;
-            float height = ray.Length;
-            var renderPos = ray.RenderPosition;
-            var renderColor = ray.RenderColor;
-            var v1 = new VertexPositionColor(new Vector3(renderPos + skew2 * width + skew1 * height, 0f), renderColor);
-            var v2 = new VertexPositionColor(new Vector3(renderPos - skew2 * width, 0f), renderColor);
-            var v3 = new VertexPositionColor(new Vector3(renderPos + skew2 * width, 0f), renderColor);
-            var v4 = new VertexPositionColor(new Vector3(renderPos - skew2 * width - skew1 * height, 0f), renderColor);
-            vertices[num++] = v1;
-            vertices[num++] = v2;
-            vertices[num++] = v3;
-            vertices[num++] = v2;
-            vertices[num++] = v3;
-            vertices[num++] = v4;
+            // loop silly this is a zoom out momemnt,,,, ,,,,
+            // this  shouldd work unless im stupid and this can rarely try n render more rays than expected and exceed the vertex buffer size
+            for (int x = 0; x < 320 * visibleScreens + OffscreenPadding; x += 320 + OffscreenPadding * 2) {
+                for (int y = 0; y < 180 * visibleScreens + OffscreenPadding; y += 180 + OffscreenPadding * 2) {
+                    var renderPos = new Vector2(ray.RenderPosition.X + x, ray.RenderPosition.Y + y);
+                    var renderColor = ray.RenderColor;
+
+                    //  need to do this here so that the correct godray fades etc etc,
+                    if (FadeNearPlayer && player != null) {
+                        float playerDistance = (renderPos + cameraPos - player.Position).Length();
+                        if (playerDistance < 64f) {
+                            renderColor *= 0.25f + 0.75f * (playerDistance / 64f);
+                        }
+                    }
+
+                    var v1 = new VertexPositionColor(new Vector3(renderPos + skew2 * rayWidth + skew1 * rayLength, 0f), renderColor);
+                    var v2 = new VertexPositionColor(new Vector3(renderPos - skew2 * rayWidth, 0f), renderColor);
+                    var v3 = new VertexPositionColor(new Vector3(renderPos + skew2 * rayWidth, 0f), renderColor);
+                    var v4 = new VertexPositionColor(new Vector3(renderPos - skew2 * rayWidth - skew1 * rayLength, 0f), renderColor);
+                    vertices[num++] = v1;
+                    vertices[num++] = v2;
+                    vertices[num++] = v3;
+                    vertices[num++] = v2;
+                    vertices[num++] = v3;
+                    vertices[num++] = v4;
+                }
+            }
         }
 
         vertexCount = num;
     }
 
-    public void DrawSelf(Matrix matrix) {
+    public void DrawSelf(Scene scene, Matrix matrix) {
         if (UsingTextureParticles)
-            DrawTextureParticles(matrix);
+            DrawTextureParticles(scene, matrix);
         else
             DrawGodrays(matrix);
     }
@@ -213,16 +227,35 @@ public class HiResGodrays : Backdrop {
         }
     }
 
-    private void DrawTextureParticles(Matrix matrix) {
+    private void DrawTextureParticles(Scene scene, Matrix matrix) {
         Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, matrix);
+
+        // im realising there mightt be some inconsistency between godrays/texture particles since one is setup in update and the other partly in render   fun
+        var cameraWidth = Util.CameraWidth;
+        var cameraHeight = Util.CameraHeight;
+        var level = scene as Level;
+        var player = level.Tracker.GetEntity<Player>();
+        var cameraPos = level.Camera.Position.Floor();
 
         for (int i = 0; i < rays.Length; i++) {
             ref var ray = ref rays[i];
 
-            var renderPos = ray.RenderPosition;
-            var renderColor = ray.RenderColor;
+            for (int x = 0; x < cameraWidth + OffscreenPadding; x += 320 + OffscreenPadding * 2) {
+                for (int y = 0; y < cameraHeight + OffscreenPadding; y += 180 + OffscreenPadding * 2) {
+                    var renderPos = new Vector2(ray.RenderPosition.X + x, ray.RenderPosition.Y + y);
+                    var renderColor = ray.RenderColor;
 
-            particleTexture.DrawCentered(renderPos, renderColor, ray.Scale * 1f / UpscaleAmount, ray.TexRotation);
+                    //  need to do this here so that the correct godray fades etc etc,
+                    if (FadeNearPlayer && player != null) {
+                        float playerDistance = (renderPos + cameraPos - player.Position).Length();
+                        if (playerDistance < 64f) {
+                            renderColor *= 0.25f + 0.75f * (playerDistance / 64f);
+                        }
+                    }
+
+                    particleTexture.DrawCentered(renderPos, renderColor, ray.Scale * 1f / UpscaleAmount, ray.TexRotation);
+                }
+            }
         }
 
         Draw.SpriteBatch.End();
@@ -272,9 +305,9 @@ public class HiResGodrays : Backdrop {
                 matrix *= Matrix.CreateScale(1f, -1f, 1f) * Matrix.CreateTranslation(0f, 1080, 0f);
 
             // zoom out support
-            // if (Util.ZoomOutActive)
-            //     //matrix *= Matrix.CreateTranslation(1920 * -0.5f, 1080 * -0.5f, 0f) * Matrix.CreateScale(Math.Min(level.Zoom, 1f)) * Matrix.CreateTranslation(1920 * 0.5f, 1080 * 0.5f, 0f);
-            //     matrix *= Matrix.CreateScale(320f / Util.CameraWidth);
+            if (Util.ZoomOutActive)
+                //matrix *= Matrix.CreateTranslation(1920 * -0.5f, 1080 * -0.5f, 0f) * Matrix.CreateScale(Math.Min(level.Zoom, 1f)) * Matrix.CreateTranslation(1920 * 0.5f, 1080 * 0.5f, 0f);
+                matrix *= Matrix.CreateScale(320f / Util.CameraWidth);
 
             // watchtower/etc edge padding
             if (level.ScreenPadding != 0f) {
@@ -288,7 +321,7 @@ public class HiResGodrays : Backdrop {
 
             SubHudRenderer.EndRender();
 
-            Backdrop.DrawSelf(matrix);
+            Backdrop.DrawSelf(Scene, matrix);
 
             SubHudRenderer.BeginRender();
         }
