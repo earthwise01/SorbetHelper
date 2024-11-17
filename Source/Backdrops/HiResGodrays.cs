@@ -89,7 +89,6 @@ public class HiResGodrays : Backdrop {
     }
 
     public HiResGodrays(BinaryPacker.Element data) : base() {
-        data = new();
         DoFadeInOut = data.AttrBool("fadeInOut", true);
         OffscreenPadding = data.AttrInt("offscreenPadding", 32);
         ScrollX = data.AttrFloat("scrollX", 1.1f);
@@ -178,6 +177,9 @@ public class HiResGodrays : Backdrop {
 
             if (UsingTextureParticles)
                 continue;
+
+            // zooommmm,,,, ,,,,
+            // ??????
 
             float width = ray.Width;
             float height = ray.Length;
@@ -270,9 +272,9 @@ public class HiResGodrays : Backdrop {
                 matrix *= Matrix.CreateScale(1f, -1f, 1f) * Matrix.CreateTranslation(0f, 1080, 0f);
 
             // zoom out support
-            if (Util.ZoomOutActive)
-                //matrix *= Matrix.CreateTranslation(1920 * -0.5f, 1080 * -0.5f, 0f) * Matrix.CreateScale(Math.Min(level.Zoom, 1f)) * Matrix.CreateTranslation(1920 * 0.5f, 1080 * 0.5f, 0f);
-                matrix *= Matrix.CreateScale(320f / Util.CameraWidth);
+            // if (Util.ZoomOutActive)
+            //     //matrix *= Matrix.CreateTranslation(1920 * -0.5f, 1080 * -0.5f, 0f) * Matrix.CreateScale(Math.Min(level.Zoom, 1f)) * Matrix.CreateTranslation(1920 * 0.5f, 1080 * 0.5f, 0f);
+            //     matrix *= Matrix.CreateScale(320f / Util.CameraWidth);
 
             // watchtower/etc edge padding
             if (level.ScreenPadding != 0f) {
