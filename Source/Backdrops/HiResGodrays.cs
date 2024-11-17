@@ -37,7 +37,7 @@ public class HiResGodrays : Backdrop {
             Percent = 0f;
             X = -backdrop.OffscreenPadding + Calc.Random.NextFloat(320 + backdrop.OffscreenPadding * 2);
             Y = -backdrop.OffscreenPadding + Calc.Random.NextFloat(180 + backdrop.OffscreenPadding * 2);
-            Duration = backdrop.DurationBase + Calc.Random.NextFloat() * backdrop.DurationRange;
+            Duration = Calc.Random.Range(backdrop.MinDuration, backdrop.MaxDuration);
             Scale = Calc.Random.Range(backdrop.MinScale, backdrop.MaxScale);
             Color = backdrop.Colors[Calc.Random.Next(backdrop.Colors.Length)];
 
@@ -61,7 +61,7 @@ public class HiResGodrays : Backdrop {
     private readonly int OffscreenPadding;
     private readonly float ScrollX, ScrollY;
     private readonly float SpeedX, SpeedY;
-    private readonly float DurationBase, DurationRange;
+    private readonly float MinDuration, MaxDuration;
     private readonly float MinScale, MaxScale; // kinda redundant for normal godrays but unlike width/length also works with texture particles
     private readonly Color[] Colors;
     private readonly bool FadeNearPlayer;
@@ -96,8 +96,8 @@ public class HiResGodrays : Backdrop {
         ScrollY = data.AttrFloat("scrollY", 1.1f);
         SpeedX = data.AttrFloat("speedX", 0f);
         SpeedY = data.AttrFloat("speedY", 8f);
-        DurationBase = data.AttrFloat("durationBase", 4f);
-        DurationRange = data.AttrFloat("durationRange", 8f);
+        MinDuration = data.AttrFloat("minDuration", 4f);
+        MaxDuration = data.AttrFloat("maxDuration", 12f);
         MinScale = data.AttrFloat("minScale", 1f);
         MaxScale = data.AttrFloat("maxScale", 1f);
         Colors = data.Attr("colors", "f52b6380").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(Util.HexToColorWithAlphaNonPremult).ToArray();

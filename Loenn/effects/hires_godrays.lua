@@ -8,7 +8,7 @@ effect.defaultData = {
     only = "*", exclude = "", tag = "", flag = "",
     colors = "f52b6380", fadex = "", fadey = "", notflag = "",
     scrollX = 1.1, scrollY = 1.1, speedX = 0, speedY = 8,
-    durationBase = 4, durationRange = 8, minWidth = 8, maxWidth = 16,
+    minDuration = 4, maxDuration = 12, minWidth = 8, maxWidth = 16,
     minScale = 1, maxScale = 1, minLength = 20, maxLength = 40,
     texturePath = "", texStartRotated = true, texMinRotate = -22.5, texMaxRotate = 22.5,
     rayCount = 6, offscreenPadding = 32, fadeInOut = true, fadeNearPlayer = true,
@@ -17,7 +17,7 @@ effect.defaultData = {
 effect.fieldOrder = {
     "only", "exclude", "tag", "flag", 
     "colors", "fadex", "fadey", "notflag",
-    "scrollX", "scrollY", "durationBase", "durationRange", 
+    "scrollX", "scrollY", "minDuration", "maxDuration", 
     "speedX", "speedY", "minWidth", "maxWidth",
     "minScale", "maxScale", "minLength", "maxLength",
     "rayCount", "texturePath", "texMinRotate", "texMaxRotate", 
