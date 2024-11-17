@@ -38,8 +38,8 @@ effect.fieldInformation = {
     texturePath = {
         options = {
             { "Normal Godrays", "" },
-            { "star", "star" }
-            { "snow", "snow" },
+            { "star", "star" },
+            { "snow", "snow" }
         }
     },
     rayCount = {
