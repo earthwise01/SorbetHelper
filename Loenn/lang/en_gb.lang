@@ -223,16 +223,16 @@ style.effects.SorbetHelper/ParallaxHiResSnow.description.color=The color of the 
 style.effects.SorbetHelper/ParallaxHiResSnow.description.alpha=The opacity of the particles, between 0 (translucent) and 1 (opaque).
 style.effects.SorbetHelper/ParallaxHiResSnow.description.additive=How much additive blending the particles should use, between 0 (not additive) and 1 (fully additive).
 style.effects.SorbetHelper/ParallaxHiResSnow.description.texturePath=The texture the particles should use.\nNote that unlike most other stylegrounds, this is relative to the Overworld Atlas instead of the Gameplay Atlas.\nThis means any custom textures need to be placed at e.g. "yourmod/Graphics/Atlases/Overworld/yourname/yourmod/customsnow".\nVanilla textures are 256x256 pixels.
-style.effects.SorbetHelper/ParallaxHiResSnow.attribute.randomRotation=Rotate Texture
-style.effects.SorbetHelper/ParallaxHiResSnow.description.randomRotation=Whether the particles should be rotated randomly.
-style.effects.SorbetHelper/ParallaxHiResSnow.description.speedStretching=Whether the particles should get stretched out if the length of the effect's direction is greater than 1.\nOverrides Rotate Texture when active.
+style.effects.SorbetHelper/ParallaxHiResSnow.attribute.randomRotation=Start Rotated
+style.effects.SorbetHelper/ParallaxHiResSnow.description.randomRotation=Whether the particles should start with a random rotation.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.speedStretching=Whether the particles should get stretched out if the length of the effect's direction is greater than 1.\nOverrides any rotation of the particles when active.
 style.effects.SorbetHelper/ParallaxHiResSnow.description.fadeTowardsForeground=Whether the particles should fade out slightly as they get closer to the foreground.
 style.effects.SorbetHelper/ParallaxHiResSnow.description.directionX=Determines how strongly and in which direction the particles should move horizontally.\nNegative values will move the particles to the left while positive values will move them to the right.
 style.effects.SorbetHelper/ParallaxHiResSnow.description.directionY=Determines how strongly and in which direction the particles should move vertically.\nNegative values will move the particles upwards while positive values will move them downwards.
 style.effects.SorbetHelper/ParallaxHiResSnow.description.minScale=Determines how large the farthest particles should be.
 style.effects.SorbetHelper/ParallaxHiResSnow.description.maxScale=Determines how large the closest particles should be.
-style.effects.SorbetHelper/ParallaxHiResSnow.description.minSpeed=Determines how fast the farthest particles should move.
-style.effects.SorbetHelper/ParallaxHiResSnow.description.maxSpeed=Determines how fast the closest particles should move.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.minSpeed=Determines the minimum speed a particle can have.\nThis is multiplied with both the particle's scale and the effect's direction to get the actual speed of a particle.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.maxSpeed=Determines the maximum speed a particle can have.\nThis is multiplied with both the particle's scale and the effect's direction to get the actual speed of a particle.
 style.effects.SorbetHelper/ParallaxHiResSnow.description.minScrollX=Determines the amount of horizontal parallax the farthest particles should have.
 style.effects.SorbetHelper/ParallaxHiResSnow.description.minScrollY=Determines the amount of vertical parallax the farthest particles should have.
 style.effects.SorbetHelper/ParallaxHiResSnow.description.maxScrollX=Determines the amount of horizontal parallax the closest particles should have.
@@ -266,5 +266,11 @@ style.effects.SorbetHelper/SpiralStars.description.centerRadius=Determines how c
 style.effects.SorbetHelper/SpiralStars.description.speed=The speed (in pixels / second) at which the stars will move towards the center.\nNegative values will make the stars move away from the center instead.
 style.effects.SorbetHelper/SpiralStars.description.rotationSpeed=The speed (in degrees / second) at which the stars will rotate around the center.
 
+# hires godrays
+style.effects.SorbetHelper/HiResGodrays.name=Godrays (Hi-Res)
+style.effects.SorbetHelper/HiResGodrays.attribute.fadex=Fade X
+style.effects.SorbetHelper/HiResGodrays.attribute.fadey=Fade Y
+style.effects.SorbetHelper/HiResGodrays.description.fadex=Advanced horizontal fading zones.\nFormat is "FromPosition-ToPosition,FromAlpha-ToAlpha". Example "n500-500,1-0".\nNegative numbers in position are denoted with "n" rather than minus. Position numbers are in pixels and use map coordinates.\nMultiple zones can be set up by using ":" as separator.
+style.effects.SorbetHelper/HiResGodrays.description.fadey=Advanced vertical fading zones.\nFormat is "FromPosition-ToPosition,FromAlpha-ToAlpha". Example "n500-500,1-0".\nNegative numbers in position are denoted with "n" rather than minus. Position numbers are in pixels and use map coordinates.\nMultiple zones can be set up by using ":" as separator.
 
 mods.SorbetHelper.name=Sorbet Helper
