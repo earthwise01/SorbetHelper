@@ -100,7 +100,7 @@ public class HiResGodrays : Backdrop {
         MaxDuration = data.AttrFloat("maxDuration", 12f);
         MinScale = data.AttrFloat("minScale", 1f);
         MaxScale = data.AttrFloat("maxScale", 1f);
-        Colors = data.Attr("colors", "f52b6380").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(Util.HexToColorWithAlphaNonPremult).ToArray();
+        Colors = data.AttrList("colors", Util.HexToColorWithAlphaNonPremult, "f52b6380").ToArray();
         FadeNearPlayer = data.AttrBool("fadeNearPlayer", true);
 
         var texturePath = data.Attr("texturePath", "");

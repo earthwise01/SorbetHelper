@@ -1,7 +1,7 @@
 local stylegroundOverHudController = {}
 
 stylegroundOverHudController.name = "SorbetHelper/StylegroundOverHudController"
-stylegroundOverHudController.texture = "objects/SorbetHelper/stylegroundOverHudController/icon"
+stylegroundOverHudController.texture = "editorSprites/SorbetHelper/stylegroundOverHudController"
 stylegroundOverHudController.placements = {
     name = "stylegroundOverHud",
     alternativeName = "altname",

@@ -7,48 +7,65 @@ using Monocle;
 using Celeste.Mod.Entities;
 using Celeste.Mod.SorbetHelper.Utils;
 
-namespace Celeste.Mod.SorbetHelper.Entities {
+namespace Celeste.Mod.SorbetHelper.Entities;
 
-    [CustomEntity("SorbetHelper/ReturnBerry")]
-    [RegisterStrawberry(true, false)]
-    public class ReturnBerry : Strawberry {
-        private readonly Vector2[] nodes;
-        public float delay;
+[CustomEntity("SorbetHelper/ReturnBerry")]
+[RegisterStrawberry(true, false)]
+public class ReturnBerry : Strawberry {
+    private readonly Vector2[] nodes;
+    private readonly float bubbleDelay;
+    private readonly bool bubbleParticles;
 
-        public ReturnBerry(EntityData data, Vector2 offset, EntityID gid) : base(data, offset, gid) {
-            nodes = data.NodesOffset(offset);
-            delay = data.Float("delay", 0.3f);
-            isGhostBerry = SaveData.Instance.CheckStrawberry(ID);
-            Add(new PlayerCollider(OnPlayer));
-            // Creates a strawberry seed list with no strawberry seeds to effectively remove them.
-            if (data.Nodes != null && data.Nodes.Length != 0) {
-                Seeds = new List<StrawberrySeed>();
-                if (data.Nodes.Length > 2) {
-                    for (int i = 2; i < data.Nodes.Length; i++) {
-                        Seeds.Add(new StrawberrySeed(this, offset + data.Nodes[i], i, isGhostBerry));
-                    }
+    public ReturnBerry(EntityData data, Vector2 offset, EntityID id) : base(data, offset, id) {
+        nodes = data.NodesOffset(offset);
+        bubbleDelay = data.Float("delay", 0.3f);
+        bubbleParticles = data.Bool("bubbleParticles", false);
+
+        Remove(Get<PlayerCollider>());
+        Add(new PlayerCollider(OnPlayer));
+
+        // recreate the strawberry seed list but accounting for the first 2 nodes being for the bubble
+        if (data.Nodes is { Length: > 0 }) {
+            Seeds.Clear();
+
+            if (data.Nodes.Length > 2) {
+                for (int i = 0; i < data.Nodes.Length - 2; i++) {
+                    Seeds.Add(new StrawberrySeed(this, offset + data.Nodes[i], i, isGhostBerry));
                 }
             }
         }
+    }
 
-        public new void OnPlayer(Player player) {
-            // Calls the OnPlayer function from Strawberry, then starts NodeRoutine if there are 2 or more nodes.
-            base.OnPlayer(player);
-            if (nodes != null && nodes.Length >= 2) {
-                Add(new Coroutine(NodeRoutine(player)));
-                Collidable = false;
-            }
+    public override void Update() {
+        base.Update();
+
+        // bubbles !!
+        // i think ive seen like a map or two do this before with a seperate emitter entity but honestly i feel like itd be cool to have it built in
+        if (!bubbleParticles || Follower.HasLeader || collected || WaitingOnSeeds || !Visible || CollideCheck<FakeWall>() || CollideCheck<Solid>())
+            return;
+
+        if (Scene.OnInterval(0.55f, ID.ID * 64f)) // not sure abt speed still or whether it shd be fast or slow
+            (Scene as Level).Particles.Emit(Player.P_CassetteFly, 2, Center + new Vector2(0f, 2f), new Vector2(5f));
+    }
+
+    public new void OnPlayer(Player player) {
+        // not an override method but still need to call "base" because the original playercollider get removed
+        base.OnPlayer(player);
+
+        if (nodes is { Length: >= 2 }) {
+            Add(new Coroutine(NodeRoutine(player)));
+            Collidable = false;
         }
+    }
 
-        private IEnumerator NodeRoutine(Player player) {
-            if (delay > 0f)
-                yield return delay;
+    private IEnumerator NodeRoutine(Player player) {
+        if (bubbleDelay > 0f)
+            yield return bubbleDelay;
 
-            // If the player is still alive, put them in the CassetteFly state
-            if (!player.Dead) {
-                Audio.Play("event:/game/general/cassette_bubblereturn", SceneAs<Level>().Camera.Position + new Vector2(160f, 90f));
-                player.StartCassetteFly(nodes[1], nodes[0]);
-            }
+        // if maddy is still alive put her in a bubble
+        if (!player.Dead) {
+            Audio.Play("event:/game/general/cassette_bubblereturn", (Scene as Level).Camera.GetCenter());
+            player.StartCassetteFly(nodes[1], nodes[0]);
         }
     }
 }

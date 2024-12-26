@@ -47,12 +47,13 @@ for k,v in ipairs(axes) do
             axes = v,
             allowWavedash = false,
             dashCornerCorrection = false,
+            refillDash = false,
             linkTag = "" -- this is flag on activate in editor
         }
     })
 end
 
-dashGateBlock.fieldOrder = {"x", "y", "width", "height", "inactiveColor", "activeColor", "finishColor", "moveSound", "blockSprite", "finishedSound", "iconSprite", "shakeTime", "axes", "moveTime", "linkTag", "moveEased", "allowReturn", "allowWavedash", "dashCornerCorrection", "smoke", "persistent"}
+dashGateBlock.fieldOrder = {"x", "y", "width", "height", "inactiveColor", "activeColor", "finishColor", "moveSound", "blockSprite", "finishedSound", "iconSprite", "shakeTime", "axes", "moveTime", "linkTag", "moveEased", "allowReturn", "allowWavedash", "dashCornerCorrection", "smoke", "persistent", "refillDash"}
 
 dashGateBlock.fieldInformation = {
     inactiveColor = {

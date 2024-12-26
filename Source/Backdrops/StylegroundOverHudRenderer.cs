@@ -43,7 +43,7 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
             // additive blendmode backdrops
             if (AdditiveBackdrops.Count > 0) {
                 BackdropRenderer.Backdrops = AdditiveBackdrops;
-                if (!level.Paused || Settings.PauseUpdate)
+                if (Settings.PauseUpdate)
                     BackdropRenderer.Update(level);
 
                 BackdropRenderer.BeforeRender(level);
@@ -56,7 +56,7 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
             // normal backdrops
             if (Backdrops.Count > 0) {
                 BackdropRenderer.Backdrops = Backdrops;
-                if (!level.Paused || Settings.PauseUpdate)
+                if (Settings.PauseUpdate)
                     BackdropRenderer.Update(level);
 
                 BackdropRenderer.BeforeRender(level);
@@ -79,6 +79,21 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
                 AdditiveBuffers[i]?.Dispose();
             }
             AdditiveBuffers.Clear();
+        }
+
+        public override void Update(Scene scene) {
+            if (Settings.PauseUpdate)
+                return;
+
+            if (AdditiveBackdrops.Count > 0) {
+                BackdropRenderer.Backdrops = AdditiveBackdrops;
+                BackdropRenderer.Update(scene);
+            }
+
+            if (Backdrops.Count > 0) {
+                BackdropRenderer.Backdrops = Backdrops;
+                BackdropRenderer.Update(scene);
+            }
         }
 
         public override void BeforeRender(Scene scene) {
@@ -344,10 +359,8 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
         // this only exists to make the [LoadLevel] Failed loading entity SorbetHelper/StylegroundOverHudController thing shut up because the controller is only used to get settings for and check whether to enable the renderer
         // probably a better way to do this maybe but as is the case with literally everything else in this mod it Works(tm) which means it is Good Enough(tm)
         [CustomEntity("SorbetHelper/StylegroundOverHudController")]
-        private class DummyEntity : Entity {
-            public override void Added(Scene scene) {
-                RemoveSelf();
-            }
+        private class DummyEntity {
+            public static Entity Load(Level level, LevelData levelData, Vector2 position, EntityData entityData) => null;
         }
     }
 }

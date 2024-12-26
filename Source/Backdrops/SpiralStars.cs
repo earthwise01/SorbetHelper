@@ -41,7 +41,8 @@ public class SpiralStars : Backdrop {
     private readonly float trailDelay;
 
     public SpiralStars(BinaryPacker.Element data) : base() {
-        center = new(data.AttrFloat("centerX", 160f), data.AttrFloat("centerY", 90f));
+        center.X = data.AttrFloat("centerX", 160f);
+        center.Y = data.AttrFloat("centerY", 90f);
 
         speed = data.AttrFloat("speed", 70f);
         rotationSpeed = Calc.DegToRad * data.AttrFloat("rotationSpeed", -40f);
@@ -65,7 +66,7 @@ public class SpiralStars : Backdrop {
         }
 
         backgroundColor = Util.HexToColorWithAlphaNonPremult(data.Attr("backgroundColor", "00000000"));
-        var colors = data.Attr("colors", "ffffff").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(Calc.HexToColor).ToArray();
+        var colors = data.AttrList("colors", Calc.HexToColor, "ffffff").ToArray();
 
         int starCount = data.AttrInt("starCount", 100);
         stars = new Star[starCount];

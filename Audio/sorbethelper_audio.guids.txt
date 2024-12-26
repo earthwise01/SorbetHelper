@@ -1,3 +1,6 @@
+{5534157c-5fb9-484a-831f-5d7810101393} event:/sorbethelper/sfx/bubblereturn_split/pop
+{81f906a3-b64b-4552-843e-9c274e5109d0} event:/sorbethelper/sfx/bubblereturn_split/slide
+{47df000f-daee-4489-bc08-8765d30361e3} event:/sorbethelper/sfx/bubblereturn_split/start
 {63f58200-0b2c-439c-a6e2-60f07fd99f05} event:/sorbethelper/sfx/gateblock_finish
 {6441f099-ebba-43df-b6d6-6b6726114b8e} event:/sorbethelper/sfx/gateblock_open
 {4d234f07-4e54-4978-a532-0da1b5bad9fe} event:/sorbethelper/sfx/gateblock_dash_hit

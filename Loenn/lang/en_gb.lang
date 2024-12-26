@@ -29,26 +29,58 @@ entities.SorbetHelper/ReturnBerry.attributes.description.winged=Determines wheth
 entities.SorbetHelper/ReturnBerry.attributes.description.delay=The delay (in seconds) before the player is placed into a bubble after grabbing the strawberry. (Default = 0.3)
 entities.SorbetHelper/ReturnBerry.attributes.description.checkpointID=Manually determine what checkpoint section strawberries are visually grouped up in, showing up on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)
 entities.SorbetHelper/ReturnBerry.attributes.description.order=Manually determine what order strawberries are visually placed in on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)
+entities.SorbetHelper/ReturnBerry.attributes.description.bubbleParticles=Whether the strawberry should visually indicate that it bubbles the player by periodically emitting bubble particles.
 
-# Dash Falling Block
-entities.SorbetHelper/DashFallingBlock.placements.name.falling_block=Dash Falling Block
-entities.SorbetHelper/DashFallingBlock.placements.description.falling_block=A falling block that only gets activated once the player dashes into it.
-entities.SorbetHelper/DashFallingBlock.attributes.description.climbFall=If the block should fall if the player climbs on its sides.\nDoes nothing unless Fall On Touch is enabled.
-entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnTouch=If the block can be triggered in the same ways as a regular falling block, even if not dashed into.
+# custom falling block
+entities.SorbetHelper/CustomFallingBlock.placements.name.customFallingBlock=Custom Falling Block
+entities.SorbetHelper/CustomFallingBlock.attributes.description.tiletype=Determines the visual appearance of the falling block.
+entities.SorbetHelper/CustomFallingBlock.attributes.description.direction=The direction the falling block will fall towards.
+entities.SorbetHelper/CustomFallingBlock.attributes.description.flagOnFall=An optional session flag to set when the block starts falling.
+entities.SorbetHelper/CustomFallingBlock.attributes.description.flagOnLand=An optional session flag to set when the block lands.
+entities.SorbetHelper/CustomFallingBlock.attributes.description.triggerFlag=An optional session flag which should trigger the block to fall.
+entities.SorbetHelper/CustomFallingBlock.attributes.description.fallOnTouch=Whether the block should fall when the player lands on it.
+entities.SorbetHelper/CustomFallingBlock.attributes.description.climbFall=Whether the block should also fall if the player climbs on its sides.\nRequires Fall On Touch to be enabled.
+entities.SorbetHelper/CustomFallingBlock.attributes.name.fallOnStaticMover=Static Mover Triggered
+entities.SorbetHelper/CustomFallingBlock.attributes.description.fallOnStaticMover=Whether the falling block can be triggered by static movers (such as springs) attached to it.
+entities.SorbetHelper/CustomFallingBlock.attributes.description.breakDashBlocks=Whether the falling block can break dash blocks.
+entities.SorbetHelper/CustomFallingBlock.attributes.description.initialShakeTime=How long (in seconds) the block should initially shake for.
+entities.SorbetHelper/CustomFallingBlock.attributes.description.variableShakeTime=How long (in seconds) the block should continue shaking for, after the initial shake time.\nUnlike the initial timer, this can be interupted if the player stops touching the block (as long as they were what caused it to fall).
+entities.SorbetHelper/CustomFallingBlock.attributes.description.maxSpeed=The maximum speed of the block (in pixels per second) as it falls.
+entities.SorbetHelper/CustomFallingBlock.attributes.description.acceleration=The acceleration of the block (in pixels per second) as it falls.
+entities.SorbetHelper/CustomFallingBlock.attributes.description.shakeSfx=The sound played by the block before it falls.
+entities.SorbetHelper/CustomFallingBlock.attributes.description.impactSfx=The sound played by the block when it lands on the ground.
+entities.SorbetHelper/CustomFallingBlock.attributes.description.depth=Determines the visual depth of the block.\nHigher values mean farther behind in the scene, default value is -9000.
+entities.SorbetHelper/CustomFallingBlock.attributes.description.chronoHelperGravity=Whether the falling block should be affected by Gravity Falling Block Switches from Chrono Helper.\nRequires Chrono Helper.
+
+# dash falling block
+entities.SorbetHelper/DashFallingBlock.placements.name.dashFallingBlock=Dash Falling Block
+entities.SorbetHelper/DashFallingBlock.placements.description.dashFallingBlock=a falling block that falls when dashed into
+entities.SorbetHelper/DashFallingBlock.attributes.description.tiletype=Determines the visual appearance of the falling block.
+entities.SorbetHelper/DashFallingBlock.attributes.description.direction=The direction the falling block will fall towards.
+entities.SorbetHelper/DashFallingBlock.attributes.description.flagOnFall=An optional session flag to set when the block starts falling.
+entities.SorbetHelper/DashFallingBlock.attributes.description.flagOnLand=An optional session flag to set when the block lands.
+entities.SorbetHelper/DashFallingBlock.attributes.description.triggerFlag=An optional session flag which should trigger the block to fall.
+entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnTouch=Whether the block should fall when the player lands on it.
+entities.SorbetHelper/DashFallingBlock.attributes.description.climbFall=Whether the block should also fall if the player climbs on its sides.\nRequires Fall On Touch to be enabled.
 entities.SorbetHelper/DashFallingBlock.attributes.name.fallOnStaticMover=Static Mover Triggered
-entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnStaticMover=If the falling block can be activated by static movers (such as springs) attached to it.
-entities.SorbetHelper/DashFallingBlock.attributes.description.depth=Determines what visual layer the block should be on (higher values mean farther behind in the scene, default value is -9000).
+entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnStaticMover=Whether the falling block can be triggered by static movers (such as springs) attached to it.
+entities.SorbetHelper/DashFallingBlock.attributes.description.breakDashBlocks=Whether the falling block can break dash blocks.
+entities.SorbetHelper/DashFallingBlock.attributes.description.initialShakeTime=How long (in seconds) the block should initially shake for.
+entities.SorbetHelper/DashFallingBlock.attributes.description.variableShakeTime=How long (in seconds) the block should continue shaking for, after the initial shake time.\nUnlike the initial timer, this can be interupted if the player stops touching the block (as long as they were what caused it to fall).
+entities.SorbetHelper/DashFallingBlock.attributes.description.maxSpeed=The maximum speed of the block (in pixels per second) as it falls.
+entities.SorbetHelper/DashFallingBlock.attributes.description.acceleration=The acceleration of the block (in pixels per second) as it falls.
 entities.SorbetHelper/DashFallingBlock.attributes.description.shakeSfx=The sound played by the block before it falls.
-entities.SorbetHelper/DashFallingBlock.attributes.description.impactSfx=The sound played by the block either when it lands on the ground or is dashed into.
-entities.SorbetHelper/DashFallingBlock.attributes.description.tiletype=Changes the visual appearance of the falling block.
-entities.SorbetHelper/DashFallingBlock.attributes.description.allowWavedash=If it is possible to wavedash on top of the block.
+entities.SorbetHelper/DashFallingBlock.attributes.description.impactSfx=The sound played by the block when it lands on the ground, or is dashed into.
+entities.SorbetHelper/DashFallingBlock.attributes.description.depth=Determines the visual depth of the block.\nHigher values mean farther behind in the scene, default value is -9000.
+entities.SorbetHelper/DashFallingBlock.attributes.description.chronoHelperGravity=Whether the falling block should be affected by Gravity Falling Block Switches from Chrono Helper.\nRequires Chrono Helper.
+
+entities.SorbetHelper/DashFallingBlock.attributes.description.allowWavedash=Whether it is possible to wavedash on top of the block.
 entities.SorbetHelper/DashFallingBlock.attributes.name.dashCornerCorrection=Easier Wallbounce
 entities.SorbetHelper/DashFallingBlock.attributes.description.dashCornerCorrection=Makes wallbouncing off of the block less precise (by allowing it up to 4 pixels deep into the block horizontally, dashing from the bottom).
-entities.SorbetHelper/DashFallingBlock.attributes.description.breakDashBlocks=Whether the falling block can break dash blocks.
-entities.SorbetHelper/DashFallingBlock.attributes.description.direction=The direction the falling block will fall towards.
 entities.SorbetHelper/DashFallingBlock.attributes.name.fallDashMode=Fall Towards Dash Direction
+entities.SorbetHelper/DashFallingBlock.attributes.description.refillDash=Whether the player should refill their dash when hitting the block.
 entities.SorbetHelper/DashFallingBlock.attributes.description.fallDashMode=Whether the direction the falling block will fall towards is determined by the direction it was dashed into from.\nOverrides the normal direction setting when enabled.
-entities.SorbetHelper/DashFallingBlock.attributes.description.dashActivated=Determines whether the block can be activated by dashing into it, disabling this effectively turns it into a regular falling block (but with some more customizabilty).
+entities.SorbetHelper/DashFallingBlock.attributes.description.dashActivated=Determines whether the block can be activated by dashing into it. Disabling this effectively turns this into a regular custom falling block.
 
 # crumble on flag block
 entities.SorbetHelper/CrumbleOnFlagBlock.placements.name.crumble_on_flag_block=Crumble On Flag Block
@@ -129,6 +161,24 @@ entities.SorbetHelper/StylegroundOverHudController.attributes.name._instructions
 entities.SorbetHelper/StylegroundOverHudController.attributes.description._instructionsButton=hi! i wanted to put this somewhere decently visible so here's a rough overview on how to use this controller\n\n~~~ the Important Stuff ~~~\n- you only need *one controller per map*! so as long as you have one even just like. sitting in the corner of a random filler room or something, the controller should be enabled.\n- once you have a controller somewhere, in order for your stylegrounds to actually appear above the hud, you'll need to add 'sorbetHelper_drawAboveHud' into their tag fields.\n- you're done! any stylegrounds with that tag should now be rendering on top of input prompts, textboxes, etc.\n\n~~~ some additional info/random stuff ~~~\n- currently, above hud stylegrounds will be unaffected by colorgrades due to Technical Limitations.\n\n- additive blendmode stylegrounds are supported, but pls note that also due to Technical Limitations, will always render above non-additive stylegrounds.\n\n- the controller will disable its effect on stylegrounds if the game is paused, but this can be changed to either keep them above or make them completely unaffected by pausing.\n  see the tooltip as well, but in the end it probably mostly comes down to personal preference abt what'd work best for your stylegrounds, though i would vaugely suggest:\n    'Disable When Paused' for consistency with vanilla or if your stylegrounds are decently busy in general/might cover up too much of the pause menu.\n    'Update When Paused' if your stylegrounds have at least some movement, aren't insanely busy and you want maximum *atmosphere and immersion* or something.\n    'Pause Above' if you still want the stylegrounds above the pause menu, but don't have moving stylegrounds or find the stylegrounds moving while paused weird/distracting.
 # currently additive blend mode stylegrounds doesn't work properly, and colorgrading doesn't have any effect on affected stylegrounds due to technical limitations.\ni'm still looking to see if i can get them working but if i do theres a good chance there'll probably be some sort of jank (at least on the code side).\n\nby default the controller will disable itself when the game is paused.\nthis can be adjusted to either stop the stylegrounds from pausing altogether, or to keep them pausing but still render them above the pause menu.\nsee the tooltip as well but personally: use Update When Paused if your stylegrounds have some movement, aren't insanely busy and you want ~maximum atmosphere~, and,\nuse Disable When Paused otherwise or if your stylegrounds are kinda busy and would cover too much of the pause menu. (or just, yknow, try all 3 and see which you prefer idk)
 
+# return bubble behavior
+entities.SorbetHelper/ReturnBubbleBehaviorController.placements.name.controller=Return Bubble Behavior Controller
+entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.time=How long (in seconds) it should take the bubble to move to its destination.\nVanilla value is 0.625 (1 / 1.6).
+entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.speed=A speed the bubble should use to approximately determine its move time, if Use Speed is enabled.\n(might not be 100% accurate at all times but still fairly close)
+entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.useSpeed=Whether the bubble should move depending on the Time or Speed attribute.
+entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.easing=The easer to use for the bubble's movement.\nVanilla value is SineInOut.
+entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.smoothCamera=Whether the camera should smoothly follow the player in the bubble rather than perfectly snapping to them.\nVanilla value is disabled.
+entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.collisionMode=How the player should be able to collide with stuff while in the bubble.\n- Vanilla\n    The player collides with stuff the same as in a vanilla return bubble.\n- DisableSquish\n    Same as Vanilla, but prevents the player from dying if they collide with a moving block while in the bubble.\n- NoCollide\n    Completely disables *all* collision while inside the bubble,\n    including things like triggering triggers, exploding puffers/bumpers, activating blocks like zip movers, etc.\nVanilla value is Vanilla.
+
+# light cover controller
+entities.SorbetHelper/LightCoverController.placements.name.controller=Light Cover Controller
+entities.SorbetHelper/LightCoverController.attributes.description.classNames=A comma seperated list of C# entity class names the controller should affect.\nYou can use something like CelesteTAS or Mapping Utils's profiling tab to try and find these.
+entities.SorbetHelper/LightCoverController.attributes.description.useFullClassNames=Whether the controller should check for the fully qualified class names or just the name of the class.\ne.g. Celeste.SummitCloud vs SummitCloud
+entities.SorbetHelper/LightCoverController.attributes.description.alpha=How strong the light cover is.
+entities.SorbetHelper/LightCoverController.attributes.description.minDepth=The minimum (closest to the camera) depth an entity can have while being affected by the controller.\nAllows restricting the controller to specific entities if you have multiple of the same but with different depths.\nLeave empty to make uncapped.
+entities.SorbetHelper/LightCoverController.attributes.description.maxDepth=The maximum (farthest from the camera) depth an entity can have while being affected by the controller.\nAllows restricting the controller to specific entities if you have multiple of the same but with different depths.\nLeave empty to make uncapped.
+entities.SorbetHelper/LightCoverController.attributes.description.global=Whether the controller should apply globally, to every entity as they are loaded.\nAllows even affecting entities added after room load, and automatically across the whole map.
+
 # depth adhering displacement wrapper
 # names probably still kinda suck but i literally cant think of anything better
 # update: renamed from displacement wrappers to displacement depth fixers which i think im actually somewhat happy with,,
@@ -163,6 +213,26 @@ entities.SorbetHelper/DisplacementEffectArea.attributes.description.waterDisplac
 entities.SorbetHelper/DisplacementEffectArea.attributes.description.alpha=The overall strength of the displacement.
 entities.SorbetHelper/DisplacementEffectArea.attributes.description.depth=The visual depth the effect should be applied at (using the power of depth adhering displacement).
 
+# entity styleground controller
+entities.SorbetHelper/EntityStylegroundController.placements.name.controller=Entity As Styleground Controller
+entities.SorbetHelper/EntityStylegroundController.placements.name.altname=Entity on Styleground Layer Controller
+entities.SorbetHelper/EntityStylegroundController.placements.description.controller=Marks specified entity types to be drawn as a styleground layer by an Entity As Styleground Renderer styleground.
+entities.SorbetHelper/EntityStylegroundController.attributes.description.classNames=A comma seperated list of C# entity class names the controller should affect.\nYou can use something like CelesteTAS or Mapping Utils's profiling tab to try and find these.
+entities.SorbetHelper/EntityStylegroundController.attributes.description.useFullClassNames=Whether the controller should check for the fully qualified class names or just the name of the class.\ne.g. Celeste.SummitCloud vs SummitCloud
+entities.SorbetHelper/EntityStylegroundController.attributes.description.minDepth=The minimum (closest to the camera) depth an entity can have while being affected by the controller.\nAllows restricting the controller to specific entities if you have multiple of the same but with different depths.\nLeave empty to make uncapped.
+entities.SorbetHelper/EntityStylegroundController.attributes.description.maxDepth=The maximum (farthest from the camera) depth an entity can have while being affected by the controller.\nAllows restricting the controller to specific entities if you have multiple of the same but with different depths.\nLeave empty to make uncapped.
+entities.SorbetHelper/EntityStylegroundController.attributes.description.tag=The styleground tag used to match with an Entity As Styleground Renderer styleground.\nRequired in order for the controller to have any effect.
+entities.SorbetHelper/EntityStylegroundController.attributes.description.global=Whether the controller should apply globally, to every entity as they are loaded.\nAllows even affecting entities added after room load, and automatically across the whole map.
+entities.SorbetHelper/EntityStylegroundController.attributes.name._instructionsButton=Info
+entities.SorbetHelper/EntityStylegroundController.attributes.description._instructionsButton=~~~ some misc info ~~~\n- the controller will *not* work on its own, but rather requires the map to have an Entity As Styleground Renderer styleground with a matching tag field.\n\n- for decals specifically, there is also a decal registry attribute available, <sorbetHelper_styleground stylegroundTag=""/>\n  this has the same requirement of an Entity As Styleground Renderer (though note that a controller isn't required when using the decal registry)\n\n- expect to encounter random issues sometimes, especially if you're using this with an entity with particularly complex rendering-\n  this is likely not the fault of either me or whoever made the entity,\n  but just a consequence of it (very reasonably) not expecting to be in these conditions, sorry!
+
+# styleground entity controller
+entities.SorbetHelper/StylegroundEntityController.placements.name.controller=Styleground As Entity Controller
+entities.SorbetHelper/StylegroundEntityController.placements.name.altname=Styleground Depth Controller
+entities.SorbetHelper/StylegroundEntityController.placements.description.controller=Makes stylegrounds with a specified tag render as an entity, with a customizable depth.\nBasically a "Styleground Depth Controller".
+entities.SorbetHelper/StylegroundEntityController.attributes.description.tag=The styleground tag to affect.
+entities.SorbetHelper/StylegroundEntityController.attributes.description.depth=The visual depth the stylegrounds should be drawn at.\nHigher values mean farther behind in the scene.
+
 # dash gate block
 # most tooltips stolen from maddie's helping hand
 # https://github.com/maddie480/MaddieHelpingHand/blob/1297e45c72dbf27972e8396139406dd55e65c227/Loenn/lang/en_gb.lang#L194
@@ -186,6 +256,7 @@ entities.SorbetHelper/DashGateBlock.attributes.description.smoke=Whether the blo
 entities.SorbetHelper/DashGateBlock.attributes.description.allowWavedash=Whether it is possible to wavedash on top of the block.
 entities.SorbetHelper/DashGateBlock.attributes.name.dashCornerCorrection=Easier Wallbounce
 entities.SorbetHelper/DashGateBlock.attributes.description.dashCornerCorrection=Makes wallbouncing off of the block less precise (by allowing it up to 4 pixels deep into the block horizontally, dashing from the bottom).
+entities.SorbetHelper/DashGateBlock.attributes.description.refillDash=Whether the player should refill their dash when hitting the block.
 entities.SorbetHelper/DashGateBlock.attributes.name.axes=Dashable Axes
 entities.SorbetHelper/DashGateBlock.attributes.description.axes=Determines which sides of the block can be dashed into.
 entities.SorbetHelper/DashGateBlock.attributes.name.linkTag=Flag On Activate
@@ -215,10 +286,34 @@ entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnStaticMover=Wh
 entities.SorbetHelper/TouchGateBlock.attributes.name.linkTag=Flag On Activate
 entities.SorbetHelper/TouchGateBlock.attributes.description.linkTag=An optional session flag to enable when the block activates.
 
+# -- triggers --
+
+# alttalkcomponentui
+triggers.SorbetHelper/MinimalInteractPrompt.placements.name.altTalkUI=Minimal Interact Prompt
+triggers.SorbetHelper/MinimalInteractPrompt.placements.description.altTalkUI=Replaces the normal interaction/talk prompt with a more subtle one that slides in from the side.
+triggers.SorbetHelper/MinimalInteractPrompt.attributes.name.dialogId=Label Dialog ID
+triggers.SorbetHelper/MinimalInteractPrompt.attributes.description.dialogId=The dialog ID to use for the prompt.
+triggers.SorbetHelper/MinimalInteractPrompt.attributes.description.onLeft=Whether the prompt should come from the left side of the screen, instead of the right.
+triggers.SorbetHelper/MinimalInteractPrompt.attributes.description.playHighlightSfx=Whether to still play the vanilla sfx for when the prompt is highlighted.
+
+# mini popups
+triggers.SorbetHelper/MiniPopupTrigger.placements.name.miniPopup=Mini Popup Trigger
+triggers.SorbetHelper/MiniPopupTrigger.attributes.description.activeTime=How long (in seconds) the mini popup should stay visible for.
+triggers.SorbetHelper/MiniPopupTrigger.attributes.description.titleText=The dialog ID to use for the title of the mini popup.
+triggers.SorbetHelper/MiniPopupTrigger.attributes.description.subText=The dialog ID to use for the subtitle of the mini popup.
+triggers.SorbetHelper/MiniPopupTrigger.attributes.description.baseColor=The base color of the mini popup.
+triggers.SorbetHelper/MiniPopupTrigger.attributes.description.accentColor=The color of the subtitle text and accent of the mini popup.
+triggers.SorbetHelper/MiniPopupTrigger.attributes.description.titleColor=The color of the title text of the mini popup.
+triggers.SorbetHelper/MiniPopupTrigger.attributes.description.iconTexture=An optional icon to display on the mini popup, relative to Graphics/Atlases/Gui/.\nThe texture should be square shaped to prevent it from being awkwardly stretched.
+triggers.SorbetHelper/MiniPopupTrigger.attributes.name.mode=Activation Mode
+triggers.SorbetHelper/MiniPopupTrigger.attributes.description.mode=Determines how the trigger will activate.
+triggers.SorbetHelper/MiniPopupTrigger.attributes.description.onlyOnce=Whether the mini popup should only be able to trigger once per session.
+triggers.SorbetHelper/MiniPopupTrigger.attributes.description.flag=A session flag.\nUsed as needed for the activation mode, otherwise determines whether or not the player can collide with the trigger.
+
 # -- effects/backdrops --
 
 # parallax hires snow
-style.effects.SorbetHelper/ParallaxHiResSnow.name=Parallax Hi-Res Snow (Customizable)
+style.effects.SorbetHelper/ParallaxHiResSnow.name=Parallax Hi-Res Snow
 style.effects.SorbetHelper/ParallaxHiResSnow.description.color=The color of the particles.
 style.effects.SorbetHelper/ParallaxHiResSnow.description.alpha=The opacity of the particles, between 0 (translucent) and 1 (opaque).
 style.effects.SorbetHelper/ParallaxHiResSnow.description.additive=How much additive blending the particles should use, between 0 (not additive) and 1 (fully additive).
@@ -297,5 +392,10 @@ style.effects.SorbetHelper/HiResGodrays.attribute.fadex=Fade X
 style.effects.SorbetHelper/HiResGodrays.attribute.fadey=Fade Y
 style.effects.SorbetHelper/HiResGodrays.description.fadex=Advanced horizontal fading zones.\nFormat is "FromPosition-ToPosition,FromAlpha-ToAlpha". Example "n500-500,1-0".\nNegative numbers in position are denoted with "n" rather than minus. Position numbers are in pixels and use map coordinates.\nMultiple zones can be set up by using ":" as separator.
 style.effects.SorbetHelper/HiResGodrays.description.fadey=Advanced vertical fading zones.\nFormat is "FromPosition-ToPosition,FromAlpha-ToAlpha". Example "n500-500,1-0".\nNegative numbers in position are denoted with "n" rather than minus. Position numbers are in pixels and use map coordinates.\nMultiple zones can be set up by using ":" as separator.
+
+# entity styleground renderer
+style.effects.SorbetHelper/EntityStylegroundRenderer.name=Entity As Styleground Renderer
+style.effects.SorbetHelper/EntityStylegroundRenderer.attribute._instructionsButton=Info
+style.effects.SorbetHelper/EntityStylegroundRenderer.description._instructionsButton=this effect will *not* do anything on its own, but rather acts as a renderer for either\nentities affected by an Entity As Styleground Controller or decals affected by a <sorbetHelper_styleground/> decal registry tag\nwith matching tag fields.
 
 mods.SorbetHelper.name=Sorbet Helper

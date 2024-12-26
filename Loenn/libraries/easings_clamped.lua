@@ -1,0 +1,18 @@
+return {
+    "Linear",
+    "SineIn",
+    "SineOut",
+    "SineInOut",
+    "QuadIn",
+    "QuadOut",
+    "QuadInOut",
+    "CubeIn",
+    "CubeOut",
+    "CubeInOut",
+    "QuintIn",
+    "QuintOut",
+    "QuintInOut",
+    "ExpoIn",
+    "ExpoOut",
+    "ExpoInOut",
+}

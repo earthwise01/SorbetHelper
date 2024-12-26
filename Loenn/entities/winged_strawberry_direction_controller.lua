@@ -1,7 +1,7 @@
 local wingedStrawberryDirectionController = {}
 
 wingedStrawberryDirectionController.name = "SorbetHelper/WingedStrawberryDirectionController"
-wingedStrawberryDirectionController.texture = "objects/SorbetHelper/wingedStrawberryDirectionController/icon"
+wingedStrawberryDirectionController.texture = "editorSprites/SorbetHelper/wingedStrawberryDirectionController"
 wingedStrawberryDirectionController.placements = {
     name = "wingedStrawberryController",
     data = {

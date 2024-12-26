@@ -1,0 +1,19 @@
+# alternate interact prompt label presets
+# probably still could add more
+
+sorbethelper_ui_talk= Talk
+sorbethelper_ui_use= Use
+sorbethelper_ui_pet= Pet
+sorbethelper_ui_check= Check
+sorbethelper_ui_inspect= Inspect
+sorbethelper_ui_toggle= Toggle
+
+# mod settings
+
+modsettings_sorbethelper_minipopupcap_description=
+reduce the maximum allowed amount of mini popups on-screen at once
+allows decreasing (not increasing!) the bulit-in caps of:
+Small -> 10, Normal -> 8, Large -> 6
+
+modsettings_sorbethelper_minipopupsize_description=
+Small -> 75%, Normal -> 100%, Large -> 125%

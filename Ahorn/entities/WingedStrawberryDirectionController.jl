@@ -34,6 +34,6 @@ function Ahorn.selection(entity::WingedStrawberryDirectionController)
     return Ahorn.Rectangle(x - 12, y - 12, 24, 24)
 end
 
-Ahorn.render(ctx::Ahorn.Cairo.CairoContext, entity::WingedStrawberryDirectionController, room::Maple.Room) = Ahorn.drawImage(ctx, "objects/SorbetHelper/wingedStrawberryDirectionController/icon", -12, -12)
+Ahorn.render(ctx::Ahorn.Cairo.CairoContext, entity::WingedStrawberryDirectionController, room::Maple.Room) = Ahorn.drawImage(ctx, "editorSprites/SorbetHelper/wingedStrawberryDirectionController/icon", -12, -12)
 
 end

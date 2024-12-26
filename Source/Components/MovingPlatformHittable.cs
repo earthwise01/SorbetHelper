@@ -39,7 +39,7 @@ namespace Celeste.Mod.SorbetHelper.Components {
 
             // go to *just* before the check for dash blocks, afterlabel is needed since this is at the start of the movement loop
             if (!cursor.TryGotoNext(MoveType.AfterLabel, instr => instr.MatchLdarg2(), instr => instr.MatchBrfalse(out _))) {
-                Logger.Log(LogLevel.Warn, "SorbetHelper", $"Failed to inject code to make horizontal falling blocks/kevins/etc activate moving block platform components in CIL code for {cursor.Method.Name}");
+                Logger.Log(LogLevel.Warn, "SorbetHelper", $"Failed to inject code to make horizontal falling blocks/kevins/etc activate moving platform hittable components in CIL code for {cursor.Method.Name}");
                 return;
             }
 
@@ -56,7 +56,7 @@ namespace Celeste.Mod.SorbetHelper.Components {
 
             // go to *just* before the check for dash blocks, afterlabel is needed since this is at the start of the movement loop
             if (!cursor.TryGotoNext(MoveType.AfterLabel, instr => instr.MatchLdarg2(), instr => instr.MatchBrfalse(out _))) {
-                Logger.Log(LogLevel.Warn, "SorbetHelper", $"Failed to inject code to make vertical falling blocks/kevins/etc activate moving block platform components in CIL code for {cursor.Method.Name}");
+                Logger.Log(LogLevel.Warn, "SorbetHelper", $"Failed to inject code to make vertical falling blocks/kevins/etc activate moving platform hittable components in CIL code for {cursor.Method.Name}");
                 return;
             }
 
