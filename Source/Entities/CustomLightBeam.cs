@@ -49,12 +49,14 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         private readonly MTexture beamTexture;
 
+        private static bool useRenderTarget = false; // originally added this because i was worried abt performance but  honestly i dont know if its rly needed or might be worse
+                                                     //  not fully removing in case it was actually helping n i need to revert so an unchanging "toggle" is good enough
         private VirtualRenderTarget lightbeamTarget;
         private Matrix targetMatrix;
         private readonly float offset;
 
         private readonly float rectangleTop, rectangleBottom, rectangleLeft, rectangleRight;
-        private bool visibleOnCamera, wasVisibleOnCamera;
+        private bool wasVisibleOnCamera;
         private const int visibilityPadding = 16;
 
         public CustomLightBeam(EntityData data, Vector2 offset) : base(data.Position + offset) {
@@ -109,7 +111,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             rectangleLeft = Math.Min(Math.Min(baseCornerA.X, baseCornerB.X), Math.Min(edgeCornerA.X, edgeCornerB.X));
             rectangleRight = Math.Max(Math.Max(baseCornerA.X, baseCornerB.X), Math.Max(edgeCornerA.X, edgeCornerB.X));
 
-            Add(new BeforeRenderHook(BeforeRender));
+            if (useRenderTarget)
+                Add(new BeforeRenderHook(BeforeRender));
         }
 
         public override void Awake(Scene scene) {
@@ -125,6 +128,9 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             if (level.Transitioning && fadeOnTransition) {
                 baseAlpha = 0f;
             }
+
+            if (!useRenderTarget)
+                return;
 
             // initialize render target and matrix
             // whY did i do this   huhh?? what was i thinking
@@ -152,11 +158,11 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         public override void Update() {
             timer += Engine.DeltaTime;
-            Level level = base.Scene as Level;
-            Player entity = base.Scene.Tracker.GetEntity<Player>();
+            Level level = Scene as Level;
+            Player entity = Scene.Tracker.GetEntity<Player>();
 
-            wasVisibleOnCamera = visibleOnCamera;
-            visibleOnCamera = InView(level.Camera);
+            wasVisibleOnCamera = Visible;
+            Visible = InView(level.Camera);
 
             // vanilla lightbeam fading
             if (entity != null) {
@@ -190,7 +196,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             alpha = baseAlpha * flagAlpha;
 
             // emit particles
-            if (visibleOnCamera && !noParticles && alpha >= 0.5f && level.OnInterval(0.8f, offset)) {
+            if (Visible && !noParticles && alpha >= 0.5f && level.OnInterval(0.8f, offset)) {
                 Vector2 vector3 = Calc.AngleToVector(rotation + (float)Math.PI / 2f, 1f);
                 Vector2 position = Position - vector3 * 4f;
                 float num = Calc.Random.Next(lightWidth - 4) + 2 - lightWidth / 2;
@@ -219,18 +225,18 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         public void BeforeRender() {
             // only update graphics every 3 frames when on camera or when the lightbeam comes on screen
-            if ((!visibleOnCamera || !Scene.OnRawInterval(0.05f, offset)) && visibleOnCamera == wasVisibleOnCamera)
+            if ((!Visible || !Scene.OnRawInterval(0.05f, offset)) && Visible == wasVisibleOnCamera)
                 return;
 
             RenderToTarget();
         }
 
         public override void Render() {
-            if (!visibleOnCamera)
-                return;
-
             if (alpha > 0f) {
-                Draw.SpriteBatch.Draw(lightbeamTarget, new Vector2(rectangleLeft - visibilityPadding / 2, rectangleTop - visibilityPadding / 2), null, Color.White * alpha, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                if (useRenderTarget)
+                    Draw.SpriteBatch.Draw(lightbeamTarget, new Vector2(rectangleLeft - visibilityPadding / 2, rectangleTop - visibilityPadding / 2), null, Color.White * alpha, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                else
+                    RenderLightbeam();
             }
         }
 
