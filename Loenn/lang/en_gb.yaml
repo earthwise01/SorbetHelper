@@ -1,0 +1,906 @@
+# source for en_gb.lang (which is "compilied" using a janky C# script and yamldotnet)
+# this is  longer technically but nicer to read/edit for me personally and handles multiline descriptions much better
+# format should hopefully be readable enough
+# not rly neccessary but   gOD i needed something to distract myself with today,,    and could be nice to have in the future
+
+ModID: SorbetHelper
+ModName: Sorbet Helper
+
+Entities:
+  SorbetHelper/FlagToggledKillbox:
+    Placements:
+      flag_toggled_killbox:
+        Name: Flag Toggled Killbox
+        Description: Same as the vanilla Killbox entity, however it can also be flag toggled.
+    Attributes:
+      flag:
+        Description: The flag that needs to be set in order for the killbox to be activated.
+      inverted:
+        Description: When checked, the killbox will be active only when the flag is disabled, rather than when it is enabled.
+
+  SorbetHelper/KillZone:
+    Placements:
+      killzone:
+        Name: Kill Zone
+        Description: Kills the player on contact, can also be flag toggled.
+    Attributes:
+      flag:
+        Description: The flag that needs to be set in order for the kill zone to be activated, leaving this empty causes the kill zone to always be active.
+      inverted:
+        Name: Invert Flag
+        Description: When checked, the kill zone will be active only when the flag is disabled, rather than when it is enabled.
+      fastKill:
+        Description: When checked, the player will die instantly upon touching the kill zone rather than getting knocked back a bit first.
+
+  SorbetHelper/ReturnBerry:
+    Placements:
+      normal:
+        Name: Strawberry (With Noded Return)
+        Description: Similar to a Strawberry, but when the player grabs it they are placed into a bubble and moved along a path of nodes.
+      winged:
+        Name: Strawberry (Winged, With Noded Return)
+        Description: Similar to a Strawberry (Winged), but when the player grabs it they are placed into a bubble and moved along a path of nodes.
+      normalalt:
+        Name: Strawberry With Return Berry
+      wingedalt:
+        Name: Winged Strawberry With Return Berry Winged Return Berry
+    Attributes:
+      winged:
+        Description: Determines whether the strawberry has wings and attempts to vertically rise offscreen when the player dashes.
+      delay:
+        Description: The delay (in seconds) before the player is placed into a bubble after grabbing the strawberry. (Default = 0.3)
+      checkpointID:
+        Description: Manually determine what checkpoint section strawberries are visually grouped up in, showing up on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)
+      order:
+        Description: Manually determine what order strawberries are visually placed in on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)
+      bubbleParticles:
+        Description: Whether the strawberry should visually indicate that it bubbles the player by periodically emitting bubble particles.
+
+  SorbetHelper/CustomFallingBlock:
+    Placements:
+      customFallingBlock:
+        Name: Custom Falling Block
+    Attributes:
+      tiletype:
+        Description: Determines the visual appearance of the falling block.
+      direction:
+        Description: The direction the falling block will fall towards.
+      flagOnFall:
+        Description: An optional session flag to set when the block starts falling.
+      flagOnLand:
+        Description: An optional session flag to set when the block lands.
+      triggerFlag:
+        Description: An optional session flag which should trigger the block to fall.
+      fallOnTouch:
+        Description: Whether the block should fall when the player lands on it.
+      climbFall:
+        Description: |-
+          Whether the block should also fall if the player climbs on its sides.
+          Requires Fall On Touch to be enabled.
+      fallOnStaticMover:
+        Name: Static Mover Triggered
+        Description: Whether the falling block can be triggered by static movers (such as springs) attached to it.
+      breakDashBlocks:
+        Description: Whether the falling block can break dash blocks.
+      initialShakeTime:
+        Description: How long (in seconds) the block should initially shake for.
+      variableShakeTime:
+        Description: |-
+          How long (in seconds) the block should continue shaking for, after the initial shake time.
+          Unlike the initial timer, this can be interupted if the player stops touching the block (as long as they were what caused it to fall).
+      maxSpeed:
+        Description: The maximum speed of the block (in pixels per second) as it falls.
+      acceleration:
+        Description: The acceleration of the block (in pixels per second) as it falls.
+      shakeSfx:
+        Description: The sound played by the block before it falls.
+      impactSfx:
+        Description: The sound played by the block when it lands on the ground.
+      depth:
+        Description: |-
+          Determines the visual depth of the block.
+          Higher values mean farther behind in the scene, default value is -9000.
+      chronoHelperGravity:
+        Description: |-
+          Whether the falling block should be affected by Gravity Falling Block Switches from Chrono Helper.
+          Requires Chrono Helper.
+
+  SorbetHelper/DashFallingBlock:
+    Placements:
+      dashFallingBlock:
+        Name: Dash Falling Block
+        Description: a falling block that falls when dashed into
+    Attributes:
+      tiletype:
+        Description: Determines the visual appearance of the falling block.
+      direction:
+        Description: The direction the falling block will fall towards.
+      flagOnFall:
+        Description: An optional session flag to set when the block starts falling.
+      flagOnLand:
+        Description: An optional session flag to set when the block lands.
+      triggerFlag:
+        Description: An optional session flag which should trigger the block to fall.
+      fallOnTouch:
+        Description: Whether the block should fall when the player lands on it.
+      climbFall:
+        Description: |-
+          Whether the block should also fall if the player climbs on its sides.
+          Requires Fall On Touch to be enabled.
+      fallOnStaticMover:
+        Name: Static Mover Triggered
+        Description: Whether the falling block can be triggered by static movers (such as springs) attached to it.
+      breakDashBlocks:
+        Description: Whether the falling block can break dash blocks.
+      initialShakeTime:
+        Description: How long (in seconds) the block should initially shake for.
+      variableShakeTime:
+        Description: |-
+          How long (in seconds) the block should continue shaking for, after the initial shake time.
+          Unlike the initial timer, this can be interupted if the player stops touching the block (as long as they were what caused it to fall).
+      maxSpeed:
+        Description: The maximum speed of the block (in pixels per second) as it falls.
+      acceleration:
+        Description: The acceleration of the block (in pixels per second) as it falls.
+      shakeSfx:
+        Description: The sound played by the block before it falls.
+      impactSfx:
+        Description: The sound played by the block when it lands on the ground, or is dashed into.
+      depth:
+        Description: |-
+          Determines the visual depth of the block.
+          Higher values mean farther behind in the scene, default value is -9000.
+      chronoHelperGravity:
+        Description: |-
+          Whether the falling block should be affected by Gravity Falling Block Switches from Chrono Helper.
+          Requires Chrono Helper.
+      # ^^^ same as custom falling block
+      allowWavedash:
+        Description: Whether it is possible to wavedash on top of the block.
+      dashCornerCorrection:
+        Name: Easier Wallbounce
+        Description: Makes wallbouncing off of the block less precise (by allowing it up to 4 pixels deep into the block horizontally, dashing from the bottom).
+      fallDashMode:
+        Name: Fall Towards Dash Direction
+        Description: |-
+          Whether the direction the falling block will fall towards is determined by the direction it was dashed into from.
+          Overrides the normal direction setting when enabled.
+      refillDash:
+        Description: Whether the player should refill their dash when hitting the block.
+      dashActivated:
+        Description: Determines whether the block can be activated by dashing into it. Disabling this effectively turns this into a regular custom falling block.
+
+  SorbetHelper/CrumbleOnFlagBlock:
+    Placements:
+      crumble_on_flag_block:
+        Name: Crumble On Flag Block
+      crumble_wall_on_flag:
+        Name: Crumble Wall On Flag
+    Attributes:
+      blendin:
+        Description: Blends the block in with the walls it touches, making it less apparent.
+      tiletype:
+        Description: Determines the visual appearance of the block.
+      inverted:
+        Name: Invert Flag
+        Description: When checked, the block will break when the flag is disabled, rather than when it is enabled.
+      flag:
+        Description: The flag that needs to be set in order for the block to break.
+      showDebris:
+        Description: Determines whether the block spawns debris when it breaks.
+      playAudio:
+        Description: Determines whether the block plays sound effects when breaking/appearing.
+      depth:
+        Description: Determines what visual layer the block should be on (higher values mean farther behind in the scene, default value is -10010).
+      destroyAttached:
+        Description: Whether objects such as spikes that are attached to the block should be affected as well.
+      fadeInTime:
+        Description: How long (in seconds) the block takes to visually fade back in when (re)appearing.
+  
+  SorbetHelper/BigWaterfall:
+    Placements:
+      normal:
+        Name: Resizable Waterfall
+        Description: A waterfall which behaves similarly to a vanilla Waterfall, but is also resizable like and closer visually to a vanilla Big Waterfall.
+      abovefg:
+        Name: Resizable Waterfall (Above Tiles)
+        Description: A waterfall which behaves similarly to a vanilla Waterfall, but is also resizable like and closer visually to a vanilla Big Waterfall. Ignores and renders above Foreground Tiles.
+      # show in search results for big waterfall
+      bigwaterfall:
+        Name: Big Waterfall
+      bigwaterfallabove:
+        Name: Big Waterfall (Above Foreground)
+    Attributes:
+      color:
+        Description: The color of the waterfall.
+      ignoreSolids:
+        Description: When checked, the waterfall will ignore any solid objects in its way (e.g. foreground tiles). Water can still block it.
+      lines:
+        Description: Determines whether the waterfall will have any additional lines for detail, disabling this will make the waterfall appear closer in appearance to a vanilla small waterfall as opposed to a big waterfall.
+      depth:
+        Description: |-
+          Determines what visual layer the waterfall should be on (higher values mean farther behind in the scene, default value is -9999 for the normal placement or -49900 for the above solids placement).
+          Note that this on its own will not affect the wavy displacement effect.
+  
+  SorbetHelper/CustomLightbeam:
+    Placements:
+      customlightbeam:
+        Name: Custom Lightbeam
+      rainbowlightbeam:
+        Name: Rainbow Lightbeam
+      customlightbeamrainbow:
+        Name: Custom Lightbeam (Rainbow)
+    Attributes:
+      # tooltips for most of the rainbow related attributes stolen from MaddieHelpingHand
+      # https://github.com/maddie480/MaddieHelpingHand/blob/master/Loenn/lang/en_gb.lang#L559
+      flag:
+        Description: The flag that needs to be set in order for the lightbeam to be activated. Leaving this empty causes the lightbeam to always be active.
+      inverted:
+        Name: Invert Flag
+        Description: When checked, the lightbeam will be active only when the flag is disabled, rather than when it is enabled.
+      flagFadeTime:
+        Description: The time (in seconds) the lightbeam takes to fade in or out according to the flag.
+      rotation:
+        Description: The rotation of the lightbeam.
+      depth:
+        Description: |-
+          Determines what visual layer the lightbeam should be on (higher values mean farther behind in the scene, default value is -9998).
+          Does not affect the particles.
+      noParticles:
+        Description: Determines whether the lightbeam emits particles.
+      texture:
+        Description: The texture of the lightbeam. Vanilla texture is 'util/lightbeam'.
+      color:
+        Description: The color of the lightbeam.
+      alpha:
+        Description: The alpha of the lightbeam.
+      rainbow:
+        Description: Determines whether the lightbeam is rainbow.
+      useCustomRainbowColors:
+        Description: |-
+          When checked, overrides the normal rainbow colors (whether vanilla or from a rainbow spinner color controller) with custom ones specified by the lightbeam.
+          Changing this requires clicking save changes and reopening this menu for the correct settings to appear.
+          (Requires rainbow to be checked)
+        # ^^^ might still be able to write this in a cleaner way but this should be good enough at least?
+      colors:
+        Name: Rainbow Colors
+        Description: |-
+          The colors the rainbow lightbeam will use, separated by commas.
+          Alpha can optionally be specifed per color by appending an additional value to it, e.g. 'ffffff80' means white with half opacity.
+      gradientSize:
+        Name: Rainbow Gradient Size
+        Description: The distance required to achieve a complete loop across all colors. Vanilla value is 280.
+      loopColors:
+        Name: Loop Rainbow Colors
+        Description: |-
+          Determines how the colors loop. For example, if 3 colors A, B and C are specified:
+          - when unchecked, the colors will cycle in the following order: A > B > C > B > A
+          - when checked, the colors will cycle in the following order: A > B > C > A > B > C
+      centerX:
+        Name: Rainbow Center X
+        Description: The horizontal position of the center of the gradient. Uses "world" coordinates. Vanilla value is 0.
+      centerY:
+        Name: Rainbow Center Y
+        Description: The vertical position of the center of the gradient. Uses "world" coordinates. Vanilla value is 0.
+      gradientSpeed:
+        Name: Rainbow Gradient Speed
+        Description: Determines how fast the gradient scrolls, in pixels per second. You can use negative values to make it scroll in the opposite direction. Vanilla value is 50.
+      singleColor:
+        Name: Uniform Rainbow Color
+        # ^^^ this might not be an accurate way of saying this but honestly at this point i've given up trying to find anything better.
+        Description: |-
+          Determines whether the rainbow lightbeam is the same color throughout or uses a gradient across all the beams of light.
+          (Requires rainbow to be checked)
+        # ^^^ last bit sounds a bit off i think but i can't come up with anything better currently.
+      fadeWhenNear:
+        Description: Determines whether the lightbeam fades out when the player is close to it.
+      fadeOnTransition:
+        Description: Determines whether the lightbeam fades out during screen transitions.
+  
+  SorbetHelper/WingedStrawberryDirectionController:
+    Placements:
+      wingedStrawberryController:
+        Name: Winged Strawberry Direction Controller
+    Attributes:
+      direction:
+        Description: The direction winged strawberries in the room will fly.
+  
+  SorbetHelper/StylegroundOverHudController:
+    Placements:
+      stylegroundOverHud:
+        Name: Stylegrounds Above HUD Controller
+      altname:
+        Name: Styleground Over GUI Controller
+    Attributes:
+      pauseBehavior:
+        Description: |-
+          How pausing should affect the stylegrounds.
+
+          Disable When Paused-
+              The stylegrounds will pause, and appear behind the pause menu.
+          Update When Paused-
+              The stylegrounds will appear above the pause menu and continue updating.
+          Pause Above-
+              The stylegrounds will pause, but still appear above the pause menu.
+      #  probably maybe could've put this on like the gb or github page or a wiki or smth but fancy loenn plugins are cool :3 and its probably useful to have the instructions in editor rather than on some random page (even if theyre pretty simple i think)
+      # also sadfsadf i wish i wasnt so "rambly" but hopefully this is still useful and not just annoying to anyone trying to use the controller,,
+      _instructionsButton:
+        Name: Usage Instructions
+        Description: |-
+          hi! i wanted to put this somewhere decently visible so here's a rough overview on how to use this controller
+
+          ~~~ the Important Stuff ~~~
+          - you only need *one controller per map*! so as long as you have one even just like. sitting in the corner of a random filler room or something, the controller should be enabled.
+          - once you have a controller somewhere, in order for your stylegrounds to actually appear above the hud, you'll need to add 'sorbetHelper_drawAboveHud' into their tag fields.
+          - you're done! any stylegrounds with that tag should now be rendering on top of input prompts, textboxes, etc.
+
+          ~~~ some additional info/random stuff ~~~
+          - currently, above hud stylegrounds will be unaffected by colorgrades due to Technical Limitations.
+
+          - additive blendmode stylegrounds are supported, but pls note that also due to Technical Limitations, will always render above non-additive stylegrounds.
+
+          - the controller will disable its effect on stylegrounds if the game is paused, but this can be changed to either keep them above or make them completely unaffected by pausing.
+            see the tooltip as well, but in the end it probably mostly comes down to personal preference abt what'd work best for your stylegrounds, though i would vaugely suggest:
+              'Disable When Paused' for consistency with vanilla or if your stylegrounds are decently busy in general/might cover up too much of the pause menu.
+              'Update When Paused' if your stylegrounds have at least some movement, aren't insanely busy and you want maximum *atmosphere and immersion* or something.
+              'Pause Above' if you still want the stylegrounds above the pause menu, but don't have moving stylegrounds or find the stylegrounds moving while paused weird/distracting.
+        # currently additive blend mode stylegrounds doesn't work properly, and colorgrading doesn't have any effect on affected stylegrounds due to technical limitations.
+        # i'm still looking to see if i can get them working but if i do theres a good chance there'll probably be some sort of jank (at least on the code side).
+        
+        # by default the controller will disable itself when the game is paused.
+        # this can be adjusted to either stop the stylegrounds from pausing altogether, or to keep them pausing but still render them above the pause menu.
+        # see the tooltip as well but personally: use Update When Paused if your stylegrounds have some movement, aren't insanely busy and you want ~maximum atmosphere~, and,
+        # use Disable When Paused otherwise or if your stylegrounds are kinda busy and would cover too much of the pause menu. (or just, yknow, try all 3 and see which you prefer idk)
+  
+  SorbetHelper/ReturnBubbleBehaviorController:
+    Placements:
+      controller:
+        Name: Return Bubble Controller
+    Attributes:
+      time:
+        Description: |-
+          How long (in seconds) it should take the bubble to move to its destination.
+          Vanilla value is 0.625 (1 / 1.6).
+      speed:
+        Description: A speed the bubble should use to approximately determine its move time, if Use Speed is enabled.
+      useSpeed:
+        Description: Whether the bubble should move depending on the Time or Speed attribute.
+      easing:
+        Description: |-
+          The easer to use for the bubble's movement.
+          Vanilla value is SineInOut.
+      smoothCamera:
+        Description: |-
+          Whether the camera should smoothly follow the player in the bubble rather than perfectly snapping to them.
+          Vanilla value is disabled.
+      refillDash:
+        Description: |-
+          Whether the bubble should always refill the player's dash.
+          Vanilla value is disabled.
+      collisionMode:
+        Description: |-
+          How the player should be able to collide with stuff while in the bubble.
+          - Vanilla
+              The player collides with stuff the same as in a vanilla return bubble.
+          - SquishFix
+              Same as Vanilla, but prevents the player from dying if they collide with a moving block while in the bubble.
+          - TriggersOnly
+              Completely disables all collision while inside the bubble, with the exception of with triggers.
+              Includes things like collecting berries inside solid tiles, exploding puffers, activating blocks like zip movers, etc.
+          - NoCollide
+              Same as TriggersOnly, but also including triggers. Fully disables *all* collision.
+          Vanilla value is Vanilla.
+  
+  SorbetHelper/LightCoverController:
+    Placements:
+      controller:
+        Name: Light Cover Controller
+    Attributes:
+      classNames:
+        Description: |-
+          A comma seperated list of C# entity class names the controller should affect.
+          You can use something like CelesteTAS or Mapping Utils to try and find these.
+      useFullClassNames:
+        Description: |-
+          Whether the controller should check for the fully qualified class names or just the name of the class.
+          e.g. Celeste.SummitCloud vs SummitCloud
+      alpha:
+        Description: How strong the light cover is.
+      minDepth:
+        Description: |-
+          The minimum (closest to the camera) depth an entity can have while being affected by the controller.
+          Allows restricting the controller to specific entities if you have multiple of the same type but with different depths.
+          Leave empty to make uncapped.
+      maxDepth:
+        Description: |-
+          The maximum (farthest from the camera) depth an entity can have while being affected by the controller.
+          Allows restricting the controller to specific entities if you have multiple of the same type but with different depths.
+          Leave empty to make uncapped.
+      global:
+        Description: |-
+          Whether the controller should apply globally, to every entity as they are loaded.
+          Allows even affecting entities added after room load, and automatically across the whole map.
+  
+  SorbetHelper/DepthAdheringDisplacementWrapper:
+    Placements:
+      # names probably still kinda suck but i literally cant think of anything better
+      # update: renamed from displacement wrappers to displacement depth fixers which i think im actually somewhat happy with,,
+      entityOnly:
+        Name: Displacement Depth Fixer (Only Distort Entity)
+        Description: |-
+          Makes the displacement effects of entities which use any (e.g. water and waterfalls) only affect their entity and nothing else.
+          (for reference vanilla displacement doesn't care about depth and just affects everything touching it)
+      distortBehind:
+        Name: Displacement Depth Fixer
+        Description: |-
+          Makes the displacement effects of entities which use any (e.g. water and waterfalls) only affect their entity and anything behind it.
+          (for reference vanilla displacement doesn't care about depth and just affects everything touching it)
+      entityOnlyAlt:
+        Name: Depth Adhering Displacement Wrapper (Only Distort Entity)
+      distortBehindAlt:
+        Name: Depth Adhering Displacement Wrapper (Depth Adhering)
+    Attributes:
+      distortBehind:
+        Name: Distort Behind
+        Description: |-
+          Whether affected entities should also apply their displacement effects to things behind them.
+          Disabling this makes entities only affect themselves.
+      # unused
+      onlyCollideTopLeft:
+        Description: |-
+          Makes it so that the wrapper needs to be touching the top left corner of entities in order to affect them.
+          Allows for more precision when choosing which entities to affect when there are many close together, although at the cost of being less intuitive.
+  
+  SorbetHelper/DisplacementEffectBlocker:
+    Placements:
+      normal:
+        Name: Displacement Effect Blocker (Full)
+        Description: Completely blocks the displacement effect produced by entities such as water or waterfalls, along with stuff like the burst offset effects from Madeline dashing or pulsing strawberries.
+      waterOnly:
+        Name: Displacement Effect Blocker (Waves Only)
+        Description: Completely blocks the displacement effect produced by entities such as water or waterfalls.
+      depthAdhering:
+        Name: Displacement Effect Blocker (for Displacement Depth Fixer)
+        Description: Blocks the displacement effect produced by entities such as water or waterfalls at a certain depth that are *affected by a Displacement Depth Fixer*.
+    Attributes:
+      waterOnly:
+        Name: Waves Only
+        Description: |-
+          Whether the displacement blocker should only affect the wavy displacement from water, etc.
+          Disabling this makes offset displacement like the burst effect from Madeline dashing or pulsing strawberries etc. also get blocked.
+      depth:
+        Description: |-
+          The depth of the displacement blocker. Any entity affected by a displacement depth fixer with a depth equal to or higher than this will be affected by the blocker.
+          (higher values mean farther behind in the scene.)
+  
+  SorbetHelper/DisplacementEffectArea:
+    Placements:
+      normal:
+        Name: Displacement Effect Area
+      depthAdhering:
+        Name: Displacement Effect Area (Supports Depth)
+    Attributes:
+      horizontalDisplacement:
+        Description: |-
+          The horizontal displacement amount.
+          Ranges from -1.0 (leftwards displacement) to 1.0 (rightwards displacement), with 0.0 resulting in no displacement.
+      verticalDisplacement:
+        Description: |-
+          The vertical displacement amount.
+          Ranges from -1.0 (upwards displacement) to 1.0 (downwards displacement), with 0.0 resulting in no displacement.
+      waterDisplacement:
+        Description: |-
+          The water displacement amount.
+          Ranges from 0.0 to 1.0, values closer to 1.0 result in faster waves.
+          Water uses 0.25, small waterfalls use 0.8, big waterfalls use 1.0, and heatwaves use 0.1.
+      alpha:
+        Description: The overall strength of the displacement.
+      depth:
+        Description: The visual depth the effect should be applied at (using the power of depth adhering displacement).
+  
+  SorbetHelper/EntityStylegroundController:
+    Placements:
+      controller:
+        Name: Entity As Styleground Controller
+        Description: Marks specified entity types to be drawn as a styleground layer by an Entity As Styleground Renderer styleground.
+      altname:
+        Name: Entity on Styleground Layer Controller
+    Attributes:
+      classNames:
+        Description: |-
+          A comma seperated list of C# entity class names the controller should affect.
+          You can use something like CelesteTAS or Mapping Utils to try and find these.
+      useFullClassNames:
+        Description: |-
+          Whether the controller should check for the fully qualified class names or just the name of the class.
+          e.g. Celeste.SummitCloud vs SummitCloud
+      minDepth:
+        Description: |-
+          The minimum (closest to the camera) depth an entity can have while being affected by the controller.
+          Allows restricting the controller to specific entities if you have multiple of the same type but with different depths.
+          Leave empty to make uncapped.
+      maxDepth:
+        Description: |-
+          The maximum (farthest from the camera) depth an entity can have while being affected by the controller.
+          Allows restricting the controller to specific entities if you have multiple of the same type but with different depths.
+          Leave empty to make uncapped.
+      tag:
+        Description: |-
+          The styleground tag used to match with an Entity As Styleground Renderer styleground.
+          Required in order for the controller to have any effect.
+      global:
+        Description: |-
+          Whether the controller should apply globally, to every entity as they are loaded.
+          Allows even affecting entities added after room load, and automatically across the whole map.
+      _instructionsButton:
+        Name: Info
+        Description: |-
+          ~~~ some misc info ~~~
+          - the controller will *not* work on its own, but rather requires the map to have an Entity As Styleground Renderer styleground with a matching tag field.
+
+          - for decals specifically, there is also a decal registry attribute available, <sorbetHelper_styleground rendererTag=""/>
+            this has the same requirement of an Entity As Styleground Renderer (though note that a controller isn't required when using the decal registry)
+
+          - expect to potentially broken behavior sometimes, especially if you're using this with an entity with particularly complex rendering-
+            this is likely not the fault of either me or whoever made the entity,
+            but just a consequence of it (very reasonably) not expecting to be in these conditions, sorry!
+  
+  SorbetHelper/StylegroundEntityController:
+    Placements:
+      controller:
+        Name: Styleground As Entity Controller
+        Description: |-
+          Makes stylegrounds with a specified tag render as an entity, with a customizable depth.
+          Basically a "Styleground Depth Controller".
+      altname:
+        Name: Styleground Depth Controller
+    Attributes:
+      tag:
+        Description: The styleground tag to affect.
+      depth:
+        Description: |-
+          The visual depth the stylegrounds should be drawn at.
+          Higher values mean farther behind in the scene.
+  
+  SorbetHelper/DashGateBlock:
+    Placements:
+      Both:
+        Name: Dash Gate Block (Both)
+      Horizontal:
+        Name: Dash Gate Block (Horizontal)
+      Vertical:
+        Name: Dash Gate Block (Vertical)
+      kevinswitchgate:
+        Name: Kevin Switch Gate
+    Attributes:
+      # most tooltips stolen from maddie's helping hand
+      # https://github.com/maddie480/MaddieHelpingHand/blob/1297e45c72dbf27972e8396139406dd55e65c227/Loenn/lang/en_gb.lang#L194
+      inactiveColor:
+        Description: The color of the block when not triggered yet.
+      activeColor:
+        Description: The color of the block while moving.
+      finishColor:
+        Description: The color of the block when it has reached its destination.
+      blockSprite:
+        Description: |-
+          The texture path for the block.
+          See Graphics/Atlases/Gameplay/objects/SorbetHelper/gateblock/dash/ in SorbetHelper.zip for how the files should be organised.
+      iconSprite:
+        Description: The texture path for the icon in the center of the block.
+      shakeTime:
+        Description: The time (in seconds) the block spends shaking before starting to move. Default value is 0.5 seconds.
+      moveTime:
+        Description: The time (in seconds) the block takes to move to its destination after shaking. Default value is 1.8 seconds.
+      moveEased:
+        Description: Whether the block should slow down before reaching its final position. If unchecked, the block will move at constant speed.
+      allowReturn:
+        Description: Whether the block will cycle between its start position and node if activated multiple times.
+      persistent:
+        Description: If enabled, the block will stay activated even if the player dies or changes rooms.
+      moveSound:
+        Description: The sound played by the gate when it starts moving.
+      finishedSound:
+        Description: The sound played by the gate when it is done moving.
+      smoke:
+        Description: Whether the block should emit smoke when reaching its final position.
+      allowWavedash:
+        Description: Whether it is possible to wavedash on top of the block.
+      dashCornerCorrection:
+        Name: Easier Wallbounce
+        Description: Makes wallbouncing off of the block less precise (by allowing it up to 4 pixels deep into the block horizontally, dashing from the bottom).
+      refillDash:
+        Description: Whether the player should refill their dash when hitting the block.
+      axes:
+        Name: Dashable Axes
+        Description: Determines which sides of the block can be dashed into.
+      linkTag:
+        Name: Flag On Activate
+        Description: An optional session flag to enable when the block activates.
+  
+  SorbetHelper/TouchGateBlock:
+    Placements:
+      normal:
+        Name: Touch Gate Block
+    Attributes:
+      # most tooltips stolen from maddie's helping hand
+      # https://github.com/maddie480/MaddieHelpingHand/blob/1297e45c72dbf27972e8396139406dd55e65c227/Loenn/lang/en_gb.lang#L194
+      inactiveColor:
+        Description: The color of the block when not triggered yet.
+      activeColor:
+        Description: The color of the block while moving.
+      finishColor:
+        Description: The color of the block when it has reached its destination.
+      blockSprite:
+        Description: |-
+          The texture path for the block.
+          See Graphics/Atlases/Gameplay/objects/SorbetHelper/gateblock/dash/ in SorbetHelper.zip for how the files should be organised.
+      iconSprite:
+        Description: The texture path for the icon in the center of the block.
+      shakeTime:
+        Description: The time (in seconds) the block spends shaking before starting to move. Default value is 0.5 seconds.
+      moveTime:
+        Description: The time (in seconds) the block takes to move to its destination after shaking. Default value is 1.8 seconds.
+      moveEased:
+        Description: Whether the block should slow down before reaching its final position. If unchecked, the block will move at constant speed.
+      allowReturn:
+        Description: Whether the block will cycle between its start position and node if activated multiple times.
+      persistent:
+        Description: If enabled, the block will stay activated even if the player dies or changes rooms.
+      moveSound:
+        Description: The sound played by the gate when it starts moving.
+      finishedSound:
+        Description: The sound played by the gate when it is done moving.
+      smoke:
+        Description: Whether the block should emit smoke when reaching its final position.
+      moveOnGrab:
+        Description: Whether the block should be activated if the player climbs on its sides.
+      moveOnStaticMover:
+        Name: Static Mover Activated
+        Description: Whether the block can be activated by static movers (such as springs) attached to it.
+      linkTag:
+        Name: Flag On Activate
+        Description: An optional session flag to enable when the block activates.
+
+Triggers:
+  SorbetHelper/AlternateInteractPrompt:
+    Placements:
+      altTalkUI:
+        Name: Alternate Style Interact Prompt
+        Description: Replaces the normal interaction/talk prompt with a different, slightly more subtle one that slides in from the side.
+      altNameAltTalkUI:
+        Name: Alternate Interact Prompt
+    Attributes:
+      dialogId:
+        Name: Label Dialog ID
+        Description: The dialog ID to use for the prompt.
+      onLeft:
+        Description: Whether the prompt should come from the left side of the screen, instead of the right.
+      playHighlightSfx:
+        Description: Whether to still play the vanilla sfx for when the prompt is highlighted.
+  
+  SorbetHelper/MiniPopupTrigger:
+    Placements:
+      miniPopup:
+        Name: Mini Popup Trigger
+    Attributes:
+      activeTime:
+        Description: How long (in seconds) the mini popup should stay visible for.
+      titleText:
+        Description: The dialog ID to use for the title of the mini popup.
+      subText:
+        Description: The dialog ID to use for the subtitle of the mini popup.
+      baseColor:
+        Description: The base color of the mini popup.
+      accentColor:
+        Description: The color of the subtitle text and accent of the mini popup.
+      titleColor:
+        Description: The color of the title text of the mini popup.
+      iconTexture:
+        Description: |-
+          An optional icon to display on the mini popup, relative to Graphics/Atlases/Gui/.
+          The texture should be square shaped to prevent it from being awkwardly stretched.
+      mode:
+        Name: Activation Mode
+        Description: Determines how the trigger will activate.
+      onlyOnce:
+        Description: Whether the mini popup should only be able to trigger once per session.
+      flag:
+        Description: |-
+          A session flag.
+          Used as needed for the activation mode, otherwise determines whether or not the player can collide with the trigger.
+
+Effects:
+  SorbetHelper/ParallaxHiResSnow:
+    Name: Parallax Hi-Res Snow
+    Attributes:
+      color:
+        Description: The color of the particles.
+      alpha:
+        Description: The opacity of the particles, between 0 (translucent) and 1 (opaque).
+      additive:
+        Description: How much additive blending the particles should use, between 0 (not additive) and 1 (fully additive).
+      texturePath:
+        Description: |-
+          The texture the particles should use.
+          Note that unlike most other stylegrounds, this is relative to the Overworld Atlas instead of the Gameplay Atlas.
+          This means any custom textures need to be placed at e.g. "yourmod/Graphics/Atlases/Overworld/yourname/yourmod/customsnow".
+          Vanilla textures are 256x256 pixels.
+      randomRotation:
+        Name: Start Rotated
+        Description: Whether the particles should start with a random rotation.
+      speedStretching:
+        Description: |-
+          Whether the particles should get stretched out if the length of the effect's direction is greater than 1.
+          Overrides any rotation of the particles when active.
+      fadeTowardsForeground:
+        Description: Whether the particles should fade out slightly as they get closer to the foreground.
+      directionX:
+        Description: |-
+          Determines how strongly and in which direction the particles should move horizontally.
+          Negative values will move the particles to the left while positive values will move them to the right.
+      directionY:
+        Description: |-
+          Determines how strongly and in which direction the particles should move vertically.
+          Negative values will move the particles upwards while positive values will move them downwards.
+      minScale:
+        Description: Determines how large the farthest particles should be.
+      maxScale:
+        Description: Determines how large the closest particles should be.
+      minSpeed:
+        Description: |-
+          Determines the minimum speed a particle can have.
+          This is multiplied with both the particle's scale and the effect's direction to get the actual speed of a particle.
+      maxSpeed:
+        Description: |-
+          Determines the maximum speed a particle can have.
+          This is multiplied with both the particle's scale and the effect's direction to get the actual speed of a particle.
+      minScrollX:
+        Description: Determines the amount of horizontal parallax the farthest particles should have.
+      minScrollY:
+        Description: Determines the amount of vertical parallax the farthest particles should have.
+      maxScrollX:
+        Description: Determines the amount of horizontal parallax the closest particles should have.
+      maxScrollY:
+        Description: Determines the amount of vertical parallax the closest particles should have.
+      sineAmplitude:
+        Description: How tall the sine movement of the particles is.
+      sineFrequency:
+        Description: How fast the sine movement of the particles is.
+      particleCount:
+        Description: The number of particles the effect should have.
+      fadeInOut:
+        Name: Fade In/Out
+        Description: Whether the effect should fade in/out when changing visibility (e.g. when transitioning to a different room or toggling its flag).
+      fadex:
+        Name: Fade X
+        Description: |-
+          Advanced horizontal fading zones.
+          Format is "FromPosition-ToPosition,FromAlpha-ToAlpha". Example "n500-500,1-0".
+          Negative numbers in position are denoted with "n" rather than minus. Position numbers are in pixels and use map coordinates.
+          Multiple zones can be set up by using ":" as separator.
+      fadey:
+        Name: Fade Y
+        Description: |-
+          Advanced vertical fading zones.
+          Format is "FromPosition-ToPosition,FromAlpha-ToAlpha". Example "n500-500,1-0".
+          Negative numbers in position are denoted with "n" rather than minus. Position numbers are in pixels and use map coordinates.
+          Multiple zones can be set up by using ":" as separator.
+  
+  SorbetHelper/SpiralStars:
+    Name: Spiral Stars
+    Attributes:
+      spritePath:
+        Name: Sprite Directory
+        Description: The directory containing the star sprites.
+      colors:
+        Description: The colors the stars should be tinted, separated by commas.
+      backgroundColor:
+        Description: The color of the background. Set its alpha to 0 to disable.
+      starCount:
+        Description: The number of stars the effect should have.
+      trailLength:
+        Name: Trail Count
+        Description: |-
+          How long the trail for each star is.
+          Can have a large impact on performance since the total amount of stars drawn is equal to starCount * trailCount.
+      trailDelay:
+        Description: Determines the delay (in seconds) between each star in the trail.
+      centerX:
+        Description: The X position of the effect's center.
+      centerY:
+        Description: The Y position of the effect's center.
+      spawnRadius:
+        Name: Outer Radius
+        Description: Determines how far away (in pixels) from the center the stars should spawn.
+      centerRadius:
+        Name: Inner Radius
+        Description: Determines how close (in pixels) to the center the stars need to be before they start to shrink and fade out.
+      speed:
+        Description: |-
+          The speed (in pixels / second) at which the stars will move towards the center.
+          Negative values will make the stars move away from the center instead.
+      rotationSpeed:
+        Description: The speed (in degrees / second) at which the stars will rotate around the center.
+  
+  SorbetHelper/HiResGodrays:
+    Name: Godrays (Hi-Res)
+    Attributes:
+      colors:
+        Description: The colors the godrays will use, separated by commas.
+      scrollX:
+        Description: Determines the amount of horizontal parallax the godrays will have.
+      scrollY:
+        Description: Determines the amount of vertical parallax the godrays will have.
+      speedX:
+        Description: How fast (in pixels / second) the godrays should move horizontally.
+      speedY:
+        Description: How fast (in pixels / second) the godrays should move vertically.
+      minDuration:
+        Description: The minimum duration a godray can last for (in seconds).
+      maxDuration:
+        Description: The maximum duration a godray can last for (in seconds).
+      minWidth:
+        Description: The minimum width the godrays can be.
+      maxWidth:
+        Description: The maximum width the godrays can be.
+      minLength:
+        Description: The minimum length the godrays can be.
+      maxLength:
+        Description: The maximum length the godrays can be.
+      minScale:
+        Description: |-
+          The minimum scale the godrays can be.
+          Works when using a texture unlike Min Width/Length.
+      maxScale:
+        Description: |-
+          The maximum scale the godrays can be.
+          Works when using a texture unlike Max Width/Length.
+      texturePath:
+        Description: |-
+          An optional texture the godrays should use, completely replacing their regular shape.
+          Note that unlike most other stylegrounds, this is relative to the Overworld Atlas instead of the Gameplay Atlas.
+          This means any custom textures need to be placed at e.g. "yourmod/Graphics/Atlases/Overworld/yourname/yourmod/godray".
+      texMinRotate:
+        Name: Min Texture Rotation
+        Description: The minimum speed a textured godray should rotate (in degreees / second).
+      texMaxRotate:
+        Name: Max Texture Rotation
+        Description: The maximum speed a textured godray should rotate (in degreees / second).
+      texStartRotated:
+        Name: Start Texture Rotated
+        Description: Whether textured godrays should have a random initial rotation.
+      rayCount:
+        Description: The number of godrays the effect should have.
+      offscreenPadding:
+        Description: |-
+          How much padding (in gameplay pixels) off the sides of the screen the effect should have before wrapping around.
+          Only recommended to increase if you're using particularly large godrays and are noticing them wrap around prematurely.
+      fadeNearPlayer:
+        Description: Whether the godrays should become slighly transparent when close to the player.
+      fadeInOut:
+        Description: Whether the effect should fade in/out when changing visibility (e.g. when transitioning to a different room or toggling its flag).
+      fadex:
+        Name: Fade X
+        Description: |-
+          Advanced horizontal fading zones.
+          Format is "FromPosition-ToPosition,FromAlpha-ToAlpha". Example "n500-500,1-0".
+          Negative numbers in position are denoted with "n" rather than minus. Position numbers are in pixels and use map coordinates.
+          Multiple zones can be set up by using ":" as separator.
+      fadey:
+        Name: Fade Y
+        Description: |-
+          Advanced vertical fading zones.
+          Format is "FromPosition-ToPosition,FromAlpha-ToAlpha". Example "n500-500,1-0".
+          Negative numbers in position are denoted with "n" rather than minus. Position numbers are in pixels and use map coordinates.
+          Multiple zones can be set up by using ":" as separator.
+  
+  SorbetHelper/EntityStylegroundRenderer:
+    Name: Entity As Styleground Renderer
+    Attributes:
+      _instructionsButton:
+        Name: Info
+        Description: |-
+          this effect will *not* do anything on its own, but rather acts as a renderer for either
+          entities affected by an Entity As Styleground Controller or decals affected by a <sorbetHelper_styleground/> decal registry tag
+          with matching tag fields.
+
