@@ -14,6 +14,8 @@ namespace Celeste.Mod.SorbetHelper.Components;
 [Tracked]
 public class EntityStylegroundMarker : RenderOverride {
     public readonly string Tag;
+    public Action EntityRender { get; private set; }
+
     public EntityStylegroundMarker(string tag) : base(active: false, visible: false) {
         Tag = tag;
     }
@@ -26,5 +28,18 @@ public class EntityStylegroundMarker : RenderOverride {
         if (string.IsNullOrEmpty(Tag) || (entity is StylegroundEntityController stylegroundEntity && stylegroundEntity.StylegroundTag == Tag))
             RemoveSelf();
 
+        // extremelyy niche; mostly for fg waterfalls
+        var depthDisplacement = entity.Get<DepthAdheringDisplacementRenderHook>();
+        DisplacementRenderHook displacement;
+        if (depthDisplacement is null && (displacement = entity.Get<DisplacementRenderHook>()) is not null) {
+            depthDisplacement = new DepthAdheringDisplacementRenderHook(entity.Render, displacement.RenderDisplacement, true);
+            entity.Remove(displacement);
+            entity.Add(depthDisplacement);
+        }
+
+        if (depthDisplacement is null)
+            EntityRender = entity.Render;
+        else
+            EntityRender = depthDisplacement.EntityRenderOverride;
     }
 }

@@ -21,8 +21,8 @@ entities.SorbetHelper/KillZone.attributes.description.fastKill=When checked, the
 # Strawberry (With Node Based Return)
 entities.SorbetHelper/ReturnBerry.placements.name.normal=Strawberry (With Noded Return)
 entities.SorbetHelper/ReturnBerry.placements.name.winged=Strawberry (Winged, With Noded Return)
-entities.SorbetHelper/ReturnBerry.placements.name.normalalt=Strawberry (With Node Based Return) (Return Berry) (Strawberry With Return)
-entities.SorbetHelper/ReturnBerry.placements.name.wingedalt=Strawberry (Winged, With Node Based Return) (Return Berry) (Winged Strawberry With Return)
+entities.SorbetHelper/ReturnBerry.placements.name.normalalt=Strawberry With Return Berry
+entities.SorbetHelper/ReturnBerry.placements.name.wingedalt=Winged Strawberry With Return Berry Winged Return Berry
 entities.SorbetHelper/ReturnBerry.placements.description.normal=Similar to a Strawberry, but when the player grabs it they are placed into a bubble and moved along a path of nodes.
 entities.SorbetHelper/ReturnBerry.placements.description.winged=Similar to a Strawberry (Winged), but when the player grabs it they are placed into a bubble and moved along a path of nodes.
 entities.SorbetHelper/ReturnBerry.attributes.description.winged=Determines whether the strawberry has wings and attempts to vertically rise offscreen when the player dashes.
@@ -101,7 +101,7 @@ entities.SorbetHelper/BigWaterfall.placements.name.normal=Resizable Waterfall
 entities.SorbetHelper/BigWaterfall.placements.name.abovefg=Resizable Waterfall (Above Tiles)
 # show in search results for big waterfall
 entities.SorbetHelper/BigWaterfall.placements.name.bigwaterfall=Big Waterfall
-entities.SorbetHelper/BigWaterfall.placements.name.bigwaterfallabove=Big Waterfall (Above Foreground) Resizable Waterfall (Above Foreground Above Solids)
+entities.SorbetHelper/BigWaterfall.placements.name.bigwaterfallabove=Big Waterfall (Above Foreground)
 entities.SorbetHelper/BigWaterfall.placements.description.normal=A waterfall which behaves similarly to a vanilla Waterfall, but is also resizable like and closer visually to a vanilla Big Waterfall.
 entities.SorbetHelper/BigWaterfall.placements.description.abovefg=A waterfall which behaves similarly to a vanilla Waterfall, but is also resizable like and closer visually to a vanilla Big Waterfall. Ignores and renders above Foreground Tiles.
 entities.SorbetHelper/BigWaterfall.attributes.description.color=The color of the waterfall.
@@ -162,21 +162,22 @@ entities.SorbetHelper/StylegroundOverHudController.attributes.description._instr
 # currently additive blend mode stylegrounds doesn't work properly, and colorgrading doesn't have any effect on affected stylegrounds due to technical limitations.\ni'm still looking to see if i can get them working but if i do theres a good chance there'll probably be some sort of jank (at least on the code side).\n\nby default the controller will disable itself when the game is paused.\nthis can be adjusted to either stop the stylegrounds from pausing altogether, or to keep them pausing but still render them above the pause menu.\nsee the tooltip as well but personally: use Update When Paused if your stylegrounds have some movement, aren't insanely busy and you want ~maximum atmosphere~, and,\nuse Disable When Paused otherwise or if your stylegrounds are kinda busy and would cover too much of the pause menu. (or just, yknow, try all 3 and see which you prefer idk)
 
 # return bubble behavior
-entities.SorbetHelper/ReturnBubbleBehaviorController.placements.name.controller=Return Bubble Behavior Controller
+entities.SorbetHelper/ReturnBubbleBehaviorController.placements.name.controller=Return Bubble Controller
 entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.time=How long (in seconds) it should take the bubble to move to its destination.\nVanilla value is 0.625 (1 / 1.6).
-entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.speed=A speed the bubble should use to approximately determine its move time, if Use Speed is enabled.\n(might not be 100% accurate at all times but still fairly close)
+entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.speed=A speed the bubble should use to approximately determine its move time, if Use Speed is enabled.
 entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.useSpeed=Whether the bubble should move depending on the Time or Speed attribute.
 entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.easing=The easer to use for the bubble's movement.\nVanilla value is SineInOut.
 entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.smoothCamera=Whether the camera should smoothly follow the player in the bubble rather than perfectly snapping to them.\nVanilla value is disabled.
-entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.collisionMode=How the player should be able to collide with stuff while in the bubble.\n- Vanilla\n    The player collides with stuff the same as in a vanilla return bubble.\n- DisableSquish\n    Same as Vanilla, but prevents the player from dying if they collide with a moving block while in the bubble.\n- NoCollide\n    Completely disables *all* collision while inside the bubble,\n    including things like triggering triggers, exploding puffers/bumpers, activating blocks like zip movers, etc.\nVanilla value is Vanilla.
+entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.refillDash=Whether the bubble should always refill the player's dash.\nVanilla value is disabled.
+entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.collisionMode=How the player should be able to collide with stuff while in the bubble.\n- Vanilla\n    The player collides with stuff the same as in a vanilla return bubble.\n- SquishFix\n    Same as Vanilla, but prevents the player from dying if they collide with a moving block while in the bubble.\n- TriggersOnly\n    Completely disables all collision while inside the bubble, with the exception of with triggers.\n    Includes things like collecting berries inside solid tiles, exploding puffers, activating blocks like zip movers, etc.\n- NoCollide\n    Same as TriggersOnly, but also including triggers. Fully disables *all* collision.\nVanilla value is Vanilla.
 
 # light cover controller
 entities.SorbetHelper/LightCoverController.placements.name.controller=Light Cover Controller
-entities.SorbetHelper/LightCoverController.attributes.description.classNames=A comma seperated list of C# entity class names the controller should affect.\nYou can use something like CelesteTAS or Mapping Utils's profiling tab to try and find these.
+entities.SorbetHelper/LightCoverController.attributes.description.classNames=A comma seperated list of C# entity class names the controller should affect.\nYou can use something like CelesteTAS or Mapping Utils to try and find these.
 entities.SorbetHelper/LightCoverController.attributes.description.useFullClassNames=Whether the controller should check for the fully qualified class names or just the name of the class.\ne.g. Celeste.SummitCloud vs SummitCloud
 entities.SorbetHelper/LightCoverController.attributes.description.alpha=How strong the light cover is.
-entities.SorbetHelper/LightCoverController.attributes.description.minDepth=The minimum (closest to the camera) depth an entity can have while being affected by the controller.\nAllows restricting the controller to specific entities if you have multiple of the same but with different depths.\nLeave empty to make uncapped.
-entities.SorbetHelper/LightCoverController.attributes.description.maxDepth=The maximum (farthest from the camera) depth an entity can have while being affected by the controller.\nAllows restricting the controller to specific entities if you have multiple of the same but with different depths.\nLeave empty to make uncapped.
+entities.SorbetHelper/LightCoverController.attributes.description.minDepth=The minimum (closest to the camera) depth an entity can have while being affected by the controller.\nAllows restricting the controller to specific entities if you have multiple of the same type but with different depths.\nLeave empty to make uncapped.
+entities.SorbetHelper/LightCoverController.attributes.description.maxDepth=The maximum (farthest from the camera) depth an entity can have while being affected by the controller.\nAllows restricting the controller to specific entities if you have multiple of the same type but with different depths.\nLeave empty to make uncapped.
 entities.SorbetHelper/LightCoverController.attributes.description.global=Whether the controller should apply globally, to every entity as they are loaded.\nAllows even affecting entities added after room load, and automatically across the whole map.
 
 # depth adhering displacement wrapper
@@ -217,14 +218,14 @@ entities.SorbetHelper/DisplacementEffectArea.attributes.description.depth=The vi
 entities.SorbetHelper/EntityStylegroundController.placements.name.controller=Entity As Styleground Controller
 entities.SorbetHelper/EntityStylegroundController.placements.name.altname=Entity on Styleground Layer Controller
 entities.SorbetHelper/EntityStylegroundController.placements.description.controller=Marks specified entity types to be drawn as a styleground layer by an Entity As Styleground Renderer styleground.
-entities.SorbetHelper/EntityStylegroundController.attributes.description.classNames=A comma seperated list of C# entity class names the controller should affect.\nYou can use something like CelesteTAS or Mapping Utils's profiling tab to try and find these.
+entities.SorbetHelper/EntityStylegroundController.attributes.description.classNames=A comma seperated list of C# entity class names the controller should affect.\nYou can use something like CelesteTAS or Mapping Utils to try and find these.
 entities.SorbetHelper/EntityStylegroundController.attributes.description.useFullClassNames=Whether the controller should check for the fully qualified class names or just the name of the class.\ne.g. Celeste.SummitCloud vs SummitCloud
-entities.SorbetHelper/EntityStylegroundController.attributes.description.minDepth=The minimum (closest to the camera) depth an entity can have while being affected by the controller.\nAllows restricting the controller to specific entities if you have multiple of the same but with different depths.\nLeave empty to make uncapped.
-entities.SorbetHelper/EntityStylegroundController.attributes.description.maxDepth=The maximum (farthest from the camera) depth an entity can have while being affected by the controller.\nAllows restricting the controller to specific entities if you have multiple of the same but with different depths.\nLeave empty to make uncapped.
+entities.SorbetHelper/EntityStylegroundController.attributes.description.minDepth=The minimum (closest to the camera) depth an entity can have while being affected by the controller.\nAllows restricting the controller to specific entities if you have multiple of the same type but with different depths.\nLeave empty to make uncapped.
+entities.SorbetHelper/EntityStylegroundController.attributes.description.maxDepth=The maximum (farthest from the camera) depth an entity can have while being affected by the controller.\nAllows restricting the controller to specific entities if you have multiple of the same type but with different depths.\nLeave empty to make uncapped.
 entities.SorbetHelper/EntityStylegroundController.attributes.description.tag=The styleground tag used to match with an Entity As Styleground Renderer styleground.\nRequired in order for the controller to have any effect.
 entities.SorbetHelper/EntityStylegroundController.attributes.description.global=Whether the controller should apply globally, to every entity as they are loaded.\nAllows even affecting entities added after room load, and automatically across the whole map.
 entities.SorbetHelper/EntityStylegroundController.attributes.name._instructionsButton=Info
-entities.SorbetHelper/EntityStylegroundController.attributes.description._instructionsButton=~~~ some misc info ~~~\n- the controller will *not* work on its own, but rather requires the map to have an Entity As Styleground Renderer styleground with a matching tag field.\n\n- for decals specifically, there is also a decal registry attribute available, <sorbetHelper_styleground stylegroundTag=""/>\n  this has the same requirement of an Entity As Styleground Renderer (though note that a controller isn't required when using the decal registry)\n\n- expect to encounter random issues sometimes, especially if you're using this with an entity with particularly complex rendering-\n  this is likely not the fault of either me or whoever made the entity,\n  but just a consequence of it (very reasonably) not expecting to be in these conditions, sorry!
+entities.SorbetHelper/EntityStylegroundController.attributes.description._instructionsButton=~~~ some misc info ~~~\n- the controller will *not* work on its own, but rather requires the map to have an Entity As Styleground Renderer styleground with a matching tag field.\n\n- for decals specifically, there is also a decal registry attribute available, <sorbetHelper_styleground rendererTag=""/>\n  this has the same requirement of an Entity As Styleground Renderer (though note that a controller isn't required when using the decal registry)\n\n- expect to potentially broken behavior sometimes, especially if you're using this with an entity with particularly complex rendering-\n  this is likely not the fault of either me or whoever made the entity,\n  but just a consequence of it (very reasonably) not expecting to be in these conditions, sorry!
 
 # styleground entity controller
 entities.SorbetHelper/StylegroundEntityController.placements.name.controller=Styleground As Entity Controller
@@ -266,7 +267,6 @@ entities.SorbetHelper/DashGateBlock.attributes.description.linkTag=An optional s
 # most tooltips stolen from maddie's helping hand
 # https://github.com/maddie480/MaddieHelpingHand/blob/1297e45c72dbf27972e8396139406dd55e65c227/Loenn/lang/en_gb.lang#L194
 entities.SorbetHelper/TouchGateBlock.placements.name.normal=Touch Gate Block
-entities.SorbetHelper/TouchGateBlock.placements.name.normalaltname=Gate Block (Touch Activated) (Activate On Touch)
 entities.SorbetHelper/TouchGateBlock.attributes.description.inactiveColor=The color of the block when not triggered yet.
 entities.SorbetHelper/TouchGateBlock.attributes.description.activeColor=The color of the block while moving.
 entities.SorbetHelper/TouchGateBlock.attributes.description.finishColor=The color of the block when it has reached its destination.
@@ -289,12 +289,13 @@ entities.SorbetHelper/TouchGateBlock.attributes.description.linkTag=An optional 
 # -- triggers --
 
 # alttalkcomponentui
-triggers.SorbetHelper/MinimalInteractPrompt.placements.name.altTalkUI=Minimal Interact Prompt
-triggers.SorbetHelper/MinimalInteractPrompt.placements.description.altTalkUI=Replaces the normal interaction/talk prompt with a more subtle one that slides in from the side.
-triggers.SorbetHelper/MinimalInteractPrompt.attributes.name.dialogId=Label Dialog ID
-triggers.SorbetHelper/MinimalInteractPrompt.attributes.description.dialogId=The dialog ID to use for the prompt.
-triggers.SorbetHelper/MinimalInteractPrompt.attributes.description.onLeft=Whether the prompt should come from the left side of the screen, instead of the right.
-triggers.SorbetHelper/MinimalInteractPrompt.attributes.description.playHighlightSfx=Whether to still play the vanilla sfx for when the prompt is highlighted.
+triggers.SorbetHelper/AlternateInteractPrompt.placements.name.altTalkUI=Alternate Style Interact Prompt
+triggers.SorbetHelper/AlternateInteractPrompt.placements.name.altNameAltTalkUI=Alternate Interact Prompt
+triggers.SorbetHelper/AlternateInteractPrompt.placements.description.altTalkUI=Replaces the normal interaction/talk prompt with a different, slightly more subtle one that slides in from the side.
+triggers.SorbetHelper/AlternateInteractPrompt.attributes.name.dialogId=Label Dialog ID
+triggers.SorbetHelper/AlternateInteractPrompt.attributes.description.dialogId=The dialog ID to use for the prompt.
+triggers.SorbetHelper/AlternateInteractPrompt.attributes.description.onLeft=Whether the prompt should come from the left side of the screen, instead of the right.
+triggers.SorbetHelper/AlternateInteractPrompt.attributes.description.playHighlightSfx=Whether to still play the vanilla sfx for when the prompt is highlighted.
 
 # mini popups
 triggers.SorbetHelper/MiniPopupTrigger.placements.name.miniPopup=Mini Popup Trigger

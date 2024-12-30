@@ -1,5 +1,5 @@
 local easings = require("mods").requireFromPlugin("libraries.easings")
-local collisionModes = { "Vanilla", "DisableSquish", "NoCollide" }
+local collisionModes = { "Vanilla", "SquishFix", "TriggersOnly", "NoCollide" }
 
 local returnBubbleBehavior = {}
 
@@ -14,8 +14,8 @@ returnBubbleBehavior.placements = {
         easing = "SineInOut", -- this is a mistake probably but whatever
         smoothCamera = true, -- vanilla value is off but its nicer on i think
         -- canSkip = false,
-        -- refillDash = false,
-        collisionMode = "DisableSquish"
+        refillDash = false,
+        collisionMode = "SquishFix"
     }
 }
 returnBubbleBehavior.fieldInformation = {

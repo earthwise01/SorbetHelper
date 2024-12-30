@@ -9,7 +9,7 @@ using TalkComponentUI = Celeste.TalkComponent.TalkComponentUI;
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [Tracked]
-[CustomEntity("SorbetHelper/MinimalInteractPrompt")]
+[CustomEntity("SorbetHelper/AlternateInteractPrompt")]
 public class AlternateInteractPromptWrapper : Entity {
     private readonly string dialogId;
     private readonly bool onLeft;

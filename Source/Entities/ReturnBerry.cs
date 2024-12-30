@@ -25,13 +25,11 @@ public class ReturnBerry : Strawberry {
         Add(new PlayerCollider(OnPlayer));
 
         // recreate the strawberry seed list but accounting for the first 2 nodes being for the bubble
-        if (data.Nodes is { Length: > 0 }) {
-            Seeds.Clear();
+        Seeds.Clear();
 
-            if (data.Nodes.Length > 2) {
-                for (int i = 0; i < data.Nodes.Length - 2; i++) {
-                    Seeds.Add(new StrawberrySeed(this, offset + data.Nodes[i], i, isGhostBerry));
-                }
+        if (data.Nodes is { Length: > 2 }) {
+            for (int i = 0; i < data.Nodes.Length - 2; i++) {
+                Seeds.Add(new StrawberrySeed(this, offset + data.Nodes[i], i, isGhostBerry));
             }
         }
     }
@@ -63,7 +61,7 @@ public class ReturnBerry : Strawberry {
             yield return bubbleDelay;
 
         // if maddy is still alive put her in a bubble
-        if (!player.Dead) {
+        if (!player.Dead && player.StateMachine.State != Player.StCassetteFly) {
             Audio.Play("event:/game/general/cassette_bubblereturn", (Scene as Level).Camera.GetCenter());
             player.StartCassetteFly(nodes[1], nodes[0]);
         }

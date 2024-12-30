@@ -9,15 +9,21 @@ local resizableWaterfall = {}
 
 resizableWaterfall.name = "SorbetHelper/BigWaterfall"
 resizableWaterfall.canResize = {true, false}
-resizableWaterfall.minimumSize = {16, 0}
+resizableWaterfall.minimumSize = {8, 0}
 resizableWaterfall.fieldInformation = {
     depth = {
+        fieldType = "integer",
         options = {-9999, -49900},
         editable = true
     },
     color = {
         fieldType = "color",
         allowXNAColors = false
+    },
+    wavePercent = {
+        options = {1.0, 0.8},
+        minimumValue = 0,
+        maximumValue = 1
     }
 }
 
@@ -34,10 +40,11 @@ resizableWaterfall.placements = {
         name = "normal",
         alternativeName = "bigwaterfall",
         data = {
-            width = 16,
+            width = 8,
             color = "87CEFA",
             ignoreSolids = false,
             lines = true,
+            wavePercent = 1.0,
             depth = -9999
         }
     },
@@ -45,10 +52,11 @@ resizableWaterfall.placements = {
         name = "abovefg",
         alternativeName = "bigwaterfallabove",
         data = {
-            width = 16,
+            width = 8,
             color = "87CEFA",
             ignoreSolids = true,
             lines = true,
+            wavePercent = 1.0,
             depth = -49900
         }
     }
@@ -100,22 +108,65 @@ local function getWaterfallHeight(room, entity, ignoreTiles)
     return wantedHeight
 end
 
+local function getWithAlpha(color, alpha)
+    return { color[1] * alpha, color[2] * alpha, color[3] * alpha, alpha }
+end
+
+-- adapted from loenn's waterfall helper with some edits
+local function getWaterfallSprite(room, entity, fillColor, borderColor)
+    local x, y = entity.x or 0, entity.y or 0
+    local width, height = entity.width or 16, getWaterfallHeight(room, entity, entity.ignoreSolids)
+
+    local hasLines = entity.lines or false
+    -- local linesOffset = (width <= 8 ? 1 : 2)
+    local borderOffset = (width <= 8 ? 1 : 2)
+
+    local sprites = {}
+
+    local middleRectangle = drawableRectangle.fromRectangle("fill", x, y, width, height, fillColor)
+    local leftRectangle = drawableRectangle.fromRectangle("fill", x - 1, y, borderOffset, height, borderColor)
+    local rightRectangle = drawableRectangle.fromRectangle("fill", x + width + 1 - borderOffset, y, borderOffset, height, borderColor)
+
+    table.insert(sprites, middleRectangle:getDrawableSprite())
+    table.insert(sprites, leftRectangle:getDrawableSprite())
+    table.insert(sprites, rightRectangle:getDrawableSprite())
+
+    local addWaveLineSprite = waterfallHelper.addWaveLineSprite
+
+    -- Add wave pattern
+    for i = 0, height, 21 do
+        -- From left to right in the waterfall
+        -- Parts connected to side borders
+        addWaveLineSprite(sprites, y, height, x - 1 + borderOffset, y + i + 9, 1, 12, borderColor)
+        addWaveLineSprite(sprites, y, height, x + borderOffset, y + i + 11, 1, 8, borderColor)
+        addWaveLineSprite(sprites, y, height, x + width - 1 - borderOffset, y + i, 1, 9, borderColor)
+        addWaveLineSprite(sprites, y, height, x + width - 0 - borderOffset, y + i - 2, 1, 13, borderColor)
+
+        if hasLines then
+            -- Wave on left border
+            addWaveLineSprite(sprites, y, height, x + 0 + borderOffset, y + i, 1, 9, borderColor)
+            addWaveLineSprite(sprites, y, height, x + 1 + borderOffset, y + i + 9, 1, 2, borderColor)
+            addWaveLineSprite(sprites, y, height, x + 1 + borderOffset, y + i + 19, 1, 2, borderColor)
+            addWaveLineSprite(sprites, y, height, x + 2 + borderOffset, y + i + 11, 1, 8, borderColor)
+
+            -- Wave on right border
+            addWaveLineSprite(sprites, y, height, x + width - 1 - borderOffset, y + i - 10, 1, 8, borderColor)
+            addWaveLineSprite(sprites, y, height, x + width - 2 - borderOffset, y + i - 2, 1, 2, borderColor)
+            addWaveLineSprite(sprites, y, height, x + width - 2 - borderOffset, y + i + 9, 1, 2, borderColor)
+            addWaveLineSprite(sprites, y, height, x + width - 3 - borderOffset, y + i, 1, 9, borderColor)
+        end
+    end
+
+    return sprites
+end
+
 function resizableWaterfall.sprite(room, entity)
-    -- height isn't ever supposed to be anything other than nil but it's probably bad practice to actively remove data anyway? meaning we back up the existing height value before doing a hackfix
-    local entityHeightHackfix = entity.height
-    -- temporarily change the height and layer to make the waterfall Actually Work visually
-    entity.height = getWaterfallHeight(room, entity, entity.ignoreSolids)
-    entity.layer = "FG"
-
     local color = utils.getColor(entity.color)
+    local fillColor = getWithAlpha(color, 0.3)
+    local borderColor = getWithAlpha(color, 0.8)
 
-    local fillColor = {color[1] * 0.3, color[2] * 0.3, color[3] * 0.3, 0.3}
-    local borderColor = {color[1] * 0.8, color[2] * 0.8, color[3] * 0.8, 0.8}
-    -- using the hackfixed height and layer values from earlier, grab a correct big waterfall sprite
-    local result = waterfallHelper.getBigWaterfallSprite(room, entity, fillColor, borderColor)
-    -- reset the height back to what it was before (it *should* always be nil but we're doing this instead of just setting it to nil due to the reason stated earlier)
-    entity.height = entityHeightHackfix
-    entity.layer = nil
+    local result = getWaterfallSprite(room, entity, fillColor, borderColor)
+
     return result
 end
 

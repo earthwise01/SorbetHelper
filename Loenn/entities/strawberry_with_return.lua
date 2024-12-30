@@ -108,6 +108,7 @@ end
 
 function return_berry.sprite(room, entity, viewport)
     local bubbleTexture = "characters/player/bubble"
+    local smallBubbleTexture = "particles/bubble"
     local berryTexture = ""
 
     local x, y = entity.x or 0, entity.y or 0
@@ -131,15 +132,19 @@ function return_berry.sprite(room, entity, viewport)
 
     local sprites = {}
 
+    -- bubbles behind berry
+    table.insert(sprites, drawableSprite.fromTexture(smallBubbleTexture, {x = x + 2, y = y - 8, color = getWhite(0.25)}))
+
     -- berry
     table.insert(sprites, drawableSprite.fromTexture(berryTexture, entity))
+
+    -- bubbles above berry
+    table.insert(sprites, drawableSprite.fromTexture(smallBubbleTexture, {x = x - 5, y = y - 2, color = getWhite(0.6)}))
+    table.insert(sprites, drawableSprite.fromTexture(smallBubbleTexture, {x = x + 4, y = y + 3, color = getWhite(0.6)}))
 
     -- end bubble
     local nx, ny = nodes[2].x or 0, nodes[2].y or 0
     table.insert(sprites, drawableSprite.fromTexture(bubbleTexture, {x = nx, y = ny, color = getWhite(0.5)}))
-
-    -- bubble around berry
-    -- table.insert(sprites, drawableSprite.fromTexture(emptyBubbleTexture, {x = x, y = y, color = getWhite(0.2)}))
 
     -- seeds
     addSeeds(sprites, entity, false)

@@ -28,7 +28,7 @@ public class CustomFallingBlock : FallingBlock {
 
     // chrono helper gravity falling block switch support
     private readonly bool chronoHelperGravityFallingBlock;
-    private bool chronoHelperGravityWasUp;
+    private bool chronoHelperGravityUp, chronoHelperGravityWasUp;
     private bool chronoHelperHasShaken;
 
     public CustomFallingBlock(EntityData data, Vector2 offset) : base(data, offset) {
@@ -68,9 +68,12 @@ public class CustomFallingBlock : FallingBlock {
 
     public override void Update() {
         // chronohelper gravity
-        if (chronoHelperGravityFallingBlock && chronoHelperGravityWasUp != ChronoHelperCompat.SessionGravityModeUp) {
-            Direction = -Direction;
-            chronoHelperGravityWasUp = !chronoHelperGravityWasUp;
+        if (chronoHelperGravityFallingBlock) {
+            chronoHelperGravityWasUp = chronoHelperGravityUp;
+            chronoHelperGravityUp = ChronoHelperCompat.SessionGravityModeUp;
+
+            if (chronoHelperGravityUp != chronoHelperGravityWasUp)
+                Direction = -Direction;
         }
 
         // flag trigger
@@ -162,10 +165,14 @@ public class CustomFallingBlock : FallingBlock {
             else if (CollideCheck<SolidTiles>(Position + Direction))
                 break;
 
-            while (CollideCheck<Platform>(Position + Direction)) {
-                chronoHelperHasShaken = false;
+            // could be a simple collidecheck but this fixes the extremely niche case of not falling if 1. sideways 2. next to a jumpthru and 3. active but landed (for using attached jumpthrus on sideways gravity falling blocks)
+            while (CollideFirst<Platform>(Position + Direction) is { } platform && (Direction.X == 0f || platform is not JumpThru)) {
                 yield return 0.1f;
             }
+
+            // makes platforms moving out of the way still behave like normal for gravity falling blocks
+            if (chronoHelperGravityFallingBlock && chronoHelperGravityUp == chronoHelperGravityWasUp)
+                chronoHelperHasShaken = false;
         }
 
         Safe = true;
@@ -222,7 +229,7 @@ public class CustomFallingBlock : FallingBlock {
         switch (dir) {
             case { X: 1f }:
                 for (int i = 2; i <= Height; i += 4) {
-                    if (Scene.CollideCheck<Solid>(TopLeft + new Vector2(3f, i))) {
+                    if (Scene.CollideCheck<Solid>(TopRight + new Vector2(3f, i))) {
                         level.ParticlesFG.Emit(P_FallDustA, 1, new Vector2(Right, Y + i), Vector2.One * 4f, 0f);
                         float direction = i >= Height / 2f ? MathF.PI / 2f : -MathF.PI / 2f;
                         level.ParticlesFG.Emit(P_DirectionalLandDust, 1, new Vector2(Right, Y + i), Vector2.One * 4f, direction);

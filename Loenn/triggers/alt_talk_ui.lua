@@ -1,8 +1,9 @@
 local trigger = {}
 
-trigger.name = "SorbetHelper/MinimalInteractPrompt"
+trigger.name = "SorbetHelper/AlternateInteractPrompt"
 trigger.placements = {
     name = "altTalkUI",
+    alternativeName = "altNameAltTalkUI",
     data = {
         dialogId = "sorbethelper_ui_talk",
         onLeft = false,

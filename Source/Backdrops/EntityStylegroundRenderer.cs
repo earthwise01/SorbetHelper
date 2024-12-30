@@ -6,6 +6,7 @@ using Celeste.Mod.Backdrops;
 using Celeste.Mod.SorbetHelper.Entities;
 using Celeste.Mod.SorbetHelper.Components;
 using Celeste.Mod.SorbetHelper.Utils;
+using FMOD.Studio;
 
 namespace Celeste.Mod.SorbetHelper.Backdrops;
 
@@ -37,27 +38,28 @@ public class EntityStylegroundRenderer : Backdrop {
 
         GameplayRenderer.Begin();
 
-        foreach (var entity in toRender)
-            entity.Render();
+        foreach (var marker in toRender)
+            marker.EntityRender(); // entity.render isn't called directly so that displacement for e.g. fg big waterfalls still works. v niche so its kinda like ehhh but  whatever
 
         GameplayRenderer.End();
     }
 
-    public List<Entity> GetEntitiesToRender(List<Component> components) {
-        var entities = new List<Entity>(components.Count);
+    private static readonly Comparison<EntityStylegroundMarker> CompareDepth = (EntityStylegroundMarker a, EntityStylegroundMarker b) => Math.Sign(b.Entity.actualDepth - a.Entity.actualDepth);
+    public List<EntityStylegroundMarker> GetEntitiesToRender(List<Component> components) {
+        var markers = new List<EntityStylegroundMarker>(components.Count);
 
         for (int i = 0; i < components.Count; i++) {
             var marker = (EntityStylegroundMarker)components[i];
 
             if (marker.Entity.Visible == true && Tags.Contains(marker.Tag))
-                entities.Add(marker.Entity);
+                markers.Add(marker);
         }
 
         // if (AccurateDepthSorting)
         // pain  (potential optimization could be to use a custom tracker entity thing which sorts depth only when needed like how entitylist.updatelists works?)
         // at the very least though thankfully only needs to go through currently visible marked entities
-        entities.Sort(EntityList.CompareDepth);
+        markers.Sort(CompareDepth);
 
-        return entities;
+        return markers;
     }
 }
