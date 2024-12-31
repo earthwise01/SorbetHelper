@@ -17,17 +17,8 @@ public class MiniPopupDisplay : Entity {
 
     private float hiddenCountSlideLerp;
 
-    private static int MiniPopupVisibleCap => Math.Min(SorbetHelperModule.Settings.MiniPopupVisibleCap, SorbetHelperModule.Settings.MiniPopupSize switch {
-        SorbetHelperSettings.MiniPopupSizes.Small => 10,
-        SorbetHelperSettings.MiniPopupSizes.Large => 6,
-        _ => 8,
-    });
-
-    private static float MiniPopupScale => SorbetHelperModule.Settings.MiniPopupSize switch {
-        SorbetHelperSettings.MiniPopupSizes.Small => 0.75f,
-        SorbetHelperSettings.MiniPopupSizes.Large => 1.25f,
-        _ => 1f,
-    }; // might make larger still not sure
+    private static int MiniPopupVisibleCap => Math.Min(SorbetHelperModule.Settings.MiniPopupVisibleCap, (int)(720f / (90 * MiniPopupScale)));
+    private static float MiniPopupScale => SorbetHelperModule.Settings.MiniPopupScale;
 
     public MiniPopupDisplay() : base() {
         Tag |= Tags.Global | Tags.TransitionUpdate | Tags.FrozenUpdate | Tags.HUD;//TagsExt.SubHUD; // can't be subhud because it looks weird going behind talkcomponentuis (although i wonder if being able to make those subhud would also be nice)
@@ -74,17 +65,17 @@ public class MiniPopupDisplay : Entity {
     }
 
     public override void Render() {
-        if ((Scene as Level).Paused)
-            return;
+        //if ((Scene as Level).Paused)
+        //    return;
 
         // base.Render();
         var boxTexHeight = bgTex.Height * 0.5f;
         var boxTexWidth = bgTex.Width * 0.5f;
 
         var scale = MiniPopupScale;
-        var outlineStroke = SorbetHelperModule.Settings.MiniPopupSize switch {
-            SorbetHelperSettings.MiniPopupSizes.Small => 1f,
-            SorbetHelperSettings.MiniPopupSizes.Large => 3f,
+        var outlineStroke = SorbetHelperModule.Settings.MiniPopupScale switch {
+            > 1.25f => 3f,
+            < 0.75f => 1f,
             _ => 2f,
         };
 
@@ -121,7 +112,7 @@ public class MiniPopupDisplay : Entity {
             ActiveFont.Draw(subText, drawPos + new Vector2(width - scale * textOffsetFromRight, scale * -12f), new Vector2(1f, 0f), new Vector2(scale * subTextScale), popup.AccentColor * 0.8f);
 
             // still undecided whether this should be on the right or left of the text
-            icon?.Draw(drawPos + new Vector2(width - scale * (iconSize + 10f), -60f), Vector2.Zero, Color.White, new Vector2(scale * iconSize / icon.Width, scale * iconSize / icon.Height));
+            icon?.Draw(drawPos + new Vector2(width - scale * (iconSize + 10f), scale * -60f), Vector2.Zero, Color.White, new Vector2(scale * iconSize / icon.Width, scale * iconSize / icon.Height));
 
             currentYPos += scale * distanceY * Ease.CubeInOut(popup.FinishedMoveUpLerp);
         }
