@@ -196,7 +196,7 @@ public class ReturnBubbleBehaviorController : Entity {
         orig(self, data);
     }
 
-    // absolutely awful but setting player.collidable to false wouldnt prevent the player itself from colliding with other entities, and i dont think theres a better way to do this
+    // absolutely awful but setting player.collidable to false wouldnt prevent the player itself from colliding with other entities, and i dont think theres a better way to do this??? or im stupid
     // in any case like, i already did this for another mod once so if i ever wanted to port that mechanic here id have to do this anyway
     // could also add hook lazy loading so any maps where this never does anything dont get any extra overhead
     private static void IL_Collide_Check(ILContext il) {
@@ -205,11 +205,11 @@ public class ReturnBubbleBehaviorController : Entity {
         ILLabel endLabel = null;
 
         if (!cursor.TryGotoNextBestFit(MoveType.After, i => i.MatchLdfld(out _), i => i.MatchBrfalse(out endLabel))) {
-            Logger.Error(nameof(SorbetHelper), "failed to inject collision disabling in CIL code for {cursor.Method.Name}!");
+            Logger.Error(nameof(SorbetHelper), $"failed to inject collision disabling in CIL code for {cursor.Method.Name}!");
             return;
         }
 
-        Logger.Verbose(nameof(SorbetHelper), "injecting collision disabling at {cursor.Index} in CIL code for {cursor.Method.Name}");
+        Logger.Verbose(nameof(SorbetHelper), $"injecting collision disabling at {cursor.Index} in CIL code for {cursor.Method.Name}");
 
         cursor.EmitLdarg0();
         cursor.EmitLdarg1();
@@ -220,30 +220,36 @@ public class ReturnBubbleBehaviorController : Entity {
     private static bool ShouldDisableCollision(Entity a, Entity b) {
         // looks a bit worse than it is maybe , code in both if checks is the same but i didnt want to include another method call and im not confident in using aggressiveinlining
         // still awful though gladstare
-        if (a is Player { StateMachine.State: Player.StCassetteFly } p1) {
+        if (a is Player p1) {
+            if (p1.StateMachine.State is not Player.StCassetteFly)
+                return false;
+
             var behavior = GetActiveBehavior(p1);
             if (behavior is null)
                 return false;
 
-            if (behavior.CollisionMode == ReturnBubbleBehavior.CollisionModes.NoCollide)
-                return true;
-
             if (behavior.CollisionMode == ReturnBubbleBehavior.CollisionModes.TriggersOnly)
                 return b is not Trigger;
+
+            if (behavior.CollisionMode == ReturnBubbleBehavior.CollisionModes.NoCollide)
+                return true;
 
             return false;
         }
 
-        if (b is Player { StateMachine.State: Player.StCassetteFly } p2) {
+        if (b is Player p2) {
+            if (p2.StateMachine.State is not Player.StCassetteFly)
+                return false;
+
             var behavior = GetActiveBehavior(p2);
             if (behavior is null)
                 return false;
 
-            if (behavior.CollisionMode == ReturnBubbleBehavior.CollisionModes.NoCollide)
-                return true;
-
             if (behavior.CollisionMode == ReturnBubbleBehavior.CollisionModes.TriggersOnly)
                 return a is not Trigger;
+
+            if (behavior.CollisionMode == ReturnBubbleBehavior.CollisionModes.NoCollide)
+                return true;
         }
 
         return false;

@@ -1,4 +1,5 @@
 Source/
 lib-stripped/
 Effects/SorbetHelper/fxc.exe
+compileLang.sh
 SorbetHelper.zip

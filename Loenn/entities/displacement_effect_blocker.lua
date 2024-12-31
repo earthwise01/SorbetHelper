@@ -44,7 +44,11 @@ end
 
 displacementEffectBlocker.fieldInformation = {
     depth = {
-        fieldType = "integer"
+        fieldType = "integer",
+        options = depths.addDepths(depths.getDepths(), {
+            {"Water & Waterfalls", -9999}, {"FG Waterfalls", -49900}
+        }),
+        editable = true
     }
 }
 

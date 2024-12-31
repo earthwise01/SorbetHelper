@@ -1,3 +1,6 @@
+local mods = require("mods")
+local depths = mods.requireFromPlugin("libraries.depths")
+
 local stylegroundEntityController = {}
 
 stylegroundEntityController.name = "SorbetHelper/StylegroundEntityController"
@@ -13,7 +16,9 @@ stylegroundEntityController.placements = {
 
 stylegroundEntityController.fieldInformation = {
     depth = {
-        fieldType = "integer"
+        fieldType = "integer",
+        options = depths.getDepths(),
+        editable = true
     }
 }
 

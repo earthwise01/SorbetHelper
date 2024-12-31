@@ -57,8 +57,12 @@ displacementArea.fieldInformation = {
         maximumValue = 1.0
     },
     depth = {
-        fieldType = "integer"
-    }
+        fieldType = "integer",
+        options = depths.addDepths(depths.getDepths(), {
+            {"Water & Waterfalls", -9999}, {"FG Waterfalls", -49900}
+        }),
+        editable = true
+    },
 }
 
 displacementArea.fieldOrder = {

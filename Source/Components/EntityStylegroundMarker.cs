@@ -32,7 +32,9 @@ public class EntityStylegroundMarker : RenderOverride {
         var depthDisplacement = entity.Get<DepthAdheringDisplacementRenderHook>();
         DisplacementRenderHook displacement;
         if (depthDisplacement is null && (displacement = entity.Get<DisplacementRenderHook>()) is not null) {
-            depthDisplacement = new DepthAdheringDisplacementRenderHook(entity.Render, displacement.RenderDisplacement, true);
+            depthDisplacement = new DepthAdheringDisplacementRenderHook(entity.Render, displacement.RenderDisplacement, true) {
+                Visible = false
+            };
             entity.Remove(displacement);
             entity.Add(depthDisplacement);
         }

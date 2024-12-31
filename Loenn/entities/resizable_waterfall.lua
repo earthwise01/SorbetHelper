@@ -4,16 +4,21 @@ local xnaColors = require("consts.xna_colors")
 local utils = require("utils")
 local waterfallHelper = require("helpers.waterfalls")
 local connectedEntities = require("helpers.connected_entities")
+local mods = require("mods")
+local depths = mods.requireFromPlugin("libraries.depths")
 
 local resizableWaterfall = {}
 
 resizableWaterfall.name = "SorbetHelper/BigWaterfall"
 resizableWaterfall.canResize = {true, false}
 resizableWaterfall.minimumSize = {8, 0}
+
 resizableWaterfall.fieldInformation = {
     depth = {
         fieldType = "integer",
-        options = {-9999, -49900},
+        options = depths.addDepths(depths.getDepths(), {
+            {"Water & Waterfalls", -9999}, {"FG Waterfalls", -49900}
+        }),
         editable = true
     },
     color = {
@@ -28,7 +33,7 @@ resizableWaterfall.fieldInformation = {
 }
 
 resizableWaterfall.fieldOrder = {
-    "x", "y", "width", "color", "depth", "lines", "ignoreSolids"
+    "x", "y", "width", "color", "depth", "ignoreSolids", "lines", "wavePercent"
 }
 
 resizableWaterfall.ignoredFields = {
@@ -41,7 +46,7 @@ resizableWaterfall.placements = {
         alternativeName = "bigwaterfall",
         data = {
             width = 8,
-            color = "87CEFA",
+            color = "87cefa",
             ignoreSolids = false,
             lines = true,
             wavePercent = 1.0,
@@ -49,11 +54,23 @@ resizableWaterfall.placements = {
         }
     },
     {
-        name = "abovefg",
-        alternativeName = "bigwaterfallabove",
+        name = "small",
+        alternativeName = "bigwaterfall",
         data = {
             width = 8,
-            color = "87CEFA",
+            color = "87cefa",
+            ignoreSolids = false,
+            lines = false,
+            wavePercent = 0.8,
+            depth = -9999
+        }
+    },
+    {
+        name = "abovefg",
+        alternativeName = "bigwaterfall",
+        data = {
+            width = 8,
+            color = "87cefa",
             ignoreSolids = true,
             lines = true,
             wavePercent = 1.0,

@@ -77,10 +77,8 @@ local function getFieldInfo(extraFields)
         },
         depth = {
             fieldType = "integer",
-            options = {
-                -9000,
-                5000
-            }
+            options = depths.getDepths(),
+            editable = true
         }
     }
 

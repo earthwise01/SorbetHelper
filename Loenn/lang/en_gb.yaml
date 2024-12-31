@@ -1,7 +1,6 @@
-# source for en_gb.lang (which is "compilied" using a janky C# script and yamldotnet)
+# source for en_gb.lang (which is "compilied" using a messy C# script and yamldotnet)
 # this is  longer technically but nicer to read/edit for me personally and handles multiline descriptions much better
 # format should hopefully be readable enough
-# not rly neccessary but   gOD i needed something to distract myself with today,,    and could be nice to have in the future
 
 ModID: SorbetHelper
 ModName: Sorbet Helper
@@ -200,27 +199,36 @@ Entities:
   SorbetHelper/BigWaterfall:
     Placements:
       normal:
+        Name: Resizable Waterfall (Detail Lines)
+        Description: A custom waterfall combining the behaviour of a small waterfall with the resizability and visuals of a big waterfall.
+      small:
         Name: Resizable Waterfall
-        Description: A waterfall which behaves similarly to a vanilla Waterfall, but is also resizable like and closer visually to a vanilla Big Waterfall.
+        Description: A custom waterfall combining the behaviour and visuals of a small waterfall with the resizability of a big waterfall.
       abovefg:
-        Name: Resizable Waterfall (Above Tiles)
-        Description: A waterfall which behaves similarly to a vanilla Waterfall, but is also resizable like and closer visually to a vanilla Big Waterfall. Ignores and renders above Foreground Tiles.
-      # show in search results for big waterfall
+        Name: Resizable Waterfall (Detail Lines, Above Tiles)
+        Description:  |-
+          A custom waterfall combining the behaviour and visuals of a small waterfall with the resizability and visuals of a big waterfall.
+          Doesn't collide with and appears above foreground tiles.
+      # show in search results for big waterfall/custom waterfall
       bigwaterfall:
-        Name: Big Waterfall
-      bigwaterfallabove:
-        Name: Big Waterfall (Above Foreground)
+        Name: Big Waterfall Custom Waterfall
     Attributes:
       color:
         Description: The color of the waterfall.
       ignoreSolids:
         Description: When checked, the waterfall will ignore any solid objects in its way (e.g. foreground tiles). Water can still block it.
       lines:
+        Name: Detail Lines
         Description: Determines whether the waterfall will have any additional lines for detail, disabling this will make the waterfall appear closer in appearance to a vanilla small waterfall as opposed to a big waterfall.
+      wavePercent:
+        Description: |-
+          Determines the speed of the waterfall.
+          Ranges from 0.0 to 1.0, values closer to 1.0 result in faster waves. Vanilla small waterfalls use 0.8 and big waterfalls use 1.0.
       depth:
         Description: |-
-          Determines what visual layer the waterfall should be on (higher values mean farther behind in the scene, default value is -9999 for the normal placement or -49900 for the above solids placement).
-          Note that this on its own will not affect the wavy displacement effect.
+          Determines what visual layer the waterfall should be on.
+          Higher values mean farther behind in the scene, defaults are -9999 for the normal placement and -49900 for the above tiles placement.
+          Does not affect the displacement waves, which will still render above everything (unless used with a displacment depth fixer).
   
   SorbetHelper/CustomLightbeam:
     Placements:
@@ -398,7 +406,7 @@ Entities:
     Attributes:
       classNames:
         Description: |-
-          A comma seperated list of C# entity class names the controller should affect.
+          A comma separated list of C# entity class names the controller should affect.
           You can use something like CelesteTAS or Mapping Utils to try and find these.
       useFullClassNames:
         Description: |-
@@ -508,7 +516,7 @@ Entities:
     Attributes:
       classNames:
         Description: |-
-          A comma seperated list of C# entity class names the controller should affect.
+          A comma separated list of C# entity class names the controller should affect.
           You can use something like CelesteTAS or Mapping Utils to try and find these.
       useFullClassNames:
         Description: |-
@@ -903,4 +911,3 @@ Effects:
           this effect will *not* do anything on its own, but rather acts as a renderer for either
           entities affected by an Entity As Styleground Controller or decals affected by a <sorbetHelper_styleground/> decal registry tag
           with matching tag fields.
-

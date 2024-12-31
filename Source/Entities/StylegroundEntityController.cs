@@ -13,6 +13,7 @@ public class StylegroundEntityController : Entity {
     private readonly BackdropRenderer BackdropRenderer = new();
 
     public readonly string StylegroundTag;
+    private bool consumedStylegrounds;
 
     public StylegroundEntityController(EntityData data, Vector2 _) {
         Depth = data.Int("depth", Depths.Above);
@@ -29,11 +30,11 @@ public class StylegroundEntityController : Entity {
             return;
         }
 
-        ConsumeStylegrounds(scene as Level);
+        if (!consumedStylegrounds)
+            ConsumeStylegrounds(scene as Level);
     }
 
     public override void Update() {
-        base.Update();
         BackdropRenderer.Update(Scene);
     }
 
@@ -56,6 +57,7 @@ public class StylegroundEntityController : Entity {
     private void ConsumeStylegrounds(Level level) {
         ConsumeStylegrounds(level.Foreground.Backdrops);
         ConsumeStylegrounds(level.Background.Backdrops);
+        consumedStylegrounds = true;
         Logger.Log(LogLevel.Verbose, "SorbetHelper", "[StylegroundEntityDepthController] consumed stylegrounds!");
     }
 

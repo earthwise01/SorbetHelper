@@ -4,6 +4,8 @@ local utils = require("utils")
 local drawableLine = require("structs.drawable_line")
 local drawableRectangle = require("structs.drawable_rectangle")
 local drawableSprite = require("structs.drawable_sprite")
+local mods = require("mods")
+local depths = mods.requireFromPlugin("libraries.depths")
 
 local lightBeam = {}
 
@@ -86,6 +88,11 @@ lightBeam.fieldInformation = {
     },
     flagFadeTime = {
         minimumValue = 0.0
+    },
+    depth = {
+        fieldType = "integer",
+        options = depths.addDepth(depths.getDepths, "Lightbeams", -9998),
+        editable = true
     }
 }
 

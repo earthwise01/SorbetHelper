@@ -2,5 +2,7 @@ bin
 obj
 .vs
 .idea
+.vscode
 Effects/SorbetHelper/fxc.exe
+compileLang.sh
 SorbetHelper.zip
