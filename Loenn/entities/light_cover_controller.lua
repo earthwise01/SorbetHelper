@@ -2,6 +2,7 @@ local lightCover = {}
 
 lightCover.name = "SorbetHelper/LightCoverController"
 lightCover.texture = "editorSprites/SorbetHelper/lightCoverController"
+lightCover.depth = -1000010
 lightCover.placements = {
     name = "controller",
     data = {

@@ -4,7 +4,7 @@ local depths = mods.requireFromPlugin("libraries.depths")
 local displacementArea = {}
 
 displacementArea.name = "SorbetHelper/DisplacementEffectArea"
-displacementArea.depth = -55000
+displacementArea.depth = -1000010
 displacementArea.placements = {
     {
         name = "normal",

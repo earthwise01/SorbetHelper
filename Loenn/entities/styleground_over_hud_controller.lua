@@ -2,6 +2,7 @@ local stylegroundOverHudController = {}
 
 stylegroundOverHudController.name = "SorbetHelper/StylegroundOverHudController"
 stylegroundOverHudController.texture = "editorSprites/SorbetHelper/stylegroundOverHudController"
+stylegroundOverHudController.depth = -1000010
 stylegroundOverHudController.placements = {
     name = "stylegroundOverHud",
     alternativeName = "altname",

@@ -4,7 +4,7 @@ local depths = mods.requireFromPlugin("libraries.depths")
 local displacementEffectBlocker = {}
 
 displacementEffectBlocker.name = "SorbetHelper/DisplacementEffectBlocker"
-displacementEffectBlocker.depth = -55000
+displacementEffectBlocker.depth = -1000010
 displacementEffectBlocker.placements = {
     {
         name = "normal",

@@ -2,6 +2,7 @@ local entityStylegroundController = {}
 
 entityStylegroundController.name = "SorbetHelper/EntityStylegroundController"
 entityStylegroundController.texture = "editorSprites/SorbetHelper/entityStylegroundController"
+entityStylegroundController.depth = -1000010
 entityStylegroundController.placements = {
     name = "controller",
     alternativeName = "altname",

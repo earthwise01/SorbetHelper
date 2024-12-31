@@ -5,6 +5,7 @@ local returnBubbleBehavior = {}
 
 returnBubbleBehavior.name = "SorbetHelper/ReturnBubbleBehaviorController"
 returnBubbleBehavior.texture = "editorSprites/SorbetHelper/returnBubbleBehavior"
+returnBubbleBehavior.depth = -1000010
 returnBubbleBehavior.placements = {
     name = "controller",
     data = {

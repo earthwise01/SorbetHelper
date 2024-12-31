@@ -1,7 +1,7 @@
 local depthAdheringDisplacementWrapper = {}
 
 depthAdheringDisplacementWrapper.name = "SorbetHelper/DepthAdheringDisplacementWrapper"
-depthAdheringDisplacementWrapper.depth = -55000
+depthAdheringDisplacementWrapper.depth = -1000010
 depthAdheringDisplacementWrapper.placements = {
     {
         name = "entityOnly",

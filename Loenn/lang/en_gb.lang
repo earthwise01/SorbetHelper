@@ -216,7 +216,7 @@ entities.SorbetHelper/EntityStylegroundController.attributes.description.maxDept
 entities.SorbetHelper/EntityStylegroundController.attributes.description.tag=The styleground tag used to match with an Entity As Styleground Renderer styleground.\nRequired in order for the controller to have any effect.
 entities.SorbetHelper/EntityStylegroundController.attributes.description.global=Whether the controller should apply globally, to every entity as they are loaded.\nAllows even affecting entities added after room load, and automatically across the whole map.
 entities.SorbetHelper/EntityStylegroundController.attributes.name._instructionsButton=Info
-entities.SorbetHelper/EntityStylegroundController.attributes.description._instructionsButton=~~~ some misc info ~~~\n- the controller will *not* work on its own, but rather requires the map to have an Entity As Styleground Renderer styleground with a matching tag field.\n\n- for decals specifically, there is also a decal registry attribute available, <sorbetHelper_styleground rendererTag=""/>\n  this has the same requirement of an Entity As Styleground Renderer (though note that a controller isn't required when using the decal registry)\n\n- expect to potentially broken behavior sometimes, especially if you're using this with an entity with particularly complex rendering-\n  this is likely not the fault of either me or whoever made the entity,\n  but just a consequence of it (very reasonably) not expecting to be in these conditions, sorry!
+entities.SorbetHelper/EntityStylegroundController.attributes.description._instructionsButton=~~~ some misc info ~~~\n- the controller will *not* work on its own, but rather requires the map to have an Entity As Styleground Renderer styleground with a matching tag field.\n\n- for decals specifically, there is also a decal registry attribute available, <sorbetHelper_styleground rendererTag=""/>\n  this has the same requirement of an Entity As Styleground Renderer (though note that a controller isn't required when using the decal registry)\n\n- expect to potentially encounter broken behavior sometimes, especially if you're using this with an entity with particularly complex rendering-\n  this is likely not the fault of either me or whoever made the entity,\n  but just a consequence of it (very reasonably) not expecting to be in these conditions, sorry!
 
 # Styleground Entity Controller
 entities.SorbetHelper/StylegroundEntityController.placements.name.controller=Styleground As Entity Controller
@@ -281,7 +281,7 @@ triggers.SorbetHelper/AlternateInteractPrompt.placements.description.altTalkUI=R
 triggers.SorbetHelper/AlternateInteractPrompt.placements.name.altNameAltTalkUI=Alternate Interact Prompt
 triggers.SorbetHelper/AlternateInteractPrompt.attributes.name.dialogId=Label Dialog ID
 triggers.SorbetHelper/AlternateInteractPrompt.attributes.description.dialogId=The dialog ID to use for the prompt.
-triggers.SorbetHelper/AlternateInteractPrompt.attributes.description.onLeft=Whether the prompt should come from the left side of the screen, instead of the right.
+triggers.SorbetHelper/AlternateInteractPrompt.attributes.description.onLeft=Whether the prompt should come from the left side of the screen, instead of the right.\nThis is recommended to be left off for the sake of consistency unless you have a good reason.
 triggers.SorbetHelper/AlternateInteractPrompt.attributes.description.playHighlightSfx=Whether to still play the vanilla sfx for when the prompt is highlighted.
 
 # Mini Popup Trigger

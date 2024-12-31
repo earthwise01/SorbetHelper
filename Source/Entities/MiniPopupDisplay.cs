@@ -91,27 +91,25 @@ public class MiniPopupDisplay : Entity {
             var subText = Dialog.Clean(popup.SubTextID);
             var icon = popup.Icon;
 
-            const float mainTextScale = 0.85f;
-            const float subTextScale = 0.6f;
+            const float mainTextScale = 0.9f;
+            const float subTextScale = 0.65f;
             const int iconSize = 80;
 
             // why did i add scalingg  like its cool to have ig but omg its so messy help,
-            // | 40px | text | 10px
-            // | 32px | 80px img | 8px | text | 10px
-            // | 40px | text | 8px | 80px img | 8px
+            // | 44px | text | 10px
+            // | 44px | text | 10px | 80px img | 10px
             var textWidth = Math.Max(ActiveFont.Measure(mainText).X * mainTextScale, ActiveFont.Measure(subText).X * subTextScale);
             var textOffsetFromRight = icon is null ? 10f : 10f + iconSize + 10f;
-            var width = MathF.Ceiling(scale * (popup.WidthOverride < 0f ? 40f + textWidth + textOffsetFromRight : popup.WidthOverride));
+            var width = MathF.Ceiling(scale * (popup.WidthOverride < 0f ? 44f + textWidth + textOffsetFromRight : popup.WidthOverride));
             var drawPos = new Vector2(1920 - width, topYPos) + new Vector2((width + 20) * Ease.CubeIn(1f - popup.SlideLerp), currentYPos);
 
-            Draw.Rect(drawPos.X + scale * (boxTexWidth - 10), drawPos.Y - scale * boxTexHeight / 2, width, scale * boxTexHeight, popup.BaseColor);
+            Draw.Rect(drawPos.X + scale * (boxTexWidth - 10), drawPos.Y - scale * boxTexHeight / 2, width, MathF.Ceiling(scale * boxTexHeight), popup.BaseColor);
             bgTex.DrawJustified(drawPos, new Vector2(0f, 0.5f), popup.BaseColor, scale * 0.5f);
             accentTex.DrawJustified(drawPos, new Vector2(0f, 0.5f), popup.AccentColor, scale * 0.5f);
 
             ActiveFont.DrawOutline(mainText, drawPos + new Vector2(width - scale * textOffsetFromRight, 0f), new Vector2(1f, 1f), new Vector2(scale * mainTextScale), popup.TitleColor * 0.8f, outlineStroke, popup.BaseColor);
             ActiveFont.Draw(subText, drawPos + new Vector2(width - scale * textOffsetFromRight, scale * -12f), new Vector2(1f, 0f), new Vector2(scale * subTextScale), popup.AccentColor * 0.8f);
 
-            // still undecided whether this should be on the right or left of the text
             icon?.Draw(drawPos + new Vector2(width - scale * (iconSize + 10f), scale * -60f), Vector2.Zero, Color.White, new Vector2(scale * iconSize / icon.Width, scale * iconSize / icon.Height));
 
             currentYPos += scale * distanceY * Ease.CubeInOut(popup.FinishedMoveUpLerp);
