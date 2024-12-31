@@ -91,7 +91,7 @@ lightBeam.fieldInformation = {
     },
     depth = {
         fieldType = "integer",
-        options = depths.addDepth(depths.getDepths, "Lightbeams", -9998),
+        options = depths.addDepth(depths.getDepths(), "Lightbeams", -9998),
         editable = true
     }
 }

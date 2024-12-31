@@ -34,7 +34,7 @@ end
 
 function depths.addDepths(list, toAdd)
     for i,p in ipairs(toAdd) do
-        depths.addDepth(list, toAdd[1], toAdd[2])
+        depths.addDepth(list, p[1], p[2])
     end
 
     return list

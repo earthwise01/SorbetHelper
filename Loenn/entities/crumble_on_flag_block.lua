@@ -1,4 +1,6 @@
 local fakeTilesHelper = require("helpers.fake_tiles")
+local mods = require("mods")
+local depths = mods.requireFromPlugin("libraries.depths")
 
 local block = {}
 
@@ -27,7 +29,9 @@ end
 
 local fieldInfo = {
     depth = {
-        fieldType = "integer"
+        fieldType = "integer",
+        options = depths.addDepth(depths.getDepths(), "Crumble Wall On Rumble", -10010),
+        editable = true
     },
     fadeInTime = {
         minimumValue = 0

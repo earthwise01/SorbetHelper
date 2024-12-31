@@ -4,6 +4,7 @@ local xnaColors = require("consts.xna_colors")
 local utils = require("utils")
 local waterfallHelper = require("helpers.waterfalls")
 local connectedEntities = require("helpers.connected_entities")
+
 local mods = require("mods")
 local depths = mods.requireFromPlugin("libraries.depths")
 

@@ -1,3 +1,6 @@
+local mods = require("mods")
+local depths = mods.requireFromPlugin("libraries.depths")
+
 local displacementArea = {}
 
 displacementArea.name = "SorbetHelper/DisplacementEffectArea"

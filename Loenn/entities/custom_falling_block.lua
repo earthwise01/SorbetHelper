@@ -1,4 +1,6 @@
 local fakeTilesHelper = require("helpers.fake_tiles")
+local mods = require("mods")
+local depths = mods.requireFromPlugin("libraries.depths")
 
 local function getPlacements(name, extraFields)
     local data = {
