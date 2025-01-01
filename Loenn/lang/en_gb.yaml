@@ -877,10 +877,10 @@ Effects:
           This means any custom textures need to be placed at e.g. "yourmod/Graphics/Atlases/Overworld/yourname/yourmod/godray".
       texMinRotate:
         Name: Min Texture Rotation
-        Description: The minimum speed a textured godray should rotate (in degreees / second).
+        Description: The minimum speed a textured godray should rotate (in degrees / second).
       texMaxRotate:
         Name: Max Texture Rotation
-        Description: The maximum speed a textured godray should rotate (in degreees / second).
+        Description: The maximum speed a textured godray should rotate (in degrees / second).
       texStartRotated:
         Name: Start Texture Rotated
         Description: Whether textured godrays should have a random initial rotation.
