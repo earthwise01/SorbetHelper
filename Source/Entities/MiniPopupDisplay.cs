@@ -11,30 +11,30 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 
 [Tracked]
 public class MiniPopupDisplay : Entity {
-    private readonly MTexture bgTex, accentTex;
+    private readonly MTexture fallbackBaseTex, fallbackAccentTex;
     private readonly List<Popup> Popups = [];
     private readonly HashSet<Popup> ToRemove = [];
 
     private float hiddenCountSlideLerp;
 
     private static int MiniPopupVisibleCap => Math.Min(SorbetHelperModule.Settings.MiniPopupVisibleCap, (int)(720f / (90 * MiniPopupScale)));
-    private static float MiniPopupScale => SorbetHelperModule.Settings.MiniPopupScale;
+    private static float MiniPopupScale => SorbetHelperModule.Settings.MiniPopupScale + 0.1f;
 
     public MiniPopupDisplay() : base() {
         Tag |= Tags.Global | Tags.TransitionUpdate | Tags.FrozenUpdate | Tags.HUD;//TagsExt.SubHUD; // can't be subhud because it looks weird going behind talkcomponentuis (although i wonder if being able to make those subhud would also be nice)
         Depth = Depths.Top;
 
-        // could make customizable maybe?
-        bgTex = GFX.Gui["SorbetHelper/popup"];
-        accentTex = GFX.Gui["SorbetHelper/popupAccent"];
+        // could make customizable maybe?    done
+        fallbackBaseTex = GFX.Gui["SorbetHelper/popup"];
+        fallbackAccentTex = GFX.Gui["SorbetHelper/popupAccent"];
     }
 
     // i wonder if i shd add a cooldown for adding popups so if multiple are added simultaneously they slide in more gradually vs all at once,
     public void CreatePopup(float activeTime, string mainTextId, string subTextId) =>
         Popups.Add(new Popup(activeTime, mainTextId, subTextId, Color.Black, Color.LightCoral, Color.White));
 
-    public void CreatePopup(float activeTime, string mainTextId, string subTextId, Color baseColor, Color accentColor, Color titleColor, string iconPath = null, int widthOverride = -1) =>
-        Popups.Add(new Popup(activeTime, mainTextId, subTextId, baseColor, accentColor, titleColor, iconPath, widthOverride));
+    public void CreatePopup(float activeTime, string mainTextId, string subTextId, Color baseColor, Color accentColor, Color titleColor, string iconPath = null, string texturePath = null, int widthOverride = -1) =>
+        Popups.Add(new Popup(activeTime, mainTextId, subTextId, baseColor, accentColor, titleColor, iconPath, texturePath, widthOverride));
 
 
     public override void Update() {
@@ -65,17 +65,15 @@ public class MiniPopupDisplay : Entity {
     }
 
     public override void Render() {
-        //if ((Scene as Level).Paused)
-        //    return;
+        if ((Scene as Level).Paused)
+            return;
 
         // base.Render();
-        var boxTexHeight = bgTex.Height * 0.5f;
-        var boxTexWidth = bgTex.Width * 0.5f;
 
         var scale = MiniPopupScale;
         var outlineStroke = SorbetHelperModule.Settings.MiniPopupScale switch {
-            > 1.25f => 3f,
-            < 0.75f => 1f,
+            > 1.2f => 3f,
+            < 0.8f => 1f,
             _ => 2f,
         };
 
@@ -90,6 +88,11 @@ public class MiniPopupDisplay : Entity {
             var mainText = Dialog.Clean(popup.MainTextID);
             var subText = Dialog.Clean(popup.SubTextID);
             var icon = popup.Icon;
+
+            var bgTex = popup.BaseTexture ?? fallbackBaseTex;
+            var accentTex = popup.AccentTexture ?? fallbackAccentTex;
+            var boxTexHeight = bgTex.Height * 0.5f;
+            var boxTexWidth = accentTex.Width * 0.5f;
 
             const float mainTextScale = 0.9f;
             const float subTextScale = 0.65f;
@@ -117,11 +120,14 @@ public class MiniPopupDisplay : Entity {
 
         int hiddenCount = Popups.Count - activeCount;
         if (hiddenCountSlideLerp > 0f) {
+            var boxTexHeight = fallbackBaseTex.Height * 0.5f;
+            var boxTexWidth = fallbackBaseTex.Width * 0.5f;
+
             var width = scale * 140;
             var drawPos = new Vector2(1920 - width, topYPos) + new Vector2((width + 20) * Ease.CubeIn(1f - hiddenCountSlideLerp), scale * distanceY * MiniPopupVisibleCap - 5);
 
             Draw.Rect(drawPos.X + scale * (boxTexWidth * 0.5f - 10), drawPos.Y - scale * (15f + 0.25f * boxTexHeight), width, MathF.Ceiling(scale * boxTexHeight * 0.5f), Color.Black);
-            bgTex.DrawJustified(drawPos - scale * new Vector2(0f, 15f), new Vector2(0f, 0.5f), Color.Black, scale * 0.5f * new Vector2(1f, 0.5f));
+            fallbackBaseTex.DrawJustified(drawPos - scale * new Vector2(0f, 15f), new Vector2(0f, 0.5f), Color.Black, scale * 0.5f * new Vector2(1f, 0.5f));
             ActiveFont.DrawOutline($"+ {hiddenCount}", drawPos + scale * new Vector2(32f, 1f), new Vector2(0f, 1f), new Vector2(scale * 1f), Color.LightGray * 0.6f, 2f, Color.Black);
         }
 
@@ -171,11 +177,12 @@ public class MiniPopupDisplay : Entity {
         public Color BaseColor, AccentColor, TitleColor;
         public string MainTextID, SubTextID;
         public MTexture Icon = null;
+        public MTexture BaseTexture, AccentTexture = null;
         public int WidthOverride;
 
         private readonly float activeTime;
 
-        public Popup(float activeTime, string mainTextId, string subTextId, Color baseColor, Color accentColor, Color titleColor, string iconPath = null, int widthOverride = -1) {
+        public Popup(float activeTime, string mainTextId, string subTextId, Color baseColor, Color accentColor, Color titleColor, string iconPath = null, string texturePath = null, int widthOverride = -1) {
             this.activeTime = activeTime;
             Reset();
 
@@ -185,6 +192,8 @@ public class MiniPopupDisplay : Entity {
             AccentColor = accentColor;
             TitleColor = titleColor;
             Icon = string.IsNullOrEmpty(iconPath) ? null : GFX.Gui[iconPath];
+            BaseTexture = string.IsNullOrEmpty(texturePath) ? null : GFX.Gui[texturePath];
+            AccentTexture = string.IsNullOrEmpty(texturePath) ?  null : GFX.Gui[texturePath + "Accent"];
             // BaseColor = Color.Lerp(Color.Black, Color.DarkSlateGray, 0.25f);
             // AccentColor = Color.Lerp(Color.DarkGoldenrod, Color.DimGray, 0.2f);
             // new Color(12, 20, 20), new Color(125, 145, 185)

@@ -544,12 +544,12 @@ Entities:
         Name: Info
         Description: |-
           ~~~ some misc info ~~~
-          - the controller will *not* work on its own, but rather requires the map to have an Entity As Styleground Renderer styleground with a matching tag field.
+          - the controller will *not* correctly work on its own, but rather requires the map to have an Entity As Styleground Renderer styleground with a matching tag field.
 
           - for decals specifically, there is also a decal registry attribute available, <sorbetHelper_styleground rendererTag=""/>
             this has the same requirement of an Entity As Styleground Renderer (though note that a controller isn't required when using the decal registry)
 
-          - expect to potentially encounter broken behavior sometimes, especially if you're using this with an entity with particularly complex rendering-
+          - be prepared to very occasionally find that some entities don't work correctly, especially if they have particularly complex rendering-
             this is likely not the fault of either me or whoever made the entity,
             but just a consequence of it (very reasonably) not expecting to be in these conditions, sorry!
   
@@ -673,7 +673,7 @@ Triggers:
   SorbetHelper/AlternateInteractPrompt:
     Placements:
       altTalkUI:
-        Name: Alternate Style Interact Prompt
+        Name: Alt Style Interact Prompt
         Description: Replaces the normal interaction/talk prompt with a different, slightly more subtle one that slides in from the side.
       altNameAltTalkUI:
         Name: Alternate Interact Prompt
@@ -684,7 +684,7 @@ Triggers:
       onLeft:
         Description: |-
           Whether the prompt should come from the left side of the screen, instead of the right.
-          This is recommended to be left off for the sake of consistency unless you have a good reason.
+          For the sake of consistency this is recommended to be left off unless necessary.
       playHighlightSfx:
         Description: Whether to still play the vanilla sfx for when the prompt is highlighted.
   
@@ -707,8 +707,13 @@ Triggers:
         Description: The color of the title text of the mini popup.
       iconTexture:
         Description: |-
-          An optional icon to display on the mini popup, relative to Graphics/Atlases/Gui/.
+          An optional icon to display on the mini popup, relative to 'Graphics/Atlases/Gui/'.
           The texture should be square shaped to prevent it from being awkwardly stretched.
+      texturePath:
+        Description: |-
+          The path to the base texture for for the popup, relative to 'Graphics/Atlases/Gui/'.
+          Expects 2 textures to exist, both the specified base texture and an accent texture.
+          e.g. inputting 'SorbetHelper/popup' means to use the two textures 'SorbetHelper/popup' and 'SorbetHelper/popupAccent'
       mode:
         Name: Activation Mode
         Description: Determines how the trigger will activate.

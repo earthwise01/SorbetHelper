@@ -11,6 +11,7 @@ trigger.placements = {
         accentColor = "f08080",
         titleColor = "ffffff",
         iconTexture = "",
+        texturePath = "SorbetHelper/popup",
 
         mode = "OnPlayerEnter",
         onlyOnce = true,
@@ -47,7 +48,8 @@ trigger.fieldOrder = {
     "subText", "accentColor",
     "activeTime", "baseColor",
     "mode", "iconTexture",
-    "flag", "onlyOnce"
+    "flag", "texturePath",
+    "onlyOnce"
 }
 
 return trigger

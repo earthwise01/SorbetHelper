@@ -22,6 +22,7 @@ public class MiniPopupTrigger : Trigger {
     private readonly string mainTextId, subTextId;
     private readonly Color baseColor, accentColor, titleColor;
     private readonly string iconPath;
+    private readonly string texturePath;
 
     private bool triggered;
 
@@ -40,6 +41,7 @@ public class MiniPopupTrigger : Trigger {
         accentColor = data.HexColor("accentColor", Color.LightCoral);
         titleColor = data.HexColor("titleColor", Color.White);
         iconPath = data.Attr("iconTexture", "");
+        texturePath = data.Attr("texturePath", "");
     }
 
     public override void Update() {
@@ -73,7 +75,7 @@ public class MiniPopupTrigger : Trigger {
             return;
 
         triggered = true;
-        Scene.Tracker.GetEntity<MiniPopupDisplay>()?.CreatePopup(activeTime, mainTextId, subTextId, baseColor, accentColor, titleColor, iconPath);
+        Scene.Tracker.GetEntity<MiniPopupDisplay>()?.CreatePopup(activeTime, mainTextId, subTextId, baseColor, accentColor, titleColor, iconPath, texturePath);
 
         if (onlyOnce)
             (Scene as Level).Session.DoNotLoad.Add(id);

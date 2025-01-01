@@ -216,7 +216,7 @@ entities.SorbetHelper/EntityStylegroundController.attributes.description.maxDept
 entities.SorbetHelper/EntityStylegroundController.attributes.description.tag=The styleground tag used to match with an Entity As Styleground Renderer styleground.\nRequired in order for the controller to have any effect.
 entities.SorbetHelper/EntityStylegroundController.attributes.description.global=Whether the controller should apply globally, to every entity as they are loaded.\nAllows even affecting entities added after room load, and automatically across the whole map.
 entities.SorbetHelper/EntityStylegroundController.attributes.name._instructionsButton=Info
-entities.SorbetHelper/EntityStylegroundController.attributes.description._instructionsButton=~~~ some misc info ~~~\n- the controller will *not* work on its own, but rather requires the map to have an Entity As Styleground Renderer styleground with a matching tag field.\n\n- for decals specifically, there is also a decal registry attribute available, <sorbetHelper_styleground rendererTag=""/>\n  this has the same requirement of an Entity As Styleground Renderer (though note that a controller isn't required when using the decal registry)\n\n- expect to potentially encounter broken behavior sometimes, especially if you're using this with an entity with particularly complex rendering-\n  this is likely not the fault of either me or whoever made the entity,\n  but just a consequence of it (very reasonably) not expecting to be in these conditions, sorry!
+entities.SorbetHelper/EntityStylegroundController.attributes.description._instructionsButton=~~~ some misc info ~~~\n- the controller will *not* correctly work on its own, but rather requires the map to have an Entity As Styleground Renderer styleground with a matching tag field.\n\n- for decals specifically, there is also a decal registry attribute available, <sorbetHelper_styleground rendererTag=""/>\n  this has the same requirement of an Entity As Styleground Renderer (though note that a controller isn't required when using the decal registry)\n\n- be prepared to very occasionally find that some entities don't work correctly, especially if they have particularly complex rendering-\n  this is likely not the fault of either me or whoever made the entity,\n  but just a consequence of it (very reasonably) not expecting to be in these conditions, sorry!
 
 # Styleground Entity Controller
 entities.SorbetHelper/StylegroundEntityController.placements.name.controller=Styleground As Entity Controller
@@ -276,12 +276,12 @@ entities.SorbetHelper/TouchGateBlock.attributes.description.linkTag=An optional 
 # -- Triggers --
 
 # Alternate Interact Prompt
-triggers.SorbetHelper/AlternateInteractPrompt.placements.name.altTalkUI=Alternate Style Interact Prompt
+triggers.SorbetHelper/AlternateInteractPrompt.placements.name.altTalkUI=Alt Style Interact Prompt
 triggers.SorbetHelper/AlternateInteractPrompt.placements.description.altTalkUI=Replaces the normal interaction/talk prompt with a different, slightly more subtle one that slides in from the side.
 triggers.SorbetHelper/AlternateInteractPrompt.placements.name.altNameAltTalkUI=Alternate Interact Prompt
 triggers.SorbetHelper/AlternateInteractPrompt.attributes.name.dialogId=Label Dialog ID
 triggers.SorbetHelper/AlternateInteractPrompt.attributes.description.dialogId=The dialog ID to use for the prompt.
-triggers.SorbetHelper/AlternateInteractPrompt.attributes.description.onLeft=Whether the prompt should come from the left side of the screen, instead of the right.\nThis is recommended to be left off for the sake of consistency unless you have a good reason.
+triggers.SorbetHelper/AlternateInteractPrompt.attributes.description.onLeft=Whether the prompt should come from the left side of the screen, instead of the right.\nFor the sake of consistency this is recommended to be left off unless necessary.
 triggers.SorbetHelper/AlternateInteractPrompt.attributes.description.playHighlightSfx=Whether to still play the vanilla sfx for when the prompt is highlighted.
 
 # Mini Popup Trigger
@@ -292,7 +292,8 @@ triggers.SorbetHelper/MiniPopupTrigger.attributes.description.subText=The dialog
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.baseColor=The base color of the mini popup.
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.accentColor=The color of the subtitle text and accent of the mini popup.
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.titleColor=The color of the title text of the mini popup.
-triggers.SorbetHelper/MiniPopupTrigger.attributes.description.iconTexture=An optional icon to display on the mini popup, relative to Graphics/Atlases/Gui/.\nThe texture should be square shaped to prevent it from being awkwardly stretched.
+triggers.SorbetHelper/MiniPopupTrigger.attributes.description.iconTexture=An optional icon to display on the mini popup, relative to 'Graphics/Atlases/Gui/'.\nThe texture should be square shaped to prevent it from being awkwardly stretched.
+triggers.SorbetHelper/MiniPopupTrigger.attributes.description.texturePath=The path to the base texture for for the popup, relative to 'Graphics/Atlases/Gui/'.\nExpects 2 textures to exist, both the specified base texture and an accent texture.\ne.g. inputting 'SorbetHelper/popup' means to use the two textures 'SorbetHelper/popup' and 'SorbetHelper/popupAccent'
 triggers.SorbetHelper/MiniPopupTrigger.attributes.name.mode=Activation Mode
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.mode=Determines how the trigger will activate.
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.onlyOnce=Whether the mini popup should only be able to trigger once per session.
