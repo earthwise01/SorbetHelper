@@ -65,13 +65,11 @@ public class AlternateInteractPromptWrapper : Entity {
             if (slideEase <= 0f || level.Frozen || Handler.Entity == null)
                 return;
 
-            const float scale = 0.8f;
+            const float scale = 0.85f;
             const int offscreenPadding = 32;
 
             string label = Dialog.Clean(dialogId);
-            // string label2 = Dialog.Clean("ui_confirm");
             float width = ButtonUI.Width(label, Input.Talk);
-            // float num4 = ButtonUI.Width(label2, Input.MenuConfirm);
 
             var position = new Vector2 {
                 X = onLeft ?
@@ -82,14 +80,6 @@ public class AlternateInteractPromptWrapper : Entity {
             // position.X += (40f + (num4 + num3) * num + (float)num2) * (1f - Ease.CubeOut(inputEase));
 
             ButtonUI.Render(position, label, Input.Talk, scale, onLeft ? 0f : 1f, selectWiggle.Value * 0.05f, alpha: slideEase * 0.5f + 0.5f);
-            // if (Overworld.ShowConfirmUI) {
-            //     position.X -= num * num3 + (float)num2;
-            //     ButtonUI.Render(position, label2, Input.MenuConfirm, num, 1f, confirmWiggle.Value * 0.05f);
-            // }
-                //             X = onLeft switch {
-                //     false => 1880f + (40f + width * scale + offscreenPadding) * (1f - Ease.CubeOut(slideEase)),
-                //     true => 40f - (40f + width * scale + offscreenPadding) * (1f - Ease.CubeOut(slideEase))
-                // },
         }
 
         // just skip any extra unneeded logic when becoming highlighted

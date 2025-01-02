@@ -72,8 +72,8 @@ public class MiniPopupDisplay : Entity {
 
         var scale = MiniPopupScale;
         var outlineStroke = SorbetHelperModule.Settings.MiniPopupScale switch {
-            > 1.2f => 3f,
-            < 0.8f => 1f,
+            > 1.15f => 3f,
+            < 0.85f => 1f,
             _ => 2f,
         };
 
@@ -106,7 +106,7 @@ public class MiniPopupDisplay : Entity {
             var width = MathF.Ceiling(scale * (popup.WidthOverride < 0f ? 44f + textWidth + textOffsetFromRight : popup.WidthOverride));
             var drawPos = new Vector2(1920 - width, topYPos) + new Vector2((width + 20) * Ease.CubeIn(1f - popup.SlideLerp), currentYPos);
 
-            Draw.Rect(drawPos.X + scale * (boxTexWidth - 10), drawPos.Y - scale * boxTexHeight / 2, width, MathF.Ceiling(scale * boxTexHeight), popup.BaseColor);
+            Draw.Rect(drawPos.X + scale * (boxTexWidth - 10), MathF.Round(drawPos.Y - scale * boxTexHeight / 2), width, MathF.Round(scale * boxTexHeight), popup.BaseColor);
             bgTex.DrawJustified(drawPos, new Vector2(0f, 0.5f), popup.BaseColor, scale * 0.5f);
             accentTex.DrawJustified(drawPos, new Vector2(0f, 0.5f), popup.AccentColor, scale * 0.5f);
 
@@ -126,7 +126,7 @@ public class MiniPopupDisplay : Entity {
             var width = scale * 140;
             var drawPos = new Vector2(1920 - width, topYPos) + new Vector2((width + 20) * Ease.CubeIn(1f - hiddenCountSlideLerp), scale * distanceY * MiniPopupVisibleCap - 5);
 
-            Draw.Rect(drawPos.X + scale * (boxTexWidth * 0.5f - 10), drawPos.Y - scale * (15f + 0.25f * boxTexHeight), width, MathF.Ceiling(scale * boxTexHeight * 0.5f), Color.Black);
+            Draw.Rect(drawPos.X + scale * (boxTexWidth * 0.5f - 10), MathF.Round(drawPos.Y - scale * (15f + 0.25f * boxTexHeight)), width, MathF.Round(scale * boxTexHeight * 0.5f), Color.Black);
             fallbackBaseTex.DrawJustified(drawPos - scale * new Vector2(0f, 15f), new Vector2(0f, 0.5f), Color.Black, scale * 0.5f * new Vector2(1f, 0.5f));
             ActiveFont.DrawOutline($"+ {hiddenCount}", drawPos + scale * new Vector2(32f, 1f), new Vector2(0f, 1f), new Vector2(scale * 1f), Color.LightGray * 0.6f, 2f, Color.Black);
         }
