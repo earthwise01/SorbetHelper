@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Celeste.Mod.SorbetHelper.Utils;
 using Celeste.Mod.Entities;
+using Monocle;
 
 namespace Celeste.Mod.SorbetHelper.Entities;
 
@@ -24,6 +25,7 @@ public class MiniPopupTrigger : Trigger {
     private readonly string iconPath;
     private readonly string texturePath;
 
+    private bool currentFlagState;
     private bool triggered;
 
     public MiniPopupTrigger(EntityData data, Vector2 offset, EntityID entityId) : base(data, offset) {
@@ -44,20 +46,31 @@ public class MiniPopupTrigger : Trigger {
         texturePath = data.Attr("texturePath", "");
     }
 
+    public override void Awake(Scene scene) {
+        base.Awake(scene);
+        if (!string.IsNullOrEmpty(flag))
+            currentFlagState = (scene as Level).Session.GetFlag(flag);
+    }
+
     public override void Update() {
         base.Update();
 
-        if (!string.IsNullOrEmpty(flag)) {
+        if (!string.IsNullOrEmpty(flag) && (Scene as Level).Session.GetFlag(flag) != currentFlagState) {
+            currentFlagState = !currentFlagState;
+
             switch (Mode) {
                 case Modes.OnPlayerEnter:
-                    Collidable = (Scene as Level).Session.GetFlag(flag);
+                    Collidable = currentFlagState;
                     break;
 
                 case Modes.OnFlagEnabled:
-                case Modes.OnFlagDisabled:
-                    if ((Scene as Level).Session.GetFlag(flag, Mode switch { Modes.OnFlagDisabled => true, _ => false}))
+                    if (currentFlagState)
                         Trigger();
+                    break;
 
+                case Modes.OnFlagDisabled:
+                    if (!currentFlagState)
+                        Trigger();
                     break;
             }
         }
