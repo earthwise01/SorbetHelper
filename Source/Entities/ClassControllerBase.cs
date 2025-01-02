@@ -126,7 +126,11 @@ public abstract class GlobalClassControllerBase : Entity {
         cursor.MarkLabel(globalControllersIsNull);
 
         static List<Entity> getGlobalControllers(EntityList entities) {
-            var globalClassControllers = entities.Scene.Tracker.GetEntities<GlobalClassControllerBase>();
+            var tracker = entities.Scene.Tracker;
+            if (!tracker.IsEntityTracked<GlobalClassControllerBase>()) // fix dependency load crash????
+                return null;
+
+            var globalClassControllers = tracker.GetEntities<GlobalClassControllerBase>();
             return globalClassControllers.Count == 0 ? null : globalClassControllers; // return null if count is 0 to (hopefully) speed up the check for whether to process entities
         }
 
