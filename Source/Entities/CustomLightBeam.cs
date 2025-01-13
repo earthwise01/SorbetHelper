@@ -5,6 +5,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 using Celeste.Mod.Entities;
 using Celeste.Mod.SorbetHelper.Utils;
+using System.Globalization;
+using System.Linq;
 
 namespace Celeste.Mod.SorbetHelper.Entities {
 
@@ -37,6 +39,20 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private const int rainbowSegmentSize = 4;
 
         private readonly bool noParticles;
+
+        private readonly float Scroll;
+        private Vector2 ScrollAnchor;
+        private Vector2 RenderPosition {
+            get {
+                // edge case so normal lightbeams dont need to bother with anything
+                if (Scroll == 1f)
+                    return Position;
+
+                // hopefully i   mathed right and this actually fully does what i think it does
+                var cam = (Scene as Level).Camera.GetCenter();
+                return cam + (Position - ScrollAnchor * (1f - Scroll) - cam * Scroll);
+            }
+        }
 
         private float baseAlpha = 1;
         private float flagAlpha = 1;
@@ -75,6 +91,17 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             fadeWhenNear = data.Bool("fadeWhenNear", true);
             fadeOnTransition = data.Bool("fadeOnTransition", true);
 
+            // eh
+            Scroll = data.Float("scroll", 1f);
+            ScrollAnchor = new Vector2(0f, 0f);
+            var a = data.Attr("scrollAnchor", "0, 0").Split(',', StringSplitOptions.TrimEntries);
+            if (a.Length >= 1)
+                float.TryParse(a[0], null, out ScrollAnchor.X);
+            if (a.Length >= 2)
+                float.TryParse(a[1], null, out ScrollAnchor.Y);
+            ScrollAnchor += Position;
+            //ScrollAnchor = Position + new Vector2(data.Float("scrollAnchorX"), data.Float("scrollAnchorY"));
+
             float alpha = Math.Clamp(data.Float("alpha", 1f), 0f, 1f);
 
             beamTexture = GFX.Game[data.Attr("texture", "util/lightbeam")];
@@ -101,8 +128,8 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
             // offscreen culling stuff
             // kinda janky i think but it works
-            Vector2 baseCornerA = Position - Calc.AngleToVector(rotation, 1f) * (lightWidth / 2f); // would be top left with a rotation of 0f
-            Vector2 baseCornerB = Position + Calc.AngleToVector(rotation, 1f) * (lightWidth / 2); // would be top right with a rotation of 0f
+            Vector2 baseCornerA = -Calc.AngleToVector(rotation, 1f) * (lightWidth / 2f); // would be top left with a rotation of 0f
+            Vector2 baseCornerB = Calc.AngleToVector(rotation, 1f) * (lightWidth / 2); // would be top right with a rotation of 0f
             Vector2 edgeCornerA = baseCornerA + Calc.AngleToVector(rotation + (float)Math.PI / 2f, 1f) * lightLength; // would be bottom left with a rotation of 0f
             Vector2 edgeCornerB = baseCornerB + Calc.AngleToVector(rotation + (float)Math.PI / 2f, 1f) * lightLength; // would be bottom right with a rotation of 0f
 
@@ -129,14 +156,14 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 baseAlpha = 0f;
             }
 
+            // initialize render target and matrix
             if (!useRenderTarget)
                 return;
 
-            // initialize render target and matrix
             // whY did i do this   huhh?? what was i thinking
             lightbeamTarget ??= VirtualContent.CreateRenderTarget("sorbet-custom-lightbeam", (int)(rectangleRight - rectangleLeft + visibilityPadding), (int)(rectangleBottom - rectangleTop + visibilityPadding));
             Vector2 offset = Calc.AngleToVector(rotation - (float)Math.PI / 2f, lightLength) / 2f;
-            targetMatrix = Matrix.CreateTranslation(-Position.X + lightbeamTarget.Width / 2f, -Position.Y + lightbeamTarget.Height / 2f, 0f) * Matrix.CreateTranslation(offset.X, offset.Y, 0f);
+            targetMatrix = Matrix.CreateTranslation(lightbeamTarget.Width / 2f, lightbeamTarget.Height / 2f, 0f) * Matrix.CreateTranslation(offset.X, offset.Y, 0f);
             RenderToTarget();
         }
 
@@ -160,6 +187,9 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             timer += Engine.DeltaTime;
             Level level = Scene as Level;
             Player entity = Scene.Tracker.GetEntity<Player>();
+
+            var pos = Position;
+            Position = RenderPosition;
 
             wasVisibleOnCamera = Visible;
             Visible = InView(level.Camera);
@@ -202,10 +232,13 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 float num = Calc.Random.Next(lightWidth - 4) + 2 - lightWidth / 2;
                 position += num * vector3.Perpendicular();
                 // if rainbow is enabled and rainbowSingleColor is disabled, call GetHue for the particle's color, otherwise use the color variable.
+                // doesn't track properly with parallax but idk
                 level.Particles.Emit(LightBeam.P_Glow, position, (rainbow && !rainbowSingleColor) ? GetHue(position) : color, rotation + (float)Math.PI / 2f);
             }
 
             base.Update();
+
+            Position = pos;
         }
 
         /* public override void DebugRender(Camera camera) {
@@ -233,10 +266,15 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
         public override void Render() {
             if (alpha > 0f) {
+                var pos = Position;
+                Position = RenderPosition;
+
                 if (useRenderTarget)
-                    Draw.SpriteBatch.Draw(lightbeamTarget, new Vector2(rectangleLeft - visibilityPadding / 2, rectangleTop - visibilityPadding / 2), null, Color.White * alpha, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                    Draw.SpriteBatch.Draw(lightbeamTarget, Position + new Vector2(rectangleLeft - visibilityPadding / 2, rectangleTop - visibilityPadding / 2), null, Color.White * alpha, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
                 else
                     RenderLightbeam();
+
+                Position = pos;
             }
         }
 
@@ -244,9 +282,20 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             Engine.Graphics.GraphicsDevice.SetRenderTarget(lightbeamTarget);
             Engine.Graphics.GraphicsDevice.Clear(Color.Transparent);
 
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, targetMatrix);
+            var pos = Position;
+            var renderPos = RenderPosition;
+
+            var matrix = targetMatrix * Matrix.CreateTranslation(new Vector3(-renderPos.X, -renderPos.Y, 0f));
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, matrix);
+
+            Position = renderPos;
+            var a = alpha;
+            alpha = 1f;
 
             RenderLightbeam();
+
+            alpha = a;
+            Position = pos;
 
             Draw.SpriteBatch.End();
         }
@@ -278,7 +327,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private void DrawBeam(float offset, float width, float length, float a) {
             float beamRotation = rotation + (float)Math.PI / 2f;
             // if rainbow is enabled and rainbowSingleColor is disabled, call GetHue for the beam's color, otherwise use the color variable.
-            Color beamColor = ((rainbow && !rainbowSingleColor) ? GetHue(Position + Calc.AngleToVector(rotation, 1f) * offset) : color) * a;
+            Color beamColor = ((rainbow && !rainbowSingleColor) ? GetHue(Position + Calc.AngleToVector(rotation, 1f) * offset) : color) * a * alpha;
 
             if (width >= 1f) {
                 beamTexture.Draw(Position + Calc.AngleToVector(rotation, 1f) * offset, new Vector2(0f, 0.5f), beamColor, new Vector2(1f / beamTexture.Width * length, width), beamRotation);
@@ -315,7 +364,12 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             return Color.Lerp(rainbowColors[colorIndex], rainbowColors[colorIndex + 1], progressInIndex);
         }
 
-        private bool InView(Camera camera) =>
-            rectangleLeft < camera.Right + visibilityPadding && rectangleRight > camera.Left - visibilityPadding && rectangleTop < camera.Bottom + visibilityPadding && rectangleBottom > camera.Top - visibilityPadding;
+        private bool InView(Camera camera) {
+            var pos = Position;
+            if (pos.X + rectangleRight > camera.X - visibilityPadding && pos.X + rectangleLeft < camera.X + camera.Viewport.Width + visibilityPadding)
+                return pos.Y + rectangleBottom > camera.Y - visibilityPadding && pos.Y + rectangleTop < camera.Y + camera.Viewport.Height + visibilityPadding;
+
+            return false;
+        }
     }
 }

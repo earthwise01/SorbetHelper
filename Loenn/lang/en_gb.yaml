@@ -304,6 +304,10 @@ Entities:
         Description: Determines whether the lightbeam fades out when the player is close to it.
       fadeOnTransition:
         Description: Determines whether the lightbeam fades out during screen transitions.
+      scroll:
+        Description: meow
+      scrollAnchor: 
+        Description: the parallax scroll anchor, relative to the lightbeam
   
   SorbetHelper/WingedStrawberryDirectionController:
     Placements:

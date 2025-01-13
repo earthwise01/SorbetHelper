@@ -36,7 +36,9 @@ lightBeam.placements = {
             singleColor = false,
             fadeWhenNear = true,
             fadeOnTransition = true,
-            flagFadeTime = 0.25
+            flagFadeTime = 0.25,
+            scroll = 1.0,
+            scrollAnchor = "0, 0"
         }
     },
     {
@@ -64,7 +66,9 @@ lightBeam.placements = {
             singleColor = false,
             fadeWhenNear = true,
             fadeOnTransition = true,
-            flagFadeTime = 0.25
+            flagFadeTime = 0.25,
+            scroll = 1.0,
+            scrollAnchor = "0, 0"
         }
     },
 }
@@ -93,7 +97,11 @@ lightBeam.fieldInformation = {
         fieldType = "integer",
         options = depths.addDepth(depths.getDepths(), "Lightbeams", -9998),
         editable = true
-    }
+    },
+    -- wip
+    -- scrollAnchor = {
+    --     fieldType = "sorbetHelper.vector",
+    -- }
 }
 
 -- hide rainbow specific fields unless rainbow is enabled and vice versa
@@ -101,12 +109,12 @@ function lightBeam.fieldOrder(entity)
     local fields = {}
     if entity.rainbow == true and entity.useCustomRainbowColors == true then
         fields = {
-            "x", "y", "width", "height", "colors", "centerX", "gradientSize", "centerY", "gradientSpeed", "alpha", "depth", "rotation", "flag", "flagFadeTime", "texture",
+            "x", "y", "width", "height", "colors", "centerX", "gradientSize", "centerY", "gradientSpeed", "alpha", "depth", "rotation", "scroll", "scrollAnchor", "flag", "flagFadeTime", "texture",
             "inverted", "fadeOnTransition", "rainbow", "useCustomRainbowColors", "noParticles", "fadeWhenNear", "singleColor", "loopColors"
         }
     else
         fields = {
-            "x", "y", "width", "height", "color", "alpha", "depth", "rotation", "flag", "flagFadeTime", "texture",
+            "x", "y", "width", "height", "color", "alpha", "depth", "rotation", "scroll", "scrollAnchor", "flag", "flagFadeTime", "texture",
             "inverted", "fadeOnTransition", "rainbow", "useCustomRainbowColors", "noParticles", "fadeWhenNear", "singleColor"
         }
     end
