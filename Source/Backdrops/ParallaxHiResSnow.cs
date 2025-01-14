@@ -62,6 +62,7 @@ public class ParallaxHiResSnow : Backdrop {
     private readonly float MinSpeed, MaxSpeed;
     private readonly Vector2 MinScroll, MaxScroll;
     private readonly float SineAmplitude, SineFrequency;
+    private readonly bool SineHorizontal;
     private readonly bool RandomTextureRotation;
     private readonly bool SpeedStretching;
     private readonly bool FadeTowardsForeground;
@@ -91,6 +92,7 @@ public class ParallaxHiResSnow : Backdrop {
         MaxScroll.Y = data.AttrFloat("maxScrollY", 1.25f);
         SineAmplitude = data.AttrFloat("sineAmplitude", 100f);
         SineFrequency = data.AttrFloat("sineFrequency", 10f) / 10f;
+        SineHorizontal = data.AttrBool("sineHorizontal", false);
 
         var texturePath = data.Attr("texturePath", "snow");
         particleTexture = OVR.Atlas.GetOrDefault(texturePath, OVR.Atlas["snow"]);
@@ -130,7 +132,10 @@ public class ParallaxHiResSnow : Backdrop {
             ref var particle = ref particles[i];
 
             particle.Position += Direction * particle.Speed * Engine.DeltaTime;
-            particle.Position.Y += (float)Math.Sin(particle.Sin) * SineAmplitude * Engine.DeltaTime;
+            if (!SineHorizontal)
+                particle.Position.Y += (float)Math.Sin(particle.Sin) * SineAmplitude * Engine.DeltaTime;
+            else
+                particle.Position.X += (float)Math.Sin(particle.Sin) * SineAmplitude * Engine.DeltaTime;
             particle.Sin += Engine.DeltaTime * SineFrequency;
 
             // if (particle.RenderPosition.X < -EdgePaddingAmount || particle.RenderPosition.X > (1920 + EdgePaddingAmount) || particle.RenderPosition.Y < -EdgePaddingAmount || particle.RenderPosition.Y > (1080 + EdgePaddingAmount)) {

@@ -785,6 +785,8 @@ Effects:
         Description: How tall the sine movement of the particles is.
       sineFrequency:
         Description: How fast the sine movement of the particles is.
+      sineHorizontal:
+        Description: Determines whether the sine movement of the particles is horizontal or vertical.
       particleCount:
         Description: The number of particles the effect should have.
       fadeInOut:

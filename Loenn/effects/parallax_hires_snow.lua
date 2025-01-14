@@ -14,7 +14,7 @@ effect.defaultData = {
     minSpeed = 2000, maxSpeed = 4000,
     minScrollX = 1, minScrollY = 1,
     maxScrollX = 1.25, maxScrollY = 1.25,
-    sineAmplitude = 100, sineFrequency = 10,
+    sineAmplitude = 100, sineFrequency = 10, sineHorizontal = false,
     particleCount = 50, speedStretching = true
 
 }
@@ -26,7 +26,7 @@ effect.fieldOrder = {
     "minScrollX", "minScrollY", "directionX", "directionY",
     "maxScrollX", "maxScrollY", "minSpeed", "maxSpeed",
     "sineAmplitude", "sineFrequency", "minScale", "maxScale",
-    "randomRotation", "speedStretching", "fadeTowardsForeground", "fadeInOut"
+    "randomRotation", "speedStretching", "sineHorizontal", "fadeTowardsForeground", "fadeInOut"
 }
 
 effect.fieldInformation = {

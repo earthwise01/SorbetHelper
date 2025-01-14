@@ -325,6 +325,7 @@ style.effects.SorbetHelper/ParallaxHiResSnow.description.maxScrollX=Determines t
 style.effects.SorbetHelper/ParallaxHiResSnow.description.maxScrollY=Determines the amount of vertical parallax the closest particles should have.
 style.effects.SorbetHelper/ParallaxHiResSnow.description.sineAmplitude=How tall the sine movement of the particles is.
 style.effects.SorbetHelper/ParallaxHiResSnow.description.sineFrequency=How fast the sine movement of the particles is.
+style.effects.SorbetHelper/ParallaxHiResSnow.description.sineHorizontal=Determines whether the sine movement of the particles is horizontal or vertical.
 style.effects.SorbetHelper/ParallaxHiResSnow.description.particleCount=The number of particles the effect should have.
 style.effects.SorbetHelper/ParallaxHiResSnow.attribute.fadeInOut=Fade In/Out
 style.effects.SorbetHelper/ParallaxHiResSnow.description.fadeInOut=Whether the effect should fade in/out when changing visibility (e.g. when transitioning to a different room or toggling its flag).
