@@ -305,10 +305,10 @@ Entities:
       fadeOnTransition:
         Description: Determines whether the lightbeam fades out during screen transitions.
       scroll:
-        Description: meow
-      scrollAnchor: 
-        Description: the parallax scroll anchor, relative to the lightbeam
-  
+        Name: Parallax
+        Description: |-
+          Determines how fast the lightbeam should scroll compared to the camera.
+          The "anchor" position of the parallax effect can optionally be controlled by adding a node, to allow multiple lightbeams to scroll together more smoothly.
   SorbetHelper/WingedStrawberryDirectionController:
     Placements:
       wingedStrawberryController:

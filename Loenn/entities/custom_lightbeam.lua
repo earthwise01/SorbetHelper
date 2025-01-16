@@ -281,9 +281,28 @@ function lightBeam.nodeSprite(room, entity, node)
     local nx, ny = node.x or 0, node.y or 0
     local anchor = sorbetUtils.getGenericNodeSprite(nx, ny, constColors.selectionCompleteNodeLineColor)
     local line = drawableLine.fromPoints({x, y, nx, ny}, constColors.selectionCompleteNodeLineColor)
-    local desc = drawableText.fromText("Scroll Anchor", nx - 16, ny - 14, 32, 8, nil, 0.75)
+    local desc = drawableText.fromText("Parallax Anchor", nx - 16, ny - 14, 32, 8, nil, 0.75)
 
     return { anchor, line, desc }
+end
+
+function lightBeam.nodeAdded(room, entity, nodeIndex)
+    local nodes = entity.nodes or {}
+
+    if nodeIndex == 0 then
+        local nodeX = entity.x
+        local nodeY = entity.y
+
+        table.insert(nodes, 1, {x = nodeX, y = nodeY})
+
+    else
+        local nodeX = nodes[nodeIndex].x
+        local nodeY = nodes[nodeIndex].y - 16
+
+        table.insert(nodes, nodeIndex + 1, {x = nodeX, y = nodeY})
+    end
+
+    return true
 end
 
 return lightBeam
