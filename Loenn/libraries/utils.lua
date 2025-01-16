@@ -8,6 +8,7 @@ function sorbetUtils.getGenericNodeSprite(x, y, color)
 
     local sprite = drawableSprite.fromTexture("editorSprites/SorbetHelper/nodeMarker", {x = x, y = y, color = color})
     sprite.rotation = math.pi / 4
+    sprite:setScale(0.9428090415820632)
 
     return sprite
 end

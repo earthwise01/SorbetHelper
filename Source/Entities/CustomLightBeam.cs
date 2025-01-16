@@ -91,15 +91,12 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             fadeWhenNear = data.Bool("fadeWhenNear", true);
             fadeOnTransition = data.Bool("fadeOnTransition", true);
 
-            // eh
+            // eh - now less but   eh,
             Scroll = data.Float("scroll", 1f);
-            ScrollAnchor = new Vector2(0f, 0f);
-            var a = data.Attr("scrollAnchor", "0, 0").Split(',', StringSplitOptions.TrimEntries);
-            if (a.Length >= 1)
-                float.TryParse(a[0], null, out ScrollAnchor.X);
-            if (a.Length >= 2)
-                float.TryParse(a[1], null, out ScrollAnchor.Y);
-            ScrollAnchor += Position;
+            if (data.Nodes?.Length >= 1)
+                ScrollAnchor = data.Nodes[0] + offset;
+            else
+                ScrollAnchor = Position;
             //ScrollAnchor = Position + new Vector2(data.Float("scrollAnchorX"), data.Float("scrollAnchorY"));
 
             float alpha = Math.Clamp(data.Float("alpha", 1f), 0f, 1f);

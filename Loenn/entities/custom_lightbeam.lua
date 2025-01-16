@@ -4,8 +4,12 @@ local utils = require("utils")
 local drawableLine = require("structs.drawable_line")
 local drawableRectangle = require("structs.drawable_rectangle")
 local drawableSprite = require("structs.drawable_sprite")
+local drawableText = require("structs.drawable_text")
+local constColors = require("consts.colors")
 local mods = require("mods")
 local depths = mods.requireFromPlugin("libraries.depths")
+local sorbetUtils = mods.requireFromPlugin("libraries.utils")
+local rainbowHelper = mods.requireFromPlugin("libraries.rainbow_helper")
 
 local lightBeam = {}
 
@@ -38,7 +42,6 @@ lightBeam.placements = {
             fadeOnTransition = true,
             flagFadeTime = 0.25,
             scroll = 1.0,
-            scrollAnchor = "0, 0"
         }
     },
     {
@@ -68,7 +71,6 @@ lightBeam.placements = {
             fadeOnTransition = true,
             flagFadeTime = 0.25,
             scroll = 1.0,
-            scrollAnchor = "0, 0"
         }
     },
 }
@@ -98,7 +100,7 @@ lightBeam.fieldInformation = {
         options = depths.addDepth(depths.getDepths(), "Lightbeams", -9998),
         editable = true
     },
-    -- wip
+    -- wip (update nvm   some other time i guess)
     -- scrollAnchor = {
     --     fieldType = "sorbetHelper.vector",
     -- }
@@ -107,15 +109,34 @@ lightBeam.fieldInformation = {
 -- hide rainbow specific fields unless rainbow is enabled and vice versa
 function lightBeam.fieldOrder(entity)
     local fields = {}
+    --  this sucksss  why do i always put effort into trying to make these look pretty
     if entity.rainbow == true and entity.useCustomRainbowColors == true then
         fields = {
-            "x", "y", "width", "height", "colors", "centerX", "gradientSize", "centerY", "gradientSpeed", "alpha", "depth", "rotation", "scroll", "scrollAnchor", "flag", "flagFadeTime", "texture",
-            "inverted", "fadeOnTransition", "rainbow", "useCustomRainbowColors", "noParticles", "fadeWhenNear", "singleColor", "loopColors"
+            "x", "y",
+            "width", "height",
+            "colors", "centerX",
+            "gradientSize", "centerY",
+            "gradientSpeed", "alpha",
+            "depth", "rotation",
+            "flag",
+            "scroll",
+            "flagFadeTime",
+            "texture", "inverted", "fadeOnTransition",
+            "rainbow", "useCustomRainbowColors", "noParticles", "fadeWhenNear",
+            "singleColor", "loopColors"
         }
     else
         fields = {
-            "x", "y", "width", "height", "color", "alpha", "depth", "rotation", "scroll", "scrollAnchor", "flag", "flagFadeTime", "texture",
-            "inverted", "fadeOnTransition", "rainbow", "useCustomRainbowColors", "noParticles", "fadeWhenNear", "singleColor"
+            "x", "y",
+            "width", "height",
+            "color", "alpha",
+            "depth", "rotation",
+            "flag",
+            "scroll",
+            "flagFadeTime",
+            "texture", "inverted", "fadeOnTransition",
+            "rainbow", "useCustomRainbowColors", "noParticles", "fadeWhenNear",
+            "singleColor"
         }
     end
     return fields
@@ -137,98 +158,29 @@ function lightBeam.ignoredFields(entity)
     return ignored
 end
 
-lightBeam.selection = lightBeamHelper.getSelection
+
+function lightBeam.selection(room, entity)
+    local base = lightBeamHelper.getSelection(room, entity)
+    local nodes = entity.nodes or {}
+
+    if #nodes < 1 then
+        return base, nil
+    end
+
+    -- for scroll anchor
+    local nx, ny = nodes[1].x or 0, nodes[1].y or 0
+    return base, {utils.rectangle(nx - 4, ny - 4, 8, 8)}
+end
+
 lightBeam.rotate = lightBeamHelper.rotate
 lightBeam.updateResizeSelection = lightBeamHelper.updateResizeSelection
-
--- lua-ified versions of a couple methods from fna/monocle and the gethue method needed for the gradient effect
-local function clamp(value, min, max)
-    if value < min then
-        return min
-    end
-    if value > max then
-        return max
-    end
-
-    return value
-end
-
-local function lerp(value1, value2, amount)
-    return value1 * (1 - amount) + value2 * amount
-end
-
-local function lerpColor(value1, value2, amount)
-    amount = clamp(amount, 0, 1)
-
-    return {
-        lerp(value1[1], value2[1], amount),
-        lerp(value1[2], value2[2], amount),
-        lerp(value1[3], value2[3], amount),
-        lerp(value1[4] or 1, value2[4] or 1, amount)
-    }
-end
-
-local function vectorLength(x, y)
-    return math.sqrt(x * x + y * y)
-end
-
-local function yoyo(value)
-    if value <= 0.5 then
-        return value * 2
-    end
-
-    return 1 - (value - 0.5) * 2
-end
-
-local function getHue(x, y, colors, gradientSize, loopColors, centerX, centerY)
-    if (#colors == 1) then
-        return colors[1]
-    end
-
-    local progress = vectorLength(x - centerX, y - centerY)
-
-    while progress < 0 do
-        progress = progress + gradientSize
-    end
-
-    progress = progress % gradientSize / gradientSize
-    if not loopColors then
-        progress = yoyo(progress)
-    end
-
-    if progress == 1 then
-        return colors[#colors]
-    end
-
-    local globalProgress = progress * (#colors - 1)
-    local colorIndex = math.floor(globalProgress)
-    local progressInIndex = globalProgress - colorIndex
-    return lerpColor(colors[colorIndex + 1], colors[colorIndex + 2], progressInIndex)
-end
-
-local function split(inputstr, seperator)
-    local result = {}
-
-    seperator = seperator or " "
-    for string in string.gmatch(inputstr, "([^" .. seperator .. "]+)") do
-        table.insert(result, string)
-    end
-
-    return result
-end
 
 -- rendering stuff
 function lightBeam.sprite(room, entity)
     local result = {}
 
     if entity.rainbow then
-        local colors = {}
-        for _, v in pairs(split(entity.colors, ",")) do
-            table.insert(colors, utils.getColor(v))
-        end
-        if entity.loopColors then
-            table.insert(colors, colors[1])
-        end
+        local colors = rainbowHelper.getColors(entity.colors or "89E5AE,88E0E0,87A9DD,9887DB,D088E2")
 
         if entity.singleColor then
             result = lightBeamHelper.getSprites(room, entity, colors[1], false)
@@ -263,7 +215,7 @@ function lightBeam.getSpritesRainbow(room, entity, colors, onlyBase)
         local offsetX = utils.round(extraOffset * math.cos(theta))
         local offsetY = utils.round(extraOffset * math.sin(theta))
 
-        local color = getHue(x + widthOffsetX + offsetX, y + widthOffsetY + offsetY, colors, entity.gradientSize, entity.loopColors, entity.centerX, entity.centerY)
+        local color = rainbowHelper.getHue(x + widthOffsetX + offsetX, y + widthOffsetY + offsetY, colors, entity.gradientSize, entity.loopColors, entity.centerX, entity.centerY)
         color[4] = 0.4
 
         sprite:addPosition(widthOffsetX, widthOffsetY)
@@ -297,7 +249,7 @@ function lightBeam.getSpritesRainbow(room, entity, colors, onlyBase)
                 local offsetY = utils.round(extraOffset * math.sin(theta))
                 local beamLengthScale = (height - math.random(4, math.floor(height / 2))) / beamSprite.meta.width
 
-                local color = getHue(x + widthOffsetX + offsetX, y + widthOffsetY + offsetY, colors, entity.gradientSize, entity.loopColors, entity.centerX, entity.centerY)
+                local color = rainbowHelper.getHue(x + widthOffsetX + offsetX, y + widthOffsetY + offsetY, colors, entity.gradientSize, entity.loopColors, entity.centerX, entity.centerY)
                 color[4] = alpha
 
                 beamSprite:addPosition(widthOffsetX, widthOffsetY)
@@ -313,6 +265,25 @@ function lightBeam.getSpritesRainbow(room, entity, colors, onlyBase)
     end
 
     return sprites
+end
+
+-- node stuff, only for scroll anchor sadly, no node based rotation (yet? if i ever get around to it,)
+function lightBeam.nodeLimits(room, entity)
+    if entity.scroll then
+        return 0, 1
+    end
+
+    return 0, 0
+end
+
+function lightBeam.nodeSprite(room, entity, node)
+    local x, y = entity.x or 0, entity.y or 0
+    local nx, ny = node.x or 0, node.y or 0
+    local anchor = sorbetUtils.getGenericNodeSprite(nx, ny, constColors.selectionCompleteNodeLineColor)
+    local line = drawableLine.fromPoints({x, y, nx, ny}, constColors.selectionCompleteNodeLineColor)
+    local desc = drawableText.fromText("Scroll Anchor", nx - 16, ny - 14, 32, 8, nil, 0.75)
+
+    return { anchor, line, desc }
 end
 
 return lightBeam
