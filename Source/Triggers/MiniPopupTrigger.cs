@@ -1,9 +1,10 @@
 using Microsoft.Xna.Framework;
 using Celeste.Mod.SorbetHelper.Utils;
+using Celeste.Mod.SorbetHelper.Entities;
 using Celeste.Mod.Entities;
 using Monocle;
 
-namespace Celeste.Mod.SorbetHelper.Entities;
+namespace Celeste.Mod.SorbetHelper.Triggers;
 
 [CustomEntity("SorbetHelper/MiniPopupTrigger")]
 public class MiniPopupTrigger : Trigger {

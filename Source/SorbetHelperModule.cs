@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 using Celeste.Mod.SorbetHelper.Utils;
 using Celeste.Mod.SorbetHelper.Entities;
+using Celeste.Mod.SorbetHelper.Triggers;
 using Celeste.Mod.SorbetHelper.Components;
 using Celeste.Mod.SorbetHelper.Backdrops;
 using MonoMod;

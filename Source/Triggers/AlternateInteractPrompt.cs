@@ -6,7 +6,7 @@ using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using TalkComponentUI = Celeste.TalkComponent.TalkComponentUI;
 
-namespace Celeste.Mod.SorbetHelper.Entities;
+namespace Celeste.Mod.SorbetHelper.Triggers;
 
 [Tracked]
 [CustomEntity("SorbetHelper/AlternateInteractPrompt")]
