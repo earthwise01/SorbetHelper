@@ -65,14 +65,13 @@ public class LightCover : Component {
 
         var tempBuffers = RenderTargetHelper.GetGameplayBuffers(batchCount);
 
-        SorbetHelperModule.AlphaMaskShader.Parameters["mask_color"].SetValue(Vector4.One); // mask to white for recoloring later
         for (int i = 0; i < batchCount; i++) {
             var batch = alphaBatches[i];
             var tempBuffer = tempBuffers[i];
             gd.SetRenderTarget(tempBuffer);
             gd.Clear(Color.Transparent);
 
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, SorbetHelperModule.AlphaMaskShader, level.Camera.Matrix);
+            GameplayRenderer.Begin();
 
             // performance is in shambles but i dont see how else im supposed to do this bweh
             // a potential optimization could maybe be to group the entities into depth-based batches which also replace their normal render calls, so that they only get rendered once per frame, but that sounds trickier to implement and could come with its own issues
@@ -83,14 +82,14 @@ public class LightCover : Component {
                     entity.Render();
             }
 
-            Draw.SpriteBatch.End();
+            GameplayRenderer.End();
         }
 
         // draw buffers over lighting
         var baseColor = level.Lighting.BaseColor;
 
         gd.SetRenderTargets(initalBuffer);
-        Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null);
+        Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, SorbetHelperModule.AlphaMaskShader);
 
         for (int i = 0; i < batchCount; i++) {
             var tempBuffer = tempBuffers[i];

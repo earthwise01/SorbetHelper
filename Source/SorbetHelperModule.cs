@@ -109,11 +109,11 @@ public class SorbetHelperModule : EverestModule {
     }
 
     public override void LoadContent(bool firstLoad) {
-        AlphaMaskShader = LoadShader("alpha_mask");
+        AlphaMaskShader = LoadShader("AlphaMask");
     }
 
     private static Effect LoadShader(string id) =>
-        new(Engine.Graphics.GraphicsDevice, Everest.Content.Get($"SorbetHelper:/Effects/SorbetHelper/{id}.fxb").Data);
+        new(Engine.Graphics.GraphicsDevice, Everest.Content.Get($"SorbetHelper:/Effects/SorbetHelper/{id}.cso").Data);
 
     // unload any leftover queued buffers with the normal gameplay buffers
     private static void On_GameplayBuffers_Unload(On.Celeste.GameplayBuffers.orig_Unload orig) {
