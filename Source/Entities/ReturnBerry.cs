@@ -29,7 +29,7 @@ public class ReturnBerry : Strawberry {
 
         if (data.Nodes is { Length: > 2 }) {
             for (int i = 0; i < data.Nodes.Length - 2; i++) {
-                Seeds.Add(new StrawberrySeed(this, offset + data.Nodes[i], i, isGhostBerry));
+                Seeds.Add(new StrawberrySeed(this, offset + data.Nodes[i + 2], i, isGhostBerry));
             }
         }
     }
@@ -42,8 +42,8 @@ public class ReturnBerry : Strawberry {
         if (!bubbleParticles || Follower.HasLeader || collected || WaitingOnSeeds || !Visible || CollideCheck<FakeWall>() || CollideCheck<Solid>())
             return;
 
-        if (Scene.OnInterval(0.55f, ID.ID * 64f)) // not sure abt speed still or whether it shd be fast or slow
-            (Scene as Level).Particles.Emit(Player.P_CassetteFly, 2, Center + new Vector2(0f, 2f), new Vector2(5f));
+        if (Scene.OnInterval(0.75f, ID.ID / 9f)) // not sure abt speed still or whether it shd be fast or slow
+            (Scene as Level).Particles.Emit(Player.P_CassetteFly, 2, Center + new Vector2(0f, 1f), new Vector2(4f, 5f));
     }
 
     public new void OnPlayer(Player player) {
