@@ -119,7 +119,7 @@ entities.SorbetHelper/CustomLightbeam.placements.name.rainbowlightbeam=Rainbow L
 entities.SorbetHelper/CustomLightbeam.placements.name.customlightbeamrainbow=Custom Lightbeam (Rainbow)
 entities.SorbetHelper/CustomLightbeam.attributes.description.flag=The flag that needs to be set in order for the lightbeam to be activated. Leaving this empty causes the lightbeam to always be active.
 entities.SorbetHelper/CustomLightbeam.attributes.name.inverted=Invert Flag
-entities.SorbetHelper/CustomLightbeam.attributes.description.inverted=When checked, the lightbeam will be active only when the flag is disabled, rather than when it is enabled.
+entities.SorbetHelper/CustomLightbeam.attributes.description.inverted=When checked, the lightbeam will only be active when the flag is disabled, rather than when it is enabled.
 entities.SorbetHelper/CustomLightbeam.attributes.description.flagFadeTime=The time (in seconds) the lightbeam takes to fade in or out according to the flag.
 entities.SorbetHelper/CustomLightbeam.attributes.description.rotation=The rotation of the lightbeam.
 entities.SorbetHelper/CustomLightbeam.attributes.description.depth=Determines what visual layer the lightbeam should be on (higher values mean farther behind in the scene, default value is -9998).\nDoes not affect the particles.
@@ -239,10 +239,9 @@ entities.SorbetHelper/SliderFadeXY.attributes.description.global=Whether the sli
 
 # Solid Tiles Depth Splitter
 entities.SorbetHelper/SolidTilesDepthSplitter.placements.name.depthSplitter=Solid Tiles Depth Splitter
-entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.depth=The visual depth the split solid tiles should be drawn at.\nHigher values mean farther behind in the scene.
+entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.depth=The visual depth the split tiles should be drawn at.\nHigher values mean farther behind in the scene.
 entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.tiletypes=The list of tiletypes to split.
-entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.splitAnimatedTiles=Whether animated tiles should be split alongside their associated tiletypes.
-entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.tryFillBehind=Whether to try and automatically cover up any gaps left below the split tilesets.\nRecommended to be used alongside tilesets using the "ignores" XML attribute.
+entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.tryFillBehind=Whether to try and automatically cover up any gaps left below the split tilesets.\nRecommended for tilesets that use the "ignores" XML attribute.
 entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.backgroundTiles=Whether to split background tiles instead of solid tiles.\nChanging this requires clicking save changes and reopening this menu for the tiletype menu to show the correct options.
 
 # Dash Gate Block

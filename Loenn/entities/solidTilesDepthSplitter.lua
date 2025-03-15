@@ -13,8 +13,7 @@ depthSplitter.placements = {
     data = {
         depth = -10510,
         tiletypes = "3",
-        splitAnimatedTiles = false,
-        tryFillBehind = false,
+        tryFillBehind = true,
         backgroundTiles = false
     }
 }
@@ -22,6 +21,7 @@ depthSplitter.placements = {
 function depthSplitter.fieldInformation(entity)
     local depthOptions = depths.addDepths(depths.getDepths(), {
         {"Above FG Decals", -10510},
+        {"Above FG Terrain", -10010},
         {"Above BG Terrain", 9990}
     })
 
@@ -48,8 +48,8 @@ end
 
 depthSplitter.fieldOrder = {
     "x", "y",
-    "tiletypes", "depth",
-    "tryFillBehind", "splitAnimatedTiles", "backgroundTiles"
+    "tiletypes", "backgroundTiles",
+    "depth", "tryFillBehind"
 }
 
 return depthSplitter

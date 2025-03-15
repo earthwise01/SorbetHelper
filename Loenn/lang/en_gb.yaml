@@ -252,7 +252,7 @@ Entities:
         Description: The flag that needs to be set in order for the lightbeam to be activated. Leaving this empty causes the lightbeam to always be active.
       inverted:
         Name: Invert Flag
-        Description: When checked, the lightbeam will be active only when the flag is disabled, rather than when it is enabled.
+        Description: When checked, the lightbeam will only be active when the flag is disabled, rather than when it is enabled.
       flagFadeTime:
         Description: The time (in seconds) the lightbeam takes to fade in or out according to the flag.
       rotation:
@@ -614,16 +614,14 @@ Entities:
     Attributes:
       depth:
         Description: |-
-          The visual depth the split solid tiles should be drawn at.
+          The visual depth the split tiles should be drawn at.
           Higher values mean farther behind in the scene.
       tiletypes:
         Description: The list of tiletypes to split.
-      splitAnimatedTiles:
-        Description: Whether animated tiles should be split alongside their associated tiletypes.
       tryFillBehind:
         Description: |-
           Whether to try and automatically cover up any gaps left below the split tilesets.
-          Recommended to be used alongside tilesets using the "ignores" XML attribute.
+          Recommended for tilesets that use the "ignores" XML attribute.
       backgroundTiles:
         Description: |-
           Whether to split background tiles instead of solid tiles.

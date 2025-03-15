@@ -23,7 +23,6 @@ public class SolidTilesDepthSplitter : Entity {
     }
 
     private readonly HashSet<char> tiletypes;
-    private readonly bool splitAnimatedTiles;
 
     private readonly bool tryFillBehind;
 
@@ -34,8 +33,6 @@ public class SolidTilesDepthSplitter : Entity {
         Depth = data.Int("depth", Depths.FGDecals - 10);
         tiletypes = data.Attr("tiletypes", "3").ToHashSet();
         tiletypes.Remove('0');
-
-        splitAnimatedTiles = data.Bool("splitAnimatedTiles", false);
 
         tryFillBehind = data.Bool("tryFillBehind", false);
     }
@@ -58,9 +55,6 @@ public class SolidTilesDepthSplitter : Entity {
             VisualExtend = origTiles.VisualExtend
         };
 
-        if (splitAnimatedTiles)
-            AnimatedTiles = new AnimatedTiles(origAnimTiles.tiles.Columns, origAnimTiles.tiles.Rows, origAnimTiles.Bank);
-
         Func<int, int, MTexture> fillBehind = null;
         if (tryFillBehind)
             fillBehind = GenerateFillBehind(tileData, autotiler);
@@ -71,7 +65,13 @@ public class SolidTilesDepthSplitter : Entity {
                     Tiles.Tiles[x, y] = origTiles.Tiles[x, y];
                     origTiles.Tiles[x, y] = tryFillBehind ? fillBehind(x, y) : null;
 
-                    if (splitAnimatedTiles) {
+                    // only create anim tiles if necessary
+                    if (origAnimTiles.tiles.AnyInSegmentAtTile(x, y)) {
+                        if (origAnimTiles.tiles[x, y] is null)
+                            continue;
+
+                        AnimatedTiles ??= new AnimatedTiles(origAnimTiles.tiles.Columns, origAnimTiles.tiles.Rows, origAnimTiles.Bank);
+
                         AnimatedTiles.tiles[x, y] = origAnimTiles.tiles[x, y];
                         origAnimTiles.tiles[x, y] = null;
                     }
@@ -81,7 +81,7 @@ public class SolidTilesDepthSplitter : Entity {
 
         // Tiles.Alpha = 0.4f;
         Add(Tiles);
-        if (splitAnimatedTiles)
+        if (AnimatedTiles is not null)
             Add(AnimatedTiles);
     }
 
