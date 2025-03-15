@@ -15,7 +15,7 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [CustomEntity("SorbetHelper/SolidTilesDepthSplitter")]
 public class SolidTilesDepthSplitter : Entity {
     private SolidTiles SolidTiles => (Scene as Level)?.SolidTiles;
-    private AnimatedTiles AnimatedTiles => (Scene as Level)?.SolidTiles.AnimatedTiles;
+    // private AnimatedTiles AnimatedTiles => (Scene as Level)?.SolidTiles.AnimatedTiles;
 
     private readonly HashSet<char> tiletypes;
     private readonly bool splitAnimatedTiles;
@@ -23,6 +23,7 @@ public class SolidTilesDepthSplitter : Entity {
     private readonly bool tryFillBehind;
 
     public TileGrid Tiles;
+    public AnimatedTiles AnimatedTiles;
 
     public SolidTilesDepthSplitter(EntityData data, Vector2 _) : base() {
         Depth = data.Int("depth", Depths.FGDecals - 10);
@@ -32,12 +33,6 @@ public class SolidTilesDepthSplitter : Entity {
         splitAnimatedTiles = data.Bool("splitAnimatedTiles", false);
 
         tryFillBehind = data.Bool("tryFillBehind", false);
-    }
-
-    public override void Added(Scene scene) {
-        base.Added(scene);
-        if (splitAnimatedTiles && AnimatedTiles is not null)
-            AnimatedTiles.Visible = false;
     }
 
     public override void Awake(Scene scene) {
@@ -56,6 +51,13 @@ public class SolidTilesDepthSplitter : Entity {
             ClipCamera = origTiles.ClipCamera
         };
 
+        var origAnimTiles = solidTiles.AnimatedTiles;
+        if (splitAnimatedTiles) {
+            AnimatedTiles = new AnimatedTiles(origAnimTiles.tiles.Columns, origAnimTiles.tiles.Rows, origAnimTiles.Bank) {
+                ClipCamera = origAnimTiles.ClipCamera
+            };
+        }
+
         Func<int, int, MTexture> fillBehind = null;
         if (tryFillBehind)
             fillBehind = GenerateFillBehind();
@@ -65,15 +67,20 @@ public class SolidTilesDepthSplitter : Entity {
             for (int y = 0; y < tileData.Rows; y++) {
                 if (tiletypes.Contains(tileData[x, y])) {
                     Tiles.Tiles[x, y] = origTiles.Tiles[x, y];
-                    // wonder if itd work to be able to have the old tiles filled in with something else?
-                    // would require a one time autotiler rerun which is eh but idk
                     origTiles.Tiles[x, y] = tryFillBehind ? fillBehind(x, y) : null;
+
+                    if (splitAnimatedTiles) {
+                        AnimatedTiles.tiles[x, y] = origAnimTiles.tiles[x, y];
+                        origAnimTiles.tiles[x, y] = null;
+                    }
                 }
             }
         }
 
         // Tiles.Alpha = 0.4f;
         Add(Tiles);
+        if (splitAnimatedTiles)
+            Add(AnimatedTiles);
     }
 
     private Func<int, int, MTexture> GenerateFillBehind() {
@@ -140,11 +147,5 @@ public class SolidTilesDepthSplitter : Entity {
             else
                 return result;
         }
-    }
-
-    public override void Render() {
-        base.Render();
-        if (splitAnimatedTiles)
-            AnimatedTiles?.Render();
     }
 }
