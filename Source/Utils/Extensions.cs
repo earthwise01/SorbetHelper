@@ -44,6 +44,70 @@ internal static class Extensions {
     public static Vector2 AttrVector(this BinaryPacker.Element self, string key, float defaultValue = 0) =>
         new(self.AttrFloat(key + "X", defaultValue), self.AttrFloat(key + "Y", defaultValue));
 
+    // entity
+    public static T GetComponentFromEnd<T>(this Entity entity) where T : Component {
+        var components = entity.Components.components;
+        for (int i = components.Count - 1; i >= 0; i--) {
+            if (components[i] is T t) {
+                return t;
+            }
+        }
+
+        return null;
+    }
+
+    // level
+
+    /// <summary>
+    /// Adds a custom entity to a Level and copies a reference to it into a list.
+    /// </summary>
+    /// <param name="level"></param>
+    /// <param name="entityData">The EntityData to load.</param>
+    /// <param name="addTo">A list to add the loaded entity to.</param>
+    /// <param name="addToLevel">Whether to automatically add the loaded entity to the level.</param>
+    /// <returns>Whether the entity was loaded.</returns>
+    public static bool LoadAndGetCustomEntity(this Level level, EntityData entityData, List<Entity> addTo, bool addToLevel = true) {
+        var toAdd = level.Entities.ToAdd;
+        var prevToAddCount = toAdd.Count;
+
+        if (!Level.LoadCustomEntity(entityData, level))
+            return false;
+
+        for (int i = prevToAddCount; i < toAdd.Count; i++)
+            addTo.Add(toAdd[i]);
+
+        if (!addToLevel && prevToAddCount != toAdd.Count)
+            toAdd.RemoveRange(prevToAddCount + 1, toAdd.Count - prevToAddCount);
+
+        return true;
+    }
+
+    /// <summary>
+    /// Adds a custom entity to a Level and returns a reference to it.
+    /// </summary>
+    /// <param name="level"></param>
+    /// <param name="entityData">The EntityData to load.</param>
+    /// <param name="addToLevel">Whether to automatically add the loaded entity to the level.</param>
+    /// <returns>The loaded entity.</returns>
+    public static Entity LoadAndGetCustomEntity(this Level level, EntityData entityData, bool addToLevel = true) {
+        var result = level.LoadAndGetCustomEntities(addToLevel, entityData);
+        return result.Count > 0 ? result[0] : null;
+    }
+
+    /// <summary>
+    /// Adds custom entities to a level and returns a list containing references to all loaded entities.
+    /// </summary>
+    /// <param name="level"></param>
+    /// <param name="addToLevel">Whether to automatically add the loaded entities to the level.</param>
+    /// <param name="entityData">The EntityData to load.</param>
+    /// <returns></returns>
+    public static List<Entity> LoadAndGetCustomEntities(this Level level, bool addToLevel = true, params EntityData[] entityData) {
+        var result = new List<Entity>();
+        foreach (var entity in entityData)
+            level.LoadAndGetCustomEntity(entity, result, addToLevel);
+        return result;
+    }
+
     // misc
     public static bool IsInRange(this int value, int min, int max) => value >= min && value <= max;
     public static bool IsInRange(this float value, float min, float max) => value >= min && value <= max;

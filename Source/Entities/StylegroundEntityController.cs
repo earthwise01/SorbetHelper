@@ -8,7 +8,8 @@ using Monocle;
 
 namespace Celeste.Mod.SorbetHelper.Entities;
 
-[GlobalEntity("SorbetHelper/StylegroundEntityController")]
+[GlobalEntity]
+[CustomEntity("SorbetHelper/StylegroundEntityController")]
 public class StylegroundEntityController : Entity {
     private readonly BackdropRenderer BackdropRenderer = new();
 

@@ -10,43 +10,55 @@ using MonoMod.Utils;
 namespace Celeste.Mod.SorbetHelper.Utils;
 
 public static class GlobalEntities {
-    public static readonly Dictionary<string, Level.EntityLoader> EntityLoaders = [];
+    // public static readonly Dictionary<string, Level.EntityLoader> EntityLoaders = [];
+    public static readonly HashSet<string> GlobalEntityIDs = [];
     public static readonly HashSet<string> OnlyOneEntities = [];
 
     private static readonly HashSet<string> OnlyOneLoaded = [];
 
+    private static bool LoadingGlobalEntities = false;
+
     private static void Event_OnLoadingThread(Level level) {
         OnlyOneLoaded.Clear();
 
+        var origLevel = level.Session.Level;
         var mapData = level.Session.MapData;
 
         foreach (var levelData in mapData.Levels) {
-            var offset = new Vector2(levelData.Bounds.Left, levelData.Bounds.Top);
+            LoadingGlobalEntities = true; // bypass the check for global entities in LoadCustomEntity
+            level.Session.Level = levelData.Name; // LoadCustomEntity doesn't take a LevelData argument and instead gets it through level.Session.LevelData,
+                                                  // so to make sure global entities are loading with the correct offsets/entityids/etc level.Session.Level needs to be modified temporarily
             Calc.PushRandom(levelData.LoadSeed);
 
-            foreach (var entityData in levelData.Entities) {
-                var name = entityData.Name;
-                if (!EntityLoaders.TryGetValue(name, out var loader) || OnlyOneLoaded.Contains(name))
-                    continue;
+            try {
+                foreach (var entityData in levelData.Entities) {
+                    var name = entityData.Name;
+                    if (!GlobalEntityIDs.Contains(name) || OnlyOneLoaded.Contains(name))
+                        continue;
 
-                var loaded = loader(level, levelData, offset, entityData);
-                if (loaded is null)
-                    continue;
+                    var loaded = level.LoadAndGetCustomEntities(entityData: entityData);
+                    foreach (var entity in loaded)
+                        entity.Tag |= Tags.Global;
 
-                loaded.AddTag(Tags.Global);
-                level.Add(loaded);
-                // wonder if i should make this result in only adding the entity with the highest id instead of the first found in the map,
-                if (OnlyOneEntities.Contains(name))
-                    OnlyOneLoaded.Add(name);
+                    // wonder if i should make this result in only adding the entity with the highest id instead of the first found in the map,
+                    // actually i wonder if this would be a good place for like    a mapdataprocessor or something idk
+                    if (OnlyOneEntities.Contains(name))
+                        OnlyOneLoaded.Add(name);
+                }
+            } catch (Exception e) {
+                Logger.Error(nameof(SorbetHelper), $"error while loading global entities for room {levelData.Name} in map {mapData.Area.SID}! {e}");
             }
 
+            LoadingGlobalEntities = false;
             Calc.PopRandom();
         }
+
+        level.Session.Level = origLevel;
     }
 
-    // don't load global entities in Level.LoadLevel
+    // don't load global entities in Level.LoadCustomEntity
     private static bool Event_OnLoadEntity(Level level, LevelData levelData, Vector2 offset, EntityData entityData) {
-        if (EntityLoaders.ContainsKey(entityData.Name))
+        if (!LoadingGlobalEntities && GlobalEntityIDs.Contains(entityData.Name))
             return true;
 
         return false;
@@ -65,76 +77,41 @@ public static class GlobalEntities {
         assembly ??= typeof(GlobalEntities).Assembly;
         var types = assembly.GetTypesSafe();
 
-        EntityLoaders.Clear();
-        OnlyOneEntities.Clear();
-
         foreach (var type in types) {
-            var attribute = type.GetCustomAttribute<GlobalEntityAttribute>();
-            if (attribute is null)
+            var globalAttr = type.GetCustomAttribute<GlobalEntityAttribute>();
+            if (globalAttr is null)
                 continue;
 
-            // stolen from Everest.Loader.ProcessAssembly :3
-            var id = attribute.ID;
+            var ids = globalAttr.IDs;
+            var onlyOne = globalAttr.OnlyOne;
 
-            Level.EntityLoader loader = null;
-
-            ConstructorInfo ctor = null;
-            MethodInfo gen = null;
-
-            gen = type.GetMethod("Load", [typeof(Level), typeof(LevelData), typeof(Vector2), typeof(EntityData)]);
-            if (gen is not null && gen.IsStatic && gen.ReturnType.IsCompatible(typeof(Entity))) {
-                loader = (level, levelData, offset, entityData) => (Entity)gen.Invoke(null, [level, levelData, offset, entityData]);
-                goto RegisterEntityLoader;
+            // if no ids specified try grabbing them from a custom entity attribute
+            if (ids.Length == 0 && type.GetCustomAttribute<CustomEntityAttribute>() is { } customEntity) {
+                ids = new string[customEntity.IDs.Length];
+                for (int i = 0; i < ids.Length; i++)
+                    ids[i] = customEntity.IDs[i].Split('=')[0].Trim();
             }
 
-            ctor = type.GetConstructor([typeof(EntityData), typeof(Vector2), typeof(EntityID)]);
-            if (ctor != null) {
-                loader = (level, levelData, offset, entityData) => (Entity)ctor.Invoke([entityData, offset, new EntityID(levelData.Name, entityData.ID)]);
-                goto RegisterEntityLoader;
-            }
+            foreach (var id in ids) {
+                GlobalEntityIDs.Add(id);
 
-            ctor = type.GetConstructor([typeof(EntityData), typeof(Vector2)]);
-            if (ctor is not null) {
-                loader = (level, levelData, offset, entityData) => (Entity)ctor.Invoke([entityData, offset]);
-                goto RegisterEntityLoader;
+                if (onlyOne)
+                    OnlyOneEntities.Add(id);
             }
-
-            ctor = type.GetConstructor([typeof(Vector2)]);
-            if (ctor is not null) {
-                loader = (level, levelData, offset, entityData) => (Entity)ctor.Invoke([offset]);
-                goto RegisterEntityLoader;
-            }
-
-            ctor = type.GetConstructor(Type.EmptyTypes);
-            if (ctor is not null) {
-                loader = (level, levelData, offset, entityData) => (Entity)ctor.Invoke(null);
-                goto RegisterEntityLoader;
-            }
-
-        RegisterEntityLoader:
-            if (loader is null) {
-                Logger.Warn(nameof(SorbetHelper), $"Found global entity without suitable constructor / Load(Level, LevelData, Vector2, EntityData): {id} ({type.FullName})");
-                continue;
-            }
-
-            EntityLoaders[id] = loader;
-            if (attribute.OnlyOne)
-                OnlyOneEntities.Add(id);
         }
     }
 }
 
 /// <summary>
-/// Mark a Monocle.Entity to be loaded from map data during the Everest LevelLoader.OnLoadingThread event.<br/>
+/// Mark a Monocle.Entity with a CustomEntityAttribute to be loaded during the Everest LevelLoader.OnLoadingThread event rather than when its room is loaded.<br/>
 /// Automatically adds the Tags.Global BitTag.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
 public class GlobalEntityAttribute : Attribute {
-    public string ID;
+    public string[] IDs;
     public bool OnlyOne;
 
-    public GlobalEntityAttribute(string id, bool onlyOne = false) : base() {
-        ID = id;
-        OnlyOne = onlyOne;
+    public GlobalEntityAttribute(params string[] ids) : base() {
+        this.IDs = ids;
     }
 }

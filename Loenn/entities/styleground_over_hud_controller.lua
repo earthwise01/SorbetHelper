@@ -1,7 +1,9 @@
+local sorbetUtils = require("mods").requireFromPlugin("libraries.utils")
+
 local stylegroundOverHudController = {}
 
 stylegroundOverHudController.name = "SorbetHelper/StylegroundOverHudController"
-stylegroundOverHudController.texture = "editorSprites/SorbetHelper/stylegroundOverHudController"
+stylegroundOverHudController.sprite = sorbetUtils.getControllerSpriteFunction("stylegroundOverHudController", true, true)
 stylegroundOverHudController.depth = -1000010
 stylegroundOverHudController.placements = {
     name = "stylegroundOverHud",

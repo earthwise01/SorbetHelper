@@ -25,30 +25,28 @@ public class SorbetHelperMapDataProcessor : EverestMapDataProcessor {
         }
 
         // swap to the global versions based on a "global" attribute
-        static void entityStylegroundControllerHandler(BinaryPacker.Element entityData) {
-            if (entityData.AttrBool("global", false)) {
-                entityData.Name = "SorbetHelper/GlobalEntityStylegroundController";
-                // Logger.Log(LogLevel.Verbose, "SorbetHelper", $"[MapDataProcessor] found an EntityStylegroundController with global set in {AreaKey.SID} ({AreaKey.Mode})!");
-            }
-        }
-        static void lightCoverControllerHandler(BinaryPacker.Element entityData) {
-            if (entityData.AttrBool("global", false)) {
-                entityData.Name = "SorbetHelper/GlobalLightCoverController";
-                // Logger.Log(LogLevel.Verbose, "SorbetHelper", $"[MapDataProcessor] found a LightCoverController with global set in {AreaKey.SID} ({AreaKey.Mode})!");
-            }
+        static void globalControllerSwap(BinaryPacker.Element entityData) {
+            if (entityData.AttrBool("global", false))
+                entityData.Name += "Global";
         }
 
         return new Dictionary<string, Action<BinaryPacker.Element>> {
-                {
-                    "entity:SorbetHelper/StylegroundOverHudController", stylegroundOverHudControllerHandler
-                },
-                {
-                    "entity:SorbetHelper/EntityStylegroundController", entityStylegroundControllerHandler
-                },
-                {
-                    "entity:SorbetHelper/LightCoverController", lightCoverControllerHandler
-                }
-            };
+            // styleground over hud
+            {
+                "entity:SorbetHelper/StylegroundOverHudController", stylegroundOverHudControllerHandler
+            },
+
+            // global controllers
+            {
+                "entity:SorbetHelper/EntityStylegroundController", globalControllerSwap
+            },
+            {
+                "entity:SorbetHelper/LightCoverController", globalControllerSwap
+            },
+            {
+                "entity:SorbetHelper/SliderFadeXY", globalControllerSwap
+            }
+        };
     }
 
     public override void Reset() {

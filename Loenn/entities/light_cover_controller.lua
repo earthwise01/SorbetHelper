@@ -1,7 +1,9 @@
+local sorbetUtils = require("mods").requireFromPlugin("libraries.utils")
+
 local lightCover = {}
 
 lightCover.name = "SorbetHelper/LightCoverController"
-lightCover.texture = "editorSprites/SorbetHelper/lightCoverController"
+lightCover.sprite = sorbetUtils.getControllerSpriteFunction("lightCoverController")
 lightCover.depth = -1000010
 lightCover.placements = {
     name = "controller",

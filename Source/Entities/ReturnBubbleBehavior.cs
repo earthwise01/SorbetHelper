@@ -231,10 +231,7 @@ public class ReturnBubbleBehaviorController : Entity {
             if (behavior.CollisionMode == ReturnBubbleBehavior.CollisionModes.TriggersOnly)
                 return b is not Trigger;
 
-            if (behavior.CollisionMode == ReturnBubbleBehavior.CollisionModes.NoCollide)
-                return true;
-
-            return false;
+            return behavior.CollisionMode == ReturnBubbleBehavior.CollisionModes.NoCollide;
         }
 
         if (b is Player p2) {
@@ -248,8 +245,7 @@ public class ReturnBubbleBehaviorController : Entity {
             if (behavior.CollisionMode == ReturnBubbleBehavior.CollisionModes.TriggersOnly)
                 return a is not Trigger;
 
-            if (behavior.CollisionMode == ReturnBubbleBehavior.CollisionModes.NoCollide)
-                return true;
+            return behavior.CollisionMode == ReturnBubbleBehavior.CollisionModes.NoCollide;
         }
 
         return false;

@@ -6,17 +6,18 @@ mods.SorbetHelper.name=Sorbet Helper
 # -- Entities --
 
 # Flag Toggled Killbox
-entities.SorbetHelper/FlagToggledKillbox.placements.name.flag_toggled_killbox=Flag Toggled Killbox
-entities.SorbetHelper/FlagToggledKillbox.placements.description.flag_toggled_killbox=Same as the vanilla Killbox entity, however it can also be flag toggled.
-entities.SorbetHelper/FlagToggledKillbox.attributes.description.flag=The flag that needs to be set in order for the killbox to be activated.
-entities.SorbetHelper/FlagToggledKillbox.attributes.description.inverted=When checked, the killbox will be active only when the flag is disabled, rather than when it is enabled.
+entities.SorbetHelper/FlagToggledKillbox.placements.name.flag_toggled_killbox=Killbox (Flag Toggled)
+entities.SorbetHelper/FlagToggledKillbox.attributes.description.flag=A session flag that needs to be set in order for the killbox to be able to activate.
+entities.SorbetHelper/FlagToggledKillbox.attributes.name.inverted=Invert Flag
+entities.SorbetHelper/FlagToggledKillbox.attributes.description.inverted=When checked, the killbox can only be active when the flag is disabled, rather than when it is enabled.
+entities.SorbetHelper/FlagToggledKillbox.attributes.description.flagOnly=Whether the killbox's collidability should be entirely dependent on the flag, rather than still requiring the player to be above it.
+entities.SorbetHelper/FlagToggledKillbox.attributes.description.lenientHitbox=Whether the player should only die once they are fully below the killbox, matching how the actual bottom of a room behaves.
 
 # Kill Zone
 entities.SorbetHelper/KillZone.placements.name.killzone=Kill Zone
-entities.SorbetHelper/KillZone.placements.description.killzone=Kills the player on contact, can also be flag toggled.
 entities.SorbetHelper/KillZone.attributes.description.flag=The flag that needs to be set in order for the kill zone to be activated, leaving this empty causes the kill zone to always be active.
 entities.SorbetHelper/KillZone.attributes.name.inverted=Invert Flag
-entities.SorbetHelper/KillZone.attributes.description.inverted=When checked, the kill zone will be active only when the flag is disabled, rather than when it is enabled.
+entities.SorbetHelper/KillZone.attributes.description.inverted=When checked, the kill zone will only be active when the flag is disabled, rather than when it is enabled.
 entities.SorbetHelper/KillZone.attributes.description.fastKill=When checked, the player will die instantly upon touching the kill zone rather than getting knocked back a bit first.
 
 # Return Berry
@@ -196,7 +197,7 @@ entities.SorbetHelper/DisplacementEffectBlocker.placements.name.depthAdhering=Di
 entities.SorbetHelper/DisplacementEffectBlocker.placements.description.depthAdhering=Blocks the displacement effect produced by entities such as water or waterfalls at a certain depth that are *affected by a Displacement Depth Fixer*.
 entities.SorbetHelper/DisplacementEffectBlocker.attributes.name.waterOnly=Waves Only
 entities.SorbetHelper/DisplacementEffectBlocker.attributes.description.waterOnly=Whether the displacement blocker should only affect the wavy displacement from water, etc.\nDisabling this makes offset displacement like the burst effect from Madeline dashing or pulsing strawberries etc. also get blocked.
-entities.SorbetHelper/DisplacementEffectBlocker.attributes.description.depth=The depth of the displacement blocker. Any entity affected by a displacement depth fixer with a depth equal to or higher than this will be affected by the blocker.\n(higher values mean farther behind in the scene.)
+entities.SorbetHelper/DisplacementEffectBlocker.attributes.description.depth=The depth of the displacement blocker.\nAny entity affected by a displacement depth fixer with a depth equal to or higher than this will be affected by the blocker.\nhigher values mean farther behind in the scene.
 
 # Displacement Effect Area
 entities.SorbetHelper/DisplacementEffectArea.placements.name.normal=Displacement Effect Area
@@ -210,7 +211,6 @@ entities.SorbetHelper/DisplacementEffectArea.attributes.description.depth=The vi
 # Entity Styleground Controller
 entities.SorbetHelper/EntityStylegroundController.placements.name.controller=Entity As Styleground Controller
 entities.SorbetHelper/EntityStylegroundController.placements.description.controller=Marks specified entity types to be drawn as a styleground layer by an Entity As Styleground Renderer styleground.
-entities.SorbetHelper/EntityStylegroundController.placements.name.altname=Entity on Styleground Layer Controller
 entities.SorbetHelper/EntityStylegroundController.attributes.description.classNames=A comma separated list of C# entity class names the controller should affect.\nYou can use something like CelesteTAS or Mapping Utils to try and find these.
 entities.SorbetHelper/EntityStylegroundController.attributes.description.useFullClassNames=Whether the controller should check for the fully qualified class names or just the name of the class.\ne.g. Celeste.SummitCloud vs SummitCloud
 entities.SorbetHelper/EntityStylegroundController.attributes.description.minDepth=The minimum (closest to the camera) depth an entity can have while being affected by the controller.\nAllows restricting the controller to specific entities if you have multiple of the same type but with different depths.\nLeave empty to make uncapped.
@@ -218,7 +218,7 @@ entities.SorbetHelper/EntityStylegroundController.attributes.description.maxDept
 entities.SorbetHelper/EntityStylegroundController.attributes.description.tag=The styleground tag used to match with an Entity As Styleground Renderer styleground.\nRequired in order for the controller to have any effect.
 entities.SorbetHelper/EntityStylegroundController.attributes.description.global=Whether the controller should apply globally, to every entity as they are loaded.\nAllows even affecting entities added after room load, and automatically across the whole map.
 entities.SorbetHelper/EntityStylegroundController.attributes.name._instructionsButton=Info
-entities.SorbetHelper/EntityStylegroundController.attributes.description._instructionsButton=~~~ some misc info ~~~\n- the controller will *not* correctly work on its own, but rather requires the map to have an Entity As Styleground Renderer styleground with a matching tag field.\n\n- for decals specifically, there is also a decal registry attribute available, <sorbetHelper_styleground rendererTag=""/>\n  this has the same requirement of an Entity As Styleground Renderer (though note that a controller isn't required when using the decal registry)\n\n- be prepared to very occasionally find that some entities don't work correctly, especially if they have particularly complex rendering-\n  this is likely not the fault of either me or whoever made the entity,\n  but just a consequence of it (very reasonably) not expecting to be in these conditions, sorry!
+entities.SorbetHelper/EntityStylegroundController.attributes.description._instructionsButton=~~~ some misc info ~~~\n- the controller *requires* the map to have an Entity As Styleground Renderer styleground with a matching tag field in order to work correctly.\n\n- for decals specifically, there is also a decal registry attribute available, <sorbetHelper_styleground rendererTag=""/>\n  this has the same requirement of an Entity As Styleground Renderer (though note that a controller isn't required when using the decal registry)\n\n- this controller is purely visual, and was originally intended for things like lightbeams, parallax decals, bg/fg waterfalls, etc.\n  non-visual only entities are also supported, but will not be made uncollidable, given parallax, looping, or other styleground-like behaviors.\n\n- be prepared to very occasionally find that some entities don't work correctly, especially if they have particularly complex rendering-\n  this is likely not the fault of either me or whoever made the entity,\n  but just a consequence of it (very reasonably) not expecting to be in these conditions, sorry!
 
 # Styleground Entity Controller
 entities.SorbetHelper/StylegroundEntityController.placements.name.controller=Styleground As Entity Controller
@@ -226,6 +226,21 @@ entities.SorbetHelper/StylegroundEntityController.placements.description.control
 entities.SorbetHelper/StylegroundEntityController.placements.name.altname=Styleground Depth Controller
 entities.SorbetHelper/StylegroundEntityController.attributes.description.tag=The styleground tag to affect.
 entities.SorbetHelper/StylegroundEntityController.attributes.description.depth=The visual depth the stylegrounds should be drawn at.\nHigher values mean farther behind in the scene.
+
+# Slider Fade XY
+entities.SorbetHelper/SliderFadeXY.placements.name.sliderFadeXY=Slider Camera Fade X/Y
+entities.SorbetHelper/SliderFadeXY.attributes.description.slider=The name of the session slider to control.
+entities.SorbetHelper/SliderFadeXY.attributes.name.fadeX=Fade X
+entities.SorbetHelper/SliderFadeXY.attributes.description.fadeX=Format is "FromPosition-ToPosition,FromValue-ToValue", e.g. "n500-500,1-0".\nNegative numbers are denoted with "n" rather than minus. Camera positions are in pixels and use map coordinates.\nMultiple zones can be set up by using ":" as the separator.\nThe final value is calculated by multiplying together the outputs of all the zones.
+entities.SorbetHelper/SliderFadeXY.attributes.name.fadeY=Fade Y
+entities.SorbetHelper/SliderFadeXY.attributes.description.fadeY=Format is "FromPosition-ToPosition,FromValue-ToValue", e.g. "n500-500,1-0".\nNegative numbers are denoted with "n" rather than minus. Camera positions are in pixels and use map coordinates.\nMultiple zones can be set up by using ":" as the separator.\nThe final value is calculated by multiplying together the outputs of all the zones.
+entities.SorbetHelper/SliderFadeXY.attributes.description.global=Whether the slider's value should be updated globally, even when not in the room containing this controller.
+
+# Solid Tiles Depth Splitter
+entities.SorbetHelper/SolidTilesDepthSplitter.placements.name.depthSplitter=Solid Tiles Depth Splitter
+entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.depth=The visual depth the split solid tiles should be drawn at.\nHigher values mean farther behind in the scene.
+entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.tiletypes=The list of tiletypes to split.
+entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.splitAnimatedTiles=Whether animated tiles should be split alongside the specified tiletypes.
 
 # Dash Gate Block
 entities.SorbetHelper/DashGateBlock.placements.name.Both=Dash Gate Block (Both)
@@ -387,5 +402,5 @@ style.effects.SorbetHelper/HiResGodrays.description.fadey=Advanced vertical fadi
 # Entity Styleground Renderer
 style.effects.SorbetHelper/EntityStylegroundRenderer.name=Entity As Styleground Renderer
 style.effects.SorbetHelper/EntityStylegroundRenderer.attribute._instructionsButton=Info
-style.effects.SorbetHelper/EntityStylegroundRenderer.description._instructionsButton=this effect will *not* do anything on its own, but rather acts as a renderer for either\nentities affected by an Entity As Styleground Controller or decals affected by a <sorbetHelper_styleground/> decal registry tag\nwith matching tag fields.
+style.effects.SorbetHelper/EntityStylegroundRenderer.description._instructionsButton=this effect will not do anything on its own, but rather acts as a renderer for either\nentities affected by an Entity As Styleground Controller or decals affected by a <sorbetHelper_styleground/> decal registry tag\nwith matching tag fields.
 

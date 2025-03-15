@@ -29,11 +29,12 @@ public class EntityStylegroundController : ClassControllerBase {
 }
 
 // swapped to in mapdataprocessor based on data.Bool("global")
-[GlobalEntity("SorbetHelper/GlobalEntityStylegroundController")]
-public class GlobalEntityStylegroundController : GlobalClassControllerBase {
+[GlobalEntity]
+[CustomEntity("SorbetHelper/EntityStylegroundControllerGlobal")]
+public class EntityStylegroundControllerGlobal : GlobalClassControllerBase {
     private readonly string StylegroundTag;
 
-    public GlobalEntityStylegroundController(EntityData data, Vector2 _) : base(data) {
+    public EntityStylegroundControllerGlobal(EntityData data, Vector2 _) : base(data) {
         StylegroundTag = data.Attr("tag", "");
     }
 

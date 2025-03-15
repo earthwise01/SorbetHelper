@@ -9,27 +9,38 @@ Entities:
   SorbetHelper/FlagToggledKillbox:
     Placements:
       flag_toggled_killbox:
-        Name: Flag Toggled Killbox
-        Description: Same as the vanilla Killbox entity, however it can also be flag toggled.
+        Name: Killbox (Flag Toggled)
     Attributes:
       flag:
-        Description: The flag that needs to be set in order for the killbox to be activated.
+        Description: A session flag that needs to be set in order for the killbox to be able to activate.
       inverted:
-        Description: When checked, the killbox will be active only when the flag is disabled, rather than when it is enabled.
+        Name: Invert Flag
+        Description: When checked, the killbox can only be active when the flag is disabled, rather than when it is enabled.
+      flagOnly:
+        Description: Whether the killbox's collidability should be entirely dependent on the flag, rather than still requiring the player to be above it.
+      lenientHitbox:
+        Description: Whether the player should only die once they are fully below the killbox, matching how the actual bottom of a room behaves.
 
   SorbetHelper/KillZone:
     Placements:
       killzone:
         Name: Kill Zone
-        Description: Kills the player on contact, can also be flag toggled.
     Attributes:
       flag:
         Description: The flag that needs to be set in order for the kill zone to be activated, leaving this empty causes the kill zone to always be active.
       inverted:
         Name: Invert Flag
-        Description: When checked, the kill zone will be active only when the flag is disabled, rather than when it is enabled.
+        Description: When checked, the kill zone will only be active when the flag is disabled, rather than when it is enabled.
       fastKill:
         Description: When checked, the player will die instantly upon touching the kill zone rather than getting knocked back a bit first.
+      # not working atm weh
+      # collidePlayer:
+      #   Description: Whether the player can collide with the kill zone.
+      # collideHoldables:
+      #   Description: |-
+      #     Whether holdables (like theo crystals or jellies) can collide with the kill zone.
+      #     Theo crystals and jellies (along with modded holdables extending them) should be killed as expected.
+      #     Any other modded holdables will fall back to their behavior when touching a spinner.
 
   SorbetHelper/ReturnBerry:
     Placements:
@@ -482,8 +493,9 @@ Entities:
           Disabling this makes offset displacement like the burst effect from Madeline dashing or pulsing strawberries etc. also get blocked.
       depth:
         Description: |-
-          The depth of the displacement blocker. Any entity affected by a displacement depth fixer with a depth equal to or higher than this will be affected by the blocker.
-          (higher values mean farther behind in the scene.)
+          The depth of the displacement blocker.
+          Any entity affected by a displacement depth fixer with a depth equal to or higher than this will be affected by the blocker.
+          higher values mean farther behind in the scene.
   
   SorbetHelper/DisplacementEffectArea:
     Placements:
@@ -515,8 +527,6 @@ Entities:
       controller:
         Name: Entity As Styleground Controller
         Description: Marks specified entity types to be drawn as a styleground layer by an Entity As Styleground Renderer styleground.
-      altname:
-        Name: Entity on Styleground Layer Controller
     Attributes:
       classNames:
         Description: |-
@@ -548,10 +558,13 @@ Entities:
         Name: Info
         Description: |-
           ~~~ some misc info ~~~
-          - the controller will *not* correctly work on its own, but rather requires the map to have an Entity As Styleground Renderer styleground with a matching tag field.
+          - the controller *requires* the map to have an Entity As Styleground Renderer styleground with a matching tag field in order to work correctly.
 
           - for decals specifically, there is also a decal registry attribute available, <sorbetHelper_styleground rendererTag=""/>
             this has the same requirement of an Entity As Styleground Renderer (though note that a controller isn't required when using the decal registry)
+
+          - this controller is purely visual, and was originally intended for things like lightbeams, parallax decals, bg/fg waterfalls, etc.
+            non-visual only entities are also supported, but will not be made uncollidable, given parallax, looping, or other styleground-like behaviors.
 
           - be prepared to very occasionally find that some entities don't work correctly, especially if they have particularly complex rendering-
             this is likely not the fault of either me or whoever made the entity,
@@ -573,7 +586,45 @@ Entities:
         Description: |-
           The visual depth the stylegrounds should be drawn at.
           Higher values mean farther behind in the scene.
-  
+
+  SorbetHelper/SliderFadeXY:
+    Placements:
+      sliderFadeXY:
+        Name: Slider Camera Fade X/Y
+    Attributes:
+      slider:
+        Description: The name of the session slider to control.
+      fadeX:
+        Name: Fade X
+        Description: |-
+          Format is "FromPosition-ToPosition,FromValue-ToValue", e.g. "n500-500,1-0".
+          Negative numbers are denoted with "n" rather than minus. Camera positions are in pixels and use map coordinates.
+          Multiple zones can be set up by using ":" as the separator.
+          The final value is calculated by multiplying together the outputs of all the zones.
+      fadeY:
+        Name: Fade Y
+        Description: |-
+          Format is "FromPosition-ToPosition,FromValue-ToValue", e.g. "n500-500,1-0".
+          Negative numbers are denoted with "n" rather than minus. Camera positions are in pixels and use map coordinates.
+          Multiple zones can be set up by using ":" as the separator.
+          The final value is calculated by multiplying together the outputs of all the zones.
+      global:
+        Description: Whether the slider's value should be updated globally, even when not in the room containing this controller.
+
+  SorbetHelper/SolidTilesDepthSplitter:
+    Placements:
+      depthSplitter:
+        Name: Solid Tiles Depth Splitter
+    Attributes:
+      depth:
+        Description: |-
+          The visual depth the split solid tiles should be drawn at.
+          Higher values mean farther behind in the scene.
+      tiletypes:
+        Description: The list of tiletypes to split.
+      splitAnimatedTiles:
+        Description: Whether animated tiles should be split alongside the specified tiletypes.
+
   SorbetHelper/DashGateBlock:
     Placements:
       Both:
@@ -921,6 +972,6 @@ Effects:
       _instructionsButton:
         Name: Info
         Description: |-
-          this effect will *not* do anything on its own, but rather acts as a renderer for either
+          this effect will not do anything on its own, but rather acts as a renderer for either
           entities affected by an Entity As Styleground Controller or decals affected by a <sorbetHelper_styleground/> decal registry tag
           with matching tag fields.

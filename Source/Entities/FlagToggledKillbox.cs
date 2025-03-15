@@ -13,21 +13,39 @@ namespace Celeste.Mod.SorbetHelper.Entities {
     public class FlagToggledKillbox : Killbox {
         private readonly string flag;
         private readonly bool inverted;
+        private readonly bool flagOnly;
 
         public FlagToggledKillbox(EntityData data, Vector2 offset) : base(data, offset) {
-            flag = data.Attr("flag");
-            inverted = data.Bool("inverted");
+            flag = data.Attr("flag", "");
+            inverted = data.Bool("inverted", false);
+            flagOnly = data.Bool("flagOnly", false);
+
+            if (data.Bool("lenientHitbox", false))
+                Get<PlayerCollider>().OnCollide = LenientOnPlayer;
         }
 
         public override void Update() {
             base.Update();
-            Player player = base.Scene.Tracker.GetEntity<Player>();
 
-            if (Collidable && player != null && !string.IsNullOrEmpty(flag)) {
-                if (!SceneAs<Level>().Session.GetFlag(flag, inverted)) {
-                    Collidable = false;
-                }
+            if (string.IsNullOrEmpty(flag)) {
+                if (flagOnly)
+                    Collidable = inverted;
+
+                return;
             }
+
+            if (Collidable || flagOnly)
+                Collidable = (Scene as Level).Session.GetFlag(flag, inverted);
         }
+
+    // based on Level.EnforceBounds
+    public void LenientOnPlayer(Player player) {
+        if (player.Top > Top && SaveData.Instance.Assists.Invincible) {
+            player.Play("event:/game/general/assist_screenbottom");
+            player.Bounce(Top);
+        } else if (player.Top > Top + 4f) {
+            player.Die(Vector2.Zero);
+        }
+    }
     }
 }

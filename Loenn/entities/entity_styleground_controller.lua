@@ -1,11 +1,12 @@
+local sorbetUtils = require("mods").requireFromPlugin("libraries.utils")
+
 local entityStylegroundController = {}
 
 entityStylegroundController.name = "SorbetHelper/EntityStylegroundController"
-entityStylegroundController.texture = "editorSprites/SorbetHelper/entityStylegroundController"
+entityStylegroundController.sprite = sorbetUtils.getControllerSpriteFunction("entityStylegroundController")
 entityStylegroundController.depth = -1000010
 entityStylegroundController.placements = {
     name = "controller",
-    alternativeName = "altname",
     data = {
         classNames = "",
         useFullClassNames = false,

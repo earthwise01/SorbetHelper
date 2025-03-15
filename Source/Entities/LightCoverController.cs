@@ -28,11 +28,12 @@ public class LightCoverController : ClassControllerBase {
 }
 
 // swapped to in mapdataprocessor based on data.Bool("global")
-[GlobalEntity("SorbetHelper/GlobalLightCoverController")]
-public class GlobalLightCoverController : GlobalClassControllerBase {
+[GlobalEntity]
+[CustomEntity("SorbetHelper/LightCoverControllerGlobal")]
+public class LightCoverControllerGlobal : GlobalClassControllerBase {
     private readonly float Alpha;
 
-    public GlobalLightCoverController(EntityData data, Vector2 _) : base(data) {
+    public LightCoverControllerGlobal(EntityData data, Vector2 _) : base(data) {
         Alpha = data.Float("alpha", 1f);
     }
 
