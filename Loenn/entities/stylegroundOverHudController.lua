@@ -24,7 +24,7 @@ stylegroundOverHudController.fieldInformation = {
         editable = false
     },
     _instructionsButton = {
-        fieldType = "sorbetHelper.info_button"
+        fieldType = "sorbetHelper.infoButton"
     }
 }
 

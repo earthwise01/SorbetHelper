@@ -6,7 +6,7 @@ local grid = require("ui.widgets.grid")
 
 local buttonField = {}
 
-buttonField.fieldType = "sorbetHelper.info_button"
+buttonField.fieldType = "sorbetHelper.infoButton"
 
 buttonField._MT = {}
 buttonField._MT.__index = {}

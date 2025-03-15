@@ -8,7 +8,7 @@ effect.defaultData = {
 
 effect.fieldInformation = {
     _instructionsButton = {
-        fieldType = "sorbetHelper.info_button"
+        fieldType = "sorbetHelper.infoButton"
     }
 }
 

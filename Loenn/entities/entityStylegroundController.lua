@@ -35,7 +35,7 @@ entityStylegroundController.fieldInformation = {
         allowEmpty = true
     },
     _instructionsButton = {
-        fieldType = "sorbetHelper.info_button"
+        fieldType = "sorbetHelper.infoButton"
     }
 }
 

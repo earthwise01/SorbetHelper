@@ -9,7 +9,7 @@ local constColors = require("consts.colors")
 local mods = require("mods")
 local depths = mods.requireFromPlugin("libraries.depths")
 local sorbetUtils = mods.requireFromPlugin("libraries.utils")
-local rainbowHelper = mods.requireFromPlugin("libraries.rainbow_helper")
+local rainbowHelper = mods.requireFromPlugin("libraries.rainbowHelper")
 
 local lightBeam = {}
 
