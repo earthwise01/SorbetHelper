@@ -11,8 +11,16 @@ killzone.placements = {
         height = 8,
         flag = "",
         inverted = false,
-        fastKill = false
+        fastKill = false,
+        collideHoldables = false
     }
+}
+
+killzone.fieldOrder = {
+    "x", "y",
+    "width", "height",
+    "flag", "fastKill", "collideHoldables",
+    "inverted"
 }
 
 return killzone

@@ -33,14 +33,10 @@ Entities:
         Description: When checked, the kill zone will only be active when the flag is disabled, rather than when it is enabled.
       fastKill:
         Description: When checked, the player will die instantly upon touching the kill zone rather than getting knocked back a bit first.
-      # not working atm weh
-      # collidePlayer:
-      #   Description: Whether the player can collide with the kill zone.
-      # collideHoldables:
-      #   Description: |-
-      #     Whether holdables (like theo crystals or jellies) can collide with the kill zone.
-      #     Theo crystals and jellies (along with modded holdables extending them) should be killed as expected.
-      #     Any other modded holdables will fall back to their behavior when touching a spinner.
+      collideHoldables:
+        Description: |-
+          Whether holdables (like theo crystals or jellies) can collide with the kill zone.
+          Theo crystals and jellies should be killed as expected, while other holdables will fall back to their behavior when touching a spinner.
 
   SorbetHelper/ReturnBerry:
     Placements:

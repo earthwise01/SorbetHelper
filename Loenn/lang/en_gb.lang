@@ -19,6 +19,7 @@ entities.SorbetHelper/KillZone.attributes.description.flag=The flag that needs t
 entities.SorbetHelper/KillZone.attributes.name.inverted=Invert Flag
 entities.SorbetHelper/KillZone.attributes.description.inverted=When checked, the kill zone will only be active when the flag is disabled, rather than when it is enabled.
 entities.SorbetHelper/KillZone.attributes.description.fastKill=When checked, the player will die instantly upon touching the kill zone rather than getting knocked back a bit first.
+entities.SorbetHelper/KillZone.attributes.description.collideHoldables=Whether holdables (like theo crystals or jellies) can collide with the kill zone.\nTheo crystals and jellies should be killed as expected, while other holdables will fall back to their behavior when touching a spinner.
 
 # Return Berry
 entities.SorbetHelper/ReturnBerry.placements.name.normal=Strawberry (With Noded Return)
