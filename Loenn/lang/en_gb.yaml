@@ -623,11 +623,15 @@ Entities:
       tiletypes:
         Description: The list of tiletypes to split.
       splitAnimatedTiles:
-        Description: Whether animated tiles should be split alongside the specified tiletypes.
+        Description: Whether animated tiles should be split alongside their associated tiletypes.
       tryFillBehind:
         Description: |-
           Whether to try and automatically cover up any gaps left below the split tilesets.
           Recommended to be used alongside tilesets using the "ignores" XML attribute.
+      backgroundTiles:
+        Description: |-
+          Whether to split background tiles instead of solid tiles.
+          Changing this requires clicking save changes and reopening this menu for the tiletype menu to show the correct options.
 
   SorbetHelper/DashGateBlock:
     Placements:

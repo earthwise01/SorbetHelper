@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Celeste.Mod.Backdrops;
 using Celeste.Mod.Entities;
 using Celeste.Mod.SorbetHelper.Utils;
 using Microsoft.Xna.Framework;
 using Monocle;
-using TerrainType = Celeste.Autotiler.TerrainType;
 
 
 namespace Celeste.Mod.SorbetHelper.Entities;
@@ -14,8 +12,15 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [GlobalEntity]
 [CustomEntity("SorbetHelper/SolidTilesDepthSplitter")]
 public class SolidTilesDepthSplitter : Entity {
-    private SolidTiles SolidTiles => (Scene as Level)?.SolidTiles;
-    // private AnimatedTiles AnimatedTiles => (Scene as Level)?.SolidTiles.AnimatedTiles;
+    // i feel like this  Works as a way to add bgtile support ?? hopefully not a messy 3am brain moment
+    public static Entity Load(Level level, LevelData levelData, Vector2 position, EntityData entityData) {
+        var entity = new SolidTilesDepthSplitter(entityData);
+        if (entityData.Bool("backgroundTiles", false))
+            entity.SplitTiles(level.BgTiles.Position, level.BgData, level.BgTiles.Tiles, level.BgTiles.AnimatedTiles, GFX.BGAutotiler);
+        else
+            entity.SplitTiles(level.SolidTiles.Position, level.SolidsData, level.SolidTiles.Tiles, level.SolidTiles.AnimatedTiles, GFX.FGAutotiler);
+        return entity;
+    }
 
     private readonly HashSet<char> tiletypes;
     private readonly bool splitAnimatedTiles;
@@ -25,7 +30,7 @@ public class SolidTilesDepthSplitter : Entity {
     public TileGrid Tiles;
     public AnimatedTiles AnimatedTiles;
 
-    public SolidTilesDepthSplitter(EntityData data, Vector2 _) : base() {
+    public SolidTilesDepthSplitter(EntityData data) : base() {
         Depth = data.Int("depth", Depths.FGDecals - 10);
         tiletypes = data.Attr("tiletypes", "3").ToHashSet();
         tiletypes.Remove('0');
@@ -35,34 +40,31 @@ public class SolidTilesDepthSplitter : Entity {
         tryFillBehind = data.Bool("tryFillBehind", false);
     }
 
-    public override void Awake(Scene scene) {
-        base.Awake(scene);
+    public override void Added(Scene scene) {
+        base.Added(scene);
 
+        Tiles.ClipCamera = (scene as Level).Camera;
+        if (AnimatedTiles is not null)
+            AnimatedTiles.ClipCamera = Tiles.ClipCamera;
+    }
+
+    private void SplitTiles(Vector2 position, VirtualMap<char> tileData, TileGrid origTiles, AnimatedTiles origAnimTiles, Autotiler autotiler) {
         if (tiletypes.Count <= 0)
             return;
 
-        var solidTiles = SolidTiles;
+        Position = position;
 
-        Position = solidTiles.Position;
-
-        var origTiles = solidTiles.Tiles;
         Tiles = new TileGrid(origTiles.TileWidth, origTiles.TileHeight, origTiles.TilesX, origTiles.TilesY) {
-            VisualExtend = origTiles.VisualExtend,
-            ClipCamera = origTiles.ClipCamera
+            VisualExtend = origTiles.VisualExtend
         };
 
-        var origAnimTiles = solidTiles.AnimatedTiles;
-        if (splitAnimatedTiles) {
-            AnimatedTiles = new AnimatedTiles(origAnimTiles.tiles.Columns, origAnimTiles.tiles.Rows, origAnimTiles.Bank) {
-                ClipCamera = origAnimTiles.ClipCamera
-            };
-        }
+        if (splitAnimatedTiles)
+            AnimatedTiles = new AnimatedTiles(origAnimTiles.tiles.Columns, origAnimTiles.tiles.Rows, origAnimTiles.Bank);
 
         Func<int, int, MTexture> fillBehind = null;
         if (tryFillBehind)
-            fillBehind = GenerateFillBehind();
+            fillBehind = GenerateFillBehind(tileData, autotiler);
 
-        var tileData = solidTiles.tileTypes;
         for (int x = 0; x < tileData.Columns; x++) {
             for (int y = 0; y < tileData.Rows; y++) {
                 if (tiletypes.Contains(tileData[x, y])) {
@@ -83,10 +85,7 @@ public class SolidTilesDepthSplitter : Entity {
             Add(AnimatedTiles);
     }
 
-    private Func<int, int, MTexture> GenerateFillBehind() {
-        var solidTiles = SolidTiles;
-        var tileData = solidTiles.tileTypes;
-
+    private Func<int, int, MTexture> GenerateFillBehind(VirtualMap<char> tileData, Autotiler autotiler) {
         var modified = new VirtualMap<char>(tileData.Columns, tileData.Rows, tileData.EmptyValue);
         for (int x = 0; x < tileData.Columns; x++) {
             for (int y = 0; y < tileData.Rows; y++) {
@@ -94,7 +93,7 @@ public class SolidTilesDepthSplitter : Entity {
             }
         }
 
-        var generated = GFX.FGAutotiler.GenerateMap(modified, paddingIgnoreOutOfLevel: true);
+        var generated = autotiler.GenerateMap(modified, paddingIgnoreOutOfLevel: true);
 
         return (x, y) => {
             if (tiletypes.Contains(modified[x, y]))

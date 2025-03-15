@@ -240,8 +240,9 @@ entities.SorbetHelper/SliderFadeXY.attributes.description.global=Whether the sli
 entities.SorbetHelper/SolidTilesDepthSplitter.placements.name.depthSplitter=Solid Tiles Depth Splitter
 entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.depth=The visual depth the split solid tiles should be drawn at.\nHigher values mean farther behind in the scene.
 entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.tiletypes=The list of tiletypes to split.
-entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.splitAnimatedTiles=Whether animated tiles should be split alongside the specified tiletypes.
+entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.splitAnimatedTiles=Whether animated tiles should be split alongside their associated tiletypes.
 entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.tryFillBehind=Whether to try and automatically cover up any gaps left below the split tilesets.\nRecommended to be used alongside tilesets using the "ignores" XML attribute.
+entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.backgroundTiles=Whether to split background tiles instead of solid tiles.\nChanging this requires clicking save changes and reopening this menu for the tiletype menu to show the correct options.
 
 # Dash Gate Block
 entities.SorbetHelper/DashGateBlock.placements.name.Both=Dash Gate Block (Both)
