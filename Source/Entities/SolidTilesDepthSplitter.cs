@@ -8,7 +8,8 @@ using Monocle;
 
 namespace Celeste.Mod.SorbetHelper.Entities;
 
-[GlobalEntity("SorbetHelper/SolidTilesDepthSplitter")]
+[GlobalEntity]
+[CustomEntity("SorbetHelper/SolidTilesDepthSplitter")]
 public class SolidTilesDepthSplitter : Entity {
     private SolidTiles SolidTiles => (Scene as Level)?.SolidTiles;
     private AnimatedTiles AnimatedTiles => (Scene as Level)?.SolidTiles.AnimatedTiles;
@@ -20,7 +21,7 @@ public class SolidTilesDepthSplitter : Entity {
 
     public SolidTilesDepthSplitter(EntityData data, Vector2 _) : base() {
         Depth = data.Int("depth", Depths.FGDecals - 10);
-        tiletypes = data.Attr("tiletypes", "3").Split(',').Select(tiletype => tiletype.FirstOrDefault('0')).ToHashSet();
+        tiletypes = data.Attr("tiletypes", "3").ToHashSet();
         tiletypes.Remove('0');
 
         splitAnimatedTiles = data.Bool("splitAnimatedTiles", false);
