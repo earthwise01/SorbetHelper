@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4.2.2
 
     - name: Download Everest lib-stripped
       uses: robinraju/release-downloader@v1.4
@@ -35,7 +35,7 @@ jobs:
         CelestePrefix: ${{ github.workspace }}/lib-stripped
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v3.1.2
+      uses: actions/upload-artifact@v4.6.1
       with:
         name: SorbetHelper
         path: |
@@ -47,4 +47,4 @@ jobs:
           Dialog/**/*
           Graphics/**/*
           Loenn/**/*
-          Effects/**/*.fxb
+          Effects/**/*.cso
