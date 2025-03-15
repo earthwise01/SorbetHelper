@@ -22,7 +22,6 @@ public class ParallaxHiResSnow : Backdrop {
         public float Sin;
         public float Rotation;
         public Vector2 Position;
-        public Vector2 RenderPosition;
 
         public void Reset(Vector2 direction, ParallaxHiResSnow backdrop) {
             float num = Calc.Random.NextFloat();
@@ -125,9 +124,6 @@ public class ParallaxHiResSnow : Backdrop {
         if (FadeY != null)
             cameraFade *= FadeY.Value(level.Camera.Y + Util.CameraHeight / 2f);
 
-        // bwehh
-        var cameraPosLarge = (level.Camera.Position.Floor() + Util.ZoomCenterOffset) * UpscaleAmount;
-
         for (int i = 0; i < particles.Length; i++) {
             ref var particle = ref particles[i];
 
@@ -141,9 +137,6 @@ public class ParallaxHiResSnow : Backdrop {
             // if (particle.RenderPosition.X < -EdgePaddingAmount || particle.RenderPosition.X > (1920 + EdgePaddingAmount) || particle.RenderPosition.Y < -EdgePaddingAmount || particle.RenderPosition.Y > (1080 + EdgePaddingAmount)) {
             //     particle.Reset(Direction, this);
             // }
-
-            particle.RenderPosition.X = -OffscreenPaddingSize + Mod(particle.Position.X - cameraPosLarge.X * particle.Scroll.X, 1920 + OffscreenPaddingSize * 2);
-            particle.RenderPosition.Y = -OffscreenPaddingSize + Mod(particle.Position.Y - cameraPosLarge.Y * particle.Scroll.Y, 1080 + OffscreenPaddingSize * 2);
         }
     }
 
@@ -161,41 +154,43 @@ public class ParallaxHiResSnow : Backdrop {
             stretchScale = new Vector2(stretchSpeed, 0.2f + (1f - stretchSpeed / 20f) * 0.8f);
         }
 
-        // zoom (out) support, kinda based on https://github.com/Ikersfletch/ExCameraDynamics/blob/main/Code/Backdrops/ZoomParticleParallax.cs
+        // zoom (out) support is kinda based on https://github.com/Ikersfletch/ExCameraDynamics/blob/main/Code/Backdrops/ZoomParticleParallax.cs
         // could've maybe gone for a depth based approach where the "distance" of the particles determines how affected they are by the "zoom" but eh idk this works
-        if (Util.ZoomOutActive) {
-            Vector2 zoomCenterOffset = Util.ZoomCenterOffset * UpscaleAmount;
 
-            for (int i = 0; i < particles.Length; i++) {
-                var renderPosition = particles[i].RenderPosition + zoomCenterOffset;
-                renderPosition.X = -OffscreenPaddingSize + Mod(OffscreenPaddingSize + renderPosition.X, 1920 + OffscreenPaddingSize * 2);
-                renderPosition.Y = -OffscreenPaddingSize + Mod(OffscreenPaddingSize + renderPosition.Y, 1080 + OffscreenPaddingSize * 2);
-
-                var particleColor = color;
-                if (particles[i].Alpha < 1f)
-                    particleColor *= particles[i].Alpha;
-
-                if (additiveMultiplier < 1f)
-                    particleColor = new(particleColor.R, particleColor.G, particleColor.B, (int)(particleColor.A * additiveMultiplier));
-
-                for (int x = 0; x < Util.CameraWidth * UpscaleAmount + OffscreenPaddingSize; x += 1920 + OffscreenPaddingSize * 2)
-                    for (int y = 0; y < Util.CameraHeight * UpscaleAmount + OffscreenPaddingSize; y += 1080 + OffscreenPaddingSize * 2)
-                        particleTexture.DrawCentered(renderPosition + new Vector2(x, y), particleColor, stretchScale * particles[i].Scale, shouldStretch ? stretchRotate : particles[i].Rotation);
-            }
-
-            return;
-        }
+        // bwehh
+        var zoomCenterOffset = Util.ZoomCenterOffset * UpscaleAmount;
+        var cameraPosLarge = (scene as Level).Camera.Position.Floor() * UpscaleAmount + zoomCenterOffset;
 
         for (int i = 0; i < particles.Length; i++) {
+            ref var particle = ref particles[i];
+
+            var renderPosition = new Vector2() {
+                X = -OffscreenPaddingSize + Mod(particle.Position.X - cameraPosLarge.X * particle.Scroll.X, 1920 + OffscreenPaddingSize * 2),
+                Y = -OffscreenPaddingSize + Mod(particle.Position.Y - cameraPosLarge.Y * particle.Scroll.Y, 1080 + OffscreenPaddingSize * 2)
+            };
+
+            // i dont remember why i did so much stuff again here and i dont feel like testing rn so   yay
+            if (Util.ZoomOutActive) {
+                renderPosition += zoomCenterOffset;
+                renderPosition.X = -OffscreenPaddingSize + Mod(OffscreenPaddingSize + renderPosition.X, 1920 + OffscreenPaddingSize * 2);
+                renderPosition.Y = -OffscreenPaddingSize + Mod(OffscreenPaddingSize + renderPosition.Y, 1080 + OffscreenPaddingSize * 2);
+            }
+
             var particleColor = color;
-            if (particles[i].Alpha < 1f)
-                particleColor *= particles[i].Alpha;
+            if (particle.Alpha < 1f)
+                particleColor *= particle.Alpha;
 
             // additive blending!! i love premultiplied alpha
             if (additiveMultiplier < 1f)
                 particleColor = new(particleColor.R, particleColor.G, particleColor.B, (int)(particleColor.A * additiveMultiplier));
 
-            particleTexture.DrawCentered(particles[i].RenderPosition, particleColor, stretchScale * particles[i].Scale, shouldStretch ? stretchRotate : particles[i].Rotation);
+            if (!Util.ZoomOutActive) {
+                particleTexture.DrawCentered(renderPosition, particleColor, stretchScale * particle.Scale, shouldStretch ? stretchRotate : particle.Rotation);
+            } else {
+                for (int x = 0; x < Util.CameraWidth * UpscaleAmount + OffscreenPaddingSize; x += 1920 + OffscreenPaddingSize * 2)
+                    for (int y = 0; y < Util.CameraHeight * UpscaleAmount + OffscreenPaddingSize; y += 1080 + OffscreenPaddingSize * 2)
+                        particleTexture.DrawCentered(renderPosition + new Vector2(x, y), particleColor, stretchScale * particles[i].Scale, shouldStretch ? stretchRotate : particles[i].Rotation);
+            }
         }
     }
 
