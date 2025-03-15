@@ -13,7 +13,8 @@ depthSplitter.placements = {
     data = {
         depth = -10510,
         tiletypes = "3",
-        splitAnimatedTiles = false
+        splitAnimatedTiles = false,
+        tryFillBehind = false
     }
 }
 
