@@ -107,7 +107,7 @@ public class SolidTilesDepthSplitter : Entity {
             if (!tiletypes.Contains(c))
                 return c;
 
-            var lookup = GFX.FGAutotiler.lookup;
+            var lookup = autotiler.lookup;
             // up, down, left, right (no diagonals)
             var neighbours = new char[4] {tileData[x, y - 1], tileData[x, y + 1], tileData[x - 1, y], tileData[x + 1, y]};
 
