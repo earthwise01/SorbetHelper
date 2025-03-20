@@ -161,7 +161,6 @@ public class StylegroundEntityControllerNoConsume : Entity {
             foreach (string tag in backdrop.Tags) {
                 if (tag == StylegroundTag && Current.Add(backdrop)) {
                     into.Insert(0, backdrop);
-                    return;
                 }
             }
         }
