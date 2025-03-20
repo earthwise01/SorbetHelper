@@ -1,0 +1,190 @@
+using System;
+using Microsoft.Xna.Framework;
+using Monocle;
+using Celeste.Mod.Entities;
+using Celeste.Mod.SorbetHelper.Utils;
+using System.Collections.Generic;
+using System.Linq;
+using System.Globalization;
+
+namespace Celeste.Mod.SorbetHelper.Entities;
+
+[GlobalEntity]
+[CustomEntity("SorbetHelper/MusicSyncController")]
+
+// i   give up on the fmod api .  callbacks?? no thanks sorry im just going to do this myself i cant rly notice any additional desync anyway
+public class MusicSyncController : Entity {
+    public readonly record struct Marker(string Name, int Position);
+    public readonly record struct TempoMarker(float Tempo, int TimeSigUpper, int TimeSigLower, int Position);
+
+    private readonly string eventName;
+    private readonly HashSet<TempoMarker> tempoMarkers = [];
+    private readonly HashSet<Marker> markers = [];
+
+    private readonly string sessionPrefix;
+
+    private readonly bool showDebugUI;
+
+    public MusicSyncController(EntityData data, Vector2 _) {
+        eventName = data.Attr("eventName");
+
+        var tempoMarkersRaw = data.Attr("tempoMarkers", "120-4-4-0");
+        foreach (var raw in tempoMarkersRaw.Split(','))
+            if (ParseTempoMarker(raw, out var tempoMarker))
+                tempoMarkers.Add(tempoMarker);
+
+        var markersRaw = data.Attr("markers");
+        foreach (var raw in markersRaw.Split(','))
+            if (ParseMarker(raw, out var marker))
+                markers.Add(marker);
+
+        sessionPrefix = data.Attr("sessionPrefix", "musicSync");
+
+        if (showDebugUI = data.Bool("showDebugUI", false))
+            Tag |= TagsExt.SubHUD;
+
+        Tag |= Tags.TransitionUpdate;
+    }
+
+    // format: tempo-timeSigUpper-timeSigLower-position
+    private static bool ParseTempoMarker(string raw, out TempoMarker marker) {
+        marker = default;
+
+        var split = raw.Split('-');
+        if (split.Length != 4)
+            return false;
+
+        if (!float.TryParse(split[0], NumberStyles.Float, CultureInfo.InvariantCulture, out var tempo))
+            return false;
+
+        if (!int.TryParse(split[1], out var timeSigUpper))
+            return false;
+        if (!int.TryParse(split[2], out var timeSigLower))
+            return false;
+
+        if (!int.TryParse(split[3], out var position))
+            return false;
+
+        marker = new TempoMarker(tempo, timeSigUpper, timeSigLower, position);
+
+        return true;
+    }
+
+    // format: name-position
+    private static bool ParseMarker(string raw, out Marker marker) {
+        marker = default;
+
+        var split = raw.Split('-');
+        if (split.Length != 2)
+            return false;
+
+        var name = split[0];
+        if (string.IsNullOrEmpty(name))
+            return false;
+
+        if (!int.TryParse(split[1], out var position))
+            return false;
+
+        marker = new Marker(name, position);
+
+        return true;
+    }
+
+    private int currentBar, currentBeat, currentTimelinePos;
+    private TempoMarker? currentTempoMarker;
+    private Marker? currentMarker;
+
+    private void UpdateValues() {
+        if (Scene is not Level level)
+            return;
+
+        // reset stuff if the event isn't playing
+        if (!string.IsNullOrEmpty(eventName) && Audio.CurrentMusic != eventName) {
+            currentTimelinePos = 0;
+            currentBar = currentBeat = 1;
+            currentTempoMarker = null;
+            currentMarker = null;
+        // otherwise update the markers using the timeline position
+        } else {
+            // get timeline position
+            var music = Audio.CurrentMusicEventInstance;
+            music.getTimelinePosition(out currentTimelinePos);
+
+            // get tempo marker (null means no marker)
+            currentTempoMarker = null;
+            foreach (var marker in tempoMarkers)
+                if (currentTimelinePos >= marker.Position)
+                    currentTempoMarker = marker;
+
+            // get beat/bar
+            if (currentTempoMarker is { } tempoMarker) {
+                var beat = (int)MathF.Floor(currentTimelinePos / (60f / (tempoMarker.Tempo * tempoMarker.TimeSigLower / 4f) * 1000f));
+                currentBar = 1 + beat / tempoMarker.TimeSigUpper;
+                currentBeat = 1 + beat % tempoMarker.TimeSigUpper;
+            } else {
+                currentBar = currentBeat = 1;
+            }
+
+            // get marker (null means no marker)
+            currentMarker = null;
+            foreach (var marker in markers)
+                if (currentTimelinePos >= marker.Position)
+                    currentMarker = marker;
+        }
+
+        // set flags/counters
+        var session = level.Session;
+        session.SetCounter(sessionPrefix + "_bar", currentBar);
+        session.SetCounter(sessionPrefix + "_beat", currentBeat);
+        session.SetCounter(sessionPrefix + "_timeline", currentTimelinePos);
+        foreach (var marker in markers) {
+            var flagName = sessionPrefix + "_" + marker.Name;
+            var isCurrent = marker == currentMarker;
+
+            if (session.GetFlag(flagName) != isCurrent)
+                session.SetFlag(flagName, isCurrent);
+        }
+    }
+
+    public override void Added(Scene scene) {
+        base.Added(scene);
+        UpdateValues();
+    }
+
+    public override void Update() {
+        base.Update();
+        UpdateValues();
+    }
+
+    public override void Render() {
+        base.Render();
+
+        // im so good at coding
+        if (!showDebugUI || (!string.IsNullOrEmpty(eventName) && Audio.CurrentMusic != eventName))
+            return;
+
+        var debugText =  $"{(string.IsNullOrEmpty(eventName) ? "Music Sync" : eventName)}\n";
+
+        // tempo
+        if (currentTempoMarker is { } tempoMarker)
+            debugText += $"""
+                          {tempoMarker.TimeSigUpper}/{tempoMarker.TimeSigLower} {tempoMarker.Tempo}bpm
+                          Bar {currentBar}
+                          Beat {currentBeat}
+
+                          """;
+        else
+            debugText += "\n\n\n";
+
+        // marker
+        if (currentMarker is { } marker)
+            debugText += $"Marker {marker.Name} @ {marker.Position}ms\n";
+        else
+            debugText += "Marker n/a\n";
+
+        debugText += $"Timeline {currentTimelinePos}ms";
+
+
+        ActiveFont.DrawOutline(debugText, new Vector2(96, 1020), new Vector2(0f, 1f), Vector2.One, Color.White, 2f, Color.Black);
+    }
+}
