@@ -89,6 +89,7 @@ public class SorbetHelperModule : EverestModule {
         AlternateInteractPromptWrapper.Unload();
         MiniPopupDisplay.Unload();
         ReturnBubbleBehaviorController.Unload();
+        StylegroundEntityControllerNoConsume.UnloadIfNeeded();
 
         // components
         RenderOverride.Unload();
