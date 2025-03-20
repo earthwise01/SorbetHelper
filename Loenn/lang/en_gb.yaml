@@ -673,7 +673,7 @@ Entities:
             flags:
             - "{prefix}_{currentMarker}"
 
-          - due to a few factors (incl celeste running at 60fps and this maybe being the best implementation), there is almost guaranteed to be some small amount of desync.
+          - due to a few factors (incl celeste running at 60fps and this maybe not being the best implementation), there is almost guaranteed to be some small amount of desync.
             that said from the small amount of testing i've done, this probably won't be particularly noticable in most cases but it is probably worth mentioning.
 
           - while it might technicallyy be possible just use the markers directly from the fmod events,
