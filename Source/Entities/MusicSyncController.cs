@@ -44,6 +44,7 @@ public class MusicSyncController : Entity {
             Tag |= TagsExt.SubHUD;
 
         Tag |= Tags.TransitionUpdate;
+        Depth = -1;
     }
 
     // format: tempo-timeSigUpper-timeSigLower-position
@@ -99,15 +100,15 @@ public class MusicSyncController : Entity {
             return;
 
         // reset stuff if the event isn't playing
-        if (!string.IsNullOrEmpty(eventName) && Audio.CurrentMusic != eventName) {
+        var music = Audio.CurrentMusicEventInstance;
+        if (music is null || (!string.IsNullOrEmpty(eventName) && Audio.CurrentMusic != eventName)) {
             currentTimelinePos = 0;
-            currentBar = currentBeat = 1;
+            currentBar = currentBeat = 0;
             currentTempoMarker = null;
             currentMarker = null;
         // otherwise update the markers using the timeline position
         } else {
             // get timeline position
-            var music = Audio.CurrentMusicEventInstance;
             music.getTimelinePosition(out currentTimelinePos);
 
             // get tempo marker (null means no marker)
@@ -122,7 +123,7 @@ public class MusicSyncController : Entity {
                 currentBar = 1 + beat / tempoMarker.TimeSigUpper;
                 currentBeat = 1 + beat % tempoMarker.TimeSigUpper;
             } else {
-                currentBar = currentBeat = 1;
+                currentBar = currentBeat = 0;
             }
 
             // get marker (null means no marker)
@@ -137,12 +138,14 @@ public class MusicSyncController : Entity {
         session.SetCounter(sessionPrefix + "_bar", currentBar);
         session.SetCounter(sessionPrefix + "_beat", currentBeat);
         session.SetCounter(sessionPrefix + "_timeline", currentTimelinePos);
+
+        var currentMarkerFlag = currentMarker.HasValue ? sessionPrefix + "_" + currentMarker.Value.Name : null;
         foreach (var marker in markers) {
             var flagName = sessionPrefix + "_" + marker.Name;
-            var isCurrent = marker == currentMarker;
+            var isCurrentFlag = flagName == currentMarkerFlag;
 
-            if (session.GetFlag(flagName) != isCurrent)
-                session.SetFlag(flagName, isCurrent);
+            if (session.GetFlag(flagName) != isCurrentFlag)
+                session.SetFlag(flagName, isCurrentFlag);
         }
     }
 

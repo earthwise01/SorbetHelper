@@ -5,7 +5,7 @@ local sorbetUtils = require("mods").requireFromPlugin("libraries.utils")
 local controller = {}
 
 controller.name = "SorbetHelper/MusicSyncController"
-controller.sprite = sorbetUtils.getControllerSpriteFunction(nil, true)
+controller.sprite = sorbetUtils.getControllerSpriteFunction("musicSyncController", true)
 controller.depth = -1000010
 controller.placements = {
     name = "controller",

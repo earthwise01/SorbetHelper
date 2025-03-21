@@ -630,7 +630,7 @@ Entities:
   SorbetHelper/MusicSyncController:
     Placements:
       controller:
-        Name: Music Session Sync Controller
+        Name: Music Session Sync Controller {experimental}
     Attributes:
       eventName:
         Description: The name of the event this controller should be active for.
@@ -660,9 +660,16 @@ Entities:
         Description: |-
           ~~~ info/random notes ~~~
 
-          - i recommend to try and only use this for visual effects and not gameplay unless you have a good reason
+          - activator triggers and session expressions from frost helper might be useful with this due to their support for counters and ability for complex logic.
 
-          - activator triggers and session expressions from frost helper might be useful with this, due to their support for counters and ability for complex logic.
+          - i recommend to mainly use this for visual effects and not gameplay unless you have a good reason.
+
+          - due to a few factors (incl celeste running at 60fps and this maybe not being the best implementation(?)), there is likely some potential for desync.
+            that said from the small amount of testing i've done it hopefully won't be particularly noticable in most cases.
+
+          - while it might technicallyy be possible just use the markers directly from the fmod events,
+            that method involves interfacing with the fmod api closer than i felt comfortable with so for now you are required to input them manually.
+            (make sure to check the tooltips for the formats!)
 
           - the flags/counters set by this controller are:
             counters:
@@ -673,13 +680,6 @@ Entities:
             flags:
             - "{prefix}_{currentMarker}"
 
-          - due to a few factors (incl celeste running at 60fps and this maybe not being the best implementation), there is almost guaranteed to be some small amount of desync.
-            that said from the small amount of testing i've done, this probably won't be particularly noticable in most cases but it is probably worth mentioning.
-
-          - while it might technicallyy be possible just use the markers directly from the fmod events,
-            that method involves interfacing with the fmod api closer than i felt comfortable with so as of now you are required to input them manually
-            (make sure to check the tooltips for the formats!)
-          
         # (technical: this controller handles the logic of checking all the markers itself which   yes is kinda stupid when fmod supports that already,
         #  but doing that makes you interact with the native libraries much closer than i feel confident in doing and from empirical testing i didn't notice any new desyncs with this method so   yay)
 
