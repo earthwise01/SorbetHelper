@@ -630,7 +630,7 @@ Entities:
   SorbetHelper/MusicSyncController:
     Placements:
       controller:
-        Name: Music Session Sync Controller {experimental}
+        Name: Music Session Sync Controller [Experimental]
     Attributes:
       eventName:
         Description: The name of the event this controller should be active for.
@@ -650,9 +650,10 @@ Entities:
           A comma separated list of tempo markers. These are used to determine what to set the beat and bar counters to.
           Marker format is "tempo-timeSigUpper-timeSigLower-positionMs", e.g. "120-4-4-0". 
       markers:
+        Name: Timeline Markers
         Description: |-
-          A comma separated list of markers. These are used to set flags based on the timeline position.
-          Marker format is "name-positionMs", e.g. "SectionA-10000".
+          A comma separated list of timeline markers. These are used to set flags based on the timeline position. Multiple markers can have the same name.
+          Marker format is "name-positionMs" or "name-startPosition-endPosition", e.g. "SectionA-10000" or "SectionB-5000-15000".
       showDebugUI:
         Description: Whether to show the current state of the controller on-screen.
       _infoButton:

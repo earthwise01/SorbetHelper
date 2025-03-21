@@ -19,6 +19,14 @@ controller.placements = {
 }
 
 controller.fieldInformation = {
+    tempoMarkers = {
+        fieldType = "list",
+        elementDefault = "120-4-4-0"
+    },
+    markers = {
+        fieldType = "list",
+        elementDefault = "Marker-1000"
+    },
     _infoButton = {
         fieldType = "sorbetHelper.infoButton"
     }

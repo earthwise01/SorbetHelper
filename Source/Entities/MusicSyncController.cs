@@ -12,14 +12,14 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [GlobalEntity]
 [CustomEntity("SorbetHelper/MusicSyncController")]
 
-// i   give up on the fmod api .  callbacks?? no thanks sorry im just going to do this myself i cant rly notice any additional desync anyway
+// i   give up on the fmod api .  callbacks?? no thanks sorry im just going to do this myself i cant rly notice any real difference anyway
 public class MusicSyncController : Entity {
-    public readonly record struct Marker(string Name, int Position);
+    public readonly record struct TimelineMarker(string Name, int Position, int EndPosition);
     public readonly record struct TempoMarker(float Tempo, int TimeSigUpper, int TimeSigLower, int Position);
 
     private readonly string eventName;
     private readonly HashSet<TempoMarker> tempoMarkers = [];
-    private readonly HashSet<Marker> markers = [];
+    private readonly HashSet<TimelineMarker> timelineMarkers = [];
 
     private readonly string sessionPrefix;
 
@@ -30,13 +30,13 @@ public class MusicSyncController : Entity {
 
         var tempoMarkersRaw = data.Attr("tempoMarkers", "120-4-4-0");
         foreach (var raw in tempoMarkersRaw.Split(','))
-            if (ParseTempoMarker(raw, out var tempoMarker))
-                tempoMarkers.Add(tempoMarker);
+            if (ParseTempoMarker(raw, out var marker))
+                tempoMarkers.Add(marker);
 
         var markersRaw = data.Attr("markers");
         foreach (var raw in markersRaw.Split(','))
-            if (ParseMarker(raw, out var marker))
-                markers.Add(marker);
+            if (ParseTimelineMarker(raw, out var marker))
+                timelineMarkers.Add(marker);
 
         sessionPrefix = data.Attr("sessionPrefix", "musicSync");
 
@@ -52,7 +52,7 @@ public class MusicSyncController : Entity {
         marker = default;
 
         var split = raw.Split('-');
-        if (split.Length != 4)
+        if (split.Length < 4)
             return false;
 
         if (!float.TryParse(split[0], NumberStyles.Float, CultureInfo.InvariantCulture, out var tempo))
@@ -72,11 +72,11 @@ public class MusicSyncController : Entity {
     }
 
     // format: name-position
-    private static bool ParseMarker(string raw, out Marker marker) {
+    private static bool ParseTimelineMarker(string raw, out TimelineMarker marker) {
         marker = default;
 
         var split = raw.Split('-');
-        if (split.Length != 2)
+        if (split.Length < 2)
             return false;
 
         var name = split[0];
@@ -86,14 +86,17 @@ public class MusicSyncController : Entity {
         if (!int.TryParse(split[1], out var position))
             return false;
 
-        marker = new Marker(name, position);
+        if (split.Length >= 3 && int.TryParse(split[2], out var endPosition))
+            marker = new TimelineMarker(name, position, endPosition);
+        else
+            marker = new TimelineMarker(name, position, -1);
 
         return true;
     }
 
     private int currentBar, currentBeat, currentTimelinePos;
     private TempoMarker? currentTempoMarker;
-    private Marker? currentMarker;
+    private TimelineMarker? currentTimelineMarker;
 
     private void UpdateValues() {
         if (Scene is not Level level)
@@ -105,7 +108,7 @@ public class MusicSyncController : Entity {
             currentTimelinePos = 0;
             currentBar = currentBeat = 0;
             currentTempoMarker = null;
-            currentMarker = null;
+            currentTimelineMarker = null;
         // otherwise update the markers using the timeline position
         } else {
             // get timeline position
@@ -114,7 +117,7 @@ public class MusicSyncController : Entity {
             // get tempo marker (null means no marker)
             currentTempoMarker = null;
             foreach (var marker in tempoMarkers)
-                if (currentTimelinePos >= marker.Position)
+                if (currentTimelinePos >= marker.Position && currentTempoMarker?.Position < marker.Position)
                     currentTempoMarker = marker;
 
             // get beat/bar
@@ -127,10 +130,10 @@ public class MusicSyncController : Entity {
             }
 
             // get marker (null means no marker)
-            currentMarker = null;
-            foreach (var marker in markers)
-                if (currentTimelinePos >= marker.Position)
-                    currentMarker = marker;
+            currentTimelineMarker = null;
+            foreach (var marker in timelineMarkers)       // don't replace the current marker with one earlier  // only care about the end position if it's greater than the start position
+                if (currentTimelinePos >= marker.Position && currentTimelineMarker?.Position <= marker.Position && (marker.EndPosition <= marker.Position || currentTimelinePos < marker.EndPosition))
+                    currentTimelineMarker = marker;
         }
 
         // set flags/counters
@@ -139,8 +142,8 @@ public class MusicSyncController : Entity {
         session.SetCounter(sessionPrefix + "_beat", currentBeat);
         session.SetCounter(sessionPrefix + "_timeline", currentTimelinePos);
 
-        var currentMarkerFlag = currentMarker.HasValue ? sessionPrefix + "_" + currentMarker.Value.Name : null;
-        foreach (var marker in markers) {
+        var currentMarkerFlag = currentTimelineMarker.HasValue ? sessionPrefix + "_" + currentTimelineMarker.Value.Name : null;
+        foreach (var marker in timelineMarkers) {
             var flagName = sessionPrefix + "_" + marker.Name;
             var isCurrentFlag = flagName == currentMarkerFlag;
 
@@ -180,7 +183,7 @@ public class MusicSyncController : Entity {
             debugText += "\n\n\n";
 
         // marker
-        if (currentMarker is { } marker)
+        if (currentTimelineMarker is { } marker)
             debugText += $"Marker {marker.Name} @ {marker.Position}ms\n";
         else
             debugText += "Marker n/a\n";
