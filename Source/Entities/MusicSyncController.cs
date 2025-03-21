@@ -117,7 +117,7 @@ public class MusicSyncController : Entity {
             // get tempo marker (null means no marker)
             currentTempoMarker = null;
             foreach (var marker in tempoMarkers)
-                if (currentTimelinePos >= marker.Position && currentTempoMarker?.Position < marker.Position)
+                if (currentTimelinePos >= marker.Position && currentTempoMarker.GetValueOrDefault().Position <= marker.Position)
                     currentTempoMarker = marker;
 
             // get beat/bar
@@ -132,7 +132,7 @@ public class MusicSyncController : Entity {
             // get marker (null means no marker)
             currentTimelineMarker = null;
             foreach (var marker in timelineMarkers)       // don't replace the current marker with one earlier  // only care about the end position if it's greater than the start position
-                if (currentTimelinePos >= marker.Position && currentTimelineMarker?.Position <= marker.Position && (marker.EndPosition <= marker.Position || currentTimelinePos < marker.EndPosition))
+                if (currentTimelinePos >= marker.Position && currentTimelineMarker.GetValueOrDefault().Position <= marker.Position && (marker.EndPosition <= marker.Position || currentTimelinePos < marker.EndPosition))
                     currentTimelineMarker = marker;
         }
 
