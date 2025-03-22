@@ -58,6 +58,7 @@ public class SorbetHelperModule : EverestModule {
         AlternateInteractPromptWrapper.Load();
         MiniPopupDisplay.Load();
         ReturnBubbleBehaviorController.Load();
+        MusicSyncControllerFMOD.Load();
 
         // components
         RenderOverride.Load();
@@ -90,6 +91,7 @@ public class SorbetHelperModule : EverestModule {
         MiniPopupDisplay.Unload();
         ReturnBubbleBehaviorController.Unload();
         StylegroundEntityControllerNoConsume.UnloadIfNeeded();
+        MusicSyncControllerFMOD.Unload();
 
         // components
         RenderOverride.Unload();
