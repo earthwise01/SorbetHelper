@@ -20,6 +20,7 @@ internal static class GlobalEntities {
 
     private static bool LoadingGlobalEntities = false;
 
+    private static bool IsGlobalEntity(EntityData entityData) => GlobalEntityIDs.Contains(entityData.Name) || (entityData.Values?.ContainsKey(ForceGlobalAttribute) ?? false);
     private static void Event_OnLoadingThread(Level level) {
         OnlyOneLoaded.Clear();
 
@@ -36,7 +37,7 @@ internal static class GlobalEntities {
                 var loaded = new List<Entity>();
                 foreach (var entityData in levelData.Entities) {
                     var name = entityData.Name;
-                    if ((!GlobalEntityIDs.Contains(name) && !entityData.Values.ContainsKey(ForceGlobalAttribute)) || OnlyOneLoaded.Contains(name))
+                    if (!IsGlobalEntity(entityData) || OnlyOneLoaded.Contains(name))
                         continue;
 
                     level.LoadAndGetCustomEntity(entityData, loaded);
@@ -63,7 +64,7 @@ internal static class GlobalEntities {
 
     // don't load global entities in Level.LoadCustomEntity
     private static bool Event_OnLoadEntity(Level level, LevelData levelData, Vector2 offset, EntityData entityData) {
-        if (!LoadingGlobalEntities && (GlobalEntityIDs.Contains(entityData.Name) || entityData.Values.ContainsKey(ForceGlobalAttribute)))
+        if (!LoadingGlobalEntities && IsGlobalEntity(entityData))
             return true;
 
         return false;
