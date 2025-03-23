@@ -10,7 +10,7 @@ using MonoMod.Utils;
 using System.Collections.ObjectModel;
 
 namespace Celeste.Mod.SorbetHelper.Utils;
-public static class Util {
+internal static class Util {
     private static CrystalStaticSpinner rainbowSpinner;
     public static Color GetRainbowHue(Scene scene, Vector2 position) {
         rainbowSpinner ??= new CrystalStaticSpinner(Vector2.Zero, false, CrystalColor.Rainbow);
@@ -77,7 +77,7 @@ public static class Util {
     /// checks if a render target's dimensions match the gameplay buffers' and resizes it if not (for zoom out or otherwise nonstandard buffer size support)
     /// </summary>
     /// <param name="target">the virtual render target to resize</param>
-    public static void CheckResizeBuffer(VirtualRenderTarget target) {
+    public static void EnsureBufferSize(VirtualRenderTarget target) {
         if (target is null || target.IsDisposed || (target.Width == GameplayBufferWidth && target.Height == GameplayBufferHeight))
             return;
 

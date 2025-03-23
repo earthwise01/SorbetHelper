@@ -62,7 +62,7 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
                 BackdropRenderer.BeforeRender(level);
 
                 Buffer ??= VirtualContent.CreateRenderTarget("sorbethelper_stylegrounds_above_hud_buffer", Util.GameplayBufferWidth, Util.GameplayBufferHeight);
-                Util.CheckResizeBuffer(Buffer);
+                Util.EnsureBufferSize(Buffer);
 
                 Engine.Instance.GraphicsDevice.SetRenderTarget(Buffer);
                 Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
@@ -230,7 +230,7 @@ namespace Celeste.Mod.SorbetHelper.Backdrops {
                     self.EndSpritebatch();
 
                     AdditiveBuffers[i] ??= VirtualContent.CreateRenderTarget("sorbethelper_stylegrounds_above_hud_buffer_additive_" + i, Util.GameplayBufferWidth, Util.GameplayBufferHeight);
-                    Util.CheckResizeBuffer(AdditiveBuffers[i]);
+                    Util.EnsureBufferSize(AdditiveBuffers[i]);
 
                     Engine.Graphics.GraphicsDevice.SetRenderTarget(AdditiveBuffers[i]);
                     Engine.Graphics.GraphicsDevice.Clear(Color.Transparent);

@@ -10,7 +10,7 @@ using MonoMod.Utils;
 
 namespace Celeste.Mod.SorbetHelper.Utils;
 
-public static class RenderTargetHelper {
+internal static class RenderTargetHelper {
     private static Queue<VirtualRenderTarget> RenderTargets { get; set; } = [];
 
     /// <summary>
@@ -26,7 +26,7 @@ public static class RenderTargetHelper {
         if (cached.IsDisposed)
             cached = VirtualContent.CreateRenderTarget("sorbetHelper-tempBuffer", Util.GameplayBufferWidth, Util.GameplayBufferHeight);
         else
-            Util.CheckResizeBuffer(cached);
+            Util.EnsureBufferSize(cached);
 
         return cached;
     }
@@ -73,9 +73,9 @@ public static class RenderTargetHelper {
     /// </summary>
     public static void DisposeQueue() {
         try {
-            foreach (var vrt in RenderTargets) {
+            foreach (var vrt in RenderTargets)
                 vrt?.Dispose();
-            }
+
             RenderTargets.Clear();
         } catch (Exception e) {
             Logger.Error(nameof(SorbetHelper), $"???? literally how? {e}"); // this threw an error one time when reloading the mod and i cant replicate it anymore. fun!

@@ -59,13 +59,13 @@ internal static class Extensions {
     // level
 
     /// <summary>
-    /// Adds a custom entity to a Level and copies a reference to it into a list.
+    /// Adds a custom entity to a Level and copies a reference to all newly loaded entities into a list.
     /// </summary>
     /// <param name="level"></param>
     /// <param name="entityData">The EntityData to load.</param>
-    /// <param name="addTo">A list to add the loaded entity to.</param>
-    /// <param name="addToLevel">Whether to automatically add the loaded entity to the level.</param>
-    /// <returns>Whether the entity was loaded.</returns>
+    /// <param name="addTo">A list to add any loaded entities to.</param>
+    /// <param name="addToLevel">Whether to automatically any the loaded entities to the level.</param>
+    /// <returns>Whether an entity was loaded.</returns>
     public static bool LoadAndGetCustomEntity(this Level level, EntityData entityData, List<Entity> addTo, bool addToLevel = true) {
         var toAdd = level.Entities.ToAdd;
         var prevToAddCount = toAdd.Count;
@@ -76,36 +76,33 @@ internal static class Extensions {
         for (int i = prevToAddCount; i < toAdd.Count; i++)
             addTo.Add(toAdd[i]);
 
-        if (!addToLevel && prevToAddCount != toAdd.Count)
-            toAdd.RemoveRange(prevToAddCount + 1, toAdd.Count - prevToAddCount);
+        if (!addToLevel && prevToAddCount <= toAdd.Count)
+            toAdd.RemoveRange(prevToAddCount, toAdd.Count - prevToAddCount);
 
         return true;
     }
 
     /// <summary>
-    /// Adds a custom entity to a Level and returns a reference to it.
+    /// Adds a custom entity to a Level and returns a reference to it.<br/>
+    /// If loading the entity results in muliple entities being created at the same time, this only returns the first one loaded.
     /// </summary>
     /// <param name="level"></param>
     /// <param name="entityData">The EntityData to load.</param>
     /// <param name="addToLevel">Whether to automatically add the loaded entity to the level.</param>
-    /// <returns>The loaded entity.</returns>
+    /// <returns>The loaded entity, or null if none was created.</returns>
     public static Entity LoadAndGetCustomEntity(this Level level, EntityData entityData, bool addToLevel = true) {
-        var result = level.LoadAndGetCustomEntities(addToLevel, entityData);
-        return result.Count > 0 ? result[0] : null;
-    }
+        var toAdd = level.Entities.ToAdd;
+        var prevToAddCount = toAdd.Count;
 
-    /// <summary>
-    /// Adds custom entities to a level and returns a list containing references to all loaded entities.
-    /// </summary>
-    /// <param name="level"></param>
-    /// <param name="addToLevel">Whether to automatically add the loaded entities to the level.</param>
-    /// <param name="entityData">The EntityData to load.</param>
-    /// <returns></returns>
-    public static List<Entity> LoadAndGetCustomEntities(this Level level, bool addToLevel = true, params EntityData[] entityData) {
-        var result = new List<Entity>();
-        foreach (var entity in entityData)
-            level.LoadAndGetCustomEntity(entity, result, addToLevel);
-        return result;
+        if (!Level.LoadCustomEntity(entityData, level) || prevToAddCount <= toAdd.Count)
+            return null;
+
+        var entity = toAdd[prevToAddCount];
+
+        if (!addToLevel)
+            toAdd.RemoveAt(prevToAddCount);
+
+        return entity;
     }
 
     // misc

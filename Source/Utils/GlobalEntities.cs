@@ -9,7 +9,9 @@ using MonoMod.Utils;
 
 namespace Celeste.Mod.SorbetHelper.Utils;
 
-public static class GlobalEntities {
+internal static class GlobalEntities {
+    public const string ForceGlobalAttribute = "sorbetHelper_makeGlobal"; // could be useful idk
+
     // public static readonly Dictionary<string, Level.EntityLoader> EntityLoaders = [];
     public static readonly HashSet<string> GlobalEntityIDs = [];
     public static readonly HashSet<string> OnlyOneEntities = [];
@@ -31,22 +33,25 @@ public static class GlobalEntities {
             Calc.PushRandom(levelData.LoadSeed);
 
             try {
+                var loaded = new List<Entity>();
                 foreach (var entityData in levelData.Entities) {
                     var name = entityData.Name;
-                    if (!GlobalEntityIDs.Contains(name) || OnlyOneLoaded.Contains(name))
+                    if ((!GlobalEntityIDs.Contains(name) && !entityData.Values.ContainsKey(ForceGlobalAttribute)) || OnlyOneLoaded.Contains(name))
                         continue;
 
-                    var loaded = level.LoadAndGetCustomEntities(entityData: entityData);
-                    foreach (var entity in loaded)
-                        entity.Tag |= Tags.Global;
+                    level.LoadAndGetCustomEntity(entityData, loaded);
 
                     // wonder if i should make this result in only adding the entity with the highest id instead of the first found in the map,
                     // actually i wonder if this would be a good place for like    a mapdataprocessor or something idk
                     if (OnlyOneEntities.Contains(name))
                         OnlyOneLoaded.Add(name);
                 }
+
+                // apply the global tag
+                foreach (var entity in loaded)
+                    entity.Tag |= Tags.Global;
             } catch (Exception e) {
-                Logger.Error(nameof(SorbetHelper), $"error while loading global entities for room {levelData.Name} in map {mapData.Area.SID}! {e}");
+                Logger.Error(nameof(SorbetHelper), $"error while loading global entities for room {levelData.Name} in map {mapData.Area.SID}!\n {e}");
             }
 
             LoadingGlobalEntities = false;
@@ -58,7 +63,7 @@ public static class GlobalEntities {
 
     // don't load global entities in Level.LoadCustomEntity
     private static bool Event_OnLoadEntity(Level level, LevelData levelData, Vector2 offset, EntityData entityData) {
-        if (!LoadingGlobalEntities && GlobalEntityIDs.Contains(entityData.Name))
+        if (!LoadingGlobalEntities && (GlobalEntityIDs.Contains(entityData.Name) || entityData.Values.ContainsKey(ForceGlobalAttribute)))
             return true;
 
         return false;
@@ -92,13 +97,16 @@ public static class GlobalEntities {
                     ids[i] = customEntity.IDs[i].Split('=')[0].Trim();
             }
 
-            foreach (var id in ids) {
-                GlobalEntityIDs.Add(id);
-
-                if (onlyOne)
-                    OnlyOneEntities.Add(id);
-            }
+            foreach (var id in ids)
+                RegisterGlobalEntity(id, onlyOne);
         }
+    }
+
+    public static void RegisterGlobalEntity(string id, bool onlyOne) {
+        GlobalEntityIDs.Add(id);
+
+        if (onlyOne)
+            OnlyOneEntities.Add(id);
     }
 }
 

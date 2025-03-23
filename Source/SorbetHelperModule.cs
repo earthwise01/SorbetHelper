@@ -41,6 +41,7 @@ public class SorbetHelperModule : EverestModule {
         // mod interop
         typeof(GravityHelperImports).ModInterop();
         typeof(ExtendedCameraDynamicsImports).ModInterop();
+        typeof(SorbetHelperExports).ModInterop();
 
         // sorbet helper misc stuff
         On.Celeste.GameplayBuffers.Unload += On_GameplayBuffers_Unload;
