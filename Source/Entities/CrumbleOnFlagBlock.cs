@@ -14,7 +14,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
     [CustomEntity("SorbetHelper/CrumbleOnFlagBlock")]
     public class CrumbleOnFlagBlock : Solid {
         public TileGrid tiles;
-        public EffectCutout cutout;
+        public LightOcclude lightOcclude;
 
         private readonly char tileType;
         private readonly bool blendIn;
@@ -27,7 +27,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private readonly float fadeInTime;
 
         public CrumbleOnFlagBlock(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, data.Height, false) {
-            base.Depth = data.Int("depth", -10010);
+            Depth = data.Int("depth", -10010);
             tileType = data.Char("tiletype", '3');
             flag = data.Attr("flag", "");
             inverted = data.Bool("inverted", false);
@@ -38,31 +38,30 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             fadeInTime = data.Float("fadeInTime", 1f);
 
             SurfaceSoundIndex = SurfaceIndex.TileToIndex[tileType];
-            Add(cutout = new EffectCutout());
         }
 
         public override void Awake(Scene scene) {
             base.Awake(scene);
-            Level level = scene as Level;
+            var level = scene as Level;
 
             if (!blendIn) {
-                tiles = GFX.FGAutotiler.GenerateBox(tileType, (int)base.Width / 8, (int)base.Height / 8).TileGrid;
+                tiles = GFX.FGAutotiler.GenerateBox(tileType, (int)Width / 8, (int)Height / 8).TileGrid;
             } else {
-                Rectangle tileBounds = level.Session.MapData.TileBounds;
-                VirtualMap<char> solidsData = level.SolidsData;
-                int x = (int)(base.X / 8f) - tileBounds.Left;
-                int y = (int)(base.Y / 8f) - tileBounds.Top;
-                int tilesX = (int)base.Width / 8;
-                int tilesY = (int)base.Height / 8;
+                var tileBounds = level.Session.MapData.TileBounds;
+                var solidsData = level.SolidsData;
+                int x = (int)(X / 8f) - tileBounds.Left;
+                int y = (int)(Y / 8f) - tileBounds.Top;
+                int tilesX = (int)Width / 8;
+                int tilesY = (int)Height / 8;
                 tiles = GFX.FGAutotiler.GenerateOverlay(tileType, x, y, tilesX, tilesY, solidsData).TileGrid;
             }
 
             Add(tiles);
             Add(new TileInterceptor(tiles, highPriority: true));
-            Add(new LightOcclude());
+            Add(lightOcclude = new LightOcclude());
 
             if (CollideCheck<Player>() || level.Session.GetFlag(flag, inverted)) {
-                cutout.Alpha = tiles.Alpha = 0f;
+                lightOcclude.Alpha = tiles.Alpha = 0f;
                 Collidable = false;
 
                 if (destroyAttached)
@@ -74,7 +73,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             base.Update();
 
             if (!string.IsNullOrEmpty(flag)) {
-                if (!SceneAs<Level>().Session.GetFlag(flag, inverted)) {
+                if (!(Scene as Level).Session.GetFlag(flag, inverted)) {
                     if (!Collidable && !CollideCheck<Player>()) {
                         Collidable = true;
 
@@ -90,14 +89,14 @@ namespace Celeste.Mod.SorbetHelper.Entities {
 
             if (Collidable) {
                 if (fadeInTime <= 0f)
-                    cutout.Alpha = tiles.Alpha = 1f;
+                    lightOcclude.Alpha = tiles.Alpha = 1f;
                 else
-                    cutout.Alpha = tiles.Alpha = Calc.Approach(tiles.Alpha, 1f, Engine.DeltaTime / fadeInTime);
+                    lightOcclude.Alpha = tiles.Alpha = Calc.Approach(tiles.Alpha, 1f, Engine.DeltaTime / fadeInTime);
             }
         }
 
         public void Break() {
-            if (!Collidable || base.Scene == null)
+            if (!Collidable || Scene is null)
                 return;
 
             Collidable = false;
@@ -107,16 +106,16 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             if (playAudio)
                 Audio.Play(SFX.game_10_quake_rockbreak, Position);
             if (showDebris) {
-                for (int i = 0; i < base.Width / 8f; i++) {
-                    for (int j = 0; j < base.Height / 8f; j++) {
-                        if (!base.Scene.CollideCheck<Solid>(new Rectangle((int)base.X + i * 8, (int)base.Y + j * 8, 8, 8))) {
-                            base.Scene.Add(Engine.Pooler.Create<Debris>().Init(Position + new Vector2(4 + i * 8, 4 + j * 8), tileType, playSound: true).BlastFrom(base.TopCenter));
+                for (int i = 0; i < Width / 8f; i++) {
+                    for (int j = 0; j < Height / 8f; j++) {
+                        if (Scene.CollideCheck<Solid>(new Rectangle((int)X + i * 8, (int)Y + j * 8, 8, 8))) {
+                            Scene.Add(Engine.Pooler.Create<Debris>().Init(Position + new Vector2(4 + i * 8, 4 + j * 8), tileType, playSound: true).BlastFrom(TopCenter));
                         }
                     }
                 }
             }
 
-            cutout.Alpha = tiles.Alpha = 0f;
+            lightOcclude.Alpha = tiles.Alpha = 0f;
         }
     }
 }
