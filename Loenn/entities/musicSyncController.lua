@@ -4,28 +4,23 @@ local sorbetUtils = require("mods").requireFromPlugin("libraries.utils")
 
 local controller = {}
 
-controller.name = "SorbetHelper/MusicSyncController"
-controller.sprite = sorbetUtils.getControllerSpriteFunction("musicSyncController", true)
+controller.name = "SorbetHelper/MusicSyncControllerFMOD"
+controller.sprite = sorbetUtils.getControllerSpriteFunction("musicSyncController", true, true)
 controller.depth = -1000010
 controller.placements = {
     name = "controller",
     data = {
-        eventName = "",
-        tempoMarkers = "120-4-4-0",
-        markers = "Marker-1000",
-        sessionPrefix = "musicSync",
-        showDebugUI = false
+        eventNames = "",
+        showDebugUI = false,
+
+        _infoButton = true
     }
 }
 
 controller.fieldInformation = {
-    tempoMarkers = {
+    eventNames = {
         fieldType = "list",
-        elementDefault = "120-4-4-0"
-    },
-    markers = {
-        fieldType = "list",
-        elementDefault = "Marker-1000"
+        elementDefault = "event:/new_content/music/lvl10/final_run"
     },
     _infoButton = {
         fieldType = "sorbetHelper.infoButton"
@@ -34,9 +29,7 @@ controller.fieldInformation = {
 
 controller.fieldOrder = {
     "x", "y",
-    "tempoMarkers", "eventName",
-    "markers", "sessionPrefix",
-    "showDebugUI",
+    "eventNames", "showDebugUI",
     "_infoButton"
 }
 

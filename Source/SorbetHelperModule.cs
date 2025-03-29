@@ -15,6 +15,8 @@ public class SorbetHelperModule : EverestModule {
 
     public override Type SettingsType => typeof(SorbetHelperSettings);
     public static SorbetHelperSettings Settings => (SorbetHelperSettings)Instance._Settings;
+    public override Type SessionType => typeof(SorbetHelperSession);
+    public static SorbetHelperSession Session => (SorbetHelperSession)Instance._Session;
 
     public static bool ExtendedVariantsLoaded { get; private set; }
     public static bool ChronoHelperLoaded { get; private set; }

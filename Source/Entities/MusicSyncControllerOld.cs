@@ -10,9 +10,10 @@ using System.Globalization;
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [GlobalEntity]
-[CustomEntity("SorbetHelper/MusicSyncController")]
+[CustomEntity("SorbetHelper/MusicSyncControllerOld")]
 
 // i   give up on the fmod api .  callbacks?? no thanks sorry im just going to do this myself i cant rly notice any real difference anyway
+// updatee  nvm pt 2. dont like reimplementing markers ill just embrace the api instead
 public class MusicSyncController : Entity {
     public readonly record struct TimelineMarker(string Name, int Position, int EndPosition);
     public readonly record struct TempoMarker(float Tempo, int TimeSigUpper, int TimeSigLower, int Position);
