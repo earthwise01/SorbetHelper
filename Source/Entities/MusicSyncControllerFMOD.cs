@@ -24,15 +24,10 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 public class MusicSyncControllerFMOD : Entity {
     private const string sessionPrefix = "musicSync_";
 
-    private readonly HashSet<string> eventNames;
-    private bool CanAffectEvent(string eventName) => eventNames.Count == 0 || eventNames.Contains(eventName);
-
     private readonly bool showDebugUI;
 
     public MusicSyncControllerFMOD(EntityData data, Vector2 _) {
-        eventNames = data.List("eventNames", str => str).ToHashSet();
-
-        if (showDebugUI = data.Bool("showDebugUI", false))
+        if (Visible = showDebugUI = data.Bool("showDebugUI", false))
             Tag |= TagsExt.SubHUD;
 
         Tag |= Tags.TransitionUpdate;
@@ -76,12 +71,13 @@ public class MusicSyncControllerFMOD : Entity {
         public int MarkerPosition;
     }
 
-    private TimelineInfo fmodTimelineInfo, sessionTimelineInfo;
+    private TimelineInfo sessionTimelineInfo;
+    private static TimelineInfo fmodTimelineInfo;
 
     // these next 2 methods are all run on the audio thread
     // this means these are called: during freezeframes, when paused, *during lag*, etc
     // (just prepare the values here and actually update stuff in the entity's update method though)
-    private void HandleBeat(TIMELINE_BEAT_PROPERTIES parameters) {
+    private static void HandleBeat(TIMELINE_BEAT_PROPERTIES parameters) {
         fmodTimelineInfo.Bar = parameters.bar;
         fmodTimelineInfo.Beat = parameters.beat;
         fmodTimelineInfo.Tempo = parameters.tempo;
@@ -92,12 +88,12 @@ public class MusicSyncControllerFMOD : Entity {
         // (Scene as Level)?.Displacement.AddBurst(Scene.Tracker.GetEntity<Player>()?.Position ?? Vector2.One, 0.2f, 4f, 32f);
     }
 
-    private void HandleMarker(TIMELINE_MARKER_PROPERTIES parameters) {
+    private static void HandleMarker(TIMELINE_MARKER_PROPERTIES parameters) {
         fmodTimelineInfo.Marker.nativeUtf8Ptr = parameters.name;
         fmodTimelineInfo.MarkerPosition = parameters.position;
     }
 
-    private void ResetTimelineInfo() {
+    private static void ResetTimelineInfo() {
         fmodTimelineInfo.Bar = 0;
         fmodTimelineInfo.Beat = 0;
         fmodTimelineInfo.Tempo = 0;
@@ -108,6 +104,7 @@ public class MusicSyncControllerFMOD : Entity {
     }
 
     private static EventInstance musicSyncEvent = null;
+    private static bool CanAffectEvent(HashSet<string> eventNames, string eventName) => eventNames.Count == 0 || eventNames.Contains(eventName);
     private static void UpdateMusicSyncEvent() {
         var eventInstance = Audio.CurrentMusicEventInstance;
         var eventPath = Audio.CurrentMusic;
@@ -115,10 +112,13 @@ public class MusicSyncControllerFMOD : Entity {
         if (eventInstance != musicSyncEvent) {
             musicSyncEvent?.setCallback(null, 0u);
 
-            var controller = Engine.Scene?.Tracker.GetEntity<MusicSyncControllerFMOD>();
-            controller?.ResetTimelineInfo();
+            HashSet<string> eventNames = null;
+            var areaKey = SaveData.Instance?.CurrentSession_Safe?.Area; // hm is there a better way to get this
+            var hasController = areaKey.HasValue && SorbetHelperMapDataProcessor.MusicSyncEvents.TryGetValue((areaKey.Value.ID, areaKey.Value.Mode), out eventNames);
 
-            if (controller is not null && controller.CanAffectEvent(eventPath))
+            ResetTimelineInfo();
+
+            if (hasController && CanAffectEvent(eventNames, eventPath))
                 (musicSyncEvent = eventInstance)?.setCallback(MusicCallback, EVENT_CALLBACK_TYPE.TIMELINE_MARKER | EVENT_CALLBACK_TYPE.TIMELINE_BEAT);
             else
                 musicSyncEvent = null;
@@ -132,21 +132,15 @@ public class MusicSyncControllerFMOD : Entity {
     }
 
     private static FMOD.RESULT MusicCallback(EVENT_CALLBACK_TYPE callbackType, nint instancePtr, nint parametersPtr) {
-        // don't do anything if there's no controller
-        // maybee i couldve linked the callback directly to the controller like the communal helper reference but like i don't know  native libraries are Scary
-        // other alternative i guess could be to use the  user data thing like one of the examples and have the controller pull from the event instead of the other way round
-        if (Engine.Scene?.Tracker.GetEntity<MusicSyncControllerFMOD>() is not { } controller)
-            return FMOD.RESULT.OK;
-
         switch (callbackType) {
             case EVENT_CALLBACK_TYPE.TIMELINE_BEAT: {
                     var parameters = Marshal.PtrToStructure<TIMELINE_BEAT_PROPERTIES>(parametersPtr);
-                    controller.HandleBeat(parameters);
+                    HandleBeat(parameters);
                 }
                 break;
             case EVENT_CALLBACK_TYPE.TIMELINE_MARKER: {
                     var parameters = Marshal.PtrToStructure<TIMELINE_MARKER_PROPERTIES>(parametersPtr);
-                    controller.HandleMarker(parameters);
+                    HandleMarker(parameters);
                 }
                 break;
         }
@@ -169,8 +163,14 @@ public class MusicSyncControllerFMOD : Entity {
     public override void Render() {
         base.Render();
 
+        if (!showDebugUI)
+            return;
+
         var currentEvent = Audio.CurrentMusic;
-        if (!showDebugUI || !CanAffectEvent(currentEvent))
+        var areaKey = (Scene as Level).Session.Area;
+        var hasController = SorbetHelperMapDataProcessor.MusicSyncEvents.TryGetValue((areaKey.ID, areaKey.Mode), out var events);
+
+        if (!hasController || !CanAffectEvent(events, currentEvent))
             return;
 
         var debugText = currentEvent + "\n";
