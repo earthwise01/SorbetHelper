@@ -294,8 +294,10 @@ entities.SorbetHelper/TouchGateBlock.attributes.description.moveSound=The sound 
 entities.SorbetHelper/TouchGateBlock.attributes.description.finishedSound=The sound played by the gate when it is done moving.
 entities.SorbetHelper/TouchGateBlock.attributes.description.smoke=Whether the block should emit smoke when reaching its final position.
 entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnGrab=Whether the block should be activated if the player climbs on its sides.
-entities.SorbetHelper/TouchGateBlock.attributes.name.moveOnStaticMover=Static Mover Activated
-entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnStaticMover=Whether the block can be activated by static movers (such as springs) attached to it.
+entities.SorbetHelper/TouchGateBlock.attributes.name.moveOnStaticMoverInteract=Static Mover Activated
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnStaticMoverInteract=Whether the block can be activated by static movers (such as springs) attached to it.
+entities.SorbetHelper/TouchGateBlock.attributes.name.moveOnStaticMover=Static Mover Activated (Broken)
+entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnStaticMover=Does nothing, replace this block to fix.
 entities.SorbetHelper/TouchGateBlock.attributes.name.linkTag=Flag On Activate
 entities.SorbetHelper/TouchGateBlock.attributes.description.linkTag=An optional session flag to enable when the block activates.
 

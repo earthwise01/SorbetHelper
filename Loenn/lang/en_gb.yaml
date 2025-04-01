@@ -750,9 +750,12 @@ Entities:
         Description: Whether the block should emit smoke when reaching its final position.
       moveOnGrab:
         Description: Whether the block should be activated if the player climbs on its sides.
-      moveOnStaticMover:
+      moveOnStaticMoverInteract:
         Name: Static Mover Activated
         Description: Whether the block can be activated by static movers (such as springs) attached to it.
+      moveOnStaticMover:
+        Name: Static Mover Activated (Broken)
+        Description: Does nothing, replace this block to fix.
       linkTag:
         Name: Flag On Activate
         Description: An optional session flag to enable when the block activates.

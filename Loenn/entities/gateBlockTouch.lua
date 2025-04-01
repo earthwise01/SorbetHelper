@@ -38,13 +38,13 @@ touchGateBlock.placements = {
             persistent = false,
             allowReturn = false,
             moveOnGrab = true,
-            moveOnStaticMover = true,
+            moveOnStaticMoverInteract = true,
             linkTag = "" -- this is flag on activate in editor
         }
     }
 }
 
-touchGateBlock.fieldOrder = {"x", "y", "width", "height", "inactiveColor", "activeColor", "finishColor", "moveSound", "blockSprite", "finishedSound", "iconSprite", "shakeTime", "linkTag", "moveTime", "moveEased", "allowReturn", "moveOnGrab", "moveOnStaticMover", "smoke", "persistent"}
+touchGateBlock.fieldOrder = {"x", "y", "width", "height", "inactiveColor", "activeColor", "finishColor", "moveSound", "blockSprite", "finishedSound", "iconSprite", "shakeTime", "linkTag", "moveTime", "moveEased", "allowReturn", "moveOnGrab", "moveOnStaticMoverInteract", "moveOnStaticMover", "smoke", "persistent"}
 
 touchGateBlock.fieldInformation = {
     inactiveColor = {
