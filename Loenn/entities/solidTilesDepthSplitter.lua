@@ -32,9 +32,9 @@ function depthSplitter.fieldInformation(entity)
             editable = true
         },
         tiletypes = {
-            fieldType = "list",
+            fieldType = "sorbetHelper.unicodeCharList",
             minimumElements = 0,
-            elementSeparator = "",
+            -- elementSeparator = "",
             elementDefault = "3",
             elementOptions = {
                 options = function()
