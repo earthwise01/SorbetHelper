@@ -52,6 +52,8 @@ public class MusicSyncControllerFMOD : Entity {
         session.SetCounter(sessionPrefix + "bar", sessionTimelineInfo.Bar);
         session.SetCounter(sessionPrefix + "beat", sessionTimelineInfo.Beat);
 
+        session.SetFlag(sessionPrefix + "beatOdd", sessionTimelineInfo.Beat % 2 != 0);
+
         var sorbetSession = SorbetHelperModule.Session;
         if (sessionTimelineInfo.Marker != sorbetSession.CurrentMusicSyncMarker) {
             if (!string.IsNullOrEmpty(sessionTimelineInfo.Marker))

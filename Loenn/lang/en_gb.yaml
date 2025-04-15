@@ -630,7 +630,9 @@ Entities:
   SorbetHelper/MusicSyncControllerFMOD:
     Placements:
       controller:
-        Name: Music Session Sync Controller [Experimental]
+        Name: Music Session Sync Controller
+      markerToFlag:
+        Name: FMOD Marker to Flag Controller
     Attributes:
       eventNames:
         Description: A comma seperated list of music events this controller should affect. Leave empty to affect all events.
@@ -641,13 +643,16 @@ Entities:
         Description: |-
           ~~~ info/random notes ~~~
 
+          this controller updates a few session flags and counters according to the destination markers and tempo markers in the currently playing music event.
+
           - the flags/counters set by this controller are:
+            flags:
+            - "musicSync_{currentMarker}", where {currentMarker} is the name of the last touched destination marker.
+            - "musicSync_beatOdd"
+
             counters:
             - "musicSync_beat"
             - "musicSync_bar"
-
-            flags:
-            - "musicSync_{currentMarker}"
 
           - activator triggers and session expressions from frost helper might be useful with this due to their support for counters and ability for complex logic.
 

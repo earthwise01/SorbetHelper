@@ -9,6 +9,7 @@ controller.sprite = sorbetUtils.getControllerSpriteFunction("musicSyncController
 controller.depth = -1000010
 controller.placements = {
     name = "controller",
+    alternativeName = "markerToFlag",
     data = {
         eventNames = "",
         showDebugUI = false,
