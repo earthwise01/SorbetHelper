@@ -108,7 +108,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             if (showDebris) {
                 for (int i = 0; i < Width / 8f; i++) {
                     for (int j = 0; j < Height / 8f; j++) {
-                        if (Scene.CollideCheck<Solid>(new Rectangle((int)X + i * 8, (int)Y + j * 8, 8, 8))) {
+                        if (!Scene.CollideCheck<Solid>(new Rectangle((int)X + i * 8, (int)Y + j * 8, 8, 8))) {
                             Scene.Add(Engine.Pooler.Create<Debris>().Init(Position + new Vector2(4 + i * 8, 4 + j * 8), tileType, playSound: true).BlastFrom(TopCenter));
                         }
                     }
