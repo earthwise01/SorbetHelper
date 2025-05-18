@@ -5,21 +5,23 @@ local stylegroundOverHudController = {}
 stylegroundOverHudController.name = "SorbetHelper/StylegroundOverHudController"
 stylegroundOverHudController.sprite = sorbetUtils.getControllerSpriteFunction("stylegroundOverHudController", true, true)
 stylegroundOverHudController.depth = -1000010
-stylegroundOverHudController.placements = {
-    name = "stylegroundOverHud",
-    alternativeName = "altname",
-    data = {
-        pauseBehavior = 2,
-        _instructionsButton = true
-    }
-}
+-- Replaced by the Styleground Depth Controller 
+--
+-- stylegroundOverHudController.placements = {    
+--     name = "stylegroundOverHud",
+--     alternativeName = "altname",
+--     data = {
+--         pauseBehavior = 2,
+--         _instructionsButton = true
+--     }
+-- }
 
 stylegroundOverHudController.fieldInformation = {
     pauseBehavior = {
         options = {
             {"Disable When Paused", 2},
             {"Update When Paused", 1},
-            {"Pause Above", 0},
+            -- {"Pause Above", 0},
         },
         editable = false
     },

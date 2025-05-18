@@ -91,6 +91,7 @@ public class SorbetHelperModule : EverestModule {
         MiniPopupDisplay.Unload();
         ReturnBubbleBehaviorController.Unload();
         StylegroundEntityControllerNoConsume.UnloadIfNeeded();
+        StylegroundDepthController.UnloadIfNeeded();
         MusicSyncControllerFMOD.Unload();
 
         // components

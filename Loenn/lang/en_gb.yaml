@@ -325,11 +325,13 @@ Entities:
         Description: The direction winged strawberries in the room will fly.
   
   SorbetHelper/StylegroundOverHudController:
-    Placements:
-      stylegroundOverHud:
-        Name: Stylegrounds Above HUD Controller
-      altname:
-        Name: Styleground Over GUI Controller
+    # Replaced by Styleground Depth Controller
+    #
+    # Placements:
+    #   stylegroundOverHud:
+    #     Name: Stylegrounds Above HUD Controller
+    #   altname:
+    #     Name: Styleground Over GUI Controller
     Attributes:
       pauseBehavior:
         Description: |-
@@ -339,10 +341,12 @@ Entities:
               The stylegrounds will pause, and appear behind the pause menu.
           Update When Paused-
               The stylegrounds will appear above the pause menu and continue updating.
-          Pause Above-
-              The stylegrounds will pause, but still appear above the pause menu.
+      #    Pause Above-
+      #        The stylegrounds will pause, but still appear above the pause menu.
+
       #  probably maybe could've put this on like the gb or github page or a wiki or smth but fancy loenn plugins are cool :3 and its probably useful to have the instructions in editor rather than on some random page (even if theyre pretty simple i think)
       # also sadfsadf i wish i wasnt so "rambly" but hopefully this is still useful and not just annoying to anyone trying to use the controller,,
+      # goodbyeee weh
       _instructionsButton:
         Name: Usage Instructions
         Description: |-
@@ -358,11 +362,11 @@ Entities:
 
           - additive blendmode stylegrounds are supported, but pls note that also due to Technical Limitations, will always render above non-additive stylegrounds.
 
-          - the controller will disable its effect on stylegrounds if the game is paused, but this can be changed to either keep them above or make them completely unaffected by pausing.
+          - the controller will disable its effect on stylegrounds if the game is paused, but this can be changed to make them completely unaffected by pausing.
             see the tooltip as well, but in the end it probably mostly comes down to personal preference abt what'd work best for your stylegrounds, though i would vaugely suggest:
               'Disable When Paused' for consistency with vanilla or if your stylegrounds are decently busy in general/might cover up too much of the pause menu.
               'Update When Paused' if your stylegrounds have at least some movement, aren't insanely busy and you want maximum *atmosphere and immersion* or something.
-              'Pause Above' if you still want the stylegrounds above the pause menu, but don't have moving stylegrounds or find the stylegrounds moving while paused weird/distracting.
+        #      'Pause Above' if you still want the stylegrounds above the pause menu, but don't have moving stylegrounds or find the stylegrounds moving while paused weird/distracting.
         # currently additive blend mode stylegrounds doesn't work properly, and colorgrading doesn't have any effect on affected stylegrounds due to technical limitations.
         # i'm still looking to see if i can get them working but if i do theres a good chance there'll probably be some sort of jank (at least on the code side).
         
@@ -567,14 +571,30 @@ Entities:
             but just a consequence of it (very reasonably) not expecting to be in these conditions, sorry!
   
   SorbetHelper/StylegroundEntityController:
-    Placements:
-      controller:
-        Name: Styleground As Entity Controller
+    # Replaced by Styleground Depth Controller
+    #
+    # Placements:
+    #   controller:
+    #     Name: Styleground As Entity Controller
+    #     Description: |-
+    #       Makes stylegrounds with a specified tag render as an entity, with a customizable depth.
+    #       Basically a "Styleground Depth Controller".
+    #   altname:
+    #     Name: Styleground Depth Controller
+    Attributes:
+      tag:
+        Description: The styleground tag to affect.
+      depth:
         Description: |-
-          Makes stylegrounds with a specified tag render as an entity, with a customizable depth.
-          Basically a "Styleground Depth Controller".
-      altname:
+          The visual depth the stylegrounds should be drawn at.
+          Higher values mean farther behind in the scene.
+
+  SorbetHelper/StylegroundDepthController:
+    Placements:
+      depth:
         Name: Styleground Depth Controller
+      aboveHud:
+        Name: Styleground Depth Controller (Above HUD)
     Attributes:
       tag:
         Description: The styleground tag to affect.
