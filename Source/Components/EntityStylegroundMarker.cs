@@ -25,7 +25,7 @@ public class EntityStylegroundMarker : RenderOverride {
 
         // no empty tags or obvious infinite loops!
         // you could probably still work around the loop thing but honestly if youre doing that you should be expecting a freeze anyway
-        if (string.IsNullOrEmpty(Tag) || (entity is StylegroundEntityController stylegroundEntity && stylegroundEntity.StylegroundTag == Tag))
+        if (string.IsNullOrEmpty(Tag) || (entity is StylegroundDepthController stylegroundDepth && stylegroundDepth.StylegroundTag == Tag))
             RemoveSelf();
 
         // extremelyy niche; mostly for fg waterfalls

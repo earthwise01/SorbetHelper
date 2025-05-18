@@ -60,8 +60,6 @@ public class StylegroundDepthController : Entity {
             Tag |= Tags.PauseUpdate;
 
         StylegroundTag = data.Attr("tag", "");
-
-        LoadIfNeeded();
     }
 
     private void DrawStylegrounds() {
@@ -311,20 +309,11 @@ public class StylegroundDepthController : Entity {
         }
     }
 
-    private static bool Loaded;
-    internal static void LoadIfNeeded() {
-        if (Loaded)
-            return;
-
+    internal static void Load() {
         IL.Celeste.BackdropRenderer.Render += IL_BackdropRenderer_Render;
         IL.Celeste.Level.Render += IL_Level_Render;
-
-        Loaded = true;
     }
-    internal static void UnloadIfNeeded() {
-        if (!Loaded)
-            return;
-
+    internal static void Unload() {
         IL.Celeste.BackdropRenderer.Render -= IL_BackdropRenderer_Render;
         IL.Celeste.Level.Render -= IL_Level_Render;
     }

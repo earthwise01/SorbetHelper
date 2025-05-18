@@ -59,6 +59,7 @@ public class SorbetHelperModule : EverestModule {
         AlternateInteractPromptWrapper.Load();
         MiniPopupDisplay.Load();
         ReturnBubbleBehaviorController.Load();
+        StylegroundDepthController.Load();
         MusicSyncControllerFMOD.Load();
 
         // components
@@ -69,7 +70,6 @@ public class SorbetHelperModule : EverestModule {
         GlobalTypeNameProcessor.Load();
 
         // backdrops
-        StylegroundOverHudRenderer.Load();
         ParallaxHiResSnow.Load();
         HiResGodrays.Load();
     }
@@ -90,8 +90,7 @@ public class SorbetHelperModule : EverestModule {
         AlternateInteractPromptWrapper.Unload();
         MiniPopupDisplay.Unload();
         ReturnBubbleBehaviorController.Unload();
-        StylegroundEntityControllerNoConsume.UnloadIfNeeded();
-        StylegroundDepthController.UnloadIfNeeded();
+        StylegroundDepthController.Unload();
         MusicSyncControllerFMOD.Unload();
 
         // components
@@ -102,7 +101,6 @@ public class SorbetHelperModule : EverestModule {
         GlobalTypeNameProcessor.Unload();
 
         // backdrops
-        StylegroundOverHudRenderer.Unload();
         ParallaxHiResSnow.Unload();
         HiResGodrays.Unload();
     }
