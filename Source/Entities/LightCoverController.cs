@@ -13,31 +13,23 @@ using System.Linq;
 
 namespace Celeste.Mod.SorbetHelper.Entities;
 
-[CustomEntity("SorbetHelper/LightCoverController")]
-public class LightCoverController : ClassControllerBase {
+[GlobalEntity(              EntityDataID + "Global")] // global version is swapped to in mapdataprocessor based on data.Bool("global")
+[CustomEntity(EntityDataID, EntityDataID + "Global")]
+public class LightCoverController : Entity {
+    private const string EntityDataID = "SorbetHelper/LightCoverController";
+
     private readonly float Alpha;
 
-    public LightCoverController(EntityData data, Vector2 _) : base(data) {
+    public LightCoverController(EntityData data, Vector2 _) {
         Alpha = data.Float("alpha", 1f);
+
+        if (data.Bool("global", false))
+            Add(new GlobalTypeNameProcessor(data, ProcessEntity));
+        else
+            Add(new TypeNameProcessor(data, ProcessEntity));
     }
 
-    public override void ProcessEntity(Entity entity) {
-        if (entity.Get<LightCover>() is null)
-            entity.Add(new LightCover(Alpha));
-    }
-}
-
-// swapped to in mapdataprocessor based on data.Bool("global")
-[GlobalEntity]
-[CustomEntity("SorbetHelper/LightCoverControllerGlobal")]
-public class LightCoverControllerGlobal : GlobalClassControllerBase {
-    private readonly float Alpha;
-
-    public LightCoverControllerGlobal(EntityData data, Vector2 _) : base(data) {
-        Alpha = data.Float("alpha", 1f);
-    }
-
-    public override void ProcessEntity(Entity entity) {
+    private void ProcessEntity(Entity entity) {
         if (entity.Get<LightCover>() is null)
             entity.Add(new LightCover(Alpha));
     }

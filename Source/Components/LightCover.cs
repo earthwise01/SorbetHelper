@@ -89,7 +89,7 @@ public class LightCover : Component {
         var baseColor = level.Lighting.BaseColor;
 
         gd.SetRenderTargets(initalBuffer);
-        Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, SorbetHelperModule.AlphaMaskShader);
+        Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, SorbetHelperModule.FxAlphaMask);
 
         for (int i = 0; i < batchCount; i++) {
             var tempBuffer = tempBuffers[i];

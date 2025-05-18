@@ -21,7 +21,7 @@ public class SorbetHelperModule : EverestModule {
     public static bool ExtendedVariantsLoaded { get; private set; }
     public static bool ChronoHelperLoaded { get; private set; }
 
-    public static Effect AlphaMaskShader { get; private set; }
+    public static Effect FxAlphaMask { get; private set; }
 
     public SorbetHelperModule() {
         Instance = this;
@@ -51,8 +51,6 @@ public class SorbetHelperModule : EverestModule {
         GlobalEntities.ProcessAttributes();
         GlobalEntities.Load();
 
-        GlobalClassControllerBase.Load();
-
         SorbetHelperDecalRegistry.LoadHandlers();
 
         // entities
@@ -68,6 +66,7 @@ public class SorbetHelperModule : EverestModule {
         MovingPlatformHittable.Load();
         ExplodeHittable.Load();
         LightCover.Load();
+        GlobalTypeNameProcessor.Load();
 
         // backdrops
         StylegroundOverHudRenderer.Load();
@@ -77,15 +76,13 @@ public class SorbetHelperModule : EverestModule {
 
     public override void Unload() {
         // sorbet helper misc stuff
-        AlphaMaskShader?.Dispose();
-        AlphaMaskShader = null;
+        FxAlphaMask?.Dispose();
+        FxAlphaMask = null;
 
         On.Celeste.GameplayBuffers.Unload -= On_GameplayBuffers_Unload;
         RenderTargetHelper.DisposeQueue();
 
         GlobalEntities.Unload();
-
-        GlobalClassControllerBase.Unload();
 
         // entities
         WingedStrawberryDirectionController.Unload();
@@ -101,6 +98,7 @@ public class SorbetHelperModule : EverestModule {
         MovingPlatformHittable.Unload();
         ExplodeHittable.Unload();
         LightCover.Unload();
+        GlobalTypeNameProcessor.Unload();
 
         // backdrops
         StylegroundOverHudRenderer.Unload();
@@ -115,7 +113,7 @@ public class SorbetHelperModule : EverestModule {
     }
 
     public override void LoadContent(bool firstLoad) {
-        AlphaMaskShader = LoadShader("AlphaMask");
+        FxAlphaMask = LoadShader("AlphaMask");
     }
 
     private static Effect LoadShader(string id) =>
