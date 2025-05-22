@@ -1,5 +1,5 @@
 - Name: SorbetHelper
-  Version: 1.7.2
+  Version: 1.7.3
   DLL: bin/SorbetHelper.dll
   Dependencies:
     - Name: EverestCore
