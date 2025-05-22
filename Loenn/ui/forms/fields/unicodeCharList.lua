@@ -183,10 +183,10 @@ local function getFormDataStrings(fields)
     for _, field in ipairs(fields) do
         local i = #data + 1
 
-        if field.getCurrentText then
-            data[i] = field:getCurrentText()
+        -- if field.getCurrentText then
+        --    data[i] = field:getCurrentText()
 
-        elseif field.getValue then
+        if field.getValue then
             data[i] = field:getValue()
         end
     end
