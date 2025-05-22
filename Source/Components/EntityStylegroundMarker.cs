@@ -23,15 +23,13 @@ public class EntityStylegroundMarker : RenderOverride {
     public override void Added(Entity entity) {
         base.Added(entity);
 
-        // no empty tags or obvious infinite loops!
-        // you could probably still work around the loop thing but honestly if youre doing that you should be expecting a freeze anyway
-        if (string.IsNullOrEmpty(Tag) || (entity is StylegroundDepthController stylegroundDepth && stylegroundDepth.StylegroundTag == Tag))
+        // no empty tags!
+        if (string.IsNullOrEmpty(Tag))
             RemoveSelf();
 
         // extremelyy niche; mostly for fg waterfalls
         var depthDisplacement = entity.Get<DepthAdheringDisplacementRenderHook>();
-        DisplacementRenderHook displacement;
-        if (depthDisplacement is null && (displacement = entity.Get<DisplacementRenderHook>()) is not null) {
+        if (depthDisplacement is null && entity.Get<DisplacementRenderHook>() is { } displacement) {
             depthDisplacement = new DepthAdheringDisplacementRenderHook(entity.Render, displacement.RenderDisplacement, true) {
                 Visible = false
             };

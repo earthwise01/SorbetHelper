@@ -17,49 +17,80 @@ using MonoMod.Utils;
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [Tracked]
-[GlobalEntity]
-[CustomEntity("SorbetHelper/StylegroundDepthController")]
 public class StylegroundDepthController : Entity {
-    // modified additive blendstate that still works after being rendered to a transparent render target
+    public enum Modes { Normal, AboveColorgrade, AboveHud, AbovePauseHud }
+
+    // -- Tracker.GetEntity controller's data
+    private readonly HashSet<Backdrop> _current = [];
+    private StylegroundDepthController _aboveColorgrade, _aboveHud, _abovePauseHud;
+
+    // -- current controller's data --
+    public readonly Modes Mode = Modes.Normal;
+    public readonly HashSet<string> StylegroundTags = [];
+    private readonly List<Backdrop> BackdropsBG = [], BackdropsFG = [];
+
+    // -- above hud rendering specific data --
     private static BlendState AdditiveFix = new BlendState() {
+        // modified additive blendstate that still works after being rendered to a transparent render target
         ColorSourceBlend = Blend.SourceAlpha,
         AlphaSourceBlend = Blend.Zero,
         ColorDestinationBlend = Blend.One,
         AlphaDestinationBlend = Blend.One
     };
-
-    private readonly List<Backdrop> BackdropsBG = [], BackdropsFG = [];
-    private readonly HashSet<Backdrop> _current = [];
-
-    public readonly string StylegroundTag;
-
-    public enum Modes { Normal, AboveColorgrade, AboveHud, AbovePauseHud }
-    public readonly Modes Mode = Modes.Normal;
-
-    // above hud rendering
     private VirtualRenderTarget Buffer;
     private static Matrix scaleMatrix;
     private static Vector2 paddingOffset;
     private static Vector2 zoomFocusOffset;
     private static float scale = 1f;
 
-    public StylegroundDepthController(EntityData data, Vector2 _) {
-        Tag |= Tags.Global;
+    // -- loading / constructor --
+    // see map data processor
+    public readonly record struct StylegroundDepthControllerData(string StylegroundTag, int Depth, Modes Mode);
+    private static void Event_OnLoadingThread(Level level) {
+        if (!SorbetHelperMapDataProcessor.StylegroundDepthControllers.TryGetValue((level.Session.Area.ID, level.Session.Area.Mode), out var depthControllers))
+            return;
 
-        var depth = data.Attr("depth", "-8500");
-        if (int.TryParse(depth, out var depthInt))
-            Depth = depthInt;
-        else if (Enum.TryParse<Modes>(depth, true, out var depthMode))
-            Mode = depthMode;
-        else
-            Logger.Error("SorbetHelper", "Invalid depth for Styleground Depth Controller! " + depth);
+        StylegroundDepthController trackedController = null;
+        var currentDepthControllers = new List<StylegroundDepthController>();
+        foreach ((string tag, int depth, Modes mode) in depthControllers) {
+            if (currentDepthControllers.FirstOrDefault(c => mode == c.Mode && ((mode != Modes.Normal || c.Depth == depth))) is not { } depthController) {
+                depthController = new StylegroundDepthController(depth, mode);
+                level.Add(depthController);
+                currentDepthControllers.Add(depthController);
+                trackedController ??= depthController;
+
+                // store the instances of any controllers with a non-default mode for easier access when using them in hooks
+                switch (mode) {
+                    case Modes.Normal:
+                        break;
+                    case Modes.AboveColorgrade:
+                        trackedController._aboveColorgrade = depthController;
+                        break;
+                    case Modes.AboveHud:
+                        trackedController._aboveHud = depthController;
+                        break;
+                    case Modes.AbovePauseHud:
+                        trackedController._abovePauseHud = depthController;
+                        break;
+                }
+
+                Logger.Info("SorbetHelper", $"creating new {nameof(StylegroundDepthController)} for mode {mode} at depth {depth}.");
+            }
+
+            depthController.StylegroundTags.Add(tag);
+        }
+    }
+
+    private StylegroundDepthController(int depth, Modes mode) {
+        Depth = depth;
+        Mode = mode;
+
+        Tag |= Tags.Global;
 
         if (Mode != Modes.Normal)
             Add(new BeforeRenderHook(BeforeRender));
         if (Mode == Modes.AbovePauseHud)
             Tag |= Tags.PauseUpdate;
-
-        StylegroundTag = data.Attr("tag", "");
     }
 
     private void DrawStylegrounds() {
@@ -90,7 +121,7 @@ public class StylegroundDepthController : Entity {
         var current = Scene.Tracker.GetEntity<StylegroundDepthController>()._current;
 
         foreach (var backdrop in origBackdrops) {
-            if (backdrop.Tags.Contains(StylegroundTag) && current.Add(backdrop)) {
+            if (backdrop.Tags.Overlaps(StylegroundTags) && current.Add(backdrop)) {
                 into.Add(backdrop);
 
                 if (Mode != Modes.Normal && backdrop is Parallax parallax && parallax.BlendState == BlendState.Additive)
@@ -99,13 +130,8 @@ public class StylegroundDepthController : Entity {
         }
     }
 
-   public override void Added(Scene scene) {
+    public override void Added(Scene scene) {
         base.Added(scene);
-
-        if (string.IsNullOrEmpty(StylegroundTag)) {
-            RemoveSelf();
-            return;
-        }
 
         RegisterStylegrounds(scene as Level);
     }
@@ -241,26 +267,26 @@ public class StylegroundDepthController : Entity {
 
         // -- setup locals
 
-        var depthControllersLocal = new VariableDefinition(il.Import(typeof(List<Entity>)));
+        var firstDepthController = new VariableDefinition(il.Import(typeof(StylegroundDepthController)));
         var pausedLocal = new VariableDefinition(il.Import(typeof(bool)));
-        il.Body.Variables.Add(depthControllersLocal);
+        il.Body.Variables.Add(firstDepthController);
         il.Body.Variables.Add(pausedLocal);
 
         cursor.EmitLdarg0();
-        cursor.EmitDelegate(getDepthControllers);
-        cursor.EmitStloc(depthControllersLocal);
+        cursor.EmitDelegate(getDepthController);
+        cursor.EmitStloc(firstDepthController);
 
         cursor.EmitLdarg0();
         cursor.EmitLdfld(typeof(Level).GetField(nameof(Level.Paused)));
         cursor.EmitStloc(pausedLocal);
 
-        static List<Entity> getDepthControllers(Level self) {
-            return self.Tracker.GetEntities<StylegroundDepthController>();
+        static StylegroundDepthController getDepthController(Level self) {
+            return self.Tracker.GetEntity<StylegroundDepthController>();
         }
 
         // -- actual rendering
 
-        cursor.EmitLdloc(depthControllersLocal);
+        cursor.EmitLdloc(firstDepthController);
         cursor.EmitDelegate(renderAboveColorgrade);
 
         if (!cursor.TryGotoNext(MoveType.AfterLabel, instr => instr.MatchLdarg0(), instr => instr.MatchLdfld<Level>("SubHudRenderer"))) {
@@ -271,7 +297,7 @@ public class StylegroundDepthController : Entity {
         Logger.Verbose("SorbetHelper", $"injecting below hud rendering at {cursor.Index} in CIL code for {cursor.Method.Name}!");
 
         // render below hud
-        cursor.EmitLdloc(depthControllersLocal);
+        cursor.EmitLdloc(firstDepthController);
         cursor.EmitLdloc(pausedLocal);
         cursor.EmitDelegate(renderBelowHud);
 
@@ -279,41 +305,41 @@ public class StylegroundDepthController : Entity {
             Logger.Warn("SorbetHelper", $"ilhook error! failed to inject above hud rendering in CIL code for {cursor.Method.Name}!");
             return;
         }
+        cursor.MoveAfterLabels();
 
         Logger.Verbose("SorbetHelper", $"injecting above hud rendering at {cursor.Index} in CIL code for {cursor.Method.Name}!");
 
         // render above hud
-        cursor.EmitLdloc(depthControllersLocal);
+        cursor.EmitLdloc(firstDepthController);
         cursor.EmitLdloc(pausedLocal);
         cursor.EmitDelegate(renderAboveHud);
 
-        static void renderAboveColorgrade(List<Entity> depthControllers) {
-            foreach (StylegroundDepthController renderer in depthControllers)
-                if (renderer.Mode == Modes.AboveColorgrade)
-                    renderer.RenderToHiRes();
+        static void renderAboveColorgrade(StylegroundDepthController depthController) {
+            depthController?._aboveColorgrade?.RenderToHiRes();
         }
 
-        static void renderBelowHud(List<Entity> depthControllers, bool paused) {
+        static void renderBelowHud(StylegroundDepthController depthController, bool paused) {
+            if (paused)
+                depthController?._aboveHud?.RenderToHiRes();
+        }
+
+        static void renderAboveHud(StylegroundDepthController depthController, bool paused) {
             if (!paused)
-                return;
+                depthController?._aboveHud?.RenderToHiRes();
 
-            foreach (StylegroundDepthController renderer in depthControllers)
-                if (renderer.Mode == Modes.AboveHud)
-                    renderer.RenderToHiRes();
-        }
-
-        static void renderAboveHud(List<Entity> depthControllers, bool paused) {
-            foreach (StylegroundDepthController renderer in depthControllers)
-                if (renderer.Mode == Modes.AbovePauseHud || (renderer.Mode == Modes.AboveHud && !paused))
-                    renderer.RenderToHiRes();
+            depthController?._abovePauseHud?.RenderToHiRes();
         }
     }
 
     internal static void Load() {
+        Everest.Events.LevelLoader.OnLoadingThread += Event_OnLoadingThread;
+
         IL.Celeste.BackdropRenderer.Render += IL_BackdropRenderer_Render;
         IL.Celeste.Level.Render += IL_Level_Render;
     }
     internal static void Unload() {
+        Everest.Events.LevelLoader.OnLoadingThread -= Event_OnLoadingThread;
+
         IL.Celeste.BackdropRenderer.Render -= IL_BackdropRenderer_Render;
         IL.Celeste.Level.Render -= IL_Level_Render;
     }

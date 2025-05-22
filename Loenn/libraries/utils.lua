@@ -16,9 +16,9 @@ function sorbetUtils.getGenericNodeSprite(x, y, color)
 end
 
 -- praying this isnt stupidly laggy
-function sorbetUtils.checkForDuplicateInMap(self, isTrigger, map)
+function sorbetUtils.checkForDuplicateInMap(self, isTrigger, duplicateCheck)
     isTrigger = isTrigger or false
-    map = map or loadedState.map
+    local map = loadedState.map
     if not map then return false end
 
     local name = self._name
@@ -28,8 +28,9 @@ function sorbetUtils.checkForDuplicateInMap(self, isTrigger, map)
 
         for _, entity in pairs(list) do
             if entity ~= self and entity._name == name then
-                -- if entity._id  actually nvm
-                return true
+                if not duplicateCheck or duplicateCheck(self, entity) then
+                    return true
+                end
             end
         end
     end
@@ -48,7 +49,7 @@ function sorbetUtils.getControllerSprites(x, y, texture, global, warning)
     end
 
     if warning then
-        table.insert(sprites, drawableText.fromText(warning, x - 24, y + 11, 48, 8, nil, 1, {1.0, 0.0, 0.0, 1.0}))
+        table.insert(sprites, drawableText.fromText(warning, x - 48, y + 11, 96, 8, nil, 1, {1.0, 0.0, 0.0, 1.0}))
     end
 
     return sprites

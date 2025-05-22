@@ -62,8 +62,11 @@ internal static class GlobalEntities {
         level.Session.Level = origLevel;
     }
 
-    // don't load global entities in Level.LoadCustomEntity
     private static bool Event_OnLoadEntity(Level level, LevelData levelData, Vector2 offset, EntityData entityData) {
+        if (entityData.Name == "SorbetHelper/MapDataProcessed") // don't give any failed to load warnings for map data processed entities
+            return true;
+
+        // don't load global entities in Level.LoadCustomEntity
         if (!LoadingGlobalEntities && IsGlobalEntity(entityData))
             return true;
 
