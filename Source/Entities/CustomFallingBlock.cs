@@ -14,9 +14,11 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [CustomEntity("SorbetHelper/CustomFallingBlock")]
 public class CustomFallingBlock : FallingBlock {
     protected readonly string flagOnFall, flagOnLand, triggerFlag;
+    protected readonly bool resetFlags;
     protected bool fallOnTouch;
     protected bool fallOnStaticMover;
     protected readonly bool breakDashBlocks;
+    protected readonly bool ignoreSolids;
     protected readonly float initialShakeTime, variableShakeTime;
     protected readonly float maxSpeed, acceleration;
     protected readonly string shakeSfx, impactSfx;
@@ -39,9 +41,11 @@ public class CustomFallingBlock : FallingBlock {
         flagOnFall = data.Attr("flagOnFall", "");
         flagOnLand = data.Attr("flagOnLand", "");
         triggerFlag = data.Attr("triggerFlag", "");
+        resetFlags = data.Bool("resetFlags", false);
         fallOnTouch = data.Bool("fallOnTouch", true);
         fallOnStaticMover = data.Bool("fallOnStaticMover", true);
         breakDashBlocks = data.Bool("breakDashBlocks", true);
+        ignoreSolids = data.Bool("ignoreSolids", false);
         initialShakeTime = data.Float("initialShakeTime", 0.2f);
         variableShakeTime = data.Float("variableShakeTime", 0.4f);
         maxSpeed = data.Float("maxSpeed", 160f);
@@ -64,6 +68,21 @@ public class CustomFallingBlock : FallingBlock {
         if (fallOnStaticMover) {
             Triggered = true;
         }
+    }
+
+    public override void Awake(Scene scene) {
+        base.Awake(scene);
+
+        if (!resetFlags)
+            return;
+
+        var session = (Scene as Level).Session;
+        if (!string.IsNullOrEmpty(flagOnFall) && session.GetFlag(flagOnFall))
+            session.SetFlag(flagOnFall, false);
+        if (!string.IsNullOrEmpty(flagOnLand) && session.GetFlag(flagOnLand))
+            session.SetFlag(flagOnLand, false);
+        if (!string.IsNullOrEmpty(triggerFlag) && session.GetFlag(triggerFlag))
+            session.SetFlag(triggerFlag, false);
     }
 
     public override void Update() {
@@ -114,17 +133,22 @@ public class CustomFallingBlock : FallingBlock {
             StopShaking();
             DirectionalShakeParticles();
 
-            var speed = new Vector2(0f);
+            var speed = new Vector2(0f, 0f);
             while (true) {
                 Level level = Scene as Level;
                 speed.X = Calc.Approach(speed.X, Direction.X * maxSpeed, acceleration * Engine.DeltaTime);
                 speed.Y = Calc.Approach(speed.Y, Direction.Y * maxSpeed, acceleration * Engine.DeltaTime);
 
-                if (MoveVCollideSolids(speed.Y * Engine.DeltaTime, thruDashBlocks: breakDashBlocks))
-                    break;
+                if (ignoreSolids) {
+                    MoveV(speed.Y * Engine.DeltaTime);
+                    MoveH(speed.X * Engine.DeltaTime);
+                } else {
+                    if (MoveVCollideSolids(speed.Y * Engine.DeltaTime, thruDashBlocks: breakDashBlocks))
+                        break;
 
-                if (MoveHCollideSolids(speed.X * Engine.DeltaTime, thruDashBlocks: breakDashBlocks))
-                    break;
+                    if (MoveHCollideSolids(speed.X * Engine.DeltaTime, thruDashBlocks: breakDashBlocks))
+                        break;
+                }
 
                 // checks whether the falling block fell out of bounds
                 // all of these checks are done on any custom falling block regardless of its direction so hopefully that wont break anything somewhere

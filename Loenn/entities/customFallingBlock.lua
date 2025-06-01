@@ -10,10 +10,12 @@ local function getPlacements(name, extraFields)
         flagOnFall = "",
         flagOnLand = "",
         triggerFlag = "",
+        resetFlags = false,
         fallOnTouch = true,
         climbFall = true,
         fallOnStaticMover = true,
         breakDashBlocks = true,
+        ignoreSolids = false,
         initialShakeTime = 0.2,
         variableShakeTime = 0.4,
         maxSpeed = 160,
@@ -107,7 +109,7 @@ dashFallingBlock.placements = getPlacements("dashFallingBlock", {
     dashCornerCorrection = true,
     refillDash = false,
     fallDashMode = "Disabled",
-    dashActivated = true,
+    -- dashActivated = true, -- not needed anymore since custom falling blocks exist as their own entity
     fallOnTouch = false,
     fallOnStaticMover = false,
 })
@@ -134,7 +136,7 @@ customFallingBlock.fieldOrder = {
     "acceleration", "maxSpeed",
     "tiletype", "direction", 
     "fallOnTouch", "climbFall", "fallOnStaticMover", "breakDashBlocks",
-    "chronoHelperGravity"
+    "ignoreSolids", "resetFlags", "chronoHelperGravity"
 }
 
 dashFallingBlock.fieldOrder = {
@@ -148,7 +150,7 @@ dashFallingBlock.fieldOrder = {
     "direction", "fallDashMode",
     "tiletype", "fallOnTouch", "climbFall",
     "allowWavedash", "dashCornerCorrection", "fallOnStaticMover", "breakDashBlocks",
-    "refillDash", "dashActivated", "chronoHelperGravity"
+    "refillDash", "dashActivated", "ignoreSolids", "resetFlags", "chronoHelperGravity"
 }
 
 return { customFallingBlock, dashFallingBlock }
