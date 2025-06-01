@@ -90,7 +90,7 @@ Entities:
 
   SorbetHelper/CustomFallingBlock:
     Placements:
-      customFallingBlock:
+      fallingBlock:
         Name: Custom Falling Block
     Attributes:
       tiletype:
@@ -103,6 +103,8 @@ Entities:
         Description: An optional session flag to set when the block lands.
       triggerFlag:
         Description: An optional session flag which should trigger the block to fall.
+      resetFlags:
+        Description: Whether the falling block should reset its session flags to false when loading, rather than leaving them as they were unless something else changes them.
       fallOnTouch:
         Description: Whether the block should fall when the player lands on it.
       climbFall:
@@ -114,6 +116,8 @@ Entities:
         Description: Whether the falling block can be triggered by static movers (such as springs) attached to it.
       breakDashBlocks:
         Description: Whether the falling block can break dash blocks.
+      ignoreSolids:
+        Description: Whether the falling block should be able to fall through solids.
       initialShakeTime:
         Description: How long (in seconds) the block should initially shake for.
       variableShakeTime:
@@ -139,7 +143,7 @@ Entities:
 
   SorbetHelper/DashFallingBlock:
     Placements:
-      dashFallingBlock:
+      fallingBlock:
         Name: Dash Falling Block
         Description: a falling block that falls when dashed into
     Copy:
@@ -162,6 +166,25 @@ Entities:
         Description: Whether the player should refill their dash when hitting the block.
       dashActivated:
         Description: Determines whether the block can be activated by dashing into it. Disabling this effectively turns this into a regular custom falling block.
+
+  SorbetHelper/CustomGravityFallingBlock:
+    Placements:
+      fallingBlock:
+        Name: Custom Gravity Falling Block
+      altName:
+        Name: Gravity Custom Falling Block
+    Copy:
+      - SorbetHelper/CustomFallingBlock
+
+  SorbetHelper/GravityDashFallingBlock:
+    Placements:
+      fallingBlock:
+        Name: Gravity Dash Falling Block
+      altName:
+        Name: Dash Gravity Falling Block
+    Copy:
+      - SorbetHelper/CustomFallingBlock
+      - SorbetHelper/DashFallingBlock
 
   SorbetHelper/CrumbleOnFlagBlock:
     Placements:

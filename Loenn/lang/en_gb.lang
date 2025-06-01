@@ -35,17 +35,19 @@ entities.SorbetHelper/ReturnBerry.attributes.description.order=Manually determin
 entities.SorbetHelper/ReturnBerry.attributes.description.bubbleParticles=Whether the strawberry should visually indicate that it bubbles the player by periodically emitting bubble particles.
 
 # Custom Falling Block
-entities.SorbetHelper/CustomFallingBlock.placements.name.customFallingBlock=Custom Falling Block
+entities.SorbetHelper/CustomFallingBlock.placements.name.fallingBlock=Custom Falling Block
 entities.SorbetHelper/CustomFallingBlock.attributes.description.tiletype=Determines the visual appearance of the falling block.
 entities.SorbetHelper/CustomFallingBlock.attributes.description.direction=The direction the falling block will fall towards.
 entities.SorbetHelper/CustomFallingBlock.attributes.description.flagOnFall=An optional session flag to set when the block starts falling.
 entities.SorbetHelper/CustomFallingBlock.attributes.description.flagOnLand=An optional session flag to set when the block lands.
 entities.SorbetHelper/CustomFallingBlock.attributes.description.triggerFlag=An optional session flag which should trigger the block to fall.
+entities.SorbetHelper/CustomFallingBlock.attributes.description.resetFlags=Whether the falling block should reset its session flags to false when loading, rather than leaving them as they were unless something else changes them.
 entities.SorbetHelper/CustomFallingBlock.attributes.description.fallOnTouch=Whether the block should fall when the player lands on it.
 entities.SorbetHelper/CustomFallingBlock.attributes.description.climbFall=Whether the block should also fall if the player climbs on its sides.\nRequires Fall On Touch to be enabled.
 entities.SorbetHelper/CustomFallingBlock.attributes.name.fallOnStaticMover=Static Mover Triggered
 entities.SorbetHelper/CustomFallingBlock.attributes.description.fallOnStaticMover=Whether the falling block can be triggered by static movers (such as springs) attached to it.
 entities.SorbetHelper/CustomFallingBlock.attributes.description.breakDashBlocks=Whether the falling block can break dash blocks.
+entities.SorbetHelper/CustomFallingBlock.attributes.description.ignoreSolids=Whether the falling block should be able to fall through solids.
 entities.SorbetHelper/CustomFallingBlock.attributes.description.initialShakeTime=How long (in seconds) the block should initially shake for.
 entities.SorbetHelper/CustomFallingBlock.attributes.description.variableShakeTime=How long (in seconds) the block should continue shaking for, after the initial shake time.\nUnlike the initial timer, this can be interupted if the player stops touching the block (as long as they were what caused it to fall).
 entities.SorbetHelper/CustomFallingBlock.attributes.description.maxSpeed=The maximum speed of the block (in pixels per second) as it falls.
@@ -56,18 +58,20 @@ entities.SorbetHelper/CustomFallingBlock.attributes.description.depth=Determines
 entities.SorbetHelper/CustomFallingBlock.attributes.description.chronoHelperGravity=Whether the falling block should be affected by Gravity Falling Block Switches from Chrono Helper.\nRequires Chrono Helper.
 
 # Dash Falling Block
-entities.SorbetHelper/DashFallingBlock.placements.name.dashFallingBlock=Dash Falling Block
-entities.SorbetHelper/DashFallingBlock.placements.description.dashFallingBlock=a falling block that falls when dashed into
+entities.SorbetHelper/DashFallingBlock.placements.name.fallingBlock=Dash Falling Block
+entities.SorbetHelper/DashFallingBlock.placements.description.fallingBlock=a falling block that falls when dashed into
 entities.SorbetHelper/DashFallingBlock.attributes.description.tiletype=Determines the visual appearance of the falling block.
 entities.SorbetHelper/DashFallingBlock.attributes.description.direction=The direction the falling block will fall towards.
 entities.SorbetHelper/DashFallingBlock.attributes.description.flagOnFall=An optional session flag to set when the block starts falling.
 entities.SorbetHelper/DashFallingBlock.attributes.description.flagOnLand=An optional session flag to set when the block lands.
 entities.SorbetHelper/DashFallingBlock.attributes.description.triggerFlag=An optional session flag which should trigger the block to fall.
+entities.SorbetHelper/DashFallingBlock.attributes.description.resetFlags=Whether the falling block should reset its session flags to false when loading, rather than leaving them as they were unless something else changes them.
 entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnTouch=Whether the block should fall when the player lands on it.
 entities.SorbetHelper/DashFallingBlock.attributes.description.climbFall=Whether the block should also fall if the player climbs on its sides.\nRequires Fall On Touch to be enabled.
 entities.SorbetHelper/DashFallingBlock.attributes.name.fallOnStaticMover=Static Mover Triggered
 entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnStaticMover=Whether the falling block can be triggered by static movers (such as springs) attached to it.
 entities.SorbetHelper/DashFallingBlock.attributes.description.breakDashBlocks=Whether the falling block can break dash blocks.
+entities.SorbetHelper/DashFallingBlock.attributes.description.ignoreSolids=Whether the falling block should be able to fall through solids.
 entities.SorbetHelper/DashFallingBlock.attributes.description.initialShakeTime=How long (in seconds) the block should initially shake for.
 entities.SorbetHelper/DashFallingBlock.attributes.description.variableShakeTime=How long (in seconds) the block should continue shaking for, after the initial shake time.\nUnlike the initial timer, this can be interupted if the player stops touching the block (as long as they were what caused it to fall).
 entities.SorbetHelper/DashFallingBlock.attributes.description.maxSpeed=The maximum speed of the block (in pixels per second) as it falls.
@@ -83,6 +87,61 @@ entities.SorbetHelper/DashFallingBlock.attributes.name.fallDashMode=Fall Towards
 entities.SorbetHelper/DashFallingBlock.attributes.description.fallDashMode=Whether the direction the falling block will fall towards is determined by the direction it was dashed into from.\nOverrides the normal direction setting when enabled.
 entities.SorbetHelper/DashFallingBlock.attributes.description.refillDash=Whether the player should refill their dash when hitting the block.
 entities.SorbetHelper/DashFallingBlock.attributes.description.dashActivated=Determines whether the block can be activated by dashing into it. Disabling this effectively turns this into a regular custom falling block.
+
+# Custom Gravity Falling Block
+entities.SorbetHelper/CustomGravityFallingBlock.placements.name.fallingBlock=Custom Gravity Falling Block
+entities.SorbetHelper/CustomGravityFallingBlock.placements.name.altName=Gravity Custom Falling Block
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.tiletype=Determines the visual appearance of the falling block.
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.direction=The direction the falling block will fall towards.
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.flagOnFall=An optional session flag to set when the block starts falling.
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.flagOnLand=An optional session flag to set when the block lands.
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.triggerFlag=An optional session flag which should trigger the block to fall.
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.resetFlags=Whether the falling block should reset its session flags to false when loading, rather than leaving them as they were unless something else changes them.
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.fallOnTouch=Whether the block should fall when the player lands on it.
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.climbFall=Whether the block should also fall if the player climbs on its sides.\nRequires Fall On Touch to be enabled.
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.name.fallOnStaticMover=Static Mover Triggered
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.fallOnStaticMover=Whether the falling block can be triggered by static movers (such as springs) attached to it.
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.breakDashBlocks=Whether the falling block can break dash blocks.
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.ignoreSolids=Whether the falling block should be able to fall through solids.
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.initialShakeTime=How long (in seconds) the block should initially shake for.
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.variableShakeTime=How long (in seconds) the block should continue shaking for, after the initial shake time.\nUnlike the initial timer, this can be interupted if the player stops touching the block (as long as they were what caused it to fall).
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.maxSpeed=The maximum speed of the block (in pixels per second) as it falls.
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.acceleration=The acceleration of the block (in pixels per second) as it falls.
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.shakeSfx=The sound played by the block before it falls.
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.impactSfx=The sound played by the block when it lands on the ground.
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.depth=Determines the visual depth of the block.\nHigher values mean farther behind in the scene, default value is -9000.
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.chronoHelperGravity=Whether the falling block should be affected by Gravity Falling Block Switches from Chrono Helper.\nRequires Chrono Helper.
+
+# Gravity Dash Falling Block
+entities.SorbetHelper/GravityDashFallingBlock.placements.name.fallingBlock=Gravity Dash Falling Block
+entities.SorbetHelper/GravityDashFallingBlock.placements.name.altName=Dash Gravity Falling Block
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.tiletype=Determines the visual appearance of the falling block.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.direction=The direction the falling block will fall towards.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.flagOnFall=An optional session flag to set when the block starts falling.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.flagOnLand=An optional session flag to set when the block lands.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.triggerFlag=An optional session flag which should trigger the block to fall.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.resetFlags=Whether the falling block should reset its session flags to false when loading, rather than leaving them as they were unless something else changes them.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.fallOnTouch=Whether the block should fall when the player lands on it.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.climbFall=Whether the block should also fall if the player climbs on its sides.\nRequires Fall On Touch to be enabled.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.name.fallOnStaticMover=Static Mover Triggered
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.fallOnStaticMover=Whether the falling block can be triggered by static movers (such as springs) attached to it.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.breakDashBlocks=Whether the falling block can break dash blocks.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.ignoreSolids=Whether the falling block should be able to fall through solids.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.initialShakeTime=How long (in seconds) the block should initially shake for.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.variableShakeTime=How long (in seconds) the block should continue shaking for, after the initial shake time.\nUnlike the initial timer, this can be interupted if the player stops touching the block (as long as they were what caused it to fall).
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.maxSpeed=The maximum speed of the block (in pixels per second) as it falls.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.acceleration=The acceleration of the block (in pixels per second) as it falls.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.shakeSfx=The sound played by the block before it falls.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.impactSfx=The sound played by the block when it lands on the ground, or is dashed into.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.depth=Determines the visual depth of the block.\nHigher values mean farther behind in the scene, default value is -9000.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.chronoHelperGravity=Whether the falling block should be affected by Gravity Falling Block Switches from Chrono Helper.\nRequires Chrono Helper.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.allowWavedash=Whether it is possible to wavedash on top of the block.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.name.dashCornerCorrection=Easier Wallbounce
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.dashCornerCorrection=Makes wallbouncing off of the block less precise (by allowing it up to 4 pixels deep into the block horizontally, dashing from the bottom).
+entities.SorbetHelper/GravityDashFallingBlock.attributes.name.fallDashMode=Fall Towards Dash Direction
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.fallDashMode=Whether the direction the falling block will fall towards is determined by the direction it was dashed into from.\nOverrides the normal direction setting when enabled.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.refillDash=Whether the player should refill their dash when hitting the block.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.dashActivated=Determines whether the block can be activated by dashing into it. Disabling this effectively turns this into a regular custom falling block.
 
 # Crumble On Flag Block
 entities.SorbetHelper/CrumbleOnFlagBlock.placements.name.crumble_on_flag_block=Crumble On Flag Block

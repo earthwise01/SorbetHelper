@@ -11,7 +11,7 @@ using Celeste.Mod.SorbetHelper.Components;
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [TrackedAs(typeof(FallingBlock))]
-[CustomEntity("SorbetHelper/DashFallingBlock")]
+[CustomEntity("SorbetHelper/DashFallingBlock", "SorbetHelper/GravityDashFallingBlock = LoadGravity")]
 public class DashFallingBlock : CustomFallingBlock {
 
     /*
@@ -32,7 +32,13 @@ public class DashFallingBlock : CustomFallingBlock {
     public static ParticleType P_HitFallDust { get; private set; }
     public static ParticleType P_RefillDash { get; private set; }
 
-    public DashFallingBlock(EntityData data, Vector2 offset) : base(data, offset) {
+    public static new Entity Load(Level level, LevelData levelData, Vector2 offset, EntityData entityData) =>
+        new DashFallingBlock(entityData, offset, entityData.Bool("chronoHelperGravity", false));
+
+    public static new Entity LoadGravity(Level level, LevelData levelData, Vector2 offset, EntityData entityData) =>
+        new DashFallingBlock(entityData, offset, true);
+
+    public DashFallingBlock(EntityData data, Vector2 offset, bool chronoHelperGravity) : base(data, offset, chronoHelperGravity) {
         fallOnTouch = data.Bool("fallOnTouch", false); // override the default to hopefully reduce the chance of breaking stuff
         fallOnStaticMover = data.Bool("fallOnStaticMover", false);
 

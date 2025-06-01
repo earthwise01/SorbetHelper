@@ -11,7 +11,7 @@ using Celeste.Mod.SorbetHelper.Components;
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [TrackedAs(typeof(FallingBlock))]
-[CustomEntity("SorbetHelper/CustomFallingBlock")]
+[CustomEntity("SorbetHelper/CustomFallingBlock", "SorbetHelper/CustomGravityFallingBlock = LoadGravity")]
 public class CustomFallingBlock : FallingBlock {
     protected readonly string flagOnFall, flagOnLand, triggerFlag;
     protected readonly bool resetFlags;
@@ -33,7 +33,13 @@ public class CustomFallingBlock : FallingBlock {
     private bool chronoHelperGravityUp, chronoHelperGravityWasUp;
     private bool chronoHelperHasShaken;
 
-    public CustomFallingBlock(EntityData data, Vector2 offset) : base(data, offset) {
+    public static Entity Load(Level level, LevelData levelData, Vector2 offset, EntityData entityData) =>
+        new CustomFallingBlock(entityData, offset, entityData.Bool("chronoHelperGravity", false));
+
+    public static Entity LoadGravity(Level level, LevelData levelData, Vector2 offset, EntityData entityData) =>
+        new CustomFallingBlock(entityData, offset, true);
+
+    public CustomFallingBlock(EntityData data, Vector2 offset, bool chronoHelperGravity) : base(data, offset) {
         // remove the Coroutine added by the vanilla falling block
         Remove(Get<Coroutine>());
 
@@ -54,9 +60,9 @@ public class CustomFallingBlock : FallingBlock {
         impactSfx = data.Attr("impactSfx", "event:/game/general/fallblock_impact");
         Depth = data.Int("depth", Depth);
 
-        chronoHelperGravityFallingBlock = data.Bool("chronoHelperGravity", false);
-        if (chronoHelperGravityFallingBlock && !SorbetHelperModule.ChronoHelperLoaded)
-            Logger.Warn(nameof(SorbetHelper), "trying to use gravity custom falling blocks without chrono helper enabled!");
+        chronoHelperGravityFallingBlock = chronoHelperGravity;
+        if (chronoHelperGravity && !SorbetHelperModule.ChronoHelperLoaded)
+            Logger.Warn(nameof(SorbetHelper), "Trying to load a Custom Gravity Falling Block without chrono helper enabled!");
 
         Add(new Coroutine(Sequence()));
 
