@@ -6,6 +6,32 @@ ModID: SorbetHelper
 ModName: Sorbet Helper
 
 Entities:
+  # entries beginning with '$' are to be used with "Copy" and do not appear in the generated language file (see light cover controller, entity as styleground controller & dash falling block for examples)
+  $TypeNameController:
+    Attributes:
+      classNames:
+        Description: |-
+          A comma separated list of C# entity class names the controller should affect.
+          You can use something like CelesteTAS or Mapping Utils to try and find these.
+      useFullClassNames:
+        Description: |-
+          Whether the controller should check for the fully qualified class names or just the name of the class.
+          e.g. Celeste.SummitCloud vs SummitCloud
+      minDepth:
+        Description: |-
+          The minimum (closest to the camera) depth an entity can have while being affected by the controller.
+          Allows restricting the controller to specific entities if you have multiple of the same type but with different depths.
+          Leave empty to make uncapped.
+      maxDepth:
+        Description: |-
+          The maximum (farthest from the camera) depth an entity can have while being affected by the controller.
+          Allows restricting the controller to specific entities if you have multiple of the same type but with different depths.
+          Leave empty to make uncapped.
+      global:
+        Description: |-
+          Whether the controller should apply globally, to every entity as they are loaded.
+          Allows even affecting entities added after room load, and automatically across the whole map.
+
   SorbetHelper/FlagToggledKillbox:
     Placements:
       flag_toggled_killbox:
@@ -116,51 +142,12 @@ Entities:
       dashFallingBlock:
         Name: Dash Falling Block
         Description: a falling block that falls when dashed into
+    Copy:
+      - SorbetHelper/CustomFallingBlock
+      # ^^^ copies attributes from custom falling block
     Attributes:
-      tiletype:
-        Description: Determines the visual appearance of the falling block.
-      direction:
-        Description: The direction the falling block will fall towards.
-      flagOnFall:
-        Description: An optional session flag to set when the block starts falling.
-      flagOnLand:
-        Description: An optional session flag to set when the block lands.
-      triggerFlag:
-        Description: An optional session flag which should trigger the block to fall.
-      fallOnTouch:
-        Description: Whether the block should fall when the player lands on it.
-      climbFall:
-        Description: |-
-          Whether the block should also fall if the player climbs on its sides.
-          Requires Fall On Touch to be enabled.
-      fallOnStaticMover:
-        Name: Static Mover Triggered
-        Description: Whether the falling block can be triggered by static movers (such as springs) attached to it.
-      breakDashBlocks:
-        Description: Whether the falling block can break dash blocks.
-      initialShakeTime:
-        Description: How long (in seconds) the block should initially shake for.
-      variableShakeTime:
-        Description: |-
-          How long (in seconds) the block should continue shaking for, after the initial shake time.
-          Unlike the initial timer, this can be interupted if the player stops touching the block (as long as they were what caused it to fall).
-      maxSpeed:
-        Description: The maximum speed of the block (in pixels per second) as it falls.
-      acceleration:
-        Description: The acceleration of the block (in pixels per second) as it falls.
-      shakeSfx:
-        Description: The sound played by the block before it falls.
       impactSfx:
         Description: The sound played by the block when it lands on the ground, or is dashed into.
-      depth:
-        Description: |-
-          Determines the visual depth of the block.
-          Higher values mean farther behind in the scene, default value is -9000.
-      chronoHelperGravity:
-        Description: |-
-          Whether the falling block should be affected by Gravity Falling Block Switches from Chrono Helper.
-          Requires Chrono Helper.
-      # ^^^ same as custom falling block
       allowWavedash:
         Description: Whether it is possible to wavedash on top of the block.
       dashCornerCorrection:
@@ -418,31 +405,11 @@ Entities:
     Placements:
       controller:
         Name: Light Cover Controller
+    Copy:
+      - $TypeNameController
     Attributes:
-      classNames:
-        Description: |-
-          A comma separated list of C# entity class names the controller should affect.
-          You can use something like CelesteTAS or Mapping Utils to try and find these.
-      useFullClassNames:
-        Description: |-
-          Whether the controller should check for the fully qualified class names or just the name of the class.
-          e.g. Celeste.SummitCloud vs SummitCloud
       alpha:
         Description: How strong the light cover is.
-      minDepth:
-        Description: |-
-          The minimum (closest to the camera) depth an entity can have while being affected by the controller.
-          Allows restricting the controller to specific entities if you have multiple of the same type but with different depths.
-          Leave empty to make uncapped.
-      maxDepth:
-        Description: |-
-          The maximum (farthest from the camera) depth an entity can have while being affected by the controller.
-          Allows restricting the controller to specific entities if you have multiple of the same type but with different depths.
-          Leave empty to make uncapped.
-      global:
-        Description: |-
-          Whether the controller should apply globally, to every entity as they are loaded.
-          Allows even affecting entities added after room load, and automatically across the whole map.
   
   SorbetHelper/DepthAdheringDisplacementWrapper:
     Placements:
@@ -527,33 +494,13 @@ Entities:
       controller:
         Name: Entity As Styleground Controller
         Description: Marks specified entity types to be drawn as a styleground layer by an Entity As Styleground Renderer styleground.
+    Copy:
+      - $TypeNameController
     Attributes:
-      classNames:
-        Description: |-
-          A comma separated list of C# entity class names the controller should affect.
-          You can use something like CelesteTAS or Mapping Utils to try and find these.
-      useFullClassNames:
-        Description: |-
-          Whether the controller should check for the fully qualified class names or just the name of the class.
-          e.g. Celeste.SummitCloud vs SummitCloud
-      minDepth:
-        Description: |-
-          The minimum (closest to the camera) depth an entity can have while being affected by the controller.
-          Allows restricting the controller to specific entities if you have multiple of the same type but with different depths.
-          Leave empty to make uncapped.
-      maxDepth:
-        Description: |-
-          The maximum (farthest from the camera) depth an entity can have while being affected by the controller.
-          Allows restricting the controller to specific entities if you have multiple of the same type but with different depths.
-          Leave empty to make uncapped.
       tag:
         Description: |-
           The styleground tag used to match with an Entity As Styleground Renderer styleground.
           Required in order for the controller to have any effect.
-      global:
-        Description: |-
-          Whether the controller should apply globally, to every entity as they are loaded.
-          Allows even affecting entities added after room load, and automatically across the whole map.
       _instructionsButton:
         Name: Info
         Description: |-
