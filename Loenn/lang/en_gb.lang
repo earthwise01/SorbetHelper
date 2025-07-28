@@ -256,6 +256,7 @@ entities.SorbetHelper/DisplacementEffectBlocker.placements.description.depthAdhe
 entities.SorbetHelper/DisplacementEffectBlocker.attributes.name.waterOnly=Waves Only
 entities.SorbetHelper/DisplacementEffectBlocker.attributes.description.waterOnly=Whether the displacement blocker should only affect the wavy displacement from water, etc.\nDisabling this makes offset displacement like the burst effect from Madeline dashing or pulsing strawberries etc. also get blocked.
 entities.SorbetHelper/DisplacementEffectBlocker.attributes.description.depth=The depth of the displacement blocker.\nAny entity affected by a displacement depth fixer with a depth equal to or higher than this will be affected by the blocker.\nhigher values mean farther behind in the scene.
+entities.SorbetHelper/DisplacementEffectBlocker.attributes.description.flag=A session flag that needs to be enabled in order for the displacement blocker to be active. Leaving this empty causes the blocker to always be active.\nAdding a '!' before the flag name will make it need to be disabled instead in order for the displacement blocker to be active.
 
 # Displacement Effect Area
 entities.SorbetHelper/DisplacementEffectArea.placements.name.normal=Displacement Effect Area
@@ -265,6 +266,7 @@ entities.SorbetHelper/DisplacementEffectArea.attributes.description.verticalDisp
 entities.SorbetHelper/DisplacementEffectArea.attributes.description.waterDisplacement=The water displacement amount.\nRanges from 0.0 to 1.0, values closer to 1.0 result in faster waves.\nWater uses 0.25, small waterfalls use 0.8, big waterfalls use 1.0, and heatwaves use 0.1.
 entities.SorbetHelper/DisplacementEffectArea.attributes.description.alpha=The overall strength of the displacement.
 entities.SorbetHelper/DisplacementEffectArea.attributes.description.depth=The visual depth the effect should be applied at (using the power of depth adhering displacement).
+entities.SorbetHelper/DisplacementEffectArea.attributes.description.flag=A session flag that needs to be enabled in order for the displacement to be visible. Leaving this empty causes the displacement to always be visible.\nAdding a '!' before the flag name will make it need to be disabled instead in order for the displacement to be visible.
 
 # Entity Styleground Controller
 entities.SorbetHelper/EntityStylegroundController.placements.name.controller=Entity As Styleground Controller

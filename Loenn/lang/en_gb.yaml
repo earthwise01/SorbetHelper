@@ -486,7 +486,11 @@ Entities:
           The depth of the displacement blocker.
           Any entity affected by a displacement depth fixer with a depth equal to or higher than this will be affected by the blocker.
           higher values mean farther behind in the scene.
-  
+      flag:
+        Description: |-
+          A session flag that needs to be enabled in order for the displacement blocker to be active. Leaving this empty causes the blocker to always be active.
+          Adding a '!' before the flag name will make it need to be disabled instead in order for the displacement blocker to be active.
+
   SorbetHelper/DisplacementEffectArea:
     Placements:
       normal:
@@ -511,7 +515,11 @@ Entities:
         Description: The overall strength of the displacement.
       depth:
         Description: The visual depth the effect should be applied at (using the power of depth adhering displacement).
-  
+      flag:
+        Description: |-
+          A session flag that needs to be enabled in order for the displacement to be visible. Leaving this empty causes the displacement to always be visible.
+          Adding a '!' before the flag name will make it need to be disabled instead in order for the displacement to be visible.
+
   SorbetHelper/EntityStylegroundController:
     Placements:
       controller:

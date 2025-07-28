@@ -16,6 +16,7 @@ displacementArea.placements = {
             waterDisplacement = 0.25,
             alpha = 1.0,
             depthAdhering = false,
+            flag = "",
         }
     },
     {
@@ -29,6 +30,7 @@ displacementArea.placements = {
             waterDisplacement = 0.25,
             alpha = 1.0,
             depthAdhering = true,
+            flag = "",
         }
     }
 }

@@ -14,17 +14,23 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/DisplacementEffectArea")]
 public class DisplacementEffectArea : Entity {
-    private readonly float horizontalDisplacement, verticalDisplacement;
-    private readonly float waterDisplacement;
-    private readonly float alpha;
+    private readonly Color color;
+
+    private readonly string flag;
+    private readonly bool invertFlag;
 
     public DisplacementEffectArea(EntityData data, Vector2 offset) : base(data.Position + offset) {
         Collider = new Hitbox(data.Width, data.Height);
 
-        horizontalDisplacement = 1f - (data.Float("horizontalDisplacement", 0.0f) + 1f) / 2f; // remap the values from the "more friendly" -1 to 1 range to the actual expected 0 to 1 range (where 0.5 is no displacement)
-        verticalDisplacement = 1f - (data.Float("verticalDisplacement", 0.0f) + 1f) / 2f;
-        waterDisplacement = data.Float("waterDisplacement", 0.25f);
-        alpha = data.Float("alpha", 1.0f);
+        var horizontalDisplacement = 1f - (data.Float("horizontalDisplacement", 0.0f) + 1f) / 2f; // remap the values from the "more friendly" -1 to 1 range to the actual expected 0 to 1 range (where 0.5 is no displacement)
+        var verticalDisplacement = 1f - (data.Float("verticalDisplacement", 0.0f) + 1f) / 2f;
+        var waterDisplacement = data.Float("waterDisplacement", 0.25f);
+        var alpha = data.Float("alpha", 1.0f);
+        color = new Color(horizontalDisplacement, verticalDisplacement, waterDisplacement) * alpha;
+
+        flag = data.Attr("flag", "");
+        if (invertFlag = flag.StartsWith('!'))
+            flag = flag.Substring(1);
 
         if (data.Bool("depthAdhering", false)) {
             Depth = data.Int("depth", 0);
@@ -35,7 +41,8 @@ public class DisplacementEffectArea : Entity {
     }
 
     public void RenderDisplacement() {
-        var color = new Color(horizontalDisplacement, verticalDisplacement, waterDisplacement) * alpha;
+        if (!string.IsNullOrEmpty(flag) && !(Scene as Level).Session.GetFlag(flag, invertFlag))
+            return;
 
         Draw.Rect(Position, Width, Height, color);
     }

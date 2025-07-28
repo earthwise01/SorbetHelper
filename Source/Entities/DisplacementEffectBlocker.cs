@@ -18,6 +18,9 @@ public class DisplacementEffectBlocker : Entity {
     public readonly bool DepthAdhering;
     public readonly bool WaterOnly;
 
+    private readonly string flag;
+    private readonly bool invertFlag;
+
     public static readonly Color NoDisplacementColor = new(0.5f, 0.5f, 0.0f, 1.0f);
     public static readonly Color NoWaterDisplacementMultColor = new(1.0f, 1.0f, 0.0f, 1.0f);
     public static readonly BlendState WaterDisplacementBlockerBlendState = new() {
@@ -33,6 +36,17 @@ public class DisplacementEffectBlocker : Entity {
         DepthAdhering = data.Bool("depthAdhering", false);
         WaterOnly = data.Bool("waterOnly", false);
         Depth = data.Int("depth", 0);
+
+        flag = data.Attr("flag", "");
+        if (invertFlag = flag.StartsWith('!'))
+            flag = flag.Substring(1);
+    }
+
+    public override void Update() {
+        base.Update();
+
+        if (!string.IsNullOrEmpty(flag))
+            Visible = (Scene as Level).Session.GetFlag(flag, invertFlag);
     }
 
     public static void Load() {
@@ -69,14 +83,14 @@ public class DisplacementEffectBlocker : Entity {
 
     private static void renderFullBlockers(Scene scene) {
         foreach (var entity in scene.Tracker.GetEntities<DisplacementEffectBlocker>()) {
-            if (entity is DisplacementEffectBlocker { DepthAdhering: false, WaterOnly: false }) {
+            if (entity is DisplacementEffectBlocker { Visible: true, DepthAdhering: false, WaterOnly: false }) {
                 Draw.Rect(entity.Position, entity.Width, entity.Height, NoDisplacementColor);
             }
         }
     }
 
     private static void renderWaterBlockers(Scene scene) {
-        var waterBlockers = scene.Tracker.GetEntities<DisplacementEffectBlocker>().Where(entity => entity is DisplacementEffectBlocker { DepthAdhering: false, WaterOnly: true });
+        var waterBlockers = scene.Tracker.GetEntities<DisplacementEffectBlocker>().Where(entity => entity is DisplacementEffectBlocker { Visible: true, DepthAdhering: false, WaterOnly: true });
         if (!waterBlockers.Any())
             return;
 

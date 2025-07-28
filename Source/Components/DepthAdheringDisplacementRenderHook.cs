@@ -77,7 +77,7 @@ public class DepthAdheringDisplacementRenderHook : RenderOverride {
         var displacementBlockers = Scene.Tracker.GetEntities<DisplacementEffectBlocker>();
         // support for displacement effect blockers
         foreach (var entity in displacementBlockers) {
-            if (entity is DisplacementEffectBlocker { DepthAdhering: true, WaterOnly: false } && entity.Depth <= Entity.Depth) {
+            if (entity is DisplacementEffectBlocker { Visible: true, DepthAdhering: true, WaterOnly: false } && entity.Depth <= Entity.Depth) {
                 Draw.Rect(entity.X, entity.Y, entity.Width, entity.Height, displacementBgColor);
             }
         }
@@ -85,7 +85,7 @@ public class DepthAdheringDisplacementRenderHook : RenderOverride {
         Draw.SpriteBatch.End();
 
         // water only displacement blockers
-        var waterBlockers = displacementBlockers.Where(entity => entity is DisplacementEffectBlocker { DepthAdhering: true, WaterOnly: true } && entity.Depth <= Entity.Depth);
+        var waterBlockers = displacementBlockers.Where(entity => entity is DisplacementEffectBlocker { Visible: true, DepthAdhering: true, WaterOnly: true } && entity.Depth <= Entity.Depth);
         if (waterBlockers.Any()) {
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, DisplacementEffectBlocker.WaterDisplacementBlockerBlendState, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, camera.Matrix);
 

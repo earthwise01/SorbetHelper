@@ -13,6 +13,7 @@ displacementEffectBlocker.placements = {
             height = 8,
             waterOnly = false,
             depthAdhering = false,
+            flag = "",
         }
     },
     {
@@ -22,6 +23,7 @@ displacementEffectBlocker.placements = {
             height = 8,
             waterOnly = true,
             depthAdhering = false,
+            flag = "",
         }
     },
     {
@@ -32,6 +34,7 @@ displacementEffectBlocker.placements = {
             waterOnly = false,
             depth = 0,
             depthAdhering = true,
+            flag = "",
         }
     }
 }
