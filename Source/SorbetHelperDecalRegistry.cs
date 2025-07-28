@@ -3,6 +3,7 @@ using Celeste.Mod.Registry.DecalRegistryHandlers;
 using Celeste.Mod.SorbetHelper.Entities;
 using Celeste.Mod.SorbetHelper.Components;
 using Celeste.Mod.SorbetHelper.Utils;
+using Celeste.Mod.SorbetHelper.HiRes;
 
 namespace Celeste.Mod.SorbetHelper;
 
@@ -44,8 +45,20 @@ public static class SorbetHelperDecalRegistry {
         }
     }
 
+    public class HiResDecalHandler : DecalRegistryHandler {
+        public override string Name => "sorbetHelper_hiRes";
+
+        public override void ApplyTo(Decal decal) {
+            decal.Add(new RenderOverride(false, false));
+            decal.Add(new HiResRenderHook(decal.Render, decal.Depth - 1));
+        }
+
+        public override void Parse(XmlAttributeCollection xml) { }
+    }
+
     internal static void LoadHandlers() {
         DecalRegistry.AddPropertyHandler<LightCoverHandler>();
         DecalRegistry.AddPropertyHandler<DecalStylegroundHandler>();
+        DecalRegistry.AddPropertyHandler<HiResDecalHandler>();
     }
 }

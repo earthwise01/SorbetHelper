@@ -8,6 +8,9 @@ sorbethelper_ui_check= Check
 sorbethelper_ui_inspect= Inspect
 sorbethelper_ui_toggle= Toggle
 
+sorbethelper_failedtoaddhiresrenderlayer= Failed to add a hi-res rendering layer!
+sorbethelper_hiresdisabled= Hi-res rendering is currently disabled; please check the Sorbet Helper wiki for more info.
+
 # mod settings
 
 modsettings_sorbethelper_minipopupscale_name= Mini Popup Scale

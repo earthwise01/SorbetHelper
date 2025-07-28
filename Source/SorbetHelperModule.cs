@@ -22,6 +22,7 @@ public class SorbetHelperModule : EverestModule {
     public static bool ChronoHelperLoaded { get; private set; }
 
     public static Effect FxAlphaMask { get; private set; }
+    public static Effect FxHiResDistort { get; private set; }
 
     public SorbetHelperModule() {
         Instance = this;
@@ -72,6 +73,9 @@ public class SorbetHelperModule : EverestModule {
         // backdrops
         ParallaxHiResSnow.Load();
         HiResGodrays.Load();
+
+        // fearful emoji
+        HiRes.HiResRenderer.LoadLoader();
     }
 
     public override void Unload() {
@@ -103,6 +107,9 @@ public class SorbetHelperModule : EverestModule {
         // backdrops
         ParallaxHiResSnow.Unload();
         HiResGodrays.Unload();
+
+        // fearful emoji
+        HiRes.HiResRenderer.UnloadLoader();
     }
 
     public override void PrepareMapDataProcessors(MapDataFixup context) {
@@ -113,6 +120,7 @@ public class SorbetHelperModule : EverestModule {
 
     public override void LoadContent(bool firstLoad) {
         FxAlphaMask = LoadShader("AlphaMask");
+        FxHiResDistort = LoadShader("HiResDistort");
     }
 
     private static Effect LoadShader(string id) =>
