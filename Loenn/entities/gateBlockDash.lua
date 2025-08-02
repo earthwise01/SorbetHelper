@@ -37,6 +37,7 @@ for k,v in ipairs(axes) do
             activeColor = "ffffff",
             finishColor = "f141df",
             smoke = true,
+            drawOutline = true,
             moveSound = "event:/sorbethelper/sfx/gateblock_open",
             finishedSound = "event:/sorbethelper/sfx/gateblock_finish",
             shakeTime = 0.5,
@@ -53,7 +54,19 @@ for k,v in ipairs(axes) do
     })
 end
 
-dashGateBlock.fieldOrder = {"x", "y", "width", "height", "inactiveColor", "activeColor", "finishColor", "moveSound", "blockSprite", "finishedSound", "iconSprite", "shakeTime", "axes", "moveTime", "linkTag", "moveEased", "allowReturn", "allowWavedash", "dashCornerCorrection", "smoke", "persistent", "refillDash"}
+dashGateBlock.fieldOrder = {
+    "x", "y",
+    "width", "height",
+    "inactiveColor", "activeColor",
+    "finishColor", "moveSound",
+    "blockSprite", "finishedSound",
+    "iconSprite", "shakeTime",
+    "axes", "moveTime",
+    "linkTag", "moveEased", "allowReturn",
+    "allowWavedash", "dashCornerCorrection", "refillDash", "persistent",
+    "smoke", "drawOutline"
+}
+
 
 dashGateBlock.fieldInformation = {
     inactiveColor = {
@@ -77,6 +90,9 @@ dashGateBlock.fieldInformation = {
             -- "SorbetHelper/gateblock/dash/icon"        
         },
         editable = true
+    },
+    drawOutline = {
+        default = true
     },
     axes = {
         options = axes,

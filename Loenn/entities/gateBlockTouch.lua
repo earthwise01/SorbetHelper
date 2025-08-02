@@ -44,7 +44,17 @@ touchGateBlock.placements = {
     }
 }
 
-touchGateBlock.fieldOrder = {"x", "y", "width", "height", "inactiveColor", "activeColor", "finishColor", "moveSound", "blockSprite", "finishedSound", "iconSprite", "shakeTime", "linkTag", "moveTime", "moveEased", "allowReturn", "moveOnGrab", "moveOnStaticMoverInteract", "moveOnStaticMover", "smoke", "persistent"}
+touchGateBlock.fieldOrder = {
+    "x", "y",
+    "width", "height",
+    "inactiveColor", "activeColor",
+    "finishColor", "moveSound",
+    "blockSprite", "finishedSound",
+    "iconSprite", "shakeTime",
+    "linkTag", "moveTime",
+    "moveOnGrab", "moveOnStaticMoverInteract", "moveOnStaticMover", "moveEased", "allowReturn",
+    "smoke", "drawOutline", "persistent"
+}
 
 touchGateBlock.fieldInformation = {
     inactiveColor = {
@@ -68,6 +78,9 @@ touchGateBlock.fieldInformation = {
             -- "SorbetHelper/gateblock/touch/icon"        
         },
         editable = true
+    },
+    drawOutline = {
+        default = true
     },
 }
 

@@ -39,6 +39,7 @@ public abstract class GateBlock : Solid {
     protected readonly SoundSource openSfx;
 
     protected readonly bool smoke;
+    protected readonly bool drawOutline;
     protected readonly Color inactiveColor;
     protected readonly Color activeColor;
     protected readonly Color finishColor;
@@ -72,6 +73,7 @@ public abstract class GateBlock : Solid {
         onActivateFlag = data.Attr("linkTag", "");
 
         smoke = data.Bool("smoke", true);
+        drawOutline = data.Bool("drawOutline", true);
         inactiveColor = Calc.HexToColor(data.Attr("inactiveColor", "5FCDE4"));
         activeColor = Calc.HexToColor(data.Attr("activeColor", "FFFFFF"));
         finishColor = Calc.HexToColor(data.Attr("finishColor", "F141DF"));
@@ -122,7 +124,10 @@ public abstract class GateBlock : Solid {
 
     public override void Added(Scene scene) {
         base.Added(scene);
-        GateBlockOutlineRenderer.TryCreateRenderer(scene);
+
+        // no need to try creating an outline renderer if the block doesn't need an outline anyway
+        if (drawOutline)
+            GateBlockOutlineRenderer.TryCreateRenderer(scene);
     }
 
     public override void Awake(Scene scene) {
@@ -182,6 +187,7 @@ public abstract class GateBlock : Solid {
 
     public virtual void RenderOutline() {
         // outline rendering should be implemented per gate block type
+        // not called if drawOutline is false
     }
 
     // (somewhat) stolen from maddie helping hand
@@ -431,7 +437,7 @@ public abstract class GateBlock : Solid {
             var blocks = Scene.Tracker.GetEntities<GateBlock>();
 
             foreach (GateBlock block in blocks) {
-                if (block.Visible && block.VisibleOnCamera) {
+                if (block.Visible && block.VisibleOnCamera && block.drawOutline) {
                     block.RenderOutline();
                 }
             }

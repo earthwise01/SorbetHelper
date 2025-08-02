@@ -702,6 +702,8 @@ Entities:
         Description: The sound played by the gate when it is done moving.
       smoke:
         Description: Whether the block should emit smoke when reaching its final position.
+      drawOutline:
+        Description: Whether the block should have an outline.
       allowWavedash:
         Description: Whether it is possible to wavedash on top of the block.
       dashCornerCorrection:
@@ -751,6 +753,8 @@ Entities:
         Description: The sound played by the gate when it is done moving.
       smoke:
         Description: Whether the block should emit smoke when reaching its final position.
+      drawOutline:
+        Description: Whether the block should have an outline.
       moveOnGrab:
         Description: Whether the block should be activated if the player climbs on its sides.
       moveOnStaticMoverInteract:
