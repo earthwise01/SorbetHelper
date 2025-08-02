@@ -5,8 +5,8 @@ local connectedEntities = require("helpers.connected_entities")
 local dashSwitchBlock = {}
 
 local colors = {
-    "0dcbe0",
-    "e5c828",
+    "00c2c2",
+    "fca700",
 }
 
 local frames = {

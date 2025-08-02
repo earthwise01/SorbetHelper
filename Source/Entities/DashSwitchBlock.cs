@@ -30,15 +30,11 @@ public class DashSwitchBlock : Solid {
     private readonly List<Image> allImages = [];
 
     public DashSwitchBlock(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, data.Height, false) {
-        _ = nameof(CassetteBlock);
-        _ = nameof(DashBlock);
-        _ = nameof(DashFallingBlock);
-
         SurfaceSoundIndex = 35;
         Index = data.Int("index", 0);
         color = Index switch {
-            0 => Calc.HexToColor("0dcbe0"),
-            1 => Calc.HexToColor("e5c828"),
+            0 => Calc.HexToColor("00c2c2"),
+            1 => Calc.HexToColor("fca700"),
             _ => throw new System.NotImplementedException($"Index {Index} is not supported!"),
         };
 
@@ -61,7 +57,8 @@ public class DashSwitchBlock : Solid {
 
         Input.Rumble(RumbleStrength.Strong, RumbleLength.Long);
         SceneAs<Level>().DirectionalShake(dir, 0.25f);
-        StartShaking(0.25f);
+        Audio.Play("event:/game/03_resort/forcefield_bump", Center);
+        Audio.Play("event:/game/05_mirror_temple/button_activate", Center);
         Switch();
 
         return DashCollisionResults.Rebound;
@@ -90,7 +87,7 @@ public class DashSwitchBlock : Solid {
         return true;
     }
 
-    public void UpdateState(int index) {
+    public void UpdateState(int index, bool silent = false) {
         Activated = Index == index;
 
         if (groupLeader && Activated && !Collidable) {
@@ -99,13 +96,20 @@ public class DashSwitchBlock : Solid {
                 foreach (var dashSwitchBlock in group) {
                     dashSwitchBlock.Collidable = true;
                     dashSwitchBlock.EnableStaticMovers();
+
+                    if (!silent)
+                        dashSwitchBlock.ActivateEffects();
                 }
 
-                wiggler.Start();
+                if (!silent)
+                    wiggler.Start();
             }
         } else if (!Activated && Collidable) {
             Collidable = false;
             DisableStaticMovers();
+
+            if (!silent)
+                DeactivateEffects();
         }
 
         UpdateVisualState();
@@ -135,6 +139,26 @@ public class DashSwitchBlock : Solid {
                         foreach (Component component in spikes.Components)
                             if (component is Image image)
                                 image.Scale = scale;
+            }
+        }
+    }
+
+    private void ActivateEffects() {
+
+    }
+
+    private void DeactivateEffects() {
+        var particles = (Scene as Level).Particles;
+
+        var particle = new ParticleType(ParticleTypes.VentDust) {
+            Color = color,
+            Color2 = Color.White,
+            ColorMode = ParticleType.ColorModes.Fade
+        };
+
+        for (int x = 0; x < Width / 8f; x++) {
+            for (int y = 0; y < Height / 8f; y++) {
+                particles.Emit(particle, 1, Position + new Vector2(x * 8 + 4, y * 8 + 4), Vector2.One * 4f, color, Calc.Random.NextAngle());
             }
         }
     }
@@ -247,7 +271,7 @@ public class DashSwitchBlock : Solid {
         if (!Collidable)
             DisableStaticMovers();
 
-        UpdateState(GetDashSwitchBlockIndex((Scene as Level).Session));
+        UpdateState(GetDashSwitchBlockIndex((Scene as Level).Session), silent: true);
     }
 
     private void FindInGroup(DashSwitchBlock block) {
