@@ -366,6 +366,11 @@ entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnStaticMover=Do
 entities.SorbetHelper/TouchGateBlock.attributes.name.linkTag=Flag On Activate
 entities.SorbetHelper/TouchGateBlock.attributes.description.linkTag=An optional session flag to enable when the block activates.
 
+# Dash Switch Block
+entities.SorbetHelper/DashSwitchBlock.placements.name.dashSwitchBlock_0=Dash Switch Block (Cyan)
+entities.SorbetHelper/DashSwitchBlock.placements.name.dashSwitchBlock_1=Dash Switch Block (Yellow)
+entities.SorbetHelper/DashSwitchBlock.attributes.description.index=The index of the block.\n0 = Cyan\n1 = Yellow
+
 # -- Triggers --
 
 # Alternate Interact Prompt

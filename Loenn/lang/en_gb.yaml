@@ -767,6 +767,19 @@ Entities:
         Name: Flag On Activate
         Description: An optional session flag to enable when the block activates.
 
+  SorbetHelper/DashSwitchBlock:
+    Placements:
+      dashSwitchBlock_0:
+        Name: Dash Switch Block (Cyan)
+      dashSwitchBlock_1:
+        Name: Dash Switch Block (Yellow)
+    Attributes:
+      index: 
+        Description: |-
+          The index of the block.
+          0 = Cyan
+          1 = Yellow
+
 Triggers:
   SorbetHelper/AlternateInteractPrompt:
     Placements:
