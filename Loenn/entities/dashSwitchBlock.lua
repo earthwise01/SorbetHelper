@@ -10,8 +10,8 @@ local colors = {
 }
 
 local frames = {
-    "objects/cassetteblock/solid",
-    "objects/cassetteblock/solid",
+    "objects/SorbetHelper/dashSwitchBlock/solid",
+    "objects/SorbetHelper/dashSwitchBlock/solid",
 }
 
 local depths = {

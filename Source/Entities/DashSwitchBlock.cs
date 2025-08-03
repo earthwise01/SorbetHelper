@@ -295,9 +295,9 @@ public class DashSwitchBlock : Solid {
     }
 
     private void SetImage(float x, float y, int tx, int ty) {
-        var atlasSubtextures = GFX.Game.GetAtlasSubtextures("objects/cassetteblock/pressed");
+        var atlasSubtextures = GFX.Game.GetAtlasSubtextures("objects/SorbetHelper/dashSwitchBlock/pressed");
         pressedImages.Add(CreateImage(x, y, tx, ty, atlasSubtextures[Index % atlasSubtextures.Count]));
-        solidImages.Add(CreateImage(x, y, tx, ty, GFX.Game["objects/cassetteblock/solid"]));
+        solidImages.Add(CreateImage(x, y, tx, ty, GFX.Game["objects/SorbetHelper/dashSwitchBlock/solid"]));
     }
 
     private Image CreateImage(float x, float y, int tx, int ty, MTexture tex) {
