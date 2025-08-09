@@ -366,6 +366,18 @@ entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnStaticMover=Do
 entities.SorbetHelper/TouchGateBlock.attributes.name.linkTag=Flag On Activate
 entities.SorbetHelper/TouchGateBlock.attributes.description.linkTag=An optional session flag to enable when the block activates.
 
+# Puffer Tweaks Controller
+entities.SorbetHelper/PufferTweaksController.placements.name.controller=Puffer Tweaks Controller
+entities.SorbetHelper/PufferTweaksController.attributes.description.fixSquishExplode=Fixes puffers exploding multiple times in quick succession when squished by a moving platform.
+entities.SorbetHelper/PufferTweaksController.attributes.description.snapToSpring=Whether puffers launched by springs should launch from the spring's position rather than their previous position.\nCan help with making contraptions/setups more consistent.
+entities.SorbetHelper/PufferTweaksController.attributes.name.springXSpeedThreshold=Spring X Speed Threshold
+entities.SorbetHelper/PufferTweaksController.attributes.description.springXSpeedThreshold=To activate a horizontal spring, puffers must be slower than or equal to this speed in its direction.
+entities.SorbetHelper/PufferTweaksController.attributes.name.springYSpeedThreshold=Spring Y Speed Threshold
+entities.SorbetHelper/PufferTweaksController.attributes.description.springYSpeedThreshold=To activate a vertical spring, puffers must be slower than or equal to this speed in its direction.
+entities.SorbetHelper/PufferTweaksController.attributes.description.canBePushedWhileExploded=Whether puffers can be pushed around by moving platforms while in their exploded state.
+entities.SorbetHelper/PufferTweaksController.attributes.description.canRespawnWhenHomeBlocked=Whether puffers can respawn when their home is blocked by a solid.
+entities.SorbetHelper/PufferTweaksController.attributes.description.moreExplodeParticles=Adds more particles to puffer explosions.
+
 # -- Triggers --
 
 # Alternate Interact Prompt

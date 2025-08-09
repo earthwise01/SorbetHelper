@@ -767,6 +767,30 @@ Entities:
         Name: Flag On Activate
         Description: An optional session flag to enable when the block activates.
 
+  SorbetHelper/PufferTweaksController:
+    Placements:
+      controller:
+        Name: Puffer Tweaks Controller
+    Attributes:
+      fixSquishExplode:
+        Description: Fixes puffers exploding multiple times in quick succession when squished by a moving platform.
+      snapToSpring:
+        Description: |-
+          Whether puffers launched by springs should launch from the spring's position rather than their previous position.
+          Can help with making contraptions/setups more consistent.
+      springXSpeedThreshold:
+        Name: Spring X Speed Threshold
+        Description: To activate a horizontal spring, puffers must be slower than or equal to this speed in its direction.
+      springYSpeedThreshold:
+        Name: Spring Y Speed Threshold
+        Description: To activate a vertical spring, puffers must be slower than or equal to this speed in its direction.
+      canBePushedWhileExploded:
+        Description: Whether puffers can be pushed around by moving platforms while in their exploded state.
+      canRespawnWhenHomeBlocked:
+        Description: Whether puffers can respawn when their home is blocked by a solid.
+      moreExplodeParticles:
+        Description: Adds more particles to puffer explosions.
+
 Triggers:
   SorbetHelper/AlternateInteractPrompt:
     Placements:

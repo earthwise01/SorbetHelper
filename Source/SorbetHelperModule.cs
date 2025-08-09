@@ -61,6 +61,7 @@ public class SorbetHelperModule : EverestModule {
         ReturnBubbleBehaviorController.Load();
         StylegroundDepthController.Load();
         MusicSyncControllerFMOD.Load();
+        PufferTweaksController.Load();
 
         // components
         RenderOverride.Load();
@@ -92,6 +93,7 @@ public class SorbetHelperModule : EverestModule {
         ReturnBubbleBehaviorController.Unload();
         StylegroundDepthController.Unload();
         MusicSyncControllerFMOD.Unload();
+        PufferTweaksController.Unload();
 
         // components
         RenderOverride.Unload();
