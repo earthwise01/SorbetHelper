@@ -7,11 +7,15 @@ mods.SorbetHelper.name=Sorbet Helper
 
 # Flag Toggled Killbox
 entities.SorbetHelper/FlagToggledKillbox.placements.name.flag_toggled_killbox=Killbox (Flag Toggled)
-entities.SorbetHelper/FlagToggledKillbox.attributes.description.flag=A session flag that needs to be set in order for the killbox to be able to activate.
+entities.SorbetHelper/FlagToggledKillbox.placements.name.accurate_killbox=Killbox (Accurate Hitbox)
+entities.SorbetHelper/FlagToggledKillbox.attributes.description.flag=An optional session flag that needs to be set in order for the killbox to be able to activate.
 entities.SorbetHelper/FlagToggledKillbox.attributes.name.inverted=Invert Flag
 entities.SorbetHelper/FlagToggledKillbox.attributes.description.inverted=When checked, the killbox can only be active when the flag is disabled, rather than when it is enabled.
-entities.SorbetHelper/FlagToggledKillbox.attributes.description.flagOnly=Whether the killbox's collidability should be entirely dependent on the flag, rather than still requiring the player to be above it.
-entities.SorbetHelper/FlagToggledKillbox.attributes.description.lenientHitbox=Whether the player should only die once they are fully below the killbox, matching how the actual bottom of a room behaves.
+entities.SorbetHelper/FlagToggledKillbox.attributes.description.flagOnly=Whether the killbox's collidability should be fully controlled by its flag, rather than also requiring the player to be above it.
+entities.SorbetHelper/FlagToggledKillbox.attributes.description.playerAboveThreshold=How far (in pixels) above the killbox the player needs to be in order for it to activate. Default is 32.
+entities.SorbetHelper/FlagToggledKillbox.attributes.name.lenientHitbox=Accurate Hitbox
+entities.SorbetHelper/FlagToggledKillbox.attributes.description.lenientHitbox=Whether the player should only die once they are fully beneath the top of the killbox, closer matching the behavior of the actual bottom of a room.
+entities.SorbetHelper/FlagToggledKillbox.attributes.description.updateOnLoad=Whether the killbox should attempt to update its collidability immediately after loading, preventing the camera from snapping up if placed next to a room transition or near a spawn point.
 
 # Kill Zone
 entities.SorbetHelper/KillZone.placements.name.killzone=Kill Zone
@@ -365,6 +369,18 @@ entities.SorbetHelper/TouchGateBlock.attributes.name.moveOnStaticMover=Static Mo
 entities.SorbetHelper/TouchGateBlock.attributes.description.moveOnStaticMover=Does nothing, replace this block to fix.
 entities.SorbetHelper/TouchGateBlock.attributes.name.linkTag=Flag On Activate
 entities.SorbetHelper/TouchGateBlock.attributes.description.linkTag=An optional session flag to enable when the block activates.
+
+# Puffer Tweaks Controller
+entities.SorbetHelper/PufferTweaksController.placements.name.controller=Puffer Tweaks Controller
+entities.SorbetHelper/PufferTweaksController.attributes.description.fixSquishExplode=Fixes puffers exploding multiple times in quick succession when squished by a moving platform.
+entities.SorbetHelper/PufferTweaksController.attributes.description.snapToSpring=Whether puffers launched by springs should launch from the spring's position rather than their previous position.\nCan help with making contraptions/setups more consistent.
+entities.SorbetHelper/PufferTweaksController.attributes.name.springXSpeedThreshold=Spring X Speed Threshold
+entities.SorbetHelper/PufferTweaksController.attributes.description.springXSpeedThreshold=To activate a horizontal spring, puffers must be slower than or equal to this speed in its direction.
+entities.SorbetHelper/PufferTweaksController.attributes.name.springYSpeedThreshold=Spring Y Speed Threshold
+entities.SorbetHelper/PufferTweaksController.attributes.description.springYSpeedThreshold=To activate a vertical spring, puffers must be slower than or equal to this speed in its direction.
+entities.SorbetHelper/PufferTweaksController.attributes.description.canBePushedWhileExploded=Whether puffers can be pushed around by moving platforms while in their exploded state.
+entities.SorbetHelper/PufferTweaksController.attributes.description.canRespawnWhenHomeBlocked=Whether puffers can respawn when their home is blocked by a solid.
+entities.SorbetHelper/PufferTweaksController.attributes.description.moreExplodeParticles=Adds more particles to puffer explosions.
 
 # Dash Switch Block
 entities.SorbetHelper/DashSwitchBlock.placements.name.dashSwitchBlock_0=Dash Switch Block (Cyan)

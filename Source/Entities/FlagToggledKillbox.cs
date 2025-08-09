@@ -5,38 +5,64 @@ using Microsoft.Xna.Framework;
 using Monocle;
 using Celeste.Mod.Entities;
 using Celeste.Mod.SorbetHelper.Utils;
+using MonoMod;
 
-namespace Celeste.Mod.SorbetHelper.Entities {
+namespace Celeste.Mod.SorbetHelper.Entities;
 
-    [CustomEntity("SorbetHelper/FlagToggledKillbox")]
-    [TrackedAs(typeof(Killbox))]
-    public class FlagToggledKillbox : Killbox {
-        private readonly string flag;
-        private readonly bool inverted;
-        private readonly bool flagOnly;
+[CustomEntity("SorbetHelper/FlagToggledKillbox")]
+[TrackedAs(typeof(Killbox))]
+public class FlagToggledKillbox : Killbox {
+    private readonly string flag;
+    private readonly bool inverted;
+    private readonly bool flagOnly;
 
-        public FlagToggledKillbox(EntityData data, Vector2 offset) : base(data, offset) {
-            flag = data.Attr("flag", "");
-            inverted = data.Bool("inverted", false);
-            flagOnly = data.Bool("flagOnly", false);
+    private readonly float playerAboveThreshold;
 
-            if (data.Bool("lenientHitbox", false))
-                Get<PlayerCollider>().OnCollide = LenientOnPlayer;
-        }
+    private readonly bool updateOnLoad;
 
-        public override void Update() {
-            base.Update();
+    public FlagToggledKillbox(EntityData data, Vector2 offset) : base(data, offset) {
+        flag = data.Attr("flag", "");
+        inverted = data.Bool("inverted", false);
+        flagOnly = data.Bool("flagOnly", false);
 
-            if (string.IsNullOrEmpty(flag)) {
-                if (flagOnly)
-                    Collidable = inverted;
+        playerAboveThreshold = data.Float("playerAboveThreshold", 32f);
 
-                return;
-            }
+        updateOnLoad = data.Bool("updateOnLoad", false);
 
-            if (Collidable || flagOnly)
+        if (data.Bool("lenientHitbox", false))
+            Get<PlayerCollider>().OnCollide = LenientOnPlayer;
+    }
+
+    public override void Awake(Scene scene) {
+        base.Awake(scene);
+
+        if (updateOnLoad)
+            Update();
+    }
+
+    public override void Update() {
+        // flag only mode checks
+        if (flagOnly) {
+            if (string.IsNullOrEmpty(flag))
+                Collidable = inverted;
+            else
                 Collidable = (Scene as Level).Session.GetFlag(flag, inverted);
+
+            return;
         }
+
+        // normal collidability checks
+        var player = Scene.Tracker.GetEntity<Player>();
+
+        if (!Collidable && player is not null && player.Bottom < Top - playerAboveThreshold)
+            Collidable = true;
+        else if (player is not null && player.Top > Bottom + 32f)
+            Collidable = false;
+
+        // only keep collidable if the flag is set (or null/empty)
+        var canBeCollidable = string.IsNullOrEmpty(flag) || (Scene as Level).Session.GetFlag(flag, inverted);
+        Collidable = Collidable && canBeCollidable;
+    }
 
     // based on Level.EnforceBounds
     public void LenientOnPlayer(Player player) {
@@ -46,6 +72,5 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         } else if (player.Top > Top + 4f) {
             player.Die(Vector2.Zero);
         }
-    }
     }
 }

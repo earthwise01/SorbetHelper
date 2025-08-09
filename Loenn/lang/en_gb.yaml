@@ -36,16 +36,23 @@ Entities:
     Placements:
       flag_toggled_killbox:
         Name: Killbox (Flag Toggled)
+      accurate_killbox:
+        Name: Killbox (Accurate Hitbox)
     Attributes:
       flag:
-        Description: A session flag that needs to be set in order for the killbox to be able to activate.
+        Description: An optional session flag that needs to be set in order for the killbox to be able to activate.
       inverted:
         Name: Invert Flag
         Description: When checked, the killbox can only be active when the flag is disabled, rather than when it is enabled.
       flagOnly:
-        Description: Whether the killbox's collidability should be entirely dependent on the flag, rather than still requiring the player to be above it.
+        Description: Whether the killbox's collidability should be fully controlled by its flag, rather than also requiring the player to be above it.
+      playerAboveThreshold:
+        Description: How far (in pixels) above the killbox the player needs to be in order for it to activate. Default is 32.
       lenientHitbox:
-        Description: Whether the player should only die once they are fully below the killbox, matching how the actual bottom of a room behaves.
+        Name: Accurate Hitbox
+        Description: Whether the player should only die once they are fully beneath the top of the killbox, closer matching the behavior of the actual bottom of a room.
+      updateOnLoad:
+        Description: Whether the killbox should attempt to update its collidability immediately after loading, preventing the camera from snapping up if placed next to a room transition or near a spawn point.
 
   SorbetHelper/KillZone:
     Placements:
@@ -766,6 +773,30 @@ Entities:
       linkTag:
         Name: Flag On Activate
         Description: An optional session flag to enable when the block activates.
+
+  SorbetHelper/PufferTweaksController:
+    Placements:
+      controller:
+        Name: Puffer Tweaks Controller
+    Attributes:
+      fixSquishExplode:
+        Description: Fixes puffers exploding multiple times in quick succession when squished by a moving platform.
+      snapToSpring:
+        Description: |-
+          Whether puffers launched by springs should launch from the spring's position rather than their previous position.
+          Can help with making contraptions/setups more consistent.
+      springXSpeedThreshold:
+        Name: Spring X Speed Threshold
+        Description: To activate a horizontal spring, puffers must be slower than or equal to this speed in its direction.
+      springYSpeedThreshold:
+        Name: Spring Y Speed Threshold
+        Description: To activate a vertical spring, puffers must be slower than or equal to this speed in its direction.
+      canBePushedWhileExploded:
+        Description: Whether puffers can be pushed around by moving platforms while in their exploded state.
+      canRespawnWhenHomeBlocked:
+        Description: Whether puffers can respawn when their home is blocked by a solid.
+      moreExplodeParticles:
+        Description: Adds more particles to puffer explosions.
 
   SorbetHelper/DashSwitchBlock:
     Placements:

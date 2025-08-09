@@ -8,14 +8,37 @@ killbox.name = "SorbetHelper/FlagToggledKillbox"
 killbox.canResize = {true, false}
 killbox.depth = -1000005
 killbox.placements = {
-    name = "flag_toggled_killbox",
-    data = {
-        width = 8,
-        flag = "",
-        inverted = false,
-        flagOnly = false,
-        lenientHitbox = false
+    {
+        name = "flag_toggled_killbox",
+        data = {
+            width = 8,
+            flag = "",
+            inverted = false,
+            flagOnly = false,
+            playerAboveThreshold = 32,
+            lenientHitbox = false,
+            updateOnLoad = false,
+        }
+    },
+    {
+        name = "accurate_killbox",
+        data = {
+            width = 8,
+            flag = "",
+            inverted = false,
+            flagOnly = false,
+            playerAboveThreshold = 32,
+            lenientHitbox = true,
+            updateOnLoad = true,
+        }
     }
+}
+
+killbox.fieldOrder = {
+    "x", "y",
+    "width", "flag",
+    "playerAboveThreshold", "inverted", "flagOnly",
+    "lenientHitbox", "updateOnLoad",
 }
 
 function killbox.rectangle(room, entity)
