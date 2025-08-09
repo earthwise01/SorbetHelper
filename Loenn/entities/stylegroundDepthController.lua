@@ -52,7 +52,7 @@ function stylegroundDepthController.sprite(room, entity)
     local x, y = entity.x or 0, entity.y or 0
     local depth = entity.depth or 0
 
-    local texture = type(depth) == "number" and "stylegroundEntityController" or "stylegroundOverHudController"
+    local texture = type(tonumber(depth)) == "number" and "stylegroundEntityController" or "stylegroundOverHudController"
     local sprites = sorbetUtils.getControllerSprites(x, y, texture, true)
 
     if entity.tag ~= "" and sorbetUtils.checkForDuplicateInMap(entity, false, function(entity1, entity2) return entity1.tag == entity2.tag end) then
