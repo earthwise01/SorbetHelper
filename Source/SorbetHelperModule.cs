@@ -63,6 +63,9 @@ public class SorbetHelperModule : EverestModule {
         MusicSyncControllerFMOD.Load();
         PufferTweaksController.Load();
 
+        // triggers
+        DashSwitchBlockStateTrigger.Load();
+
         // components
         RenderOverride.Load();
         MovingPlatformHittable.Load();
@@ -94,6 +97,9 @@ public class SorbetHelperModule : EverestModule {
         StylegroundDepthController.Unload();
         MusicSyncControllerFMOD.Unload();
         PufferTweaksController.Unload();
+
+        // triggers
+        DashSwitchBlockStateTrigger.Unload();
 
         // components
         RenderOverride.Unload();

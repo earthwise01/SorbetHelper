@@ -71,7 +71,7 @@ public class DashSwitchBlock : Solid {
         SetDashSwitchBlockIndex(session, nextIndex);
 
         foreach (var dashSwitchBlock in Scene.Tracker.GetEntities<DashSwitchBlock>().Cast<DashSwitchBlock>())
-            dashSwitchBlock.UpdateState(nextIndex);
+            dashSwitchBlock.UpdateState();
     }
 
     private bool BlockedCheck() {
@@ -87,8 +87,9 @@ public class DashSwitchBlock : Solid {
         return true;
     }
 
-    public void UpdateState(int index, bool silent = false) {
-        Activated = Index == index;
+    public void UpdateState(bool silent = false) {
+        var currentIndex = GetDashSwitchBlockIndex((Scene as Level).Session);
+        Activated = Index == currentIndex;
 
         if (groupLeader && Activated && !Collidable) {
             bool canActivate = BlockedCheck();
@@ -166,7 +167,7 @@ public class DashSwitchBlock : Solid {
     public override void Update() {
         base.Update();
 
-        UpdateState(GetDashSwitchBlockIndex((Scene as Level).Session));
+        UpdateState();
     }
 
     // -- SETUP --
@@ -271,7 +272,7 @@ public class DashSwitchBlock : Solid {
         if (!Collidable)
             DisableStaticMovers();
 
-        UpdateState(GetDashSwitchBlockIndex((Scene as Level).Session), silent: true);
+        UpdateState(silent: true);
     }
 
     private void FindInGroup(DashSwitchBlock block) {

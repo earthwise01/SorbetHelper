@@ -385,7 +385,7 @@ entities.SorbetHelper/PufferTweaksController.attributes.description.moreExplodeP
 # Dash Switch Block
 entities.SorbetHelper/DashSwitchBlock.placements.name.dashSwitchBlock_0=Dash Switch Block (Cyan)
 entities.SorbetHelper/DashSwitchBlock.placements.name.dashSwitchBlock_1=Dash Switch Block (Yellow)
-entities.SorbetHelper/DashSwitchBlock.attributes.description.index=The index of the block.\n0 = Cyan\n1 = Yellow
+entities.SorbetHelper/DashSwitchBlock.attributes.description.index=The index of the block.
 
 # -- Triggers --
 
@@ -412,6 +412,12 @@ triggers.SorbetHelper/MiniPopupTrigger.attributes.name.mode=Activation Mode
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.mode=Determines how the trigger will activate.
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.onlyOnce=Whether the mini popup should only be able to trigger once per session.
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.flag=A session flag.\nUsed as needed for the activation mode, otherwise determines whether or not the player can collide with the trigger.
+
+# Dash Switch Block State Trigger
+triggers.SorbetHelper/DashSwitchBlockStateTrigger.placements.name.dashSwitchBlockState=Dash Switch Block State Trigger
+triggers.SorbetHelper/DashSwitchBlockStateTrigger.attributes.description.index=The index to set dash switch blocks to.
+triggers.SorbetHelper/DashSwitchBlockStateTrigger.attributes.name.mode=Activation Mode
+triggers.SorbetHelper/DashSwitchBlockStateTrigger.attributes.description.mode=Determines how the trigger will activate.
 
 # -- Styleground Effects --
 
