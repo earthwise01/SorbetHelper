@@ -392,8 +392,8 @@ triggers.SorbetHelper/AlternateInteractPrompt.placements.description.altTalkUISm
 triggers.SorbetHelper/AlternateInteractPrompt.placements.name.altNameAltTalkUI=Alternate Interact Prompt
 triggers.SorbetHelper/AlternateInteractPrompt.attributes.name.dialogId=Label Dialog ID
 triggers.SorbetHelper/AlternateInteractPrompt.attributes.description.dialogId=The dialog ID to use for the label displayed next to the button prompt.
-triggers.SorbetHelper/AlternateInteractPrompt.attributes.description.style=The alternate style to use.\nBottom Corner:\n  The prompt will slide in from the bottom right corner when approached. Position not indicated.\nSmall Arrow:\n  The normal UI is replaced with a smaller floaty arrow, which is then replaced by the button prompt when approached.
-triggers.SorbetHelper/AlternateInteractPrompt.attributes.description.playHighlightSfx=Whether to still play the vanilla sfx for when the prompt is highlighted.
+triggers.SorbetHelper/AlternateInteractPrompt.attributes.description.style=The alternate style to use.\nBottom Corner:\n  The prompt will slide in from the bottom right corner when approached. Only appears when highlighted / does not have an indicator.\nSmall Arrow:\n  The normal UI is replaced with a smaller floaty arrow, which the button prompt appears on top of when approached.
+triggers.SorbetHelper/AlternateInteractPrompt.attributes.description.playHighlightSfx=Whether to still play the vanilla sfx (and bounce effects) when the prompt is highlighted.
 triggers.SorbetHelper/AlternateInteractPrompt.attributes.description.onLeft=Whether the prompt (in the BottomCorner style) should come from the left side of the screen, instead of the right.\nFor the sake of consistency this is recommended to be left off unless necessary.
 
 # Mini Popup Trigger
