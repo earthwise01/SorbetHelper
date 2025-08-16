@@ -801,21 +801,31 @@ Entities:
 Triggers:
   SorbetHelper/AlternateInteractPrompt:
     Placements:
-      altTalkUI:
-        Name: Alt Style Interact Prompt
-        Description: Replaces the normal interaction/talk prompt with a different, slightly more subtle one that slides in from the side.
+      altTalkUIBottomCorner:
+        Name: Alt Style Interact Prompt (Bottom Corner)
+        Description: Replaces the normal interaction/talk prompt with one that slides in from the bottom corner.
+      altTalkUISmallArrow:
+        Name: Alt Style Interact Prompt (Small Arrow)
+        Description: Replaces the normal interaction/talk prompt with a smaller floaty arrow that expands to reveal the prompt when approached. 
       altNameAltTalkUI:
         Name: Alternate Interact Prompt
     Attributes:
       dialogId:
         Name: Label Dialog ID
-        Description: The dialog ID to use for the prompt.
-      onLeft:
+        Description: The dialog ID to use for the label displayed next to the button prompt.
+      style:
         Description: |-
-          Whether the prompt should come from the left side of the screen, instead of the right.
-          For the sake of consistency this is recommended to be left off unless necessary.
+          The alternate style to use.
+          Bottom Corner:
+            The prompt will slide in from the bottom right corner when approached. Position not indicated.
+          Small Arrow:
+            The normal UI is replaced with a smaller floaty arrow, which is then replaced by the button prompt when approached.
       playHighlightSfx:
         Description: Whether to still play the vanilla sfx for when the prompt is highlighted.
+      onLeft:
+        Description: |-
+          Whether the prompt (in the BottomCorner style) should come from the left side of the screen, instead of the right.
+          For the sake of consistency this is recommended to be left off unless necessary.
   
   SorbetHelper/MiniPopupTrigger:
     Placements:
