@@ -75,7 +75,7 @@ public class AlternateInteractPromptWrapper : Entity {
             switch (Style) {
                 case Styles.BottomCorner: {
                     // hello ??? indentation
-                        var slideEase = Math.Min(highlightedEase, slide);
+                        float slideEase = Math.Min(highlightedEase, slide);
 
                         if (slideEase <= 0f || level.FrozenOrPaused || Handler.Entity == null)
                             return;
@@ -103,27 +103,30 @@ public class AlternateInteractPromptWrapper : Entity {
                         if (level.FrozenOrPaused || slide <= 0f || Handler.Entity == null)
                             return;
 
-                        var slideEase = Math.Min(highlightedEase, slide);
-
                         Vector2 camPos = level.Camera.Position.Floor();
                         Vector2 drawPos = Handler.Entity.Position + Handler.DrawAt - camPos;
                         if (SaveData.Instance != null && SaveData.Instance.Assists.MirrorMode)
-                            drawPos.X = 320f - drawPos.X;
+                            drawPos.X = level.Camera.Viewport.Width - drawPos.X;
 
                         drawPos.X *= 6f;
                         drawPos.Y *= 6f;
                         drawPos.Y += (float)Math.Sin(timer * 4f) * MathHelper.Lerp(12f, 6f, highlightedEase) + 64f * (1f - Ease.CubeOut(slide));
+
+                        // blehh
+                        float zoomScale = level.Camera.Viewport.Width != 320 ? level.Zoom : 1f;
+
                         float wiggle = (!Highlighted) ? (1f + wiggler.Value * 0.5f) : (1f - wiggler.Value * 0.5f);
                         float trueAlpha = Ease.CubeInOut(slide) * alpha;
-                        var color = lineColor * trueAlpha;
+                        Color color = lineColor * trueAlpha;
 
-                        GFX.Gui["SorbetHelper/smallTalkArrow"].DrawJustified(drawPos - new Vector2(0f, 48f * Ease.CubeInOut(highlightedEase)), new Vector2(0.5f, 1f), color * alpha * Calc.ClampedMap(1f - highlightedEase, 0f, 0.75f), wiggle);
+                        Vector2 arrowPos = drawPos - new Vector2(0f, 48f * Ease.CubeInOut(highlightedEase));
+                        GFX.Gui["SorbetHelper/smallTalkArrow"].DrawJustified(arrowPos * zoomScale, new Vector2(0.5f, 1f), color * alpha * Calc.ClampedMap(1f - highlightedEase, 0f, 0.75f), wiggle * zoomScale);
 
                         const float buttonUIScale = 0.75f;
 
                         string label = Dialog.Clean(dialogId);
-                        var position = drawPos - new Vector2(0, 24f) + new Vector2(0, -8f) * highlightedEase;
-                        ButtonUI.Render(position, label, Input.Talk, buttonUIScale * ((wiggle - 1f) * 0.5f + 1f), 0.5f, selectWiggle.Value * 0.05f, alpha: Calc.ClampedMap(highlightedEase, 0.25f, 1f) * trueAlpha);
+                        Vector2 promptPos = drawPos - new Vector2(0, 18f + 8f * highlightedEase);
+                        ButtonUI.Render(promptPos * zoomScale, label, Input.Talk, buttonUIScale * ((wiggle - 1f) * 0.5f + 1f) * zoomScale, 0.5f, selectWiggle.Value * 0.05f, alpha: Calc.ClampedMap(highlightedEase, 0.25f, 1f) * trueAlpha);
 
                         break;
                     }
