@@ -110,23 +110,23 @@ public class AlternateInteractPromptWrapper : Entity {
 
                         drawPos.X *= 6f;
                         drawPos.Y *= 6f;
-                        drawPos.Y += (float)Math.Sin(timer * 4f) * MathHelper.Lerp(12f, 6f, highlightedEase) + 64f * (1f - Ease.CubeOut(slide));
+                        drawPos.Y += (float)Math.Sin(timer * 4f) * MathHelper.Lerp(12f, 6f, highlightedEase);
 
                         // blehh
                         float zoomScale = level.Camera.Viewport.Width != 320 ? level.Zoom : 1f;
 
-                        float wiggle = (!Highlighted) ? (1f + wiggler.Value * 0.5f) : (1f - wiggler.Value * 0.5f);
+                        float wiggle = (!Highlighted) ? (1f + wiggler.Value * 0.25f) : (1f - wiggler.Value * 0.25f);
                         float trueAlpha = Ease.CubeInOut(slide) * alpha;
                         Color color = lineColor * trueAlpha;
 
-                        Vector2 arrowPos = drawPos - new Vector2(0f, 48f * Ease.CubeInOut(highlightedEase));
-                        GFX.Gui["SorbetHelper/smallTalkArrow"].DrawJustified(arrowPos * zoomScale, new Vector2(0.5f, 1f), color * alpha * Calc.ClampedMap(1f - highlightedEase, 0f, 0.75f), wiggle * zoomScale);
+                        Vector2 arrowPos = drawPos + new Vector2(0f, 64f * (1f - Ease.CubeOut(slide)));// - new Vector2(0f, 48f * Ease.CubeInOut(highlightedEase));
+                        GFX.Gui["SorbetHelper/smallTalkArrow"].DrawJustified(arrowPos * zoomScale, new Vector2(0.5f, 1f), color * alpha, wiggle * zoomScale);
 
                         const float buttonUIScale = 0.75f;
 
                         string label = Dialog.Clean(dialogId);
-                        Vector2 promptPos = drawPos - new Vector2(0, 18f + 8f * highlightedEase);
-                        ButtonUI.Render(promptPos * zoomScale, label, Input.Talk, buttonUIScale * ((wiggle - 1f) * 0.5f + 1f) * zoomScale, 0.5f, selectWiggle.Value * 0.05f, alpha: Calc.ClampedMap(highlightedEase, 0.25f, 1f) * trueAlpha);
+                        Vector2 promptPos = drawPos - new Vector2(0, 60f + 8f * highlightedEase);
+                        ButtonUI.Render(promptPos * zoomScale, label, Input.Talk, buttonUIScale * wiggle * zoomScale, 0.5f, selectWiggle.Value * 0.05f, alpha: Calc.ClampedMap(highlightedEase, 0.25f, 1f) * trueAlpha);
 
                         break;
                     }
