@@ -36,7 +36,7 @@ public class AlternateInteractPromptWrapper : Entity {
         public enum Styles { BottomCorner, SmallArrow }
 
         private readonly string dialogId;
-        private readonly Styles style = Styles.SmallArrow;
+        public readonly Styles Style = Styles.SmallArrow;
         private readonly bool origHighlightEffects;
 
         // BottomCorner style only
@@ -45,7 +45,7 @@ public class AlternateInteractPromptWrapper : Entity {
         public TalkComponentAltUI(TalkComponent handler, string dialogId, Styles style, bool origHighlightEffects, bool onLeft) : base(handler) {
             Add(selectWiggle = Wiggler.Create(0.4f, 4f));
             this.dialogId = dialogId;
-            this.style = style;
+            this.Style = style;
             this.origHighlightEffects = origHighlightEffects;
             this.onLeft = onLeft;
 
@@ -72,7 +72,7 @@ public class AlternateInteractPromptWrapper : Entity {
             // base.Render();
             Level level = Scene as Level;
 
-            switch (style) {
+            switch (Style) {
                 case Styles.BottomCorner: {
                     // hello ??? indentation
                         var slideEase = Math.Min(highlightedEase, slide);
@@ -177,7 +177,7 @@ public class AlternateInteractPromptWrapper : Entity {
         cursor.EmitDelegate(adjustHoverTimerForCustomUI);
 
         static float adjustHoverTimerForCustomUI(float orig, TalkComponentUI UI) {
-            if (UI is not TalkComponentAltUI)
+            if (UI is TalkComponentAltUI { Style: TalkComponentAltUI.Styles.BottomCorner } )
                 return 0f;
 
             return orig;
