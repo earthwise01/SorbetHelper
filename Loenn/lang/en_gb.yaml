@@ -821,6 +821,7 @@ Triggers:
           Small Arrow:
             The normal UI is replaced with a smaller floaty arrow, which the button prompt appears on top of when approached.
       playHighlightSfx:
+        Name: Has Highlight Effects
         Description: Whether to still play the vanilla sfx (and bounce effects) when the prompt is highlighted.
       onLeft:
         Description: |-
