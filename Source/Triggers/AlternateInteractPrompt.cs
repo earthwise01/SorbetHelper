@@ -1,6 +1,6 @@
 using System;
-using Monocle;
 using Microsoft.Xna.Framework;
+using Monocle;
 using Celeste.Mod.Entities;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
@@ -11,34 +11,48 @@ namespace Celeste.Mod.SorbetHelper.Triggers;
 [Tracked]
 [CustomEntity("SorbetHelper/AlternateInteractPrompt")]
 public class AlternateInteractPromptWrapper : Entity {
-    private readonly string dialogId;
-    private readonly bool onLeft;
-    private readonly bool origHighlightEffects;
+    private readonly TalkComponentAltUI.Options Options;
 
     public AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : base(data.Position + offset) {
         Collider = new Hitbox(data.Width, data.Height);
-        dialogId = data.Attr("dialogId", "sorbethelper_ui_talk");
-        onLeft = data.Bool("onLeft", false);
-        origHighlightEffects = data.Bool("playHighlightSfx", false);
+
+        Options = new TalkComponentAltUI.Options(
+            Style: data.Enum("style", TalkComponentAltUI.Styles.BottomCorner),
+            LabelDialogID: data.Attr("dialogId", "sorbethelper_ui_talk"),
+            HighlightEffects: data.Bool("playHighlightSfx", false),
+            OnLeftCorner: data.Bool("onLeft", false)
+        );
     }
 
+    #region Custom TalkComponentUI
+
     public class TalkComponentAltUI : TalkComponentUI {
+        public enum Styles {
+            BottomCorner,
+            SmallArrow
+        }
+
+        public readonly record struct Options(
+            Styles Style,
+            string LabelDialogID,
+            bool HighlightEffects,
+            bool OnLeftCorner = false // for BottomCorner style only
+        );
+
+        private const float PromptScale = 0.85f;
+
         private readonly Wiggler selectWiggle;
         private float selectWiggleDelay;
         private float highlightedEase;
 
-        private readonly string dialogId;
-        private readonly bool onLeft;  // i wonder if this should just be setting based instead of mapper selected
-        private readonly bool origHighlightEffects;
+        private readonly Options options;
 
-        public TalkComponentAltUI(TalkComponent handler, string dialogId, bool onLeft, bool origHighlightEffects) : base(handler) {
+        private TalkComponentAltUI(TalkComponent handler, Options options) : base(handler) {
             Add(selectWiggle = Wiggler.Create(0.4f, 4f));
-            this.dialogId = dialogId;
-            this.onLeft = onLeft;
-            this.origHighlightEffects = origHighlightEffects;
+            this.options = options;
 
             Depth = -100000;
-            Tag |= Tags.TransitionUpdate; // don't get frozen during transition and suddenly disappear
+            Tag |= Tags.TransitionUpdate; // (for BottomCorner style) don't get frozen during transition and suddenly disappear
 
             // swap to subhud
             Tag &= ~Tags.HUD;
@@ -60,90 +74,138 @@ public class AlternateInteractPromptWrapper : Entity {
             // base.Render();
             Level level = Scene as Level;
 
-            var slideEase = Math.Min(highlightedEase, slide);
-
-            if (slideEase <= 0f || level.Frozen || Handler.Entity == null)
+            if (level.FrozenOrPaused || slide <= 0f || Handler.Entity == null)
                 return;
 
-            const float scale = 0.85f;
-            const int offscreenPadding = 32;
+            switch (options.Style) {
+                case Styles.BottomCorner: {
+                        float slideEase = Math.Min(highlightedEase, slide);
 
-            string label = Dialog.Clean(dialogId);
-            float width = ButtonUI.Width(label, Input.Talk);
+                        if (slideEase <= 0f)
+                            return;
 
-            var position = new Vector2 {
-                X = onLeft ?
-                    40f - (40f + width * scale + offscreenPadding) * (1f - Ease.CubeOut(slideEase)) :
-                    1880f + (40f + width * scale + offscreenPadding) * (1f - Ease.CubeOut(slideEase)),
-                Y = 1024f
-            };
-            // position.X += (40f + (num4 + num3) * num + (float)num2) * (1f - Ease.CubeOut(inputEase));
+                        string label = Dialog.Clean(options.LabelDialogID);
 
-            ButtonUI.Render(position, label, Input.Talk, scale, onLeft ? 0f : 1f, selectWiggle.Value * 0.05f, alpha: slideEase * 0.5f + 0.5f);
+                        float width = ButtonUI.Width(label, Input.Talk);
+                        const int offscreenPadding = 32;
+                        Vector2 drawPos = new Vector2(
+                            x: 1880f + (40f + width * PromptScale + offscreenPadding) * (1f - Ease.CubeOut(slideEase)),
+                            y: 1024f
+                        );
+
+                        if (options.OnLeftCorner)
+                            drawPos.X = 1920 - drawPos.X;
+
+                        RenderPrompt(drawPos, label, justifyX: options.OnLeftCorner ? 0f : 1f, alpha: slideEase * 0.5f + 0.5f);
+
+                        break;
+                    }
+                case Styles.SmallArrow: {
+                        Vector2 camPos = level.Camera.Position.Floor();
+                        Vector2 drawPos = Handler.Entity.Position + Handler.DrawAt - camPos;
+                        if (SaveData.Instance != null && SaveData.Instance.Assists.MirrorMode)
+                            drawPos.X = level.Camera.Viewport.Width - drawPos.X;
+
+                        drawPos *= 6f;
+                        drawPos.Y += (float)Math.Sin(timer * 4f) * MathHelper.Lerp(12f, 6f, highlightedEase);
+
+                        float zoomScale = level.Camera.Viewport.Width != 320 ? level.Zoom : 1f;
+
+                        float arrowWiggle = (!Highlighted) ? (1f + wiggler.Value * 0.5f) : (1f - wiggler.Value * 0.5f);
+                        float promptWiggle = (!Highlighted) ? (1f + wiggler.Value * 0.375f) : (1f - wiggler.Value * 0.375f);
+                        float trueAlpha = Ease.CubeInOut(slide) * alpha;
+                        Color color = lineColor * trueAlpha;
+
+                        Vector2 arrowPos = drawPos + new Vector2(0f, 64f * (1f - Ease.CubeOut(slide)));// - new Vector2(0f, 48f * Ease.CubeInOut(highlightedEase));
+                        GFX.Gui["SorbetHelper/smallTalkArrow"].DrawJustified(arrowPos * zoomScale, new Vector2(0.5f, 1f), color, arrowWiggle * zoomScale);
+
+                        string label = Dialog.Clean(options.LabelDialogID);
+                        Vector2 promptPos = drawPos - new Vector2(0, 68f);
+                        RenderPrompt(promptPos * zoomScale, label, scale: promptWiggle * zoomScale, alpha: trueAlpha * highlightedEase);
+
+                        break;
+                    }
+            }
         }
 
-        // just skip any extra unneeded logic when becoming highlighted
-        internal delegate void orig_set_Highlighted(TalkComponentUI self, bool value);
-        internal static void On_set_Highlighted(orig_set_Highlighted orig, TalkComponentUI self, bool value) {
-            if (self is TalkComponentAltUI { origHighlightEffects: false })
+        private void RenderPrompt(Vector2 position, string label, float scale = 1f, float justifyX = 0.5f, float alpha = 1f) {
+            if (!string.IsNullOrEmpty(label))
+                ButtonUI.Render(position, label, Input.Talk, PromptScale * scale, justifyX, selectWiggle.Value * 0.05f, alpha: alpha);
+            else
+                Input.GuiButton(Input.Talk, Input.PrefixMode.Latest).DrawJustified(position, new Vector2(justifyX, 0.5f), Color.White * alpha, PromptScale * scale + selectWiggle.Value * 0.05f);
+        }
+
+        #region Hooks
+
+        private static Hook hook_set_Highlighted = null;
+        internal static void Load() {
+            hook_set_Highlighted = new Hook(typeof(TalkComponentUI).GetMethod("set_Highlighted"), TalkComponentAltUI.On_set_Highlighted);
+            IL.Celeste.TalkComponent.Update += IL_TalkComponent_Update;
+        }
+        internal static void Unload() {
+            hook_set_Highlighted?.Dispose();
+            hook_set_Highlighted = null;
+            IL.Celeste.TalkComponent.Update -= IL_TalkComponent_Update;
+        }
+
+        private delegate void orig_set_Highlighted(TalkComponentUI self, bool value);
+        private static void On_set_Highlighted(orig_set_Highlighted orig, TalkComponentUI self, bool value) {
+            if (self is TalkComponentAltUI { options.HighlightEffects: false })
                 self.highlighted = value;
             else
                 orig(self, value);
         }
-    }
 
-    private static void IL_TalkComponent_Update(ILContext il) {
-        var cursor = new ILCursor(il);
+        private static void IL_TalkComponent_Update(ILContext il) {
+            var cursor = new ILCursor(il);
 
-        // swaps out the vanilla talkcomponentui for a custom one if necessary
-        cursor.GotoNext(MoveType.Before, instr => instr.MatchNewobj<TalkComponentUI>());
+            // swap out the vanilla TalkComponentUI for a custom one if colliding with an AlternateInteractPromptWrapper
+            cursor.GotoNext(MoveType.Before, instr => instr.MatchNewobj<TalkComponentUI>());
 
-        var skipOrigTalkComponentUI = cursor.DefineLabel();
+            var skipOrigTalkComponentUI = cursor.DefineLabel();
 
-        // why ami like this,
-        cursor.EmitDelegate(tryGetAltUI);
-        cursor.EmitDup();
-        cursor.EmitBrtrue(skipOrigTalkComponentUI);
-        cursor.EmitPop();
-        cursor.EmitLdarg0();
+            cursor.EmitDelegate(tryGetAltUI);
+            cursor.EmitDup();
+            cursor.EmitBrtrue(skipOrigTalkComponentUI);
+            cursor.EmitPop();
+            cursor.EmitLdarg0();
 
-        cursor.GotoNext(MoveType.After, instr => instr.MatchNewobj<TalkComponentUI>());
-        cursor.MarkLabel(skipOrigTalkComponentUI);
+            cursor.GotoNext(MoveType.After, instr => instr.MatchNewobj<TalkComponentUI>());
+            cursor.MarkLabel(skipOrigTalkComponentUI);
 
-        static TalkComponentAltUI tryGetAltUI(TalkComponent self) {
-            if (self.Entity is not { } entity)
-                return null;
+            static TalkComponentAltUI tryGetAltUI(TalkComponent self) {
+                if (self.Entity is not { } entity)
+                    return null;
 
-            var altUITrigger = entity.Scene.CollideFirst<AlternateInteractPromptWrapper>(entity.Position);
-            if (altUITrigger is null)
-                return null;
+                var altUITrigger = entity.Scene.CollideFirst<AlternateInteractPromptWrapper>(entity.Position);
+                if (altUITrigger is null)
+                    return null;
 
-            return new TalkComponentAltUI(self, altUITrigger.dialogId, altUITrigger.onLeft, altUITrigger.origHighlightEffects);
+                return new TalkComponentAltUI(self, altUITrigger.Options);
+            }
+
+            // adjust the minimum hoverTimer required for TalkComponentAltUIs to be considered highlighted
+            cursor.Index = -1;
+            cursor.GotoPrev(MoveType.After, instr => instr.MatchLdcR4(0.1f));
+            cursor.EmitLdarg0();
+            cursor.EmitLdfld(typeof(TalkComponent).GetField(nameof(TalkComponent.UI)));
+            cursor.EmitDelegate(adjustHoverTimerForCustomUI);
+
+            static float adjustHoverTimerForCustomUI(float orig, TalkComponentUI UI) {
+                if (UI is TalkComponentAltUI altUI) {
+                    return altUI.options.Style switch {
+                        Styles.BottomCorner => 0f,
+                        _ => 0.1f
+                    };
+                }
+
+                return orig;
+            }
         }
 
-        // adjust the minimum hoverTimer required for custom talkcomponentuis to be "highlighted"
-        cursor.Index = -1;
-        cursor.GotoPrev(MoveType.After, instr => instr.MatchLdcR4(0.1f));
-        cursor.EmitLdarg0();
-        cursor.EmitLdfld(typeof(TalkComponent).GetField(nameof(TalkComponent.UI)));
-        cursor.EmitDelegate(adjustHoverTimerForCustomUI);
-
-        static float adjustHoverTimerForCustomUI(float orig, TalkComponentUI UI) {
-            if (UI is TalkComponentAltUI)
-                return 0f;
-
-            return orig;
-        }
+        #endregion
     }
 
-    private static Hook hook_set_Highlighted = null;
-    internal static void Load() {
-        hook_set_Highlighted = new Hook(typeof(TalkComponentUI).GetMethod("set_Highlighted"), TalkComponentAltUI.On_set_Highlighted);
-        IL.Celeste.TalkComponent.Update += IL_TalkComponent_Update;
-    }
-    internal static void Unload() {
-        hook_set_Highlighted?.Dispose();
-        hook_set_Highlighted = null;
-        IL.Celeste.TalkComponent.Update -= IL_TalkComponent_Update;
-    }
+    #endregion
+
 }
