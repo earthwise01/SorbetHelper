@@ -36,7 +36,7 @@ public class AlternateInteractPromptWrapper : Entity {
             Styles Style,
             string LabelDialogID,
             bool HighlightEffects,
-            bool OnLeftCorner = false // BottomCorner style only
+            bool OnLeftCorner = false // for BottomCorner style only
         );
 
         private const float PromptScale = 0.85f;
@@ -109,21 +109,19 @@ public class AlternateInteractPromptWrapper : Entity {
                         drawPos *= 6f;
                         drawPos.Y += (float)Math.Sin(timer * 4f) * MathHelper.Lerp(12f, 6f, highlightedEase);
 
-                        // blehh
                         float zoomScale = level.Camera.Viewport.Width != 320 ? level.Zoom : 1f;
 
-                        float wiggle = (!Highlighted) ? (1f + wiggler.Value * 0.5f) : (1f - wiggler.Value * 0.5f);
+                        float arrowWiggle = (!Highlighted) ? (1f + wiggler.Value * 0.5f) : (1f - wiggler.Value * 0.5f);
+                        float promptWiggle = (!Highlighted) ? (1f + wiggler.Value * 0.375f) : (1f - wiggler.Value * 0.375f);
                         float trueAlpha = Ease.CubeInOut(slide) * alpha;
                         Color color = lineColor * trueAlpha;
 
                         Vector2 arrowPos = drawPos + new Vector2(0f, 64f * (1f - Ease.CubeOut(slide)));// - new Vector2(0f, 48f * Ease.CubeInOut(highlightedEase));
-                        GFX.Gui["SorbetHelper/smallTalkArrow"].DrawJustified(arrowPos * zoomScale, new Vector2(0.5f, 1f), color * alpha, wiggle * zoomScale);
-
-                        // const float promptScale = 0.75f;
+                        GFX.Gui["SorbetHelper/smallTalkArrow"].DrawJustified(arrowPos * zoomScale, new Vector2(0.5f, 1f), color, arrowWiggle * zoomScale);
 
                         string label = Dialog.Clean(options.LabelDialogID);
-                        Vector2 promptPos = drawPos - new Vector2(0, 60f + 8f * highlightedEase);
-                        RenderPrompt(promptPos * zoomScale, label, scale: wiggle * zoomScale, alpha: Calc.ClampedMap(highlightedEase, 0.25f, 1f) * trueAlpha);
+                        Vector2 promptPos = drawPos - new Vector2(0, 68f);
+                        RenderPrompt(promptPos * zoomScale, label, scale: promptWiggle * zoomScale, alpha: trueAlpha * highlightedEase);
 
                         break;
                     }
@@ -166,7 +164,6 @@ public class AlternateInteractPromptWrapper : Entity {
 
             var skipOrigTalkComponentUI = cursor.DefineLabel();
 
-            // why ami like this,
             cursor.EmitDelegate(tryGetAltUI);
             cursor.EmitDup();
             cursor.EmitBrtrue(skipOrigTalkComponentUI);
