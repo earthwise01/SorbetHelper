@@ -43,6 +43,7 @@ public class SorbetHelperModule : EverestModule {
         // mod interop
         typeof(GravityHelperImports).ModInterop();
         typeof(ExtendedCameraDynamicsImports).ModInterop();
+        typeof(CommunalHelperDashStateImports).ModInterop();
         typeof(SorbetHelperExports).ModInterop();
 
         // sorbet helper misc stuff

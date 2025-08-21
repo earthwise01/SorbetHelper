@@ -801,12 +801,16 @@ Entities:
   SorbetHelper/DashSwitchBlock:
     Placements:
       dashSwitchBlock_0:
-        Name: Dash Switch Block (Cyan)
+        Name: Dash Color Switch Block (Cyan)
       dashSwitchBlock_1:
-        Name: Dash Switch Block (Yellow)
+        Name: Dash Color Switch Block (Yellow)
+      coloUr:
+        Name: Dash Colour Switch
     Attributes:
       index: 
         Description: The index of the block.
+      switchOnDreamTunnel:
+        Description: Whether the block should switch if the player dashes through it with a Communal Helper Dream Tunnel Dash.
 
 Triggers:
   SorbetHelper/AlternateInteractPrompt:

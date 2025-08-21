@@ -34,7 +34,7 @@ public class DashSwitchBlockStateTrigger : Trigger {
 
         DashSwitchBlock.SetDashSwitchBlockIndex((Scene as Level).Session, Index);
         foreach (var dashSwitchBlock in Scene.Tracker.GetEntities<DashSwitchBlock>().Cast<DashSwitchBlock>())
-            dashSwitchBlock.UpdateState();
+            dashSwitchBlock.UpdateState(playEffects: false);
     }
 
     private static void Event_Player_Spawn(Player player) {

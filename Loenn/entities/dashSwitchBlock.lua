@@ -40,8 +40,10 @@ dashSwitchBlock.placements = {}
 for i, _ in ipairs(colors) do
     dashSwitchBlock.placements[i] = {
         name = string.format("dashSwitchBlock_%s", i - 1),
+        alternativeName = "coloUr",
         data = {
             index = i - 1,
+            switchOnDreamTunnel = false,
             width = 16,
             height = 16
         }

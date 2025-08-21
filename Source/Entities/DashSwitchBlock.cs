@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Celeste.Mod.Entities;
@@ -41,6 +42,27 @@ public class DashSwitchBlock : Solid {
         Add(lightOcclude = new LightOcclude(0.8f));
 
         OnDashCollide = OnDashed;
+
+        // switch if communal helper dream tunnel dashed
+        var switchOnDreamTunnel = data.Bool("switchOnDreamTunnel", false);
+        if (switchOnDreamTunnel && CommunalHelperDashStateImports.DreamTunnelInteraction is not null) {
+            void onEnter(Player player) { }
+            void onExit(Player player) {
+                Switch();
+                Add(new Coroutine(GlitchSequence(), true));
+            }
+
+            static IEnumerator GlitchSequence() {
+                Glitch.Value = 0.22f;
+                while (Glitch.Value > 0.0f) {
+                    Glitch.Value -= 0.5f * Engine.DeltaTime;
+                    yield return null;
+                }
+                Glitch.Value = 0.0f;
+            }
+
+            Add(CommunalHelperDashStateImports.DreamTunnelInteraction(onEnter, onExit));
+        }
     }
 
     private DashCollisionResults OnDashed(Player player, Vector2 dir) {
@@ -55,23 +77,26 @@ public class DashSwitchBlock : Solid {
             return DashCollisionResults.NormalCollision;
         }
 
-        Input.Rumble(RumbleStrength.Strong, RumbleLength.Long);
         SceneAs<Level>().DirectionalShake(dir, 0.25f);
-        Audio.Play("event:/game/03_resort/forcefield_bump", Center);
-        Audio.Play("event:/game/05_mirror_temple/button_activate", Center);
         Switch();
 
         return DashCollisionResults.Rebound;
     }
 
-    public void Switch() {
+    public void Switch(bool playSfx = true) {
+        if (playSfx) {
+            Input.Rumble(RumbleStrength.Strong, RumbleLength.Long);
+            Audio.Play("event:/game/03_resort/forcefield_bump", Center);
+            Audio.Play("event:/game/05_mirror_temple/button_activate", Center);
+        }
+
         var session = (Scene as Level).Session;
         var currentIndex = GetDashSwitchBlockIndex(session);
         var nextIndex = (currentIndex + 1) % 2;
         SetDashSwitchBlockIndex(session, nextIndex);
 
         foreach (var dashSwitchBlock in Scene.Tracker.GetEntities<DashSwitchBlock>().Cast<DashSwitchBlock>())
-            dashSwitchBlock.UpdateState();
+            dashSwitchBlock.UpdateState(playEffects: true);
     }
 
     private bool BlockedCheck() {
@@ -87,7 +112,7 @@ public class DashSwitchBlock : Solid {
         return true;
     }
 
-    public void UpdateState(bool silent = false) {
+    public void UpdateState(bool playEffects = false) {
         var currentIndex = GetDashSwitchBlockIndex((Scene as Level).Session);
         Activated = Index == currentIndex;
 
@@ -98,18 +123,18 @@ public class DashSwitchBlock : Solid {
                     dashSwitchBlock.Collidable = true;
                     dashSwitchBlock.EnableStaticMovers();
 
-                    if (!silent)
+                    if (!playEffects)
                         dashSwitchBlock.ActivateEffects();
                 }
 
-                if (!silent)
+                if (!playEffects)
                     wiggler.Start();
             }
         } else if (!Activated && Collidable) {
             Collidable = false;
             DisableStaticMovers();
 
-            if (!silent)
+            if (!playEffects)
                 DeactivateEffects();
         }
 
@@ -149,17 +174,19 @@ public class DashSwitchBlock : Solid {
     }
 
     private void DeactivateEffects() {
-        var particles = (Scene as Level).Particles;
+        var level = Scene as Level;
 
-        var particle = new ParticleType(ParticleTypes.VentDust) {
-            Color = color,
+        var particle = new ParticleType(Lightning.P_Shatter) {
+            Color = Color.Lerp(color, Color.White, 0.75f),
             Color2 = Color.White,
             ColorMode = ParticleType.ColorModes.Fade
         };
 
         for (int x = 0; x < Width / 8f; x++) {
             for (int y = 0; y < Height / 8f; y++) {
-                particles.Emit(particle, 1, Position + new Vector2(x * 8 + 4, y * 8 + 4), Vector2.One * 4f, color, Calc.Random.NextAngle());
+                var position = Position + new Vector2(x * 8 + 5, y * 8 + 3);
+
+                level.ParticlesFG.Emit(particle, 1, position, Vector2.One * 4f, color, (position - Center).Angle());
             }
         }
     }
@@ -167,7 +194,7 @@ public class DashSwitchBlock : Solid {
     public override void Update() {
         base.Update();
 
-        UpdateState();
+        UpdateState(playEffects: true);
     }
 
     // -- SETUP --
@@ -272,7 +299,7 @@ public class DashSwitchBlock : Solid {
         if (!Collidable)
             DisableStaticMovers();
 
-        UpdateState(silent: true);
+        UpdateState(playEffects: false);
     }
 
     private void FindInGroup(DashSwitchBlock block) {
