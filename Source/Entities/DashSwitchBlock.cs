@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,8 @@ using Monocle;
 
 namespace Celeste.Mod.SorbetHelper.Entities;
 
-// a *lot* taken from cassette blocks and color switches (https://github.com/CommunalHelper/VortexHelper/blob/dev/Code/Entities/ColorSwitch.cs) + switch blocks (https://github.com/CommunalHelper/VortexHelper/blob/dev/Code/Entities/SwitchBlock.cs) from vortex helper
+// heavily inspired by color switches (https://github.com/CommunalHelper/VortexHelper/blob/dev/Code/Entities/ColorSwitch.cs) + switch blocks (https://github.com/CommunalHelper/VortexHelper/blob/dev/Code/Entities/SwitchBlock.cs) from vortex helper
+// code also taken from vanilla cassette blocks, and playback billboards (for rendering)
 
 [CustomEntity("SorbetHelper/DashSwitchBlock")]
 [Tracked]
@@ -29,6 +31,7 @@ public class DashSwitchBlock : Solid {
     private readonly List<Image> pressedImages = [];
     private readonly List<Image> solidImages = [];
     private readonly List<Image> allImages = [];
+    private uint noiseSeed;
 
     public DashSwitchBlock(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, data.Height, false) {
         SurfaceSoundIndex = 35;
@@ -36,7 +39,7 @@ public class DashSwitchBlock : Solid {
         color = Index switch {
             0 => Calc.HexToColor("00c2c2"),
             1 => Calc.HexToColor("fca700"),
-            _ => throw new System.NotImplementedException($"Index {Index} is not supported!"),
+            _ => throw new NotImplementedException($"Index {Index} is not supported!"),
         };
 
         Add(lightOcclude = new LightOcclude(0.8f));
@@ -123,18 +126,18 @@ public class DashSwitchBlock : Solid {
                     dashSwitchBlock.Collidable = true;
                     dashSwitchBlock.EnableStaticMovers();
 
-                    if (!playEffects)
+                    if (playEffects)
                         dashSwitchBlock.ActivateEffects();
                 }
 
-                if (!playEffects)
+                if (playEffects)
                     wiggler.Start();
             }
         } else if (!Activated && Collidable) {
             Collidable = false;
             DisableStaticMovers();
 
-            if (!playEffects)
+            if (playEffects)
                 DeactivateEffects();
         }
 
@@ -174,7 +177,7 @@ public class DashSwitchBlock : Solid {
     }
 
     private void DeactivateEffects() {
-        var level = Scene as Level;
+        Level level = Scene as Level;
 
         var particle = new ParticleType(Lightning.P_Shatter) {
             Color = Color.Lerp(color, Color.White, 0.75f),
@@ -195,7 +198,61 @@ public class DashSwitchBlock : Solid {
         base.Update();
 
         UpdateState(playEffects: true);
+
+        if (Activated && Scene.OnInterval(0.1f))
+            noiseSeed++;
     }
+
+    public override void Render() {
+        uint seed = noiseSeed;
+        DrawNoise(ref seed);
+
+        base.Render();
+    }
+
+    // taken and slighly modified from PlaybackBillboard
+    private void DrawNoise(ref uint seed) {
+        Rectangle bounds = new Rectangle((int)X, (int)Y, (int)Width, (int)Height);
+        string texture = Activated ? "objects/SorbetHelper/dashSwitchBlock/solidNoise" : "objects/SorbetHelper/dashSwitchBlock/pressedNoise";
+
+        MTexture mTexture = GFX.Game[texture];
+        Vector2 vector = new Vector2(PseudoRandRange(ref seed, 0f, mTexture.Width / 2), PseudoRandRange(ref seed, 0f, mTexture.Height / 2));
+        Vector2 vector2 = new Vector2(mTexture.Width, mTexture.Height) / 2f;
+        for (float num = 0f; num < bounds.Width; num += vector2.X) {
+            float num2 = Math.Min(bounds.Width - num, vector2.X);
+            for (float num3 = 0f; num3 < bounds.Height; num3 += vector2.Y) {
+                float num4 = Math.Min(bounds.Height - num3, vector2.Y);
+                int x = (int)(mTexture.ClipRect.X + vector.X);
+                int y = (int)(mTexture.ClipRect.Y + vector.Y);
+                Rectangle value = new Rectangle(x, y, (int)num2, (int)num4);
+                Draw.SpriteBatch.Draw(mTexture.Texture.Texture_Safe, new Vector2(bounds.X + num, bounds.Y + num3), value, color);
+            }
+        }
+
+        switch (Index) {
+            case 0:
+                for (int i = bounds.Y; (float)i < bounds.Bottom; i += 2) {
+                    float num = 0.05f + (1f + (float)Math.Sin(i / 16f + Scene.TimeActive * 2f)) / 2f * 0.2f;
+                    Draw.Line(bounds.X, i, bounds.X + bounds.Width, i, Color.Black * num);
+                }
+                break;
+            case 1:
+                for (int i = bounds.X; (float)i < bounds.Right; i += 2) {
+                    float num = 0.05f + (1f + (float)Math.Sin(i / 16f + Scene.TimeActive * 2f)) / 2f * 0.2f;
+                    Draw.Line(i, bounds.Y, i, bounds.Y + bounds.Height, Color.Black * num);
+                }
+                break;
+        }
+    }
+
+    private static uint PseudoRand(ref uint seed) {
+        seed ^= seed << 13;
+        seed ^= seed >> 17;
+        return seed;
+    }
+
+    private static float PseudoRandRange(ref uint seed, float min, float max) =>
+        min + PseudoRand(ref seed) % 1000 / 1000f * (max - min);
 
     // -- SETUP --
 

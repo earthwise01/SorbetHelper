@@ -1,5 +1,6 @@
 local utils = require("utils")
 local drawableSprite = require("structs.drawable_sprite")
+local drawableRectangle = require("structs.drawable_rectangle")
 local connectedEntities = require("helpers.connected_entities")
 
 local dashSwitchBlock = {}
@@ -14,13 +15,6 @@ local frames = {
     "objects/SorbetHelper/dashSwitchBlock/solid",
 }
 
-local depths = {
-    -10,
-    -10,
-    -10,
-    -10
-}
-
 local colorNames = {
     ["Cyan"] = 0,
     ["Yellow"] = 1,
@@ -28,6 +22,7 @@ local colorNames = {
 
 dashSwitchBlock.name = "SorbetHelper/DashSwitchBlock"
 dashSwitchBlock.warnBelowSize = {16, 16}
+dashSwitchBlock.depth = -10
 dashSwitchBlock.fieldInformation = {
     index = {
         fieldType = "integer",
@@ -57,7 +52,7 @@ local function getSearchPredicate(entity)
     end
 end
 
-local function getTileSprite(entity, x, y, frame, color, depth, rectangles)
+local function getTileSprite(entity, x, y, frame, color, rectangles)
     local hasAdjacent = connectedEntities.hasAdjacent
 
     local drawX, drawY = (x - 1) * 8, (y - 1) * 8
@@ -120,8 +115,6 @@ local function getTileSprite(entity, x, y, frame, color, depth, rectangles)
         sprite:useRelativeQuad(quadX, quadY, 8, 8)
         sprite:setColor(color)
 
-        sprite.depth = depth
-
         return sprite
     end
 end
@@ -141,11 +134,13 @@ function dashSwitchBlock.sprite(room, entity)
     local index = entity.index or 0
     local color = colors[index + 1] or colors[1]
     local frame = frames[index + 1] or frames[1]
-    local depth = depths[index + 1] or depths[1]
+
+    local fillRectangle = drawableRectangle.fromRectangle("fill", entity.x or 0, entity.y or 0, width, height, color)
+    table.insert(sprites, fillRectangle)
 
     for x = 1, tileWidth do
         for y = 1, tileHeight do
-            local sprite = getTileSprite(entity, x, y, frame, color, depth, rectangles)
+            local sprite = getTileSprite(entity, x, y, frame, color, rectangles)
 
             if sprite then
                 table.insert(sprites, sprite)
