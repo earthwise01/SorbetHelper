@@ -72,14 +72,6 @@ public class DashSwitchBlock : Solid {
         if (!SaveData.Instance.Assists.Invincible && player.CollideCheck<Spikes>())
             return DashCollisionResults.NormalCollision;
 
-        // gravity helper support
-        bool gravityInverted = GravityHelperImports.IsPlayerInverted?.Invoke() ?? false;
-
-        // make wallbouncing easier if dash corner correction is enabled
-        if ((player.Left >= Right - 4f || player.Right < Left + 4f) && dir.Y == (gravityInverted ? 1f : -1f)) {
-            return DashCollisionResults.NormalCollision;
-        }
-
         SceneAs<Level>().DirectionalShake(dir, 0.25f);
         Switch();
 
@@ -215,31 +207,31 @@ public class DashSwitchBlock : Solid {
         Rectangle bounds = new Rectangle((int)X, (int)Y, (int)Width, (int)Height);
         string texture = Activated ? "objects/SorbetHelper/dashSwitchBlock/solidNoise" : "objects/SorbetHelper/dashSwitchBlock/pressedNoise";
 
-        MTexture mTexture = GFX.Game[texture];
-        Vector2 vector = new Vector2(PseudoRandRange(ref seed, 0f, mTexture.Width / 2), PseudoRandRange(ref seed, 0f, mTexture.Height / 2));
-        Vector2 vector2 = new Vector2(mTexture.Width, mTexture.Height) / 2f;
-        for (float num = 0f; num < bounds.Width; num += vector2.X) {
-            float num2 = Math.Min(bounds.Width - num, vector2.X);
-            for (float num3 = 0f; num3 < bounds.Height; num3 += vector2.Y) {
-                float num4 = Math.Min(bounds.Height - num3, vector2.Y);
-                int x = (int)(mTexture.ClipRect.X + vector.X);
-                int y = (int)(mTexture.ClipRect.Y + vector.Y);
-                Rectangle value = new Rectangle(x, y, (int)num2, (int)num4);
-                Draw.SpriteBatch.Draw(mTexture.Texture.Texture_Safe, new Vector2(bounds.X + num, bounds.Y + num3), value, color);
+        MTexture noiseTexture = GFX.Game[texture];
+        Vector2 noiseRandPos = new Vector2(PseudoRandRange(ref seed, 0f, noiseTexture.Width / 2), PseudoRandRange(ref seed, 0f, noiseTexture.Height / 2));
+        Vector2 noiseHalfSize = new Vector2(noiseTexture.Width, noiseTexture.Height) / 2f;
+        for (float x = 0f; x < bounds.Width; x += noiseHalfSize.X) {
+            float sourceWidth = Math.Min(bounds.Width - x, noiseHalfSize.X);
+            for (float y = 0f; y < bounds.Height; y += noiseHalfSize.Y) {
+                float sourceHeight = Math.Min(bounds.Height - y, noiseHalfSize.Y);
+                int sourceX = (int)(noiseTexture.ClipRect.X + noiseRandPos.X);
+                int sourceY = (int)(noiseTexture.ClipRect.Y + noiseRandPos.Y);
+                Rectangle sourceRect = new Rectangle(sourceX, sourceY, (int)sourceWidth, (int)sourceHeight);
+                Draw.SpriteBatch.Draw(noiseTexture.Texture.Texture_Safe, new Vector2(bounds.X + x, bounds.Y + y), sourceRect, color);
             }
         }
 
         switch (Index) {
             case 0:
-                for (int i = bounds.Y; (float)i < bounds.Bottom; i += 2) {
-                    float num = 0.05f + (1f + (float)Math.Sin(i / 16f + Scene.TimeActive * 2f)) / 2f * 0.2f;
-                    Draw.Line(bounds.X, i, bounds.X + bounds.Width, i, Color.Black * num);
+                for (int y = bounds.Y; (float)y < bounds.Bottom; y += 2) {
+                    float alpha = 0.05f + (1f + (float)Math.Sin(y / 16f + Scene.TimeActive * 2f)) / 2f * 0.2f;
+                    Draw.Line(bounds.X, y, bounds.X + bounds.Width, y, Color.Black * alpha);
                 }
                 break;
             case 1:
-                for (int i = bounds.X; (float)i < bounds.Right; i += 2) {
-                    float num = 0.05f + (1f + (float)Math.Sin(i / 16f + Scene.TimeActive * 2f)) / 2f * 0.2f;
-                    Draw.Line(i, bounds.Y, i, bounds.Y + bounds.Height, Color.Black * num);
+                for (int x = bounds.X; (float)x < bounds.Right; x += 2) {
+                    float alpha = 0.05f + (1f + (float)Math.Sin(x / 16f + Scene.TimeActive * 2f)) / 2f * 0.2f;
+                    Draw.Line(x + 1, bounds.Y, x + 1, bounds.Y + bounds.Height, Color.Black * alpha);
                 }
                 break;
         }
