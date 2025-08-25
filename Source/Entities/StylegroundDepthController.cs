@@ -202,6 +202,7 @@ public class StylegroundDepthController : Entity {
             Logger.Warn("SorbetHelper", $"ilhook error! failed to find backdrop visible check in CIL code for {cursor.Method.Name}!");
             return;
         }
+        cursor.GotoNext(MoveType.Before, i => i.MatchBrfalse(out _));
 
         Logger.Verbose("SorbetHelper", $"injecting check for styleground depth controllers at {cursor.Index} in CIL code for {cursor.Method.Name}!");
 
