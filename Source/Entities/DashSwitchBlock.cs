@@ -102,6 +102,13 @@ public class DashSwitchBlock : Solid {
         foreach (var dashSwitchBlock in group) {
             if (dashSwitchBlock.CollideCheck(player))
                 return false;
+
+            // sometime i wonder if this rly should've just been a map specific entity
+            // idk hopefully this doesn't end up causing issues in the future even though most other similar blocks dont do this
+            foreach (var staticMover in dashSwitchBlock.staticMovers) {
+                if (staticMover.Entity is Spikes spikes && spikes.CollideCheck(player))
+                    return false;
+            }
         }
 
         return true;
@@ -137,7 +144,7 @@ public class DashSwitchBlock : Solid {
     }
 
     private void UpdateVisualState() {
-        Depth = Collidable ? Depths.Player - 10 : 9880;
+        Depth = Collidable ? Depths.Player - 10 : (Activated ? 9870 : 9880);
 
         foreach (StaticMover staticMover in staticMovers)
             staticMover.Entity.Depth = Depth + 1;
