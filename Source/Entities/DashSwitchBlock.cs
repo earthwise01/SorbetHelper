@@ -204,8 +204,9 @@ public class DashSwitchBlock : Solid {
 
     // taken and slighly modified from PlaybackBillboard
     private void DrawNoise(ref uint seed) {
+        // todo: make this scale properly with the bounce effect
         Rectangle bounds = new Rectangle((int)X, (int)Y, (int)Width, (int)Height);
-        string texture = Activated ? "objects/SorbetHelper/dashSwitchBlock/solidNoise" : "objects/SorbetHelper/dashSwitchBlock/pressedNoise";
+        string texture = Collidable ? "objects/SorbetHelper/dashSwitchBlock/solidNoise" : "objects/SorbetHelper/dashSwitchBlock/pressedNoise";
 
         MTexture noiseTexture = GFX.Game[texture];
         Vector2 noiseRandPos = new Vector2(PseudoRandRange(ref seed, 0f, noiseTexture.Width / 2), PseudoRandRange(ref seed, 0f, noiseTexture.Height / 2));
