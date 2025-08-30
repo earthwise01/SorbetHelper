@@ -146,6 +146,12 @@ public class DashSwitchBlock : Solid {
     private void UpdateVisualState() {
         Depth = Collidable ? Depths.Player - 10 : (Activated ? 9870 : 9880);
 
+        // shake when blocked from activating
+        if (Activated && !Collidable)
+            StartShaking();
+        else
+            StopShaking();
+
         foreach (StaticMover staticMover in staticMovers)
             staticMover.Entity.Depth = Depth + 1;
 
@@ -203,10 +209,15 @@ public class DashSwitchBlock : Solid {
     }
 
     public override void Render() {
+        var position = Position;
+        Position += Shake;
+
         uint seed = noiseSeed;
         DrawNoise(ref seed);
 
         base.Render();
+
+        Position = position;
     }
 
     // taken and slighly modified from PlaybackBillboard
