@@ -146,12 +146,6 @@ public class DashSwitchBlock : Solid {
     private void UpdateVisualState() {
         Depth = Collidable ? Depths.Player - 10 : (Activated ? 9870 : 9880);
 
-        // shake when blocked from activating
-        if (Activated && !Collidable)
-            StartShaking();
-        else
-            StopShaking();
-
         foreach (StaticMover staticMover in staticMovers)
             staticMover.Entity.Depth = Depth + 1;
 
@@ -163,8 +157,16 @@ public class DashSwitchBlock : Solid {
             image.Visible = !Collidable;
 
         if (groupLeader) {
+            // shake when blocked from activating
+            if (Activated && !Collidable)
+                StartShaking();
+            else
+                StopShaking();
+
             var scale = new Vector2(1f + wiggler.Value * 0.05f * wigglerScaler.X, 1f + wiggler.Value * 0.15f * wigglerScaler.Y);
             foreach (var dashSwitchBlock in group) {
+                dashSwitchBlock.shakeAmount = shakeAmount;
+
                 foreach (var image in dashSwitchBlock.allImages)
                     image.Scale = scale;
 
@@ -173,6 +175,18 @@ public class DashSwitchBlock : Solid {
                         foreach (Component component in spikes.Components)
                             if (component is Image image)
                                 image.Scale = scale;
+            }
+        }
+    }
+
+    public override void OnShake(Vector2 amount) {
+        base.OnShake(amount);
+
+        if (groupLeader) {
+            foreach (var dashSwitchBlock in group) {
+                if (!dashSwitchBlock.groupLeader) {
+                    dashSwitchBlock.OnShake(amount);
+                }
             }
         }
     }
