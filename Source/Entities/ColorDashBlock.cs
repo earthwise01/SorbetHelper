@@ -12,15 +12,15 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 // heavily inspired by color switches (https://github.com/CommunalHelper/VortexHelper/blob/dev/Code/Entities/ColorSwitch.cs) + switch blocks (https://github.com/CommunalHelper/VortexHelper/blob/dev/Code/Entities/SwitchBlock.cs) from vortex helper
 // code also taken from vanilla cassette blocks, and playback billboards (for rendering)
 
-[CustomEntity("SorbetHelper/DashSwitchBlock")]
+[CustomEntity("SorbetHelper/ColorDashBlock")]
 [Tracked]
-public class DashSwitchBlock : Solid {
+public class ColorDashBlock : Solid {
     public readonly int Index;
     private Color color;
 
     public bool Activated;
 
-    private List<DashSwitchBlock> group;
+    private List<ColorDashBlock> group;
     private bool groupLeader;
     private Vector2 groupOrigin;
 
@@ -33,7 +33,7 @@ public class DashSwitchBlock : Solid {
     private readonly List<Image> allImages = [];
     private uint noiseSeed;
 
-    public DashSwitchBlock(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, data.Height, false) {
+    public ColorDashBlock(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, data.Height, false) {
         SurfaceSoundIndex = 35;
         Index = data.Int("index", 0);
         color = Index switch {
@@ -86,12 +86,12 @@ public class DashSwitchBlock : Solid {
         }
 
         var session = (Scene as Level).Session;
-        var currentIndex = GetDashSwitchBlockIndex(session);
+        var currentIndex = GetColorDashBlockIndex(session);
         var nextIndex = (currentIndex + 1) % 2;
-        SetDashSwitchBlockIndex(session, nextIndex);
+        SetColorDashBlockIndex(session, nextIndex);
 
-        foreach (var dashSwitchBlock in Scene.Tracker.GetEntities<DashSwitchBlock>().Cast<DashSwitchBlock>())
-            dashSwitchBlock.UpdateState(playEffects: true);
+        foreach (ColorDashBlock colorDashBlock in Scene.Tracker.GetEntities<ColorDashBlock>())
+            colorDashBlock.UpdateState(playEffects: true);
     }
 
     private bool BlockedCheck() {
@@ -99,13 +99,13 @@ public class DashSwitchBlock : Solid {
         if (player is null)
             return true;
 
-        foreach (var dashSwitchBlock in group) {
-            if (dashSwitchBlock.CollideCheck(player))
+        foreach (var colorDashBlock in group) {
+            if (colorDashBlock.CollideCheck(player))
                 return false;
 
             // sometime i wonder if this rly should've just been a map specific entity
             // idk hopefully this doesn't end up causing issues in the future even though most other similar blocks dont do this
-            foreach (var staticMover in dashSwitchBlock.staticMovers) {
+            foreach (var staticMover in colorDashBlock.staticMovers) {
                 if (staticMover.Entity is Spikes spikes && spikes.CollideCheck(player))
                     return false;
             }
@@ -115,18 +115,18 @@ public class DashSwitchBlock : Solid {
     }
 
     public void UpdateState(bool playEffects = false) {
-        var currentIndex = GetDashSwitchBlockIndex((Scene as Level).Session);
+        var currentIndex = GetColorDashBlockIndex((Scene as Level).Session);
         Activated = Index == currentIndex;
 
         if (groupLeader && Activated && !Collidable) {
             bool canActivate = BlockedCheck();
             if (canActivate) {
-                foreach (var dashSwitchBlock in group) {
-                    dashSwitchBlock.Collidable = true;
-                    dashSwitchBlock.EnableStaticMovers();
+                foreach (var colorDashBlock in group) {
+                    colorDashBlock.Collidable = true;
+                    colorDashBlock.EnableStaticMovers();
 
                     if (playEffects)
-                        dashSwitchBlock.ActivateEffects();
+                        colorDashBlock.ActivateEffects();
                 }
 
                 if (playEffects)
@@ -164,13 +164,13 @@ public class DashSwitchBlock : Solid {
                 StopShaking();
 
             var scale = new Vector2(1f + wiggler.Value * 0.05f * wigglerScaler.X, 1f + wiggler.Value * 0.15f * wigglerScaler.Y);
-            foreach (var dashSwitchBlock in group) {
-                dashSwitchBlock.shakeAmount = shakeAmount;
+            foreach (var colorDashBlock in group) {
+                colorDashBlock.shakeAmount = shakeAmount;
 
-                foreach (var image in dashSwitchBlock.allImages)
+                foreach (var image in colorDashBlock.allImages)
                     image.Scale = scale;
 
-                foreach (var staticMover in dashSwitchBlock.staticMovers)
+                foreach (var staticMover in colorDashBlock.staticMovers)
                     if (staticMover.Entity is Spikes spikes)
                         foreach (Component component in spikes.Components)
                             if (component is Image image)
@@ -183,9 +183,9 @@ public class DashSwitchBlock : Solid {
         base.OnShake(amount);
 
         if (groupLeader) {
-            foreach (var dashSwitchBlock in group) {
-                if (!dashSwitchBlock.groupLeader) {
-                    dashSwitchBlock.OnShake(amount);
+            foreach (var colorDashBlock in group) {
+                if (!colorDashBlock.groupLeader) {
+                    colorDashBlock.OnShake(amount);
                 }
             }
         }
@@ -238,7 +238,7 @@ public class DashSwitchBlock : Solid {
     private void DrawNoise(ref uint seed) {
         // todo: make this scale properly with the bounce effect
         Rectangle bounds = new Rectangle((int)X, (int)Y, (int)Width, (int)Height);
-        string texture = Collidable ? "objects/SorbetHelper/dashSwitchBlock/solidNoise" : "objects/SorbetHelper/dashSwitchBlock/pressedNoise";
+        string texture = Collidable ? "objects/SorbetHelper/colorDashBlock/solidNoise" : "objects/SorbetHelper/colorDashBlock/pressedNoise";
 
         MTexture noiseTexture = GFX.Game[texture];
         Vector2 noiseRandPos = new Vector2(PseudoRandRange(ref seed, 0f, noiseTexture.Width / 2), PseudoRandRange(ref seed, 0f, noiseTexture.Height / 2));
@@ -284,7 +284,7 @@ public class DashSwitchBlock : Solid {
     public override void Awake(Scene scene) {
         base.Awake(scene);
 
-        // setup colours for static movers (taken from cassette blocks)
+        // setup colours for static movers
         var fadeColor = Calc.HexToColor("667da5");
         var disabledColor = new Color(fadeColor.R / 255f * (color.R / 255f), fadeColor.G / 255f * (color.G / 255f), fadeColor.B / 255f * (color.B / 255f), 1f);
         foreach (StaticMover staticMover in staticMovers) {
@@ -301,7 +301,7 @@ public class DashSwitchBlock : Solid {
             }
         }
 
-        // setup group (also taken from cassette blocks)
+        // setup group
         if (group is null) {
             groupLeader = true;
             group = [this];
@@ -311,29 +311,29 @@ public class DashSwitchBlock : Solid {
             float groupRight = float.MinValue;
             float groupTop = float.MaxValue;
             float groupBottom = float.MinValue;
-            foreach (var dashSwitchBlock in group) {
-                if (dashSwitchBlock.Left < groupLeft)
-                    groupLeft = dashSwitchBlock.Left;
-                if (dashSwitchBlock.Right > groupRight)
-                    groupRight = dashSwitchBlock.Right;
-                if (dashSwitchBlock.Bottom > groupBottom)
-                    groupBottom = dashSwitchBlock.Bottom;
-                if (dashSwitchBlock.Top < groupTop)
-                    groupTop = dashSwitchBlock.Top;
+            foreach (var colorDashBlock in group) {
+                if (colorDashBlock.Left < groupLeft)
+                    groupLeft = colorDashBlock.Left;
+                if (colorDashBlock.Right > groupRight)
+                    groupRight = colorDashBlock.Right;
+                if (colorDashBlock.Bottom > groupBottom)
+                    groupBottom = colorDashBlock.Bottom;
+                if (colorDashBlock.Top < groupTop)
+                    groupTop = colorDashBlock.Top;
             }
 
             groupOrigin = new Vector2((int)(groupLeft + (groupRight - groupLeft) / 2f), (int)groupBottom);
             wigglerScaler = new Vector2(Calc.ClampedMap(groupRight - groupLeft, 32f, 96f, 1f, 0.2f), Calc.ClampedMap(groupBottom - groupTop, 32f, 96f, 1f, 0.2f));
             Add(wiggler = Wiggler.Create(0.3f, 3f));
 
-            foreach (var dashSwitchBlock in group) {
-                dashSwitchBlock.wiggler = wiggler;
-                dashSwitchBlock.wigglerScaler = wigglerScaler;
-                dashSwitchBlock.groupOrigin = groupOrigin;
+            foreach (var colorDashBlock in group) {
+                colorDashBlock.wiggler = wiggler;
+                colorDashBlock.wigglerScaler = wigglerScaler;
+                colorDashBlock.groupOrigin = groupOrigin;
             }
         }
 
-        // setup spike origins (do you get the idea yet)
+        // setup spike origins
         foreach (var staticMover in staticMovers) {
             if (staticMover.Entity is Spikes spikes) {
                 spikes.SetOrigins(groupOrigin);
@@ -384,19 +384,19 @@ public class DashSwitchBlock : Solid {
         UpdateState(playEffects: false);
     }
 
-    private void FindInGroup(DashSwitchBlock block) {
-        foreach (var entity in Scene.Tracker.GetEntities<DashSwitchBlock>().Cast<DashSwitchBlock>()) {
-            if (entity != this && entity != block && entity.Index == Index && (entity.CollideRect(new Rectangle((int)block.X - 1, (int)block.Y, (int)block.Width + 2, (int)block.Height)) || entity.CollideRect(new Rectangle((int)block.X, (int)block.Y - 1, (int)block.Width, (int)block.Height + 2))) && !group.Contains(entity)) {
-                group.Add(entity);
-                FindInGroup(entity);
-                entity.group = group;
+    private void FindInGroup(ColorDashBlock block) {
+        foreach (ColorDashBlock otherBlock in Scene.Tracker.GetEntities<ColorDashBlock>()) {
+            if (otherBlock != this && otherBlock != block && otherBlock.Index == Index && (otherBlock.CollideRect(new Rectangle((int)block.X - 1, (int)block.Y, (int)block.Width + 2, (int)block.Height)) || otherBlock.CollideRect(new Rectangle((int)block.X, (int)block.Y - 1, (int)block.Width, (int)block.Height + 2))) && !group.Contains(otherBlock)) {
+                group.Add(otherBlock);
+                FindInGroup(otherBlock);
+                otherBlock.group = group;
             }
         }
     }
 
     private bool CheckForSame(float x, float y) {
-        foreach (var dashSwitchBlock in Scene.Tracker.GetEntities<DashSwitchBlock>().Cast<DashSwitchBlock>()) {
-            if (dashSwitchBlock.Index == Index && dashSwitchBlock.Collider.Collide(new Rectangle((int)x, (int)y, 8, 8))) {
+        foreach (ColorDashBlock otherBlock in Scene.Tracker.GetEntities<ColorDashBlock>()) {
+            if (otherBlock.Index == Index && otherBlock.Collider.Collide(new Rectangle((int)x, (int)y, 8, 8))) {
                 return true;
             }
         }
@@ -405,9 +405,9 @@ public class DashSwitchBlock : Solid {
     }
 
     private void SetImage(float x, float y, int tx, int ty) {
-        var atlasSubtextures = GFX.Game.GetAtlasSubtextures("objects/SorbetHelper/dashSwitchBlock/pressed");
+        var atlasSubtextures = GFX.Game.GetAtlasSubtextures("objects/SorbetHelper/colorDashBlock/pressed");
         pressedImages.Add(CreateImage(x, y, tx, ty, atlasSubtextures[Index % atlasSubtextures.Count]));
-        solidImages.Add(CreateImage(x, y, tx, ty, GFX.Game["objects/SorbetHelper/dashSwitchBlock/solid"]));
+        solidImages.Add(CreateImage(x, y, tx, ty, GFX.Game["objects/SorbetHelper/colorDashBlock/solid"]));
     }
 
     private Image CreateImage(float x, float y, int tx, int ty, MTexture tex) {
@@ -424,6 +424,7 @@ public class DashSwitchBlock : Solid {
 
     // -- SESSION HELPERS --
 
-    public static int GetDashSwitchBlockIndex(Session session) => session.GetCounter("SorbetHelper_DashSwitchBlockIndex");
-    public static void SetDashSwitchBlockIndex(Session session, int index) => session.SetCounter("SorbetHelper_DashSwitchBlockIndex", index);
+    // todo: also set a flag depending on the index?
+    public static int GetColorDashBlockIndex(Session session) => session.GetCounter("SorbetHelper_ColorDashBlockIndex");
+    public static void SetColorDashBlockIndex(Session session, int index) => session.SetCounter("SorbetHelper_ColorDashBlockIndex", index);
 }

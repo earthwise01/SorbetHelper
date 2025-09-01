@@ -3,7 +3,7 @@ local drawableSprite = require("structs.drawable_sprite")
 local drawableRectangle = require("structs.drawable_rectangle")
 local connectedEntities = require("helpers.connected_entities")
 
-local dashSwitchBlock = {}
+local colorDashBlock = {}
 
 local colors = {
     "00c2c2",
@@ -11,8 +11,8 @@ local colors = {
 }
 
 local frames = {
-    "objects/SorbetHelper/dashSwitchBlock/solid",
-    "objects/SorbetHelper/dashSwitchBlock/solid",
+    "objects/SorbetHelper/colorDashBlock/solid",
+    "objects/SorbetHelper/colorDashBlock/solid",
 }
 
 local colorNames = {
@@ -20,21 +20,21 @@ local colorNames = {
     ["Yellow"] = 1,
 }
 
-dashSwitchBlock.name = "SorbetHelper/DashSwitchBlock"
-dashSwitchBlock.warnBelowSize = {16, 16}
-dashSwitchBlock.depth = -10
-dashSwitchBlock.fieldInformation = {
+colorDashBlock.name = "SorbetHelper/ColorDashBlock"
+colorDashBlock.warnBelowSize = {16, 16}
+colorDashBlock.depth = -10
+colorDashBlock.fieldInformation = {
     index = {
         fieldType = "integer",
         options = colorNames,
         editable = false
     }
 }
-dashSwitchBlock.placements = {}
+colorDashBlock.placements = {}
 
 for i, _ in ipairs(colors) do
-    dashSwitchBlock.placements[i] = {
-        name = string.format("dashSwitchBlock_%s", i - 1),
+    colorDashBlock.placements[i] = {
+        name = string.format("colorDashBlock_%s", i - 1),
         alternativeName = "coloUr",
         data = {
             index = i - 1,
@@ -119,7 +119,7 @@ local function getTileSprite(entity, x, y, frame, color, rectangles)
     end
 end
 
-function dashSwitchBlock.sprite(room, entity)
+function colorDashBlock.sprite(room, entity)
     local relevantBlocks = utils.filter(getSearchPredicate(entity), room.entities)
 
     connectedEntities.appendIfMissing(relevantBlocks, entity)
@@ -151,4 +151,4 @@ function dashSwitchBlock.sprite(room, entity)
     return sprites
 end
 
-return dashSwitchBlock
+return colorDashBlock

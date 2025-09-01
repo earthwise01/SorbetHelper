@@ -1,8 +1,9 @@
 local trigger = {}
 
-trigger.name = "SorbetHelper/DashSwitchBlockStateTrigger"
+trigger.name = "SorbetHelper/ColorDashBlockStateTrigger"
 trigger.placements = {
-    name = "dashSwitchBlockState",
+    name = "colorDashBlockState",
+    alternativeName = "coloUr",
     data = {
         index = 0,
         mode = "OnPlayerEnter",

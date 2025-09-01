@@ -6,15 +6,15 @@ using Monocle;
 
 namespace Celeste.Mod.SorbetHelper.Triggers;
 
-[CustomEntity("SorbetHelper/DashSwitchBlockStateTrigger")]
+[CustomEntity("SorbetHelper/ColorDashBlockStateTrigger")]
 [Tracked]
-public class DashSwitchBlockStateTrigger : Trigger {
+public class ColorDashBlockStateTrigger : Trigger {
     public enum Modes { OnLevelLoad, OnPlayerSpawn, OnPlayerEnter }
 
     public readonly Modes Mode;
     public readonly int Index;
 
-    public DashSwitchBlockStateTrigger(EntityData data, Vector2 offset) : base(data, offset) {
+    public ColorDashBlockStateTrigger(EntityData data, Vector2 offset) : base(data, offset) {
         Mode = data.Enum("mode", Modes.OnPlayerEnter);
         Index = data.Int("index", 0);
     }
@@ -23,7 +23,7 @@ public class DashSwitchBlockStateTrigger : Trigger {
         base.Added(scene);
 
         if (Mode is Modes.OnLevelLoad)
-            DashSwitchBlock.SetDashSwitchBlockIndex((Scene as Level).Session, Index);
+            ColorDashBlock.SetColorDashBlockIndex((Scene as Level).Session, Index);
     }
 
     public override void OnEnter(Player player) {
@@ -32,15 +32,15 @@ public class DashSwitchBlockStateTrigger : Trigger {
         if (Mode is not Modes.OnPlayerEnter)
             return;
 
-        DashSwitchBlock.SetDashSwitchBlockIndex((Scene as Level).Session, Index);
-        foreach (var dashSwitchBlock in Scene.Tracker.GetEntities<DashSwitchBlock>().Cast<DashSwitchBlock>())
-            dashSwitchBlock.UpdateState(playEffects: false);
+        ColorDashBlock.SetColorDashBlockIndex((Scene as Level).Session, Index);
+        foreach (ColorDashBlock colorDashBlock in Scene.Tracker.GetEntities<ColorDashBlock>())
+            colorDashBlock.UpdateState(playEffects: false);
     }
 
     private static void Event_Player_Spawn(Player player) {
-        var trigger = player.CollideFirst<DashSwitchBlockStateTrigger>();
+        var trigger = player.CollideFirst<ColorDashBlockStateTrigger>();
         if (trigger is { Mode: Modes.OnPlayerSpawn })
-            DashSwitchBlock.SetDashSwitchBlockIndex((trigger.Scene as Level).Session, trigger.Index);
+            ColorDashBlock.SetColorDashBlockIndex((trigger.Scene as Level).Session, trigger.Index);
     }
 
     internal static void Load() {

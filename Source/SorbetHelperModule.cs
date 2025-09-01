@@ -65,7 +65,7 @@ public class SorbetHelperModule : EverestModule {
         PufferTweaksController.Load();
 
         // triggers
-        DashSwitchBlockStateTrigger.Load();
+        ColorDashBlockStateTrigger.Load();
 
         // components
         RenderOverride.Load();
@@ -100,7 +100,7 @@ public class SorbetHelperModule : EverestModule {
         PufferTweaksController.Unload();
 
         // triggers
-        DashSwitchBlockStateTrigger.Unload();
+        ColorDashBlockStateTrigger.Unload();
 
         // components
         RenderOverride.Unload();

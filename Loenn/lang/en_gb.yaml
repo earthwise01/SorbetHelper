@@ -798,14 +798,14 @@ Entities:
       moreExplodeParticles:
         Description: Adds more particles to puffer explosions.
 
-  SorbetHelper/DashSwitchBlock:
+  SorbetHelper/ColorDashBlock:
     Placements:
-      dashSwitchBlock_0:
-        Name: Dash Color Switch Block (Cyan)
-      dashSwitchBlock_1:
-        Name: Dash Color Switch Block (Yellow)
+      colorDashBlock_0:
+        Name: Color Dash Block (Cyan)
+      colorDashBlock_1:
+        Name: Color Dash Block (Yellow)
       coloUr:
-        Name: Dash Colour Switch
+        Name: Colour Dash Block
     Attributes:
       index: 
         Description: The index of the block.
@@ -878,13 +878,15 @@ Triggers:
           A session flag.
           Used as needed for the activation mode, otherwise determines whether or not the player can collide with the trigger.
 
-  SorbetHelper/DashSwitchBlockStateTrigger:
+  SorbetHelper/ColorDashBlockStateTrigger:
     Placements:
-      dashSwitchBlockState:
-        Name: Dash Switch Block State Trigger
+      colorDashBlockState:
+        Name: Color Dash Block State Trigger
+      coloUr:
+        Name: Colour Dash Block State Trigger
     Attributes:
       index:
-        Description: The index to set dash switch blocks to.
+        Description: The index to set color dash blocks to.
       mode:
         Name: Activation Mode
         Description: Determines how the trigger will activate.
