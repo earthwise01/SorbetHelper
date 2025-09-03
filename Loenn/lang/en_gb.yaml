@@ -798,6 +798,20 @@ Entities:
       moreExplodeParticles:
         Description: Adds more particles to puffer explosions.
 
+  SorbetHelper/ColorDashBlock:
+    Placements:
+      colorDashBlock_0:
+        Name: Color Dash Block (Cyan)
+      colorDashBlock_1:
+        Name: Color Dash Block (Yellow)
+      coloUr:
+        Name: Colour Dash Block
+    Attributes:
+      index: 
+        Description: The index of the block.
+      switchOnDreamTunnel:
+        Description: Whether the block should switch if the player dashes through it with a Communal Helper Dream Tunnel Dash.
+
 Triggers:
   SorbetHelper/AlternateInteractPrompt:
     Placements:
@@ -863,6 +877,19 @@ Triggers:
         Description: |-
           A session flag.
           Used as needed for the activation mode, otherwise determines whether or not the player can collide with the trigger.
+
+  SorbetHelper/ColorDashBlockStateTrigger:
+    Placements:
+      colorDashBlockState:
+        Name: Color Dash Block State Trigger
+      coloUr:
+        Name: Colour Dash Block State Trigger
+    Attributes:
+      index:
+        Description: The index to set color dash blocks to.
+      mode:
+        Name: Activation Mode
+        Description: Determines how the trigger will activate.
 
 Effects:
   SorbetHelper/ParallaxHiResSnow:

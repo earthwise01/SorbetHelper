@@ -8,6 +8,7 @@ using static ExtendedVariants.Module.ExtendedVariantsModule;
 using System.Runtime.CompilerServices;
 using System.Reflection;
 using System.Linq;
+using Monocle;
 
 namespace Celeste.Mod.SorbetHelper.Utils;
 
@@ -86,4 +87,9 @@ public static class ChronoHelperCompat {
 [ModImportName("ExtendedCameraDynamics")]
 public static class ExtendedCameraDynamicsImports {
     public static Func<bool> ExtendedCameraHooksEnabled;
+}
+
+[ModImportName("CommunalHelper.DashStates")]
+public static class CommunalHelperDashStateImports {
+    public static Func<Action<Player>, Action<Player>, Component> DreamTunnelInteraction;
 }

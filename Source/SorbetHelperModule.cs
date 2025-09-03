@@ -43,6 +43,7 @@ public class SorbetHelperModule : EverestModule {
         // mod interop
         typeof(GravityHelperImports).ModInterop();
         typeof(ExtendedCameraDynamicsImports).ModInterop();
+        typeof(CommunalHelperDashStateImports).ModInterop();
         typeof(SorbetHelperExports).ModInterop();
 
         // sorbet helper misc stuff
@@ -62,6 +63,9 @@ public class SorbetHelperModule : EverestModule {
         StylegroundDepthController.Load();
         MusicSyncControllerFMOD.Load();
         PufferTweaksController.Load();
+
+        // triggers
+        ColorDashBlockStateTrigger.Load();
 
         // components
         RenderOverride.Load();
@@ -94,6 +98,9 @@ public class SorbetHelperModule : EverestModule {
         StylegroundDepthController.Unload();
         MusicSyncControllerFMOD.Unload();
         PufferTweaksController.Unload();
+
+        // triggers
+        ColorDashBlockStateTrigger.Unload();
 
         // components
         RenderOverride.Unload();

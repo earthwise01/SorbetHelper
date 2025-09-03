@@ -382,6 +382,13 @@ entities.SorbetHelper/PufferTweaksController.attributes.description.canBePushedW
 entities.SorbetHelper/PufferTweaksController.attributes.description.canRespawnWhenHomeBlocked=Whether puffers can respawn when their home is blocked by a solid.
 entities.SorbetHelper/PufferTweaksController.attributes.description.moreExplodeParticles=Adds more particles to puffer explosions.
 
+# Color Dash Block
+entities.SorbetHelper/ColorDashBlock.placements.name.colorDashBlock_0=Color Dash Block (Cyan)
+entities.SorbetHelper/ColorDashBlock.placements.name.colorDashBlock_1=Color Dash Block (Yellow)
+entities.SorbetHelper/ColorDashBlock.placements.name.coloUr=Colour Dash Block
+entities.SorbetHelper/ColorDashBlock.attributes.description.index=The index of the block.
+entities.SorbetHelper/ColorDashBlock.attributes.description.switchOnDreamTunnel=Whether the block should switch if the player dashes through it with a Communal Helper Dream Tunnel Dash.
+
 # -- Triggers --
 
 # Alternate Interact Prompt
@@ -411,6 +418,13 @@ triggers.SorbetHelper/MiniPopupTrigger.attributes.name.mode=Activation Mode
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.mode=Determines how the trigger will activate.
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.onlyOnce=Whether the mini popup should only be able to trigger once per session.
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.flag=A session flag.\nUsed as needed for the activation mode, otherwise determines whether or not the player can collide with the trigger.
+
+# Color Dash Block State Trigger
+triggers.SorbetHelper/ColorDashBlockStateTrigger.placements.name.colorDashBlockState=Color Dash Block State Trigger
+triggers.SorbetHelper/ColorDashBlockStateTrigger.placements.name.coloUr=Colour Dash Block State Trigger
+triggers.SorbetHelper/ColorDashBlockStateTrigger.attributes.description.index=The index to set color dash blocks to.
+triggers.SorbetHelper/ColorDashBlockStateTrigger.attributes.name.mode=Activation Mode
+triggers.SorbetHelper/ColorDashBlockStateTrigger.attributes.description.mode=Determines how the trigger will activate.
 
 # -- Styleground Effects --
 
