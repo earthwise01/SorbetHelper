@@ -32,6 +32,10 @@ public class MusicSyncControllerFMOD : Entity {
 
         Tag |= Tags.TransitionUpdate;
 
+        // kind of don't like doing thisss but whatever
+        if (data.Bool("pauseUpdate", false))
+            Tag |= Tags.PauseUpdate;
+
         Depth = 1;
     }
 
