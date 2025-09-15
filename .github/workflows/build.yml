@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4.2.2
+    - uses: actions/checkout@v5
 
     - name: Download Everest lib-stripped
       uses: robinraju/release-downloader@v1.4
@@ -26,7 +26,7 @@ jobs:
       run: unzip lib-stripped.zip
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v5
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
