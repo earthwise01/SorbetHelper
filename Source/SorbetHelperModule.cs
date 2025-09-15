@@ -18,9 +18,6 @@ public class SorbetHelperModule : EverestModule {
     public override Type SessionType => typeof(SorbetHelperSession);
     public static SorbetHelperSession Session => (SorbetHelperSession)Instance._Session;
 
-    public static bool ExtendedVariantsLoaded { get; private set; }
-    public static bool ChronoHelperLoaded { get; private set; }
-
     public static Effect FxAlphaMask { get; private set; }
 
     public SorbetHelperModule() {
@@ -30,20 +27,19 @@ public class SorbetHelperModule : EverestModule {
     public override void Initialize() {
         base.Initialize();
 
-        ExtendedVariantsLoaded = Everest.Loader.DependencyLoaded(new EverestModuleMetadata {
-            Name = "ExtendedVariantMode",
-            Version = new Version(0, 38, 0)
-        });
-        ChronoHelperLoaded = ChronoHelperCompat.TryLoad();
+        ExtendedVariantsCompat.Load();
+        ChronoHelperCompat.Load();
 
         DashFallingBlock.LoadParticles();
     }
 
     public override void Load() {
         // mod interop
-        typeof(GravityHelperImports).ModInterop();
-        typeof(ExtendedCameraDynamicsImports).ModInterop();
-        typeof(CommunalHelperDashStateImports).ModInterop();
+        // imports
+        GravityHelperInterop.Load();
+        ExtendedCameraDynamicsInterop.Load();
+        CommunalHelperDashStatesInterop.Load();
+        // exports
         typeof(SorbetHelperExports).ModInterop();
 
         // sorbet helper misc stuff

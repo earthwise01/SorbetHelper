@@ -75,7 +75,7 @@ public class DashGateBlock : GateBlock {
 
     public DashCollisionResults OnDashed(Player player, Vector2 dir) {
         if (!Triggered && CanActivate(dir)) {
-            bool gravityInverted = GravityHelperImports.IsPlayerInverted?.Invoke() ?? false;
+            bool gravityInverted = GravityHelperInterop.IsImported && GravityHelperInterop.IsPlayerInverted();
 
             // make wallbouncing easier
             if ((player.Left >= Right - 4f || player.Right < Left + 4f) && dir.Y == (gravityInverted ? 1f : -1f) && dashCornerCorrection) {

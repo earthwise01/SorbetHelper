@@ -65,7 +65,7 @@ internal static class Util {
     /// <summary>
     /// whether extended camera dynamics specifically is being used for zoom out
     /// </summary>
-    public static bool UsingExtendedCameraDynamics => ExtendedCameraDynamicsImports.ExtendedCameraHooksEnabled?.Invoke() ?? false;
+    public static bool UsingExtendedCameraDynamics => ExtendedCameraDynamicsInterop.IsImported && ExtendedCameraDynamicsInterop.ExtendedCameraHooksEnabled();
 
     /// <summary>
     /// how far the center of the screen has been shifted as a result of zoom out or otherwise nonstandard camera sizes

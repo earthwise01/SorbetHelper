@@ -47,8 +47,8 @@ public class ColorDashBlock : Solid {
         OnDashCollide = OnDashed;
 
         // switch if communal helper dream tunnel dashed
-        var switchOnDreamTunnel = data.Bool("switchOnDreamTunnel", false);
-        if (switchOnDreamTunnel && CommunalHelperDashStateImports.DreamTunnelInteraction is not null) {
+        bool switchOnDreamTunnel = data.Bool("switchOnDreamTunnel", false);
+        if (switchOnDreamTunnel && CommunalHelperDashStatesInterop.IsImported) {
             void onEnter(Player player) { }
             void onExit(Player player) {
                 Switch();
@@ -64,7 +64,7 @@ public class ColorDashBlock : Solid {
                 Glitch.Value = 0.0f;
             }
 
-            Add(CommunalHelperDashStateImports.DreamTunnelInteraction(onEnter, onExit));
+            Add(CommunalHelperDashStatesInterop.DreamTunnelInteraction(onEnter, onExit));
         }
     }
 

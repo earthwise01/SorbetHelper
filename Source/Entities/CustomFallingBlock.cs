@@ -61,7 +61,7 @@ public class CustomFallingBlock : FallingBlock {
         Depth = data.Int("depth", Depth);
 
         chronoHelperGravityFallingBlock = chronoHelperGravity;
-        if (chronoHelperGravity && !SorbetHelperModule.ChronoHelperLoaded)
+        if (chronoHelperGravity && !ChronoHelperCompat.IsLoaded)
             Logger.Warn(nameof(SorbetHelper), "Trying to load a Custom Gravity Falling Block without chrono helper enabled!");
 
         Add(new Coroutine(Sequence()));

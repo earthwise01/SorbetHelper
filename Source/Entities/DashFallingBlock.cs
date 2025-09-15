@@ -58,7 +58,7 @@ public class DashFallingBlock : CustomFallingBlock {
     public DashCollisionResults OnDashCollision(Player player, Vector2 dir) {
         if (!HasStartedFalling && !Triggered) {
             // gravity helper support
-            bool gravityInverted = GravityHelperImports.IsPlayerInverted?.Invoke() ?? false;
+            bool gravityInverted = GravityHelperInterop.IsImported && GravityHelperInterop.IsPlayerInverted();
 
             // make wallbouncing easier if dash corner correction is enabled
             if ((player.Left >= Right - 4f || player.Right < Left + 4f) && dir.Y == (gravityInverted ? 1f : -1f) && dashCornerCorrection) {
