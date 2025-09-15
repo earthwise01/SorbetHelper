@@ -33,6 +33,7 @@ entities.SorbetHelper/ReturnBerry.placements.description.winged=Similar to a Str
 entities.SorbetHelper/ReturnBerry.placements.name.normalalt=Strawberry With Return Berry
 entities.SorbetHelper/ReturnBerry.placements.name.wingedalt=Winged Strawberry With Return Berry Winged Return Berry
 entities.SorbetHelper/ReturnBerry.attributes.description.winged=Determines whether the strawberry has wings and attempts to vertically rise offscreen when the player dashes.
+entities.SorbetHelper/ReturnBerry.attributes.description.moon=Makes the strawberry render as a moon berry.\nCrashes the map if the strawberry also has wings due to the 'flap' animation not being present.
 entities.SorbetHelper/ReturnBerry.attributes.description.delay=The delay (in seconds) before the player is placed into a bubble after grabbing the strawberry. (Default = 0.3)
 entities.SorbetHelper/ReturnBerry.attributes.description.checkpointID=Manually determine what checkpoint section strawberries are visually grouped up in, showing up on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)
 entities.SorbetHelper/ReturnBerry.attributes.description.order=Manually determine what order strawberries are visually placed in on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)

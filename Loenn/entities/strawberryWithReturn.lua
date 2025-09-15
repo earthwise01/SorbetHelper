@@ -30,11 +30,11 @@ function return_berry.fieldOrder(entity)
     local fields = {}
     if entity.checkpointID == nil then
         fields = {
-            "x", "y", "delay", "winged"
+            "x", "y", "delay", "winged", "moon", "bubbleParticles"
         }
     else
         fields = {
-            "x", "y", "checkpointID", "order", "delay", "winged"
+            "x", "y", "checkpointID", "order", "delay", "winged", "moon", "bubbleParticles"
         }
     end
     return fields
@@ -47,6 +47,7 @@ return_berry.placements = {
         placementType = "point",
         data = {
             winged = false,
+            moon = false,
             checkpointID = -1,
             order = -1,
             delay = 0.3,
@@ -63,6 +64,7 @@ return_berry.placements = {
         placementType = "point",
         data = {
             winged = true,
+            moon = false,
             checkpointID = -1,
             order = -1,
             delay = 0.3,
@@ -113,20 +115,31 @@ function return_berry.sprite(room, entity, viewport)
 
     local x, y = entity.x or 0, entity.y or 0
     local winged = entity.winged
+    local moon = entity.moon
     local nodes = entity.nodes
     local seeded = nodes and #nodes > 2
 
-    if winged then
-        if seeded then
-            berryTexture = "collectables/ghostberry/wings01"
+    if moon then
+        if winged or seeded then
+            berryTexture = "collectables/moonBerry/ghost00"
         else
-            berryTexture = "collectables/strawberry/wings01"
+            berryTexture = "collectables/moonBerry/normal00"
         end
+
     else
-        if seeded then
-            berryTexture = "collectables/ghostberry/idle00"
+        if winged then
+            if seeded then
+                berryTexture = "collectables/ghostberry/wings01"
+            else
+                berryTexture = "collectables/strawberry/wings01"
+            end
+
         else
-            berryTexture = "collectables/strawberry/normal00"
+            if seeded then
+                berryTexture = "collectables/ghostberry/idle00"
+            else
+                berryTexture = "collectables/strawberry/normal00"
+            end
         end
     end
 
@@ -182,9 +195,12 @@ end
 function return_berry.selection(room, entity)
     local x, y = entity.x or 0, entity.y or 0
     local winged = entity.winged
+    local moon = entity.moon
     local mainRectangle
 
-    if winged then
+    if moon then
+        mainRectangle = utils.rectangle(x - 8, y - 7, 16, 13)
+    elseif winged then
         mainRectangle = utils.rectangle(x - 17, y - 7, 34, 13)
     else
         mainRectangle = utils.rectangle(x - 5, y - 7, 10, 13)

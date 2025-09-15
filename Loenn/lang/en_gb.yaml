@@ -86,6 +86,10 @@ Entities:
     Attributes:
       winged:
         Description: Determines whether the strawberry has wings and attempts to vertically rise offscreen when the player dashes.
+      moon:
+        Description: |-
+          Makes the strawberry render as a moon berry.
+          Crashes the map if the strawberry also has wings due to the 'flap' animation not being present.
       delay:
         Description: The delay (in seconds) before the player is placed into a bubble after grabbing the strawberry. (Default = 0.3)
       checkpointID:
