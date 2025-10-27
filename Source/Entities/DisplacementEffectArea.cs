@@ -22,10 +22,10 @@ public class DisplacementEffectArea : Entity {
     public DisplacementEffectArea(EntityData data, Vector2 offset) : base(data.Position + offset) {
         Collider = new Hitbox(data.Width, data.Height);
 
-        var horizontalDisplacement = 1f - (data.Float("horizontalDisplacement", 0.0f) + 1f) / 2f; // remap the values from the "more friendly" -1 to 1 range to the actual expected 0 to 1 range (where 0.5 is no displacement)
-        var verticalDisplacement = 1f - (data.Float("verticalDisplacement", 0.0f) + 1f) / 2f;
-        var waterDisplacement = data.Float("waterDisplacement", 0.25f);
-        var alpha = data.Float("alpha", 1.0f);
+        float horizontalDisplacement = 1f - (data.Float("horizontalDisplacement", 0.0f) + 1f) / 2f; // remap the values from the "more friendly" -1 to 1 range to the actual expected 0 to 1 range (where 0.5 is no displacement)
+        float verticalDisplacement = 1f - (data.Float("verticalDisplacement", 0.0f) + 1f) / 2f;
+        float waterDisplacement = data.Float("waterDisplacement", 0.25f);
+        float alpha = data.Float("alpha", 1.0f);
         color = new Color(horizontalDisplacement, verticalDisplacement, waterDisplacement) * alpha;
 
         flag = data.Attr("flag", "");
@@ -34,7 +34,7 @@ public class DisplacementEffectArea : Entity {
 
         if (data.Bool("depthAdhering", false)) {
             Depth = data.Int("depth", 0);
-            Add(new DepthAdheringDisplacementRenderHook(() => { }, RenderDisplacement, true));
+            Add(new DepthAdheringDisplacementRenderHook(() => { }, RenderDisplacement, true, false));
         } else {
             Add(new DisplacementRenderHook(RenderDisplacement));
         }

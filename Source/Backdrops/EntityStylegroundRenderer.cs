@@ -11,8 +11,8 @@ using FMOD.Studio;
 namespace Celeste.Mod.SorbetHelper.Backdrops;
 
 /// <summary>
-/// renders entities with an entitystyleground component as if they were a styleground<br/>
-/// also see components.entitystylegroundmarker and entities.entitystylegroundcontroller
+/// Renders entities with an EntityStylegroundMarker component as if they were part of a styleground.<br/>
+/// See also Components.EntityStylegroundMarker and Entities.EntityStylegroundController.
 /// </summary>
 [CustomBackdrop("SorbetHelper/EntityStylegroundRenderer")]
 public class EntityStylegroundRenderer : Backdrop {
@@ -30,28 +30,28 @@ public class EntityStylegroundRenderer : Backdrop {
     public override void Render(Scene scene) {
         base.Render(scene);
 
-        var components = scene.Tracker.GetComponents<EntityStylegroundMarker>();
+        List<Component> components = scene.Tracker.GetComponents<EntityStylegroundMarker>();
         if (components.Count == 0)
             return;
 
-        var toRender = GetEntitiesToRender(components);
+        List<EntityStylegroundMarker> toRender = GetEntitiesToRender(components);
 
         GameplayRenderer.Begin();
 
-        foreach (var marker in toRender)
-            marker.EntityRender(); // entity.render isn't called directly so that displacement for e.g. fg big waterfalls still works. v niche so its kinda like ehhh but  whatever
+        foreach (EntityStylegroundMarker marker in toRender)
+            marker.Entity.Render();
 
         GameplayRenderer.End();
     }
 
     private static readonly Comparison<EntityStylegroundMarker> CompareDepth = (EntityStylegroundMarker a, EntityStylegroundMarker b) => Math.Sign(b.Entity.actualDepth - a.Entity.actualDepth);
     public List<EntityStylegroundMarker> GetEntitiesToRender(List<Component> components) {
-        var markers = new List<EntityStylegroundMarker>(components.Count);
+        List<EntityStylegroundMarker> markers = new List<EntityStylegroundMarker>(components.Count);
 
         for (int i = 0; i < components.Count; i++) {
-            var marker = (EntityStylegroundMarker)components[i];
+            EntityStylegroundMarker marker = (EntityStylegroundMarker)components[i];
 
-            if (marker.Entity.Visible == true && Tags.Contains(marker.Tag))
+            if (marker.EntityVisible == true && Tags.Contains(marker.Tag))
                 markers.Add(marker);
         }
 

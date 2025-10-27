@@ -1,120 +1,97 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Monocle;
-using Celeste;
-using Celeste.Mod.SorbetHelper.Entities;
-using MonoMod.Cil;
-using Mono.Cecil.Cil;
 using System.Linq;
-using Celeste.Mod.SorbetHelper.Utils;
+using Monocle;
+using Celeste.Mod.SorbetHelper.Entities;
+using MonoMod.RuntimeDetour;
+using System.Reflection;
 
 namespace Celeste.Mod.SorbetHelper.Components;
 
-/*
-    some personal notes, probably not necessary but due to the relative messiness of all of this i felt the need to document What and Why i did what i did here
-
-    what this attempts to do is apply displacement in the middle of rendering gameplay as opposed to afterwards like a normal displacement render hook does.
-    the implementation i've ended up i've come up with can probably be improved on somewhat, both in terms of performance and also visual parity (there are a few minor differences compared to normal displacement i think),
-    but i'll take it since it seems to somehow have ended up actually working?? which is a first for any cursed workarounds for silly minor effects i've tried
-
-    roughly how it works is when added to an entity it gets passed both the entity's render method and a render displacement method, which then are used in the component's render method to render the entity to the screen
-    during gameplay rendering instead of the entity's normal render method, due to a hook which makes the game attempt to render its component instead of the entity if it has one.
-
-    also if anything here seems like a weird thing to do its probably because i had/still have basically no clue how rendering actually works so im suprised this even ended up working at all,
-    granted a most of this is. pretty much the result of tons of trial and error and just  throwing stuff together until it works over probably too much time but still.
-    (like Oh My God basically everything in here, even the Comments and Variable Names, have been through a. somewhat ridiculous amount uncommited revisions)
-*/
-
 [Tracked]
-public class DepthAdheringDisplacementRenderHook : RenderOverride {
-    public readonly Action renderEntity;
-    public readonly Action renderDisplacement;
-    public readonly bool distortBehind;
+public class DepthAdheringDisplacementRenderHook : Component {
+    public readonly Action RenderEntity;
+    public readonly Action RenderDisplacement;
 
-    public DepthAdheringDisplacementRenderHook(Action renderEntity, Action renderDisplacement, bool distortBehind) : base(active: false, visible: true) {
-        this.renderEntity = renderEntity;
-        this.renderDisplacement = renderDisplacement;
+    private readonly bool distortBehind;
+
+    private readonly VisibleOverride VisibleOverride;
+    public bool EntityVisible => VisibleOverride?.EntityVisible != false;
+
+    public DepthAdheringDisplacementRenderHook(Action renderEntity, Action renderDisplacement, bool distortBehind, bool respectVisible) : base(false, false) {
+        RenderEntity = renderEntity;
+        RenderDisplacement = renderDisplacement;
         this.distortBehind = distortBehind;
+
+        if (respectVisible)
+            VisibleOverride = new VisibleOverride();
     }
 
-    public override void EntityRenderOverride() {
-        GameplayRenderer.End();
+    public DepthAdheringDisplacementRenderHook(Action renderEntity, Action renderDisplacement, bool distortBehind) : this(renderEntity, renderDisplacement, distortBehind, true) { }
 
-        var entityBuffer = RenderTargetHelper.GetGameplayBuffer();
-        var displacementMapBuffer = RenderTargetHelper.GetGameplayBuffer();
+    private void TrackSelf() => DepthAdheringDisplacementRenderer.GetRenderer(Scene, Entity.Depth, distortBehind).Track(this);
+    private void UntrackSelf() => DepthAdheringDisplacementRenderer.GetRenderer(Scene, Entity.Depth, distortBehind).Untrack(this);
 
-        var gd = Engine.Instance.GraphicsDevice;
-        var origRenderTargets = gd.GetRenderTargets();
+    public override void Added(Entity entity) {
+        base.Added(entity);
 
-        gd.SetRenderTarget(entityBuffer);
-        gd.Clear(Color.Transparent);
+        if (Scene is not null)
+            TrackSelf();
 
-        GameplayRenderer.Begin();
-
-        // copy the gameplay buffer into the entity buffer if the component is set to also distort stuff behind the entity
-        Camera camera = SceneAs<Level>().Camera;
-        if (distortBehind)
-            Draw.SpriteBatch.Draw((RenderTarget2D)origRenderTargets[0].RenderTarget, camera.Position, Color.White);
-
-        renderEntity();
-
-        GameplayRenderer.End();
-
-        // displacement map rendering stuff
-        Color displacementBgColor = DisplacementEffectBlocker.NoDisplacementColor;
-
-        gd.SetRenderTarget(displacementMapBuffer);
-        gd.Clear(displacementBgColor);
-
-        Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, camera.Matrix);
-
-        renderDisplacement();
-
-        var displacementBlockers = Scene.Tracker.GetEntities<DisplacementEffectBlocker>();
-        // support for displacement effect blockers
-        foreach (var entity in displacementBlockers) {
-            if (entity is DisplacementEffectBlocker { Visible: true, DepthAdhering: true, WaterOnly: false } && entity.Depth <= Entity.Depth) {
-                Draw.Rect(entity.X, entity.Y, entity.Width, entity.Height, displacementBgColor);
-            }
-        }
-
-        Draw.SpriteBatch.End();
-
-        // water only displacement blockers
-        var waterBlockers = displacementBlockers.Where(entity => entity is DisplacementEffectBlocker { Visible: true, DepthAdhering: true, WaterOnly: true } && entity.Depth <= Entity.Depth);
-        if (waterBlockers.Any()) {
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, DisplacementEffectBlocker.WaterDisplacementBlockerBlendState, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, camera.Matrix);
-
-            foreach (var entity in waterBlockers) {
-                Draw.Rect(entity.Position, entity.Width, entity.Height, DisplacementEffectBlocker.NoWaterDisplacementMultColor);
-            }
-
-            Draw.SpriteBatch.End();
-        }
-
-        gd.SetRenderTargets(origRenderTargets);
-        // if distortBehind is enabled, clear the gameplay buffer first before drawing the result (since in this case it also already includes a copy of the gameplay buffer alongside the entity)
-        if (distortBehind)
-            gd.Clear(Color.Transparent);
-
-        // temporarily force the anxiety effect off to stop the game from applying it multiple times
-        // done manually rather than via Distort.Anxiety to prevent issues with ExtendedVariants
-        // this is gonna affect literally no-one but at the very least this means i don't have to freak out over the fact that i knowingly left a bug in
-        float anxietyBackup = GFX.FxDistort.Parameters["anxiety"].GetValueSingle();
-        GFX.FxDistort.Parameters["anxiety"].SetValue(0f);
-
-        // apply the displacement effect to the entity buffer and render the result to the main gameplay buffer
-        Distort.Render((RenderTarget2D)entityBuffer, (RenderTarget2D)displacementMapBuffer, hasDistortion: true);
-
-        GFX.FxDistort.Parameters["anxiety"].SetValue(anxietyBackup);
-
-        RenderTargetHelper.ReturnGameplayBuffer(entityBuffer);
-        RenderTargetHelper.ReturnGameplayBuffer(displacementMapBuffer);
-
-        GameplayRenderer.Begin();
+        if (VisibleOverride is not null)
+            entity.Add(VisibleOverride);
+        else
+            entity.Visible = false;
     }
+
+    public override void EntityAdded(Scene scene) {
+        base.EntityAdded(scene);
+        TrackSelf();
+    }
+
+    public override void Removed(Entity entity) {
+        UntrackSelf();
+
+        if (VisibleOverride is not null)
+            entity.Remove(VisibleOverride);
+
+        base.Removed(entity);
+    }
+
+    public override void EntityRemoved(Scene scene) {
+        UntrackSelf();
+        base.EntityRemoved(scene);
+    }
+
+    #region Hooks
+
+    private static Hook hook_Entity_set_Depth;
+
+    internal static void Load() {
+        hook_Entity_set_Depth = new Hook(typeof(Entity).GetMethod("set_Depth", BindingFlags.Instance | BindingFlags.Public), On_Entity_set_Depth);
+    }
+
+    internal static void Unload() {
+        hook_Entity_set_Depth?.Dispose();
+        hook_Entity_set_Depth = null;
+    }
+
+    // i'm kinda bleh on hooking this but any other approaches seem slightly too unreliable + i guess depth doesn't change that oftenn and communal helper dream sprites take this approach too
+    private static void On_Entity_set_Depth(Action<Entity, int> orig, Entity self, int value) {
+        if (self.Depth == value || self.Scene is null || self.Scene.Tracker.CountComponents<DepthAdheringDisplacementRenderHook>() == 0) {
+            orig(self, value);
+            return;
+        }
+
+        DepthAdheringDisplacementRenderHook[] renderHooks = self.Components.GetAll<DepthAdheringDisplacementRenderHook>().ToArray();
+        foreach (DepthAdheringDisplacementRenderHook renderHook in renderHooks)
+            renderHook.UntrackSelf();
+
+        orig(self, value);
+
+        foreach (DepthAdheringDisplacementRenderHook renderHook in renderHooks)
+            renderHook.TrackSelf();
+    }
+
+    #endregion
+
 }

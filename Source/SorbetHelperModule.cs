@@ -64,7 +64,8 @@ public class SorbetHelperModule : EverestModule {
         ColorDashBlockStateTrigger.Load();
 
         // components
-        RenderOverride.Load();
+        VisibleOverride.Load();
+        DepthAdheringDisplacementRenderHook.Load();
         MovingPlatformHittable.Load();
         ExplodeHittable.Load();
         LightCover.Load();
@@ -99,7 +100,8 @@ public class SorbetHelperModule : EverestModule {
         ColorDashBlockStateTrigger.Unload();
 
         // components
-        RenderOverride.Unload();
+        VisibleOverride.Unload();
+        DepthAdheringDisplacementRenderHook.Unload();
         MovingPlatformHittable.Unload();
         ExplodeHittable.Unload();
         LightCover.Unload();
