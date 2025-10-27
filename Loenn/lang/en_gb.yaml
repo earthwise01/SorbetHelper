@@ -816,6 +816,14 @@ Entities:
       switchOnDreamTunnel:
         Description: Whether the block should switch if the player dashes through it with a Communal Helper Dream Tunnel Dash.
 
+  SorbetHelper/DarknessTransparencyFixController:
+    Placements:
+      controller:
+        Name: Darkness Transparency Fix Controller
+    Attributes:
+      global:
+        Description: Whether this controller should work globally.
+
 Triggers:
   SorbetHelper/AlternateInteractPrompt:
     Placements:

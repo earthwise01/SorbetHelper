@@ -86,6 +86,9 @@ public class SorbetHelperMapDataProcessor : EverestMapDataProcessor {
             },
             {
                 "entity:SorbetHelper/SliderFadeXY", globalControllerSwap
+            },
+            {
+                $"entity:{DarknessTransparencyFixController.EntityDataID}", globalControllerSwap
             }
         };
     }

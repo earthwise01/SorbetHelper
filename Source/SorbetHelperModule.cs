@@ -59,6 +59,7 @@ public class SorbetHelperModule : EverestModule {
         StylegroundDepthController.Load();
         MusicSyncControllerFMOD.Load();
         PufferTweaksController.Load();
+        DarknessTransparencyFixController.Load();
 
         // triggers
         ColorDashBlockStateTrigger.Load();
@@ -95,6 +96,7 @@ public class SorbetHelperModule : EverestModule {
         StylegroundDepthController.Unload();
         MusicSyncControllerFMOD.Unload();
         PufferTweaksController.Unload();
+        DarknessTransparencyFixController.Unload();
 
         // triggers
         ColorDashBlockStateTrigger.Unload();

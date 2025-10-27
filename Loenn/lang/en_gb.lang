@@ -390,6 +390,10 @@ entities.SorbetHelper/ColorDashBlock.placements.name.coloUr=Colour Dash Block
 entities.SorbetHelper/ColorDashBlock.attributes.description.index=The index of the block.
 entities.SorbetHelper/ColorDashBlock.attributes.description.switchOnDreamTunnel=Whether the block should switch if the player dashes through it with a Communal Helper Dream Tunnel Dash.
 
+# Darkness Transparency Fix Controller
+entities.SorbetHelper/DarknessTransparencyFixController.placements.name.controller=Darkness Transparency Fix Controller
+entities.SorbetHelper/DarknessTransparencyFixController.attributes.description.global=Whether this controller should work globally.
+
 # -- Triggers --
 
 # Alternate Interact Prompt
