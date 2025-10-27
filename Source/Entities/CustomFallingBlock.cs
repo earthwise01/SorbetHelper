@@ -30,14 +30,15 @@ public class CustomFallingBlock : FallingBlock {
 
     // chrono helper gravity falling block switch support
     private readonly bool chronoHelperGravityFallingBlock;
+    private readonly float chronoHelperGravityChangeShakeTime;
     private bool chronoHelperGravityUp, chronoHelperGravityWasUp;
     private bool chronoHelperHasShaken;
 
     public static Entity Load(Level level, LevelData levelData, Vector2 offset, EntityData entityData) =>
-        new CustomFallingBlock(entityData, offset, entityData.Bool("chronoHelperGravity", false));
+        new CustomFallingBlock(entityData, offset, chronoHelperGravity: entityData.Bool("chronoHelperGravity", false));
 
     public static Entity LoadGravity(Level level, LevelData levelData, Vector2 offset, EntityData entityData) =>
-        new CustomFallingBlock(entityData, offset, true);
+        new CustomFallingBlock(entityData, offset, chronoHelperGravity: true);
 
     public CustomFallingBlock(EntityData data, Vector2 offset, bool chronoHelperGravity) : base(data, offset) {
         // remove the Coroutine added by the vanilla falling block
@@ -62,11 +63,11 @@ public class CustomFallingBlock : FallingBlock {
 
         chronoHelperGravityFallingBlock = chronoHelperGravity;
         if (chronoHelperGravity && !ChronoHelperCompat.IsLoaded)
-            Logger.Warn(nameof(SorbetHelper), "Trying to load a Custom Gravity Falling Block without chrono helper enabled!");
+            Logger.Warn(nameof(SorbetHelper), "Trying to load a Custom Gravity Falling Block without Chrono Helper enabled!");
+        chronoHelperGravityChangeShakeTime = data.Float("chronoHelperGravityChangeShakeTime", 0.1f);
 
         Add(new Coroutine(Sequence()));
 
-        // i was going to use a moving block hittable component before i remembered that. right TrackedAs is a Thing i can just use that asdfasd (+ having falling blocks trigger other falling blocks is neat maybe but inconsistent with vanilla)
         // Add(new MovingBlockHittable(OnMovingBlockHit));
     }
 
@@ -82,7 +83,7 @@ public class CustomFallingBlock : FallingBlock {
         if (!resetFlags)
             return;
 
-        var session = (Scene as Level).Session;
+        Session session = (Scene as Level).Session;
         if (!string.IsNullOrEmpty(flagOnFall) && session.GetFlag(flagOnFall))
             session.SetFlag(flagOnFall, false);
         if (!string.IsNullOrEmpty(flagOnLand) && session.GetFlag(flagOnLand))
@@ -123,11 +124,9 @@ public class CustomFallingBlock : FallingBlock {
 
             if (!chronoHelperGravityFallingBlock || !chronoHelperHasShaken)
                 yield return initialShakeTime;
-            // this is so so awful  butwhen implementing support for chrono helper gravity originally i had some delay before the blocks fell after landing
-            //  turns out though chrono helper does Not do that itself and has the blocks fall again instantly but i both had already used the extra delay and found it felt good
-            // so for publically releasing this im compromising by keeping that behavior by default but disabling the delay for parity if a flag is set
-            else if (!(Scene as Level).Session.GetFlag("SorbetHelper_CorrectChronoHelperParity"))
-                yield return 0.1f;
+            // the consequences of my actions ...
+            else if (chronoHelperGravityChangeShakeTime > 0f && !(Scene as Level).Session.GetFlag("SorbetHelper_CorrectChronoHelperParity"))
+                yield return chronoHelperGravityChangeShakeTime;
 
             float shakeTimer = variableShakeTime;
             while (shakeTimer > 0f && PlayerWaitCheck() && (!chronoHelperGravityFallingBlock || !chronoHelperHasShaken)) {
@@ -139,7 +138,7 @@ public class CustomFallingBlock : FallingBlock {
             StopShaking();
             DirectionalShakeParticles();
 
-            var speed = new Vector2(0f, 0f);
+            Vector2 speed = Vector2.Zero;
             while (true) {
                 Level level = Scene as Level;
                 speed.X = Calc.Approach(speed.X, Direction.X * maxSpeed, acceleration * Engine.DeltaTime);
@@ -158,6 +157,7 @@ public class CustomFallingBlock : FallingBlock {
 
                 // checks whether the falling block fell out of bounds
                 // all of these checks are done on any custom falling block regardless of its direction so hopefully that wont break anything somewhere
+                // todo: maybe allow disabling this for gravity falling blocks?
                 if (Top > level.Bounds.Bottom + 16 || Bottom < level.Bounds.Top - 16 || Right < level.Bounds.Left - 16 || Left > level.Bounds.Right + 16 ||
                 ((Top > level.Bounds.Bottom - 1 || Bottom < level.Bounds.Top + 1 || Right < level.Bounds.Left + 1 || Left > level.Bounds.Right - 1) && CollideCheck<Solid>(Position + Direction))) {
                     Collidable = Visible = false;
@@ -209,9 +209,9 @@ public class CustomFallingBlock : FallingBlock {
     }
 
     public void DirectionalShakeParticles() {
-        var dir = Direction.FourWayNormal();
+        Vector2 dir = Direction.FourWayNormal();
 
-        var level = Scene as Level;
+        Level level = Scene as Level;
         switch (dir) {
             case { X: 1f }:
                 for (int i = 2; i < Height; i += 4) {
@@ -249,13 +249,13 @@ public class CustomFallingBlock : FallingBlock {
     }
 
     public void DirectionalLandParticles() {
-        var dir = Direction.FourWayNormal();
+        Vector2 dir = Direction.FourWayNormal();
 
-        var P_DirectionalLandDust = new ParticleType(P_LandDust) {
+        ParticleType P_DirectionalLandDust = new ParticleType(P_LandDust) {
             Acceleration = dir * -30f
         };
 
-        var level = Scene as Level;
+        Level level = Scene as Level;
         switch (dir) {
             case { X: 1f }:
                 for (int i = 2; i <= Height; i += 4) {

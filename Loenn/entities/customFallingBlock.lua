@@ -25,6 +25,7 @@ local function getFallingBlock(id, altName, placementData, fieldInfo, fieldOrder
         impactSfx = "event:/game/general/fallblock_impact",
         depth = -9000,
         -- chronoHelperGravity = false,
+        chronoHelperGravityChangeShakeTime = 0.0, -- grrr
     }
 
     if placementData then
@@ -96,9 +97,10 @@ local function getFallingBlock(id, altName, placementData, fieldInfo, fieldOrder
     -- create the falling block
     local fallingBlock = {}
     fallingBlock.name = id
-    fallingBlock.depth = function (entity) return entity.depth or -9000 end
+    fallingBlock.depth = function (entity) return entity.depth end
     fallingBlock.placements = placements
     fallingBlock.fieldInformation = fieldInformation
+    fallingBlock.ignoredFields = { "_id", "_name", "chronoHelperGravityChangeShakeTime" }
     fallingBlock.fieldOrder = fieldOrder
     fallingBlock.sprite = fakeTilesHelper.getEntitySpriteFunction("tiletype", false)
     return fallingBlock

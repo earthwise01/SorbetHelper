@@ -101,7 +101,7 @@ public static class ChronoHelperCompat {
     public static bool SessionGravityModeUp {
         get {
             if (!IsLoaded)
-                return false;
+                throw new Exception("failed to get chrono helper falling block gravity: chrono helper is not installed!");
 
             if (!ReflectionSucceeded) // maybe change to a postcard???
                 throw new Exception("failed to get chrono helper gravity!     this is likely due to an unexpected code change, please report this   to @earthwise_ in the celeste discord, or on SorbetHelper's github!");
