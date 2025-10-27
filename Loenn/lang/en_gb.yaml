@@ -243,6 +243,15 @@ Entities:
     Attributes:
       color:
         Description: The color of the waterfall.
+      alpha:
+        Description: The alpha of the waterfall.
+      depth:
+        Description: |-
+          Determines what visual layer the waterfall should be on.
+          Higher values mean farther behind in the scene, defaults are -9999 for the normal placement and -49900 for the above tiles placement.
+          Does not affect the displacement waves, which will still render above everything (unless used with a displacment depth fixer).
+      splashParticleDepth:
+        Description: The visual depth to render the splash particles at, or whether to disable them completely.
       ignoreSolids:
         Description: When checked, the waterfall will ignore any solid objects in its way (e.g. foreground tiles). Water can still block it.
       lines:
@@ -252,11 +261,6 @@ Entities:
         Description: |-
           Determines the speed of the waterfall.
           Ranges from 0.0 to 1.0, values closer to 1.0 result in faster waves. Vanilla small waterfalls use 0.8 and big waterfalls use 1.0.
-      depth:
-        Description: |-
-          Determines what visual layer the waterfall should be on.
-          Higher values mean farther behind in the scene, defaults are -9999 for the normal placement and -49900 for the above tiles placement.
-          Does not affect the displacement waves, which will still render above everything (unless used with a displacment depth fixer).
   
   SorbetHelper/CustomLightbeam:
     Placements:

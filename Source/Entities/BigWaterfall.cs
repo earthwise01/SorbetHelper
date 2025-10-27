@@ -13,6 +13,10 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/BigWaterfall")]
 public class BigWaterfall : Entity {
+    private enum SplashParticleDepths {
+        ParticlesBG, Particles, ParticlesFG, None
+    }
+
     private float width;
     private float height;
 
@@ -23,6 +27,7 @@ public class BigWaterfall : Entity {
     private readonly Color baseColor;
     private readonly Color surfaceColor;
     private readonly Color fillColor;
+    private readonly SplashParticleDepths splashParticleDepth;
 
     private Water water;
     private Solid solid;
@@ -36,15 +41,18 @@ public class BigWaterfall : Entity {
         Tag = Tags.TransitionUpdate;
 
         width = data.Width;
+
+        float alpha = data.Float("alpha", 1f);
+        baseColor = Calc.HexToColor(data.Attr("color", "87CEFA")) * alpha;
+        surfaceColor = baseColor * 0.8f;
+        fillColor = baseColor * 0.3f;
+
         Depth = data.Int("depth", -49900);
+        splashParticleDepth = data.Enum("splashParticleDepth", SplashParticleDepths.ParticlesFG);
 
         ignoreSolids = data.Bool("ignoreSolids", false);
         hasLines = data.Bool("lines", true);
         wavePercent = data.Float("wavePercent", 1f);
-
-        baseColor = Calc.HexToColor(data.Attr("color", "87CEFA"));
-        surfaceColor = baseColor * 0.8f;
-        fillColor = baseColor * 0.3f;
 
         if (hasLines) {
             if (width <= 8f) {
@@ -57,10 +65,10 @@ public class BigWaterfall : Entity {
         }
 
         if (width > 16f && hasLines) {
-            int num = Calc.Random.Next((int)(width / 16f));
-            for (int i = 0; i < num; i++) {
+            int lineCount = Calc.Random.Next((int)(width / 16f));
+
+            for (int i = 0; i < lineCount; i++)
                 lines.Add(8f + Calc.Random.NextFloat(width - 16f));
-            }
         }
     }
 
@@ -89,7 +97,7 @@ public class BigWaterfall : Entity {
         if (!visibleOnCamera)
             return;
 
-        var waveColor = new Color(0.5f, 0.5f, wavePercent, 1f);
+        Color waveColor = new Color(0.5f, 0.5f, wavePercent, 1f);
 
         if (water is not { TopSurface: not null }) {
             Draw.Rect(X, Y, width, height, waveColor);
@@ -104,10 +112,12 @@ public class BigWaterfall : Entity {
     }
 
     public override void Update() {
-        visibleOnCamera = InView((Scene as Level).Camera);
+        Level level = Scene as Level;
+
+        visibleOnCamera = InView(level.Camera);
 
         if (loopingSfx is not null) {
-            Vector2 cameraPos = (Scene as Level).Camera.GetCenter();
+            Vector2 cameraPos = level.Camera.GetCenter();
             loopingSfx.Position.Y = Calc.Clamp(cameraPos.Y, Y, height);
         }
 
@@ -120,9 +130,17 @@ public class BigWaterfall : Entity {
                 }
             }
 
-            if ((water is not null || solid is not null) && !(Scene as Level).Transitioning) {
-                var particlesPosition = new Vector2(X + (width / 2f), Y + height + 2f);
-                (Scene as Level).ParticlesFG.Emit(Water.P_Splash, 1, particlesPosition, new Vector2((width / 2f) + 4f, 2f), baseColor, new Vector2(0f, -1f).Angle());
+            if (splashParticleDepth != SplashParticleDepths.None && (water is not null || solid is not null) && !level.Transitioning) {
+                Vector2 particlesPosition = new Vector2(X + (width / 2f), Y + height + 2f);
+
+                ParticleSystem particles = splashParticleDepth switch {
+                    SplashParticleDepths.ParticlesFG => level.ParticlesFG,
+                    SplashParticleDepths.Particles   => level.Particles,
+                    SplashParticleDepths.ParticlesBG => level.ParticlesBG,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+
+                particles.Emit(Water.P_Splash, 1, particlesPosition, new Vector2((width / 2f) + 4f, 2f), baseColor, new Vector2(0f, -1f).Angle());
             }
         }
 
@@ -133,9 +151,9 @@ public class BigWaterfall : Entity {
         if (!visibleOnCamera)
             return;
 
-        var edgeSize = width <= 8f ? 2 : 3;
-        var innerEdgeSize = edgeSize - 1;
-        var fillShrink = width <= 8f ? 1 : 0;
+        int edgeSize = width <= 8f ? 2 : 3;
+        int innerEdgeSize = edgeSize - 1;
+        int fillShrink = width <= 8f ? 1 : 0;
 
         if (water == null || water.TopSurface == null) {
             Draw.Rect(X + fillShrink, Y, width - fillShrink, height, fillColor);

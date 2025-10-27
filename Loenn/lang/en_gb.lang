@@ -171,11 +171,13 @@ entities.SorbetHelper/BigWaterfall.placements.name.abovefg=Resizable Waterfall (
 entities.SorbetHelper/BigWaterfall.placements.description.abovefg=A custom waterfall combining the behaviour and visuals of a small waterfall with the resizability and visuals of a big waterfall.\nDoesn't collide with and appears above foreground tiles.
 entities.SorbetHelper/BigWaterfall.placements.name.bigwaterfall=Big Waterfall Custom Waterfall
 entities.SorbetHelper/BigWaterfall.attributes.description.color=The color of the waterfall.
+entities.SorbetHelper/BigWaterfall.attributes.description.alpha=The alpha of the waterfall.
+entities.SorbetHelper/BigWaterfall.attributes.description.depth=Determines what visual layer the waterfall should be on.\nHigher values mean farther behind in the scene, defaults are -9999 for the normal placement and -49900 for the above tiles placement.\nDoes not affect the displacement waves, which will still render above everything (unless used with a displacment depth fixer).
+entities.SorbetHelper/BigWaterfall.attributes.description.splashParticleDepth=The visual depth to render the splash particles at, or whether to disable them completely.
 entities.SorbetHelper/BigWaterfall.attributes.description.ignoreSolids=When checked, the waterfall will ignore any solid objects in its way (e.g. foreground tiles). Water can still block it.
 entities.SorbetHelper/BigWaterfall.attributes.name.lines=Detail Lines
 entities.SorbetHelper/BigWaterfall.attributes.description.lines=Determines whether the waterfall will have any additional lines for detail, disabling this will make the waterfall appear closer in appearance to a vanilla small waterfall as opposed to a big waterfall.
 entities.SorbetHelper/BigWaterfall.attributes.description.wavePercent=Determines the speed of the waterfall.\nRanges from 0.0 to 1.0, values closer to 1.0 result in faster waves. Vanilla small waterfalls use 0.8 and big waterfalls use 1.0.
-entities.SorbetHelper/BigWaterfall.attributes.description.depth=Determines what visual layer the waterfall should be on.\nHigher values mean farther behind in the scene, defaults are -9999 for the normal placement and -49900 for the above tiles placement.\nDoes not affect the displacement waves, which will still render above everything (unless used with a displacment depth fixer).
 
 # Custom Lightbeam
 entities.SorbetHelper/CustomLightbeam.placements.name.customlightbeam=Custom Lightbeam

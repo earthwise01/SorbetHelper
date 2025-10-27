@@ -15,6 +15,14 @@ resizableWaterfall.canResize = {true, false}
 resizableWaterfall.minimumSize = {8, 0}
 
 resizableWaterfall.fieldInformation = {
+    color = {
+        fieldType = "color",
+        allowXNAColors = false
+    },
+    alpha = {
+        minimumValue = 0,
+        maximumValue = 1
+    },
     depth = {
         fieldType = "integer",
         options = depths.addDepths(depths.getDepths(), {
@@ -22,9 +30,11 @@ resizableWaterfall.fieldInformation = {
         }),
         editable = true
     },
-    color = {
-        fieldType = "color",
-        allowXNAColors = false
+    splashParticleDepth = {
+        options = {
+            {"BG Particles (8000)", "ParticlesBG"}, {"Particles (-8000)", "Particles"}, {"FG Particles (-50000)", "ParticlesFG"}, {"None", "None"}
+        },
+        editable = false
     },
     wavePercent = {
         options = {1.0, 0.8},
@@ -34,7 +44,11 @@ resizableWaterfall.fieldInformation = {
 }
 
 resizableWaterfall.fieldOrder = {
-    "x", "y", "width", "color", "depth", "ignoreSolids", "lines", "wavePercent"
+    "x", "y",
+    "width", "color",
+    "depth", "alpha",
+    "splashParticleDepth", "wavePercent",
+    "ignoreSolids", "lines"
 }
 
 resizableWaterfall.ignoredFields = {
@@ -48,10 +62,12 @@ resizableWaterfall.placements = {
         data = {
             width = 8,
             color = "87cefa",
+            alpha = 1.0,
+            depth = -9999,
+            splashParticleDepth = "ParticlesFG",
             ignoreSolids = false,
             lines = true,
-            wavePercent = 1.0,
-            depth = -9999
+            wavePercent = 1.0
         }
     },
     {
@@ -60,10 +76,12 @@ resizableWaterfall.placements = {
         data = {
             width = 8,
             color = "87cefa",
+            alpha = 1.0,
+            depth = -9999,
+            splashParticleDepth = "ParticlesFG",
             ignoreSolids = false,
             lines = false,
-            wavePercent = 0.8,
-            depth = -9999
+            wavePercent = 0.8
         }
     },
     {
@@ -72,10 +90,12 @@ resizableWaterfall.placements = {
         data = {
             width = 8,
             color = "87cefa",
+            alpha = 1.0,
+            depth = -49900,
+            splashParticleDepth = "ParticlesFG",
             ignoreSolids = true,
             lines = true,
-            wavePercent = 1.0,
-            depth = -49900
+            wavePercent = 1.0
         }
     }
 }
