@@ -37,7 +37,7 @@ Entities:
       flag_toggled_killbox:
         Name: Killbox (Flag Toggled)
       accurate_killbox:
-        Name: Killbox (Accurate Hitbox)
+        Name: Accurate Killbox
     Attributes:
       flag:
         Description: An optional session flag that needs to be set in order for the killbox to be able to activate.
@@ -45,12 +45,12 @@ Entities:
         Name: Invert Flag
         Description: When checked, the killbox can only be active when the flag is disabled, rather than when it is enabled.
       flagOnly:
-        Description: Whether the killbox's collidability should be fully controlled by its flag, rather than also requiring the player to be above it.
+        Description: Whether the killbox's collidability should only be determined by its flag, instead of also requiring the player to be above it.
       playerAboveThreshold:
         Description: How far (in pixels) above the killbox the player needs to be in order for it to activate. Default is 32.
       lenientHitbox:
         Name: Accurate Hitbox
-        Description: Whether the player should only die once they are fully beneath the top of the killbox, closer matching the behavior of the actual bottom of a room.
+        Description: Whether the player should only die once they are fully beneath the top of the killbox, accurately matching how the kill plane at the bottom of a room behaves.
       updateOnLoad:
         Description: Whether the killbox should attempt to update its collidability immediately after loading, preventing the camera from snapping up if placed next to a room transition or near a spawn point.
 
@@ -60,7 +60,7 @@ Entities:
         Name: Kill Zone
     Attributes:
       flag:
-        Description: The flag that needs to be set in order for the kill zone to be activated, leaving this empty causes the kill zone to always be active.
+        Description: The flag that needs to be set in order for the kill zone to be activated. Leaving this empty causes the kill zone to always be active.
       inverted:
         Name: Invert Flag
         Description: When checked, the kill zone will only be active when the flag is disabled, rather than when it is enabled.
