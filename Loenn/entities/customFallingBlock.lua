@@ -97,7 +97,7 @@ local function getFallingBlock(id, altName, placementData, fieldInfo, fieldOrder
     -- create the falling block
     local fallingBlock = {}
     fallingBlock.name = id
-    fallingBlock.depth = function (entity) return entity.depth end
+    fallingBlock.depth = function (room, entity) return entity.depth or -9000 end
     fallingBlock.placements = placements
     fallingBlock.fieldInformation = fieldInformation
     fallingBlock.ignoredFields = { "_id", "_name", "chronoHelperGravityChangeShakeTime" }
