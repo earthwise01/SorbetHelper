@@ -261,6 +261,8 @@ Entities:
         Description: |-
           Determines the speed of the waterfall.
           Ranges from 0.0 to 1.0, values closer to 1.0 result in faster waves. Vanilla small waterfalls use 0.8 and big waterfalls use 1.0.
+      rippleWater:
+        Description: Whether the waterfall should create ripples when it lands in water.
   
   SorbetHelper/CustomLightbeam:
     Placements:

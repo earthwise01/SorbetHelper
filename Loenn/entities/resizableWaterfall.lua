@@ -48,7 +48,7 @@ resizableWaterfall.fieldOrder = {
     "width", "color",
     "depth", "alpha",
     "splashParticleDepth", "wavePercent",
-    "ignoreSolids", "lines"
+    "ignoreSolids", "lines", "rippleWater"
 }
 
 resizableWaterfall.ignoredFields = {
@@ -67,7 +67,8 @@ resizableWaterfall.placements = {
             splashParticleDepth = "ParticlesFG",
             ignoreSolids = false,
             lines = true,
-            wavePercent = 1.0
+            wavePercent = 1.0,
+            rippleWater = true
         }
     },
     {
@@ -81,7 +82,8 @@ resizableWaterfall.placements = {
             splashParticleDepth = "ParticlesFG",
             ignoreSolids = false,
             lines = false,
-            wavePercent = 0.8
+            wavePercent = 0.8,
+            rippleWater = true
         }
     },
     {
@@ -95,7 +97,8 @@ resizableWaterfall.placements = {
             splashParticleDepth = "ParticlesFG",
             ignoreSolids = true,
             lines = true,
-            wavePercent = 1.0
+            wavePercent = 1.0,
+            rippleWater = true
         }
     }
 }

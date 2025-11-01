@@ -23,6 +23,7 @@ public class BigWaterfall : Entity {
     private readonly bool ignoreSolids;
     private readonly bool hasLines;
     private readonly float wavePercent;
+    private readonly bool rippleWater;
 
     private readonly Color baseColor;
     private readonly Color surfaceColor;
@@ -53,6 +54,7 @@ public class BigWaterfall : Entity {
         ignoreSolids = data.Bool("ignoreSolids", false);
         hasLines = data.Bool("lines", true);
         wavePercent = data.Float("wavePercent", 1f);
+        rippleWater = data.Bool("rippleWater", true);
 
         if (hasLines) {
             if (width <= 8f) {
@@ -77,10 +79,17 @@ public class BigWaterfall : Entity {
         Level level = Scene as Level;
 
         height = 8f;
-        while (Y + height < level.Bounds.Bottom && (water = Scene.CollideFirst<Water>(new Rectangle((int)X, (int)(Y + height), 8, 8))) == null && ((solid = Scene.CollideFirst<Solid>(new Rectangle((int)X, (int)(Y + height), 8, 8))) == null || !solid.BlockWaterfalls || ignoreSolids)) {
+        while (Y + height < level.Bounds.Bottom
+                && (water = Scene.CollideFirst<Water>(new Rectangle((int)X, (int)(Y + height), 8, 8))) is null
+                && (ignoreSolids || (solid = Scene.CollideFirst<Solid>(new Rectangle((int)X, (int)(Y + height), 8, 8))) is null || !solid.BlockWaterfalls))
+        {
             height += 8f;
             solid = null;
         }
+
+        // snap to the water even if its vertical distance from the top of the waterfall isn't a multiple of 8px
+        if (water is not null)
+            height = Math.Max(water.Y - Y, 0f);
 
         Add(loopingSfx = new SoundSource());
         loopingSfx.Play(width <= 24 ? "event:/env/local/waterfall_small_main" : "event:/env/local/waterfall_big_main");
@@ -122,7 +131,7 @@ public class BigWaterfall : Entity {
         }
 
         if (visibleOnCamera) {
-            if (water is { Active: true, TopSurface: not null } && Scene.OnInterval(0.3f)) {
+            if (rippleWater && water is { Active: true, TopSurface: not null } && Scene.OnInterval(0.3f)) {
                 water.TopSurface.DoRipple(new Vector2(X + (width / 2f), water.Y), 0.75f);
                 if (width >= 32) {
                     water.TopSurface.DoRipple(new Vector2(X + 8f, water.Y), 0.75f);
