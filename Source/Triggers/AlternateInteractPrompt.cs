@@ -10,12 +10,10 @@ namespace Celeste.Mod.SorbetHelper.Triggers;
 
 [Tracked]
 [CustomEntity("SorbetHelper/AlternateInteractPrompt")]
-public class AlternateInteractPromptWrapper : Entity {
+public class AlternateInteractPromptWrapper : Trigger {
     private readonly TalkComponentAltUI.Options Options;
 
-    public AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : base(data.Position + offset) {
-        Collider = new Hitbox(data.Width, data.Height);
-
+    public AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : base(data, offset) {
         Options = new TalkComponentAltUI.Options(
             Style: data.Enum("style", TalkComponentAltUI.Styles.BottomCorner),
             LabelDialogID: data.Attr("dialogId", "sorbethelper_ui_talk"),
