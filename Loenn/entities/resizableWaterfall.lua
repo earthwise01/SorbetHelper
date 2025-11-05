@@ -219,11 +219,7 @@ function resizableWaterfall.rectangle(room, entity)
 end
 
 function resizableWaterfall.depth(room, entity)
-    if entity.ignoreSolids then
-        return -49900
-    end
-
-    return -9999
+    return entity.depth or (entity.ignoreSolids and -49900 or -9999)
 end
 
 return resizableWaterfall
