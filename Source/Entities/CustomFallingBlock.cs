@@ -195,9 +195,11 @@ public class CustomFallingBlock : FallingBlock {
             else if (CollideCheck<SolidTiles>(Position + Direction))
                 break;
 
+            // disable falling block cycles on new gravity falling blocks
+            bool fallingBlockCycles = !chronoHelperGravityFallingBlock || chronoHelperGravityChangeShakeTime != 0f;
             // could be a simple collidecheck but this fixes the extremely niche case of not falling if 1. sideways 2. next to a jumpthru and 3. active but landed (for using attached jumpthrus on sideways gravity falling blocks)
             while (CollideFirst<Platform>(Position + Direction) is { } platform && (Direction.X == 0f || platform is not JumpThru)) {
-                yield return 0.1f;
+                yield return fallingBlockCycles ? 0.1f : null;
             }
 
             // makes platforms moving out of the way still behave like normal for gravity falling blocks
