@@ -825,7 +825,8 @@ Entities:
   SorbetHelper/DarknessTransparencyFixController:
     Placements:
       controller:
-        Name: Darkness Transparency Fix Controller
+        Name: Fix Darkness Transparency Controller
+        Description: Fixes darkness causing transparent objects (e.g. waterfalls, lightbeams, dash trails) to fade towards black as they get more transparent.
     Attributes:
       global:
         Description: Whether this controller should work globally.

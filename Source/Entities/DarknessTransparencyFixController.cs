@@ -1,10 +1,7 @@
-using System;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 using Celeste.Mod.Entities;
 using Celeste.Mod.SorbetHelper.Utils;
-using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 
 namespace Celeste.Mod.SorbetHelper.Entities;
@@ -15,39 +12,25 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 public class DarknessTransparencyFixController : Entity {
     public const string EntityDataID = "SorbetHelper/DarknessTransparencyFixController";
 
-    public static readonly BlendState DestinationTransparencySubtractFixed = new BlendState {
-        // certified one line fix :white_check_mark: i love premultiplied alpha
-        ColorSourceBlend = Blend.DestinationAlpha, // Blend.One,
-        ColorDestinationBlend = Blend.One,
-        ColorBlendFunction = BlendFunction.ReverseSubtract,
-        AlphaSourceBlend = Blend.Zero,
-        AlphaDestinationBlend = Blend.One,
-        AlphaBlendFunction = BlendFunction.Add
-    };
-
     internal static void Load() {
-        IL.Celeste.LightingRenderer.Render += IL_LightingRenderer_Render;
+        // guarantee hook order with style mask helper
+        using (new DetourConfigContext(new DetourConfig("SorbetHelper", before: ["StyleMaskHelper"])).Use())
+            On.Celeste.LightingRenderer.Render += On_LightingRenderer_Render;
     }
 
     internal static void Unload() {
-        IL.Celeste.LightingRenderer.Render -= IL_LightingRenderer_Render;
+        On.Celeste.LightingRenderer.Render -= On_LightingRenderer_Render;
     }
 
-    // doesn't work with lighting masks because stylemask helper is evil and hates me grr
-    private static void IL_LightingRenderer_Render(ILContext il) {
-        ILCursor cursor = new ILCursor(il);
-
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdsfld(typeof(GFX), nameof(GFX.DestinationTransparencySubtract))))
-            throw new IndexOutOfRangeException("Unable to find GFX.DestinationTransparencySubtract to replace with premultiplied alpha compatible version!");
-
-        cursor.EmitLdarg1();
-        cursor.EmitDelegate(useFixedDestinationTransparencySubtract);
-
-        static BlendState useFixedDestinationTransparencySubtract(BlendState orig, Scene scene) {
-            if (scene.Tracker.GetEntity<DarknessTransparencyFixController>() is null)
-                return orig;
-
-            return DestinationTransparencySubtractFixed;
+    // kinda bleh on modifying a static field in a hook like this but  oh well (i love style mask helper compat :tada:)
+    private static void On_LightingRenderer_Render(On.Celeste.LightingRenderer.orig_Render orig, LightingRenderer self, Scene scene) {
+        if (scene.Tracker.GetEntity<DarknessTransparencyFixController>() is not null) {
+            // use ColorSourceBlend = Blend.DestinationAlpha instead so that darkness behaves correctly with premultiplied alpha
+            GFX.DestinationTransparencySubtract.ColorSourceBlend = Blend.DestinationAlpha;
+            orig(self, scene);
+            GFX.DestinationTransparencySubtract.ColorSourceBlend = Blend.One;
+        } else {
+            orig(self, scene);
         }
     }
 }

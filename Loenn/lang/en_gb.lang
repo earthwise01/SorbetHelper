@@ -394,7 +394,8 @@ entities.SorbetHelper/ColorDashBlock.attributes.description.index=The index of t
 entities.SorbetHelper/ColorDashBlock.attributes.description.switchOnDreamTunnel=Whether the block should switch if the player dashes through it with a Communal Helper Dream Tunnel Dash.
 
 # Darkness Transparency Fix Controller
-entities.SorbetHelper/DarknessTransparencyFixController.placements.name.controller=Darkness Transparency Fix Controller
+entities.SorbetHelper/DarknessTransparencyFixController.placements.name.controller=Fix Darkness Transparency Controller
+entities.SorbetHelper/DarknessTransparencyFixController.placements.description.controller=Fixes darkness causing transparent objects (e.g. waterfalls, lightbeams, dash trails) to fade towards black as they get more transparent.
 entities.SorbetHelper/DarknessTransparencyFixController.attributes.description.global=Whether this controller should work globally.
 
 # -- Triggers --
