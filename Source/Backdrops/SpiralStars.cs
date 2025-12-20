@@ -22,11 +22,11 @@ public class SpiralStars : Backdrop {
         public Vector2 Position;
 
         public readonly record struct Trail(Vector2 Position, float Scale, int FrameIndex);
-        public List<Trail> Trails = [];
+        public readonly List<Trail> Trails = [];
     }
 
     private readonly List<List<MTexture>> textures;
-    private Vector2 textureCenter;
+    private readonly Vector2 textureCenter;
     private readonly float[] trailAlphas;
 
     private readonly Color backgroundColor;
@@ -61,17 +61,16 @@ public class SpiralStars : Backdrop {
         textureCenter = new Vector2(textures[0][0].Width, textures[0][0].Height) / 2f;
 
         trailAlphas = new float[trailLength];
-        for (int j = 0; j < trailAlphas.Length; j++) {
+        for (int j = 0; j < trailAlphas.Length; j++)
             trailAlphas[j] = 0.7f * (1f - (float)j / (float)trailAlphas.Length);
-        }
 
         backgroundColor = Util.HexToColorWithAlphaNonPremult(data.Attr("backgroundColor", "00000000"));
-        var colors = data.AttrList("colors", Calc.HexToColor, "ffffff").ToArray();
+        Color[] colors = data.AttrList("colors", Util.HexToColorWithAlphaNonPremult, "ffffff").ToArray();
 
         int starCount = data.AttrInt("starCount", 100);
         stars = new Star[starCount];
         for (int i = 0; i < stars.Length; i++) {
-            var star = new Star {
+            Star star = new Star {
                 AnimationTimer = Calc.Random.NextFloat(MathF.PI * 2f),
                 TextureSet = Calc.Random.Next(textures.Count),
                 Color = colors[Calc.Random.Next(colors.Length)],
@@ -88,7 +87,7 @@ public class SpiralStars : Backdrop {
     public override void Update(Scene scene) {
         base.Update(scene);
 
-        foreach (var star in stars) {
+        foreach (Star star in stars) {
             star.Distance = Mod(star.Distance - Engine.DeltaTime * speed, spawningDistance + 1);
             star.Angle += Engine.DeltaTime * rotationSpeed;
             star.AnimationTimer += Engine.DeltaTime;
@@ -103,11 +102,11 @@ public class SpiralStars : Backdrop {
 
         Vector2 zoomCenterOffset = Util.ZoomCenterOffset;
 
-        foreach (var star in stars) {
-            var textureSet = textures[star.TextureSet];
+        foreach (Star star in stars) {
+            List<MTexture> textureSet = textures[star.TextureSet];
 
             for (int j = 0; j < star.Trails.Count; j++) {
-                var trail = star.Trails[j];
+                Star.Trail trail = star.Trails[j];
                 float trailScale = trail.Scale;
 
                 textureSet[trail.FrameIndex].Draw(trail.Position + zoomCenterOffset, textureCenter, star.Color * trailScale * trailAlphas[j], trailScale);
@@ -127,6 +126,7 @@ public class SpiralStars : Backdrop {
 
         if (trailLength > 0) {
             star.Trails.Clear();
+
             for (int i = 1; i <= trailLength; i++) {
                 star.Trails.Add(GetTrailWithTimeOffset(star, i * -trailDelay));
             }
@@ -148,10 +148,8 @@ public class SpiralStars : Backdrop {
         int frameIndex = (int)((Math.Sin(star.AnimationTimer + timeOffset) + 1.0) / 2.0 * list.Count);
         frameIndex %= list.Count;
 
-        return new(position, scale, frameIndex);
+        return new Star.Trail(position, scale, frameIndex);
     }
 
-    private static float Mod(float x, float m) {
-        return (x % m + m) % m;
-    }
+    private static float Mod(float x, float m) => (x % m + m) % m;
 }

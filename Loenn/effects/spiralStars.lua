@@ -30,7 +30,8 @@ effect.fieldInformation = {
         fieldType = "list",
         elementOptions = {
             fieldType = "color",
-            allowXNAColors = false
+            allowXNAColors = false,
+            showAlpha = true
         }
     },
     backgroundColor = {
