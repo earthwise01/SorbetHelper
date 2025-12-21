@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 using Celeste.Mod.Entities;
 using MonoMod.Cil;
@@ -10,17 +11,14 @@ namespace Celeste.Mod.SorbetHelper.Triggers;
 
 [Tracked]
 [CustomEntity("SorbetHelper/AlternateInteractPrompt")]
-public class AlternateInteractPromptWrapper : Trigger {
-    private readonly TalkComponentAltUI.Options Options;
+public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : Trigger(data, offset) {
 
-    public AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : base(data, offset) {
-        Options = new TalkComponentAltUI.Options(
-            Style: data.Enum("style", TalkComponentAltUI.Styles.BottomCorner),
-            LabelDialogID: data.Attr("dialogId", "sorbethelper_ui_talk"),
-            HighlightEffects: data.Bool("playHighlightSfx", false),
-            OnLeftCorner: data.Bool("onLeft", false)
-        );
-    }
+    private readonly TalkComponentAltUI.Options options = new TalkComponentAltUI.Options(
+        Style: data.Enum("style", TalkComponentAltUI.Styles.BottomCorner),
+        LabelDialogId: data.Attr("dialogId", "sorbethelper_ui_talk"),
+        HighlightEffects: data.Bool("playHighlightSfx", false),
+        OnLeftCorner: data.Bool("onLeft", false)
+    );
 
     #region Custom TalkComponentUI
 
@@ -32,12 +30,10 @@ public class AlternateInteractPromptWrapper : Trigger {
 
         public readonly record struct Options(
             Styles Style,
-            string LabelDialogID,
+            string LabelDialogId,
             bool HighlightEffects,
             bool OnLeftCorner = false // for BottomCorner style only
         );
-
-        private const float PromptScale = 0.85f;
 
         private readonly Wiggler selectWiggle;
         private float selectWiggleDelay;
@@ -65,14 +61,15 @@ public class AlternateInteractPromptWrapper : Trigger {
                 selectWiggleDelay = 0.5f;
             }
             selectWiggleDelay -= Engine.DeltaTime;
+
             base.Update();
         }
 
         public override void Render() {
             // base.Render();
-            Level level = Scene as Level;
+            Level level = SceneAs<Level>();
 
-            if (level.FrozenOrPaused || slide <= 0f || Handler.Entity == null)
+            if (level is null || level.FrozenOrPaused || slide <= 0f || Handler.Entity == null)
                 return;
 
             switch (options.Style) {
@@ -82,19 +79,28 @@ public class AlternateInteractPromptWrapper : Trigger {
                         if (slideEase <= 0f)
                             return;
 
-                        string label = Dialog.Clean(options.LabelDialogID);
+                        string label = Dialog.Clean(options.LabelDialogId);
 
-                        float width = ButtonUI.Width(label, Input.Talk);
-                        const int offscreenPadding = 32;
+                        const int offscreenPaddingX = 16;
+                        const int edgePaddingX = 100;
+                        const int edgePaddingY = 80;
+                        float width = GetPromptWidth(label);
                         Vector2 drawPos = new Vector2(
-                            x: 1880f + (40f + width * PromptScale + offscreenPadding) * (1f - Ease.CubeOut(slideEase)),
-                            y: 1024f
+                            x: 1920f - edgePaddingX + (edgePaddingX + width + offscreenPaddingX) * (1f - Ease.CubeOut(slideEase)),
+                            y: 1080f - edgePaddingY
                         );
 
                         if (options.OnLeftCorner)
                             drawPos.X = 1920 - drawPos.X;
 
-                        RenderPrompt(drawPos, label, justifyX: options.OnLeftCorner ? 0f : 1f, alpha: slideEase * 0.5f + 0.5f);
+                        RenderPrompt(
+                            drawPos, label, 1f,
+                            justifyX: options.OnLeftCorner ? 0f : 1f,
+                            flipX: options.OnLeftCorner,
+                            wiggle: selectWiggle.Value * 0.05f,
+                            alpha: slideEase * 0.5f + 0.5f,
+                            backgroundAlpha: 0f
+                        );
 
                         break;
                     }
@@ -109,28 +115,85 @@ public class AlternateInteractPromptWrapper : Trigger {
 
                         float zoomScale = level.Camera.Viewport.Width != 320 ? level.Zoom : 1f;
 
-                        float arrowWiggle = (!Highlighted) ? (1f + wiggler.Value * 0.5f) : (1f - wiggler.Value * 0.5f);
-                        float promptWiggle = (!Highlighted) ? (1f + wiggler.Value * 0.375f) : (1f - wiggler.Value * 0.375f);
-                        float trueAlpha = Ease.CubeInOut(slide) * alpha;
-                        Color color = lineColor * trueAlpha;
+                        float arrowWiggle = (!Highlighted) ? (1f + wiggler.Value * 0.4f) : (1f - wiggler.Value * 0.4f);
+                        float promptWiggle = (!Highlighted) ? (1f + wiggler.Value * 0.275f) : (1f - wiggler.Value * 0.275f);
 
-                        Vector2 arrowPos = drawPos + new Vector2(0f, 64f * (1f - Ease.CubeOut(slide)));// - new Vector2(0f, 48f * Ease.CubeInOut(highlightedEase));
-                        GFX.Gui["SorbetHelper/smallTalkArrow"].DrawJustified(arrowPos * zoomScale, new Vector2(0.5f, 1f), color, arrowWiggle * zoomScale);
+                        float arrowAlpha = Ease.CubeInOut(slide) * alpha;
 
-                        string label = Dialog.Clean(options.LabelDialogID);
-                        Vector2 promptPos = drawPos - new Vector2(0, 68f);
-                        RenderPrompt(promptPos * zoomScale, label, scale: promptWiggle * zoomScale, alpha: trueAlpha * highlightedEase);
+                        Vector2 arrowPos = drawPos + new Vector2(0f, 64f * (1f - Ease.CubeOut(slide))); // - new Vector2(0f, 48f * Ease.CubeInOut(highlightedEase));
+                        GFX.Gui["SorbetHelper/smallTalkArrow"].DrawJustified(arrowPos * zoomScale, new Vector2(0.5f, 1f), lineColor * arrowAlpha, arrowWiggle * zoomScale);
+
+                        string label = Dialog.Clean(options.LabelDialogId);
+                        Vector2 promptPos = (drawPos - new Vector2(0, 80f)) * zoomScale;
+                        float promptScale = promptWiggle * zoomScale;
+
+                        RenderPrompt(
+                            promptPos, label, promptScale,
+                            justifyX: 0.5f,
+                            flipX: true,
+                            wiggle: selectWiggle.Value * 0.05f,
+                            alpha: arrowAlpha * highlightedEase,
+                            backgroundAlpha: 0f
+                        );
 
                         break;
                     }
             }
         }
 
-        private void RenderPrompt(Vector2 position, string label, float scale = 1f, float justifyX = 0.5f, float alpha = 1f) {
-            if (!string.IsNullOrEmpty(label))
-                ButtonUI.Render(position, label, Input.Talk, PromptScale * scale, justifyX, selectWiggle.Value * 0.05f, alpha: alpha);
+        private static float GetPromptWidth(string label) {
+            MTexture buttonTexture = Input.GuiButton(Input.Talk, Input.PrefixMode.Latest);
+
+            if (string.IsNullOrEmpty(label))
+                return buttonTexture.Width;
             else
-                Input.GuiButton(Input.Talk, Input.PrefixMode.Latest).DrawJustified(position, new Vector2(justifyX, 0.5f), Color.White * alpha, PromptScale * scale + selectWiggle.Value * 0.05f);
+                return ActiveFont.Measure(label).X + 8f + buttonTexture.Width;
+        }
+
+        private static void RenderPrompt(Vector2 position, string label, float scale, float justifyX = 0.5f, bool flipX = false, float wiggle = 0f, float alpha = 1f, float backgroundAlpha = 1f) {
+            RenderBackground(position, label, scale, justifyX, backgroundAlpha * alpha);
+
+            MTexture buttonTexture = Input.GuiButton(Input.Talk, Input.PrefixMode.Latest);
+            float promptWidth = GetPromptWidth(label);
+
+            position.X -= scale * promptWidth * (justifyX - 0.5f);
+
+            // draw button
+            Vector2 buttonOrigin = new Vector2(buttonTexture.Width - promptWidth / 2f, buttonTexture.Height / 2f);
+            if (flipX)
+                buttonOrigin.X = buttonTexture.Width - buttonOrigin.X;
+            buttonTexture.Draw(position, buttonOrigin, Color.White * alpha, scale + wiggle);
+
+            // draw text
+            if (string.IsNullOrEmpty(label))
+                return;
+
+            float textWidth = ActiveFont.Measure(label).X;
+            Vector2 textJustify = new Vector2(promptWidth / 2f / textWidth, 0.5f);
+            if (flipX)
+                textJustify.X = 1f - textJustify.X;
+            ActiveFont.DrawOutline(label, position, textJustify, Vector2.One * (scale + wiggle), Color.White * alpha, 2f, Color.Black * alpha);
+        }
+
+        private static void RenderBackground(Vector2 position, string label, float scale = 1f, float justifyX = 0.5f, float alpha = 1f) {
+            if (alpha <= 0f)
+                return;
+
+            MTexture edgeTexture = GFX.Gui["SorbetHelper/semicircle"];
+            Color color = Color.Black * alpha;
+
+            float width = GetPromptWidth(label) * scale;
+            float height = edgeTexture.Height * scale;
+
+            float edgeInnerDistance = 0f; // edgeTexture.Width / 6f * scale;
+            float rectX = MathF.Floor(position.X - width * justifyX + edgeInnerDistance);
+            float rectWidth = MathF.Ceiling(width - edgeInnerDistance * 2f);
+
+            if (rectWidth > 0f)
+                Draw.Rect(rectX, position.Y - height / 2f, rectWidth, height, color);
+            edgeTexture.DrawJustified(new Vector2(rectX, (int)position.Y), new Vector2(1f, 0.5f), color, scale, 0f, SpriteEffects.FlipHorizontally);
+            edgeTexture.DrawJustified(new Vector2(rectX + rectWidth, (int)position.Y), new Vector2(0f, 0.5f), color, scale);
+
         }
 
         #region Hooks
@@ -155,14 +218,14 @@ public class AlternateInteractPromptWrapper : Trigger {
         }
 
         private static void IL_TalkComponent_Update(ILContext il) {
-            var cursor = new ILCursor(il);
+            ILCursor cursor = new ILCursor(il);
 
             // swap out the vanilla TalkComponentUI for a custom one if colliding with an AlternateInteractPromptWrapper
             cursor.GotoNext(MoveType.Before, instr => instr.MatchNewobj<TalkComponentUI>());
 
-            var skipOrigTalkComponentUI = cursor.DefineLabel();
+            ILLabel skipOrigTalkComponentUI = cursor.DefineLabel();
 
-            cursor.EmitDelegate(tryGetAltUI);
+            cursor.EmitDelegate(TryGetCustomUi);
             cursor.EmitDup();
             cursor.EmitBrtrue(skipOrigTalkComponentUI);
             cursor.EmitPop();
@@ -171,27 +234,27 @@ public class AlternateInteractPromptWrapper : Trigger {
             cursor.GotoNext(MoveType.After, instr => instr.MatchNewobj<TalkComponentUI>());
             cursor.MarkLabel(skipOrigTalkComponentUI);
 
-            static TalkComponentAltUI tryGetAltUI(TalkComponent self) {
-                if (self.Entity is not { } entity)
-                    return null;
-
-                var altUITrigger = entity.Scene.CollideFirst<AlternateInteractPromptWrapper>(entity.Position);
-                if (altUITrigger is null)
-                    return null;
-
-                return new TalkComponentAltUI(self, altUITrigger.Options);
-            }
-
             // adjust the minimum hoverTimer required for TalkComponentAltUIs to be considered highlighted
             cursor.Index = -1;
             cursor.GotoPrev(MoveType.After, instr => instr.MatchLdcR4(0.1f));
             cursor.EmitLdarg0();
             cursor.EmitLdfld(typeof(TalkComponent).GetField(nameof(TalkComponent.UI)));
-            cursor.EmitDelegate(adjustHoverTimerForCustomUI);
+            cursor.EmitDelegate(AdjustCustomUiHoverTimer);
 
-            static float adjustHoverTimerForCustomUI(float orig, TalkComponentUI UI) {
-                if (UI is TalkComponentAltUI altUI) {
-                    return altUI.options.Style switch {
+            return;
+
+            static TalkComponentAltUI TryGetCustomUi(TalkComponent self) {
+                if (self.Entity is not { } entity)
+                    return null;
+
+                return entity.Scene.CollideFirst<AlternateInteractPromptWrapper>(entity.Position) is { } wrapper
+                    ? new TalkComponentAltUI(self, wrapper.options)
+                    : null;
+            }
+
+            static float AdjustCustomUiHoverTimer(float orig, TalkComponentUI ui) {
+                if (ui is TalkComponentAltUI altUi) {
+                    return altUi.options.Style switch {
                         Styles.BottomCorner => 0f,
                         _ => 0.1f
                     };
@@ -202,6 +265,7 @@ public class AlternateInteractPromptWrapper : Trigger {
         }
 
         #endregion
+
     }
 
     #endregion

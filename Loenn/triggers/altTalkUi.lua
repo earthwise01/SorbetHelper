@@ -6,7 +6,7 @@ trigger.placements = {
         name = "altTalkUIBottomCorner",
         alternativeName = "altNameAltTalkUI",
         data = {
-            dialogId = "sorbethelper_ui_talk",
+            dialogId = "",
             style = "BottomCorner",
             playHighlightSfx = true,
             onLeft = false,
@@ -16,7 +16,7 @@ trigger.placements = {
         name = "altTalkUISmallArrow",
         alternativeName = "altNameAltTalkUI",
         data = {
-            dialogId = "sorbethelper_ui_talk",
+            dialogId = "",
             style = "SmallArrow",
             playHighlightSfx = true,
             onLeft = false,
@@ -28,6 +28,7 @@ trigger.fieldInformation = {
     dialogId = {
         -- debatable how useful most of these are but  i feel like theyre pretty general enough n its good to have presets so ppl wont have to duplicate the same thing everywhere
         options = {
+            { "(None)", ""},
             { "Talk", "sorbethelper_ui_talk" },
             { "Use", "sorbethelper_ui_use" },
             { "Pet", "sorbethelper_ui_pet" },
