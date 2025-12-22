@@ -1,12 +1,9 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 using Celeste.Mod.Backdrops;
-using Celeste.Mod.Entities;
 using Celeste.Mod.UI;
 using Celeste.Mod.SorbetHelper.Utils;
 
@@ -14,7 +11,7 @@ namespace Celeste.Mod.SorbetHelper.Backdrops;
 
 [CustomBackdrop("SorbetHelper/HiResGodrays")]
 public class HiResGodrays : Backdrop {
-    public struct Ray {
+    private struct Ray {
         public float X, Y;
 
         public float Percent;
@@ -35,47 +32,47 @@ public class HiResGodrays : Backdrop {
 
         public void Reset(HiResGodrays backdrop) {
             Percent = 0f;
-            X = -backdrop.OffscreenPadding + Calc.Random.NextFloat(320 + backdrop.OffscreenPadding * 2);
-            Y = -backdrop.OffscreenPadding + Calc.Random.NextFloat(180 + backdrop.OffscreenPadding * 2);
-            Duration = Calc.Random.Range(backdrop.MinDuration, backdrop.MaxDuration);
-            Scale = Calc.Random.Range(backdrop.MinScale, backdrop.MaxScale);
-            Color = backdrop.Colors[Calc.Random.Next(backdrop.Colors.Length)];
+            X = -backdrop.offscreenPadding + Calc.Random.NextFloat(320 + backdrop.offscreenPadding * 2);
+            Y = -backdrop.offscreenPadding + Calc.Random.NextFloat(180 + backdrop.offscreenPadding * 2);
+            Duration = Calc.Random.Range(backdrop.minDuration, backdrop.maxDuration);
+            Scale = Calc.Random.Range(backdrop.minScale, backdrop.maxScale);
+            Color = backdrop.colors[Calc.Random.Next(backdrop.colors.Length)];
 
             // image particles
-            if (backdrop.TexStartRotated)
+            if (backdrop.texStartRotated)
                 TexRotation = Calc.Random.NextFloat(MathF.PI * 2f);
-            TexRotationSpeed = Calc.Random.Range(backdrop.TexMinRotate, backdrop.TexMaxRotate);
+            TexRotationSpeed = Calc.Random.Range(backdrop.texMinRotate, backdrop.texMaxRotate);
 
             // godrays
-            Width = Calc.Random.Next(backdrop.MinWidth, backdrop.MaxWidth) * Scale;
-            Length = Calc.Random.Next(backdrop.MinLength, backdrop.MaxLength) * Scale;
+            Width = Calc.Random.Next(backdrop.minWidth, backdrop.maxWidth) * Scale;
+            Length = Calc.Random.Next(backdrop.minLength, backdrop.maxLength) * Scale;
         }
     }
 
-    private const float UpscaleAmount = Celeste.TargetWidth / Celeste.GameWidth;
+    private const float UpscaleAmount = 6f;
 
-    private readonly bool DoFadeInOut;
+    private readonly bool doVisibleFade;
     private float visibleFade = 1f;
     private float cameraFade = 1f;
 
-    private readonly int OffscreenPadding;
-    private readonly float ScrollX, ScrollY;
-    private readonly float SpeedX, SpeedY;
-    private readonly float MinDuration, MaxDuration;
-    private readonly float MinScale, MaxScale; // kinda redundant for normal godrays but unlike width/length also works with texture particles
-    private readonly Color[] Colors;
-    private readonly bool FadeNearPlayer;
+    private readonly int offscreenPadding;
+    private readonly float scrollX, scrollY;
+    private readonly float speedX, speedY;
+    private readonly float minDuration, maxDuration;
+    private readonly float minScale, maxScale; // kinda redundant for normal godrays but unlike width/length also works with texture particles
+    private readonly Color[] colors;
+    private readonly bool fadeNearPlayer;
 
-    private readonly bool UsingTextureParticles;
+    private readonly bool usingTextureParticles;
 
     // godrays
-    private readonly int MinWidth, MaxWidth;
-    private readonly int MinLength, MaxLength;
+    private readonly int minWidth, maxWidth;
+    private readonly int minLength, maxLength;
 
     // image particles
     private readonly MTexture particleTexture;
-    private readonly bool TexStartRotated;
-    private readonly float TexMinRotate, TexMaxRotate;
+    private readonly bool texStartRotated;
+    private readonly float texMinRotate, texMaxRotate;
 
     private readonly int rayCount;
     private readonly Ray[] rays;
@@ -90,33 +87,33 @@ public class HiResGodrays : Backdrop {
     }
 
     public HiResGodrays(BinaryPacker.Element data) : base() {
-        DoFadeInOut = data.AttrBool("fadeInOut", true);
-        OffscreenPadding = data.AttrInt("offscreenPadding", 32);
-        ScrollX = data.AttrFloat("scrollX", 1.1f);
-        ScrollY = data.AttrFloat("scrollY", 1.1f);
-        SpeedX = data.AttrFloat("speedX", 0f);
-        SpeedY = data.AttrFloat("speedY", 8f);
-        MinDuration = data.AttrFloat("minDuration", 4f);
-        MaxDuration = data.AttrFloat("maxDuration", 12f);
-        MinScale = data.AttrFloat("minScale", 1f);
-        MaxScale = data.AttrFloat("maxScale", 1f);
-        Colors = data.AttrList("colors", Util.HexToColorWithAlphaNonPremult, "f52b6380").ToArray();
-        FadeNearPlayer = data.AttrBool("fadeNearPlayer", true);
+        doVisibleFade = data.AttrBool("fadeInOut", true);
+        offscreenPadding = data.AttrInt("offscreenPadding", 32);
+        scrollX = data.AttrFloat("scrollX", 1.1f);
+        scrollY = data.AttrFloat("scrollY", 1.1f);
+        speedX = data.AttrFloat("speedX", 0f);
+        speedY = data.AttrFloat("speedY", 8f);
+        minDuration = data.AttrFloat("minDuration", 4f);
+        maxDuration = data.AttrFloat("maxDuration", 12f);
+        minScale = data.AttrFloat("minScale", 1f);
+        maxScale = data.AttrFloat("maxScale", 1f);
+        colors = data.AttrList("colors", Util.HexToColorWithAlphaNonPremult, "f52b6380").ToArray();
+        fadeNearPlayer = data.AttrBool("fadeNearPlayer", true);
 
-        var texturePath = data.Attr("texturePath", "");
-        UsingTextureParticles = !string.IsNullOrWhiteSpace(texturePath);
+        string texturePath = data.Attr("texturePath", "");
+        usingTextureParticles = !string.IsNullOrWhiteSpace(texturePath);
 
         // godrays
-        MinWidth = data.AttrInt("minWidth", 8);
-        MaxWidth = data.AttrInt("maxWidth", 16);
-        MinLength = data.AttrInt("minLength", 20);
-        MaxLength = data.AttrInt("maxLength", 40);
+        minWidth = data.AttrInt("minWidth", 8);
+        maxWidth = data.AttrInt("maxWidth", 16);
+        minLength = data.AttrInt("minLength", 20);
+        maxLength = data.AttrInt("maxLength", 40);
 
         // image particles
         particleTexture = OVR.Atlas.GetOrDefault(texturePath, OVR.Atlas["star"]);
-        TexStartRotated = data.AttrBool("textureStartRotated", true);
-        TexMinRotate = data.AttrFloat("textureMinRotate", -22.5f) * Calc.DegToRad;
-        TexMaxRotate = data.AttrFloat("textureMaxRotate", 22.5f) * Calc.DegToRad;
+        texStartRotated = data.AttrBool("textureStartRotated", true);
+        texMinRotate = data.AttrFloat("textureMinRotate", -22.5f) * Calc.DegToRad;
+        texMaxRotate = data.AttrFloat("textureMaxRotate", 22.5f) * Calc.DegToRad;
 
         rayCount = data.AttrInt("rayCount", 6);
         rays = new Ray[rayCount];
@@ -124,17 +121,26 @@ public class HiResGodrays : Backdrop {
         Reset();
     }
 
+    private void Added(Scene scene) {
+        Level level = scene as Level;
+
+        level.Add(new HiResGodraysRenderer(this));
+        visibleFade = IsVisible(level) ? 1f : 0f;
+    }
+
     public override void Update(Scene scene) {
         Level level = scene as Level;
 
         base.Update(scene);
-        // janky silly but makes fading out work with flags better
-        if (!Visible && DoFadeInOut && visibleFade > 0f)
-            Visible = true;
 
         // fading
-        if (DoFadeInOut)
-            visibleFade = Calc.Approach(visibleFade, IsVisible(level) ? 1 : 0, Engine.DeltaTime * 2f);
+        if (doVisibleFade) {
+            visibleFade = Calc.Approach(visibleFade, IsVisible(level) ? 1f : 0f, Engine.DeltaTime * 2f);
+
+            // force visible while fading out
+            if (!Visible && visibleFade > 0f)
+                Visible = true;
+        }
 
         cameraFade = 1f;
         if (FadeX != null)
@@ -145,38 +151,38 @@ public class HiResGodrays : Backdrop {
         float alpha = visibleFade * cameraFade * ExtendedVariantsCompat.ForegroundEffectOpacity;
 
         // resize vertex buffer for zoom out if needed,
-        int visibleScreens = (int)Math.Ceiling((Util.CameraWidth + OffscreenPadding * 2f) / (320f + OffscreenPadding * 2f));
+        int visibleScreens = (int)Math.Ceiling((Util.CameraWidth + offscreenPadding * 2f) / (320f + offscreenPadding * 2f));
         int expectedBufferLength = rayCount * 6 * visibleScreens * visibleScreens;
-        if (!UsingTextureParticles && vertices.Length != expectedBufferLength)
+        if (!usingTextureParticles && vertices.Length != expectedBufferLength)
             vertices = new VertexPositionColor[expectedBufferLength];
 
-        var cameraPos = level.Camera.Position.Floor();
-        var player = level.Tracker.GetEntity<Player>();
+        Vector2 cameraPos = level.Camera.Position.Floor();
+        Player player = level.Tracker.GetEntity<Player>();
 
-        var skew1 = Calc.AngleToVector(-1.6707964f, 1f);
-        var skew2 = new Vector2(0f - skew1.Y, skew1.X);
-        int num = 0;
+        Vector2 skew1 = Calc.AngleToVector(-1.6707964f, 1f);
+        Vector2 skew2 = new Vector2(0f - skew1.Y, skew1.X);
+        int vertexIndex = 0;
         for (int i = 0; i < rays.Length; i++) {
-            ref var ray = ref rays[i];
+            ref Ray ray = ref rays[i];
 
             if (ray.Percent >= 1f)
                 ray.Reset(this);
 
             ray.Percent += Engine.DeltaTime / ray.Duration;
-            ray.X += SpeedX * Engine.DeltaTime;
-            ray.Y += SpeedY * Engine.DeltaTime;
+            ray.X += speedX * Engine.DeltaTime;
+            ray.Y += speedY * Engine.DeltaTime;
             ray.TexRotation += ray.TexRotationSpeed * Engine.DeltaTime;
 
             float percent = ray.Percent;
 
-            float renderX = -OffscreenPadding + Mod(ray.X - cameraPos.X * ScrollX, 320f + OffscreenPadding * 2f);
-            float renderY = -OffscreenPadding + Mod(ray.Y - cameraPos.Y * ScrollY, 180f + OffscreenPadding * 2f);
+            float renderX = -offscreenPadding + Mod(ray.X - cameraPos.X * scrollX, 320f + offscreenPadding * 2f);
+            float renderY = -offscreenPadding + Mod(ray.Y - cameraPos.Y * scrollY, 180f + offscreenPadding * 2f);
             ray.RenderPosition = new Vector2(renderX, renderY);
 
-            var rayAlpha = Ease.CubeInOut(Calc.Clamp(((percent < 0.5f) ? percent : (1f - percent)) * 2f, 0f, 1f)) * alpha;
+            float rayAlpha = Ease.CubeInOut(Calc.Clamp(((percent < 0.5f) ? percent : (1f - percent)) * 2f, 0f, 1f)) * alpha;
             ray.RenderColor = ray.Color * rayAlpha;
 
-            if (UsingTextureParticles)
+            if (usingTextureParticles)
                 continue;
 
             float rayWidth = ray.Width;
@@ -184,38 +190,38 @@ public class HiResGodrays : Backdrop {
 
             // loop silly this is a zoom out momemnt,,,, ,,,,
             // this  shouldd work unless im stupid and this can rarely try n render more rays than expected and exceed the vertex buffer size
-            for (int x = 0; x < 320 * visibleScreens + OffscreenPadding; x += 320 + OffscreenPadding * 2) {
-                for (int y = 0; y < 180 * visibleScreens + OffscreenPadding; y += 180 + OffscreenPadding * 2) {
-                    var renderPos = new Vector2(ray.RenderPosition.X + x, ray.RenderPosition.Y + y);
-                    var renderColor = ray.RenderColor;
+            for (int x = 0; x < 320 * visibleScreens + offscreenPadding; x += 320 + offscreenPadding * 2) {
+                for (int y = 0; y < 180 * visibleScreens + offscreenPadding; y += 180 + offscreenPadding * 2) {
+                    Vector2 renderPos = new Vector2(ray.RenderPosition.X + x, ray.RenderPosition.Y + y);
+                    Color renderColor = ray.RenderColor;
 
                     //  need to do this here so that the correct godray fades etc etc,
-                    if (FadeNearPlayer && player != null) {
+                    if (fadeNearPlayer && player != null) {
                         float playerDistance = (renderPos + cameraPos - player.Position).Length();
                         if (playerDistance < 64f) {
                             renderColor *= 0.25f + 0.75f * (playerDistance / 64f);
                         }
                     }
 
-                    var v1 = new VertexPositionColor(new Vector3(renderPos + skew2 * rayWidth + skew1 * rayLength, 0f), renderColor);
-                    var v2 = new VertexPositionColor(new Vector3(renderPos - skew2 * rayWidth, 0f), renderColor);
-                    var v3 = new VertexPositionColor(new Vector3(renderPos + skew2 * rayWidth, 0f), renderColor);
-                    var v4 = new VertexPositionColor(new Vector3(renderPos - skew2 * rayWidth - skew1 * rayLength, 0f), renderColor);
-                    vertices[num++] = v1;
-                    vertices[num++] = v2;
-                    vertices[num++] = v3;
-                    vertices[num++] = v2;
-                    vertices[num++] = v3;
-                    vertices[num++] = v4;
+                    VertexPositionColor v1 = new VertexPositionColor(new Vector3(renderPos + skew2 * rayWidth + skew1 * rayLength, 0f), renderColor);
+                    VertexPositionColor v2 = new VertexPositionColor(new Vector3(renderPos - skew2 * rayWidth, 0f), renderColor);
+                    VertexPositionColor v3 = new VertexPositionColor(new Vector3(renderPos + skew2 * rayWidth, 0f), renderColor);
+                    VertexPositionColor v4 = new VertexPositionColor(new Vector3(renderPos - skew2 * rayWidth - skew1 * rayLength, 0f), renderColor);
+                    vertices[vertexIndex++] = v1;
+                    vertices[vertexIndex++] = v2;
+                    vertices[vertexIndex++] = v3;
+                    vertices[vertexIndex++] = v2;
+                    vertices[vertexIndex++] = v3;
+                    vertices[vertexIndex++] = v4;
                 }
             }
         }
 
-        vertexCount = num;
+        vertexCount = vertexIndex;
     }
 
     public void DrawSelf(Scene scene, Matrix matrix) {
-        if (UsingTextureParticles)
+        if (usingTextureParticles)
             DrawTextureParticles(scene, matrix);
         else
             DrawGodrays(matrix);
@@ -231,22 +237,22 @@ public class HiResGodrays : Backdrop {
         Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, matrix);
 
         // im realising there mightt be some inconsistency between godrays/texture particles since one is setup in update and the other partly in render   fun
-        var cameraWidth = Util.CameraWidth;
-        var cameraHeight = Util.CameraHeight;
-        var level = scene as Level;
-        var player = level.Tracker.GetEntity<Player>();
-        var cameraPos = level.Camera.Position.Floor();
+        int cameraWidth = Util.CameraWidth;
+        int cameraHeight = Util.CameraHeight;
+        Level level = scene as Level;
+        Player player = level.Tracker.GetEntity<Player>();
+        Vector2 cameraPos = level.Camera.Position.Floor();
 
         for (int i = 0; i < rays.Length; i++) {
-            ref var ray = ref rays[i];
+            ref Ray ray = ref rays[i];
 
-            for (int x = 0; x < cameraWidth + OffscreenPadding; x += 320 + OffscreenPadding * 2) {
-                for (int y = 0; y < cameraHeight + OffscreenPadding; y += 180 + OffscreenPadding * 2) {
-                    var renderPos = new Vector2(ray.RenderPosition.X + x, ray.RenderPosition.Y + y);
-                    var renderColor = ray.RenderColor;
+            for (int x = 0; x < cameraWidth + offscreenPadding; x += 320 + offscreenPadding * 2) {
+                for (int y = 0; y < cameraHeight + offscreenPadding; y += 180 + offscreenPadding * 2) {
+                    Vector2 renderPos = new Vector2(ray.RenderPosition.X + x, ray.RenderPosition.Y + y);
+                    Color renderColor = ray.RenderColor;
 
                     //  need to do this here so that the correct godray fades etc etc,
-                    if (FadeNearPlayer && player != null) {
+                    if (fadeNearPlayer && player != null) {
                         float playerDistance = (renderPos + cameraPos - player.Position).Length();
                         if (playerDistance < 64f) {
                             renderColor *= 0.25f + 0.75f * (playerDistance / 64f);
@@ -273,30 +279,28 @@ public class HiResGodrays : Backdrop {
     }
 
     private static void OnLoadingThread(Level level) {
-        var hiResGodrayBackdrops = level.Foreground.Backdrops.Where(backdrop => backdrop is HiResGodrays);
-
-        foreach (var godrays in hiResGodrayBackdrops) {
-            var entity = new HiResGodraysRenderer(godrays as HiResGodrays);
-            level.Add(entity);
+        foreach (Backdrop backdrop in level.Foreground.Backdrops) {
+            if (backdrop is HiResGodrays godrays)
+                godrays.Added(level);
         }
     }
 
-    public class HiResGodraysRenderer : Entity {
-        private readonly HiResGodrays Backdrop;
+    private class HiResGodraysRenderer : Entity {
+        private readonly HiResGodrays backdrop;
 
         public HiResGodraysRenderer(HiResGodrays backdrop) : base() {
-            Backdrop = backdrop;
+            this.backdrop = backdrop;
 
             Tag = global::Celeste.Tags.Global | TagsExt.SubHUD;
-            Depth = 2000000; // doesn't really matter but just in case it gets used with other subhud stuff :p
+            Depth = 2000000;
         }
 
         public override void Render() {
-            if (!Backdrop.Visible)
+            if (!backdrop.Visible)
                 return;
 
-            var level = Scene as Level;
-            var matrix = Matrix.CreateScale(UpscaleAmount);
+            Level level = Scene as Level;
+            Matrix matrix = Matrix.CreateScale(UpscaleAmount);
 
             // mirror mode
             if (SaveData.Instance.Assists.MirrorMode)
@@ -306,13 +310,12 @@ public class HiResGodrays : Backdrop {
 
             // zoom out support
             if (Util.ZoomOutActive)
-                //matrix *= Matrix.CreateTranslation(1920 * -0.5f, 1080 * -0.5f, 0f) * Matrix.CreateScale(Math.Min(level.Zoom, 1f)) * Matrix.CreateTranslation(1920 * 0.5f, 1080 * 0.5f, 0f);
                 matrix *= Matrix.CreateScale(320f / Util.CameraWidth);
 
             // watchtower/etc edge padding
             if (level.ScreenPadding != 0f) {
                 float paddingScale = (320f - level.ScreenPadding * 2f) / 320f;
-                Vector2 paddingOffset = new(level.ScreenPadding, level.ScreenPadding * 0.5625f);
+                Vector2 paddingOffset = new Vector2(level.ScreenPadding, level.ScreenPadding * 0.5625f);
                 matrix *= Matrix.CreateTranslation(1920 * -0.5f, 1080 * -0.5f, 0f) * Matrix.CreateScale(paddingScale) * Matrix.CreateTranslation(1920 * 0.5f + paddingOffset.X, 1080 * 0.5f + paddingOffset.Y, 0f);
             }
 
@@ -321,7 +324,7 @@ public class HiResGodrays : Backdrop {
 
             SubHudRenderer.EndRender();
 
-            Backdrop.DrawSelf(Scene, matrix);
+            backdrop.DrawSelf(Scene, matrix);
 
             SubHudRenderer.BeginRender();
         }

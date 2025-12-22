@@ -1,12 +1,8 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 using Celeste.Mod.Backdrops;
-using Celeste.Mod.Entities;
 using Celeste.Mod.UI;
 using Celeste.Mod.SorbetHelper.Utils;
 
@@ -14,7 +10,7 @@ namespace Celeste.Mod.SorbetHelper.Backdrops;
 
 [CustomBackdrop("SorbetHelper/ParallaxHiResSnow")]
 public class ParallaxHiResSnow : Backdrop {
-    public struct Particle {
+    private struct Particle {
         public float Alpha;
         public float Scale;
         public Vector2 Scroll;
@@ -23,100 +19,99 @@ public class ParallaxHiResSnow : Backdrop {
         public float Rotation;
         public Vector2 Position;
 
-        public void Reset(Vector2 direction, ParallaxHiResSnow backdrop) {
-            float num = Calc.Random.NextFloat();
-            num *= num * num * num;
+        public void Reset(ParallaxHiResSnow backdrop) {
+            float scalePercent = Calc.Random.NextFloat();
+            scalePercent *= scalePercent * scalePercent * scalePercent;
 
-            Scale = Calc.Map(num, 0f, 1f, backdrop.MinScale, backdrop.MaxScale);
-            Speed = Scale * Calc.Random.Range(backdrop.MinSpeed, backdrop.MaxSpeed);
-            Scroll = new(Calc.Map(num, 0f, 1f, backdrop.MinScroll.X, backdrop.MaxScroll.X), Calc.Map(num, 0f, 1f, backdrop.MinScroll.Y, backdrop.MaxScroll.Y));
+            Scale = Calc.Map(scalePercent, 0f, 1f, backdrop.minScale, backdrop.maxScale);
+            Speed = Scale * Calc.Random.Range(backdrop.minSpeed, backdrop.maxSpeed);
+            Scroll = new Vector2(Calc.Map(scalePercent, 0f, 1f, backdrop.minScroll.X, backdrop.maxScroll.X), Calc.Map(scalePercent, 0f, 1f, backdrop.minScroll.Y, backdrop.maxScroll.Y));
 
-            if (direction.X < 0f) {
-                Position = new Vector2(1920 + OffscreenPaddingSize, Calc.Random.NextFloat(1080));
-            } else if (direction.X > 0f) {
-                Position = new Vector2(-OffscreenPaddingSize, Calc.Random.NextFloat(1080));
-            } else if (direction.Y > 0f) {
-                Position = new Vector2(Calc.Random.NextFloat(1920), -OffscreenPaddingSize);
-            } else if (direction.Y < 0f) {
-                Position = new Vector2(Calc.Random.NextFloat(1920), 1080 + OffscreenPaddingSize);
-            }
+            Position.X = -OffscreenPaddingSize + Calc.Random.NextFloat(1920 + OffscreenPaddingSize * 2);
+            Position.Y = -OffscreenPaddingSize + Calc.Random.NextFloat(1080 + OffscreenPaddingSize * 2);
 
             Sin = Calc.Random.NextFloat(MathF.PI * 2f);
-            Rotation = backdrop.RandomTextureRotation ? Calc.Random.NextFloat(MathF.PI * 2f) : 0f;
-            Alpha = backdrop.FadeTowardsForeground ? MathHelper.Lerp(1f, 0f, num * 0.8f) : 1f;
+            Rotation = backdrop.randomTextureRotation ? Calc.Random.NextFloat(MathF.PI * 2f) : 0f;
+            Alpha = backdrop.fadeTowardsForeground ? MathHelper.Lerp(1f, 0f, scalePercent * 0.8f) : 1f;
         }
     }
 
     private const int OffscreenPaddingSize = 128;
-    private const float UpscaleAmount = Celeste.TargetWidth / Celeste.GameWidth;
+    private const float UpscaleAmount = 6f;
 
-    private readonly bool DoFadeInOut;
+    private readonly bool doVisibleFade;
     private float visibleFade = 1f;
     private float cameraFade = 1f;
 
     public Vector2 Direction;
-    private readonly float AdditiveBlend;
+    private readonly float additiveBlend;
 
-    private readonly float MinScale, MaxScale;
-    private readonly float MinSpeed, MaxSpeed;
-    private readonly Vector2 MinScroll, MaxScroll;
-    private readonly float SineAmplitude, SineFrequency;
-    private readonly bool SineHorizontal;
-    private readonly bool RandomTextureRotation;
-    private readonly bool SpeedStretching;
-    private readonly bool FadeTowardsForeground;
+    private readonly float minScale, maxScale;
+    private readonly float minSpeed, maxSpeed;
+    private readonly Vector2 minScroll, maxScroll;
+    private readonly float sineAmplitude, sineFrequency;
+    private readonly bool sineHorizontal;
+    private readonly bool randomTextureRotation;
+    private readonly bool speedStretching;
+    private readonly bool fadeTowardsForeground;
 
     private readonly Particle[] particles;
     private readonly MTexture particleTexture;
 
     public void Reset() {
         for (int i = 0; i < particles.Length; i++) {
-            particles[i].Reset(Direction, this);
-            particles[i].Position.X = -OffscreenPaddingSize + Calc.Random.NextFloat(1920 + OffscreenPaddingSize * 2);
-            particles[i].Position.Y = -OffscreenPaddingSize + Calc.Random.NextFloat(1080 + OffscreenPaddingSize * 2);
+            particles[i].Reset(this);
         }
     }
 
     public ParallaxHiResSnow(BinaryPacker.Element data) : base() {
-        DoFadeInOut = data.AttrBool("fadeInOut", true);
+        doVisibleFade = data.AttrBool("fadeInOut", true);
         Direction.X = data.AttrFloat("directionX", -1f);
         Direction.Y = data.AttrFloat("directionY", 0f);
-        MinScale = data.AttrFloat("minScale", 0.05f);
-        MaxScale = data.AttrFloat("maxScale", 0.8f);
-        MinSpeed = data.AttrFloat("minSpeed", 2000f);
-        MaxSpeed = data.AttrFloat("maxSpeed", 4000f);
-        MinScroll.X = data.AttrFloat("minScrollX", 1f);
-        MinScroll.Y = data.AttrFloat("minScrollY", 1f);
-        MaxScroll.X = data.AttrFloat("maxScrollX", 1.25f);
-        MaxScroll.Y = data.AttrFloat("maxScrollY", 1.25f);
-        SineAmplitude = data.AttrFloat("sineAmplitude", 100f);
-        SineFrequency = data.AttrFloat("sineFrequency", 10f) / 10f;
-        SineHorizontal = data.AttrBool("sineHorizontal", false);
+        minScale = data.AttrFloat("minScale", 0.05f);
+        maxScale = data.AttrFloat("maxScale", 0.8f);
+        minSpeed = data.AttrFloat("minSpeed", 2000f);
+        maxSpeed = data.AttrFloat("maxSpeed", 4000f);
+        minScroll.X = data.AttrFloat("minScrollX", 1f);
+        minScroll.Y = data.AttrFloat("minScrollY", 1f);
+        maxScroll.X = data.AttrFloat("maxScrollX", 1.25f);
+        maxScroll.Y = data.AttrFloat("maxScrollY", 1.25f);
+        sineAmplitude = data.AttrFloat("sineAmplitude", 100f);
+        sineFrequency = data.AttrFloat("sineFrequency", 10f) / 10f;
+        sineHorizontal = data.AttrBool("sineHorizontal", false);
 
-        var texturePath = data.Attr("texturePath", "snow");
+        string texturePath = data.Attr("texturePath", "snow");
         particleTexture = OVR.Atlas.GetOrDefault(texturePath, OVR.Atlas["snow"]);
-        AdditiveBlend = data.AttrFloat("additive", 0f);
-        RandomTextureRotation = data.AttrBool("randomRotation", true);
-        SpeedStretching = data.AttrBool("speedStretching", false);
-        FadeTowardsForeground = data.AttrBool("fadeTowardsForeground", true);
+        additiveBlend = data.AttrFloat("additive", 0f);
+        randomTextureRotation = data.AttrBool("randomRotation", true);
+        speedStretching = data.AttrBool("speedStretching", false);
+        fadeTowardsForeground = data.AttrBool("fadeTowardsForeground", true);
 
-        var particleCount = data.AttrInt("particleCount", 50);
+        int particleCount = data.AttrInt("particleCount", 50);
         particles = new Particle[particleCount];
         Reset();
+    }
+
+    private void Added(Scene scene) {
+        Level level = scene as Level;
+
+        level.Add(new ParallaxHiResSnowRenderer(this));
+        visibleFade = IsVisible(level) ? 1f : 0f;
     }
 
     public override void Update(Scene scene) {
         Level level = scene as Level;
 
         base.Update(scene);
-        // janky silly but makes fading out work with flags better
-        if (!Visible && DoFadeInOut && visibleFade > 0f)
-            // if ((ExcludeFrom is null || !ExcludeFrom.Contains(level.Session.Level)) && (OnlyIn is null || OnlyIn.Contains(level.Session.Level)))
-            Visible = true;
 
         // fading
-        if (DoFadeInOut)
-            visibleFade = Calc.Approach(visibleFade, IsVisible(level) ? 1 : 0, Engine.DeltaTime * 2f);
+        if (doVisibleFade) {
+            visibleFade = Calc.Approach(visibleFade, IsVisible(level) ? 1f : 0f, Engine.DeltaTime * 2f);
+
+            // force visible while fading out
+            if (!Visible && visibleFade > 0f)
+                Visible = true;
+        }
 
         cameraFade = 1f;
         if (FadeX != null)
@@ -125,29 +120,25 @@ public class ParallaxHiResSnow : Backdrop {
             cameraFade *= FadeY.Value(level.Camera.Y + Util.CameraHeight / 2f);
 
         for (int i = 0; i < particles.Length; i++) {
-            ref var particle = ref particles[i];
+            ref Particle particle = ref particles[i];
 
             particle.Position += Direction * particle.Speed * Engine.DeltaTime;
-            if (!SineHorizontal)
-                particle.Position.Y += (float)Math.Sin(particle.Sin) * SineAmplitude * Engine.DeltaTime;
+            if (!sineHorizontal)
+                particle.Position.Y += (float)Math.Sin(particle.Sin) * sineAmplitude * Engine.DeltaTime;
             else
-                particle.Position.X += (float)Math.Sin(particle.Sin) * SineAmplitude * Engine.DeltaTime;
-            particle.Sin += Engine.DeltaTime * SineFrequency;
-
-            // if (particle.RenderPosition.X < -EdgePaddingAmount || particle.RenderPosition.X > (1920 + EdgePaddingAmount) || particle.RenderPosition.Y < -EdgePaddingAmount || particle.RenderPosition.Y > (1080 + EdgePaddingAmount)) {
-            //     particle.Reset(Direction, this);
-            // }
+                particle.Position.X += (float)Math.Sin(particle.Sin) * sineAmplitude * Engine.DeltaTime;
+            particle.Sin += Engine.DeltaTime * sineFrequency;
         }
     }
 
     public void DrawSelf(Scene scene) {
-        var color = Color * visibleFade * cameraFade * ExtendedVariantsCompat.ForegroundEffectOpacity;
-        var additiveMultiplier = 1f - AdditiveBlend;
+        Color color = Color * visibleFade * cameraFade * ExtendedVariantsCompat.ForegroundEffectOpacity;
+        float additiveMultiplier = 1f - additiveBlend;
 
         float stretchSpeed = Calc.Clamp(Direction.Length(), 0f, 20f);
         float stretchRotate = 0f;
-        var stretchScale = Vector2.One;
-        bool shouldStretch = stretchSpeed > 1f && SpeedStretching;
+        Vector2 stretchScale = Vector2.One;
+        bool shouldStretch = stretchSpeed > 1f && speedStretching;
 
         if (shouldStretch) {
             stretchRotate = Direction.Angle();
@@ -158,13 +149,13 @@ public class ParallaxHiResSnow : Backdrop {
         // could've maybe gone for a depth based approach where the "distance" of the particles determines how affected they are by the "zoom" but eh idk this works
 
         // bwehh
-        var zoomCenterOffset = Util.ZoomCenterOffset * UpscaleAmount;
-        var cameraPosLarge = (scene as Level).Camera.Position.Floor() * UpscaleAmount + zoomCenterOffset;
+        Vector2 zoomCenterOffset = Util.ZoomCenterOffset * UpscaleAmount;
+        Vector2 cameraPosLarge = (scene as Level).Camera.Position.Floor() * UpscaleAmount + zoomCenterOffset;
 
         for (int i = 0; i < particles.Length; i++) {
-            ref var particle = ref particles[i];
+            ref Particle particle = ref particles[i];
 
-            var renderPosition = new Vector2() {
+            Vector2 renderPosition = new Vector2() {
                 X = -OffscreenPaddingSize + Mod(particle.Position.X - cameraPosLarge.X * particle.Scroll.X, 1920 + OffscreenPaddingSize * 2),
                 Y = -OffscreenPaddingSize + Mod(particle.Position.Y - cameraPosLarge.Y * particle.Scroll.Y, 1080 + OffscreenPaddingSize * 2)
             };
@@ -176,20 +167,20 @@ public class ParallaxHiResSnow : Backdrop {
                 renderPosition.Y = -OffscreenPaddingSize + Mod(OffscreenPaddingSize + renderPosition.Y, 1080 + OffscreenPaddingSize * 2);
             }
 
-            var particleColor = color;
+            Color particleColor = color;
             if (particle.Alpha < 1f)
                 particleColor *= particle.Alpha;
 
             // additive blending!! i love premultiplied alpha
             if (additiveMultiplier < 1f)
-                particleColor = new(particleColor.R, particleColor.G, particleColor.B, (int)(particleColor.A * additiveMultiplier));
+                particleColor = new Color(particleColor.R, particleColor.G, particleColor.B, (int)(particleColor.A * additiveMultiplier));
 
             if (!Util.ZoomOutActive) {
                 particleTexture.DrawCentered(renderPosition, particleColor, stretchScale * particle.Scale, shouldStretch ? stretchRotate : particle.Rotation);
             } else {
                 for (int x = 0; x < Util.CameraWidth * UpscaleAmount + OffscreenPaddingSize; x += 1920 + OffscreenPaddingSize * 2)
-                    for (int y = 0; y < Util.CameraHeight * UpscaleAmount + OffscreenPaddingSize; y += 1080 + OffscreenPaddingSize * 2)
-                        particleTexture.DrawCentered(renderPosition + new Vector2(x, y), particleColor, stretchScale * particles[i].Scale, shouldStretch ? stretchRotate : particles[i].Rotation);
+                for (int y = 0; y < Util.CameraHeight * UpscaleAmount + OffscreenPaddingSize; y += 1080 + OffscreenPaddingSize * 2)
+                    particleTexture.DrawCentered(renderPosition + new Vector2(x, y), particleColor, stretchScale * particles[i].Scale, shouldStretch ? stretchRotate : particles[i].Rotation);
             }
         }
     }
@@ -205,30 +196,28 @@ public class ParallaxHiResSnow : Backdrop {
     }
 
     private static void OnLoadingThread(Level level) {
-        var hiResSnowBackdrops = level.Foreground.Backdrops.Where(backdrop => backdrop is ParallaxHiResSnow);
-
-        foreach (var hiResSnow in hiResSnowBackdrops) {
-            var entity = new ParallaxHiResSnowRenderer(hiResSnow as ParallaxHiResSnow);
-            level.Add(entity);
+        foreach (Backdrop backdrop in level.Foreground.Backdrops) {
+            if (backdrop is ParallaxHiResSnow hiResSnow)
+                hiResSnow.Added(level);
         }
     }
 
-    public class ParallaxHiResSnowRenderer : Entity {
-        private readonly ParallaxHiResSnow Backdrop;
+    private class ParallaxHiResSnowRenderer : Entity {
+        private readonly ParallaxHiResSnow backdrop;
 
         public ParallaxHiResSnowRenderer(ParallaxHiResSnow backdrop) : base() {
-            Backdrop = backdrop;
+            this.backdrop = backdrop;
 
             Tag = global::Celeste.Tags.Global | TagsExt.SubHUD;
-            Depth = 2000000; // doesn't really matter but just in case it gets used with other subhud stuff :p
+            Depth = 2000000;
         }
 
         public override void Render() {
-            if (!Backdrop.Visible)
+            if (!backdrop.Visible)
                 return;
 
-            var level = Scene as Level;
-            var matrix = Matrix.Identity;
+            Level level = Scene as Level;
+            Matrix matrix = Matrix.Identity;
 
             // mirror mode
             if (SaveData.Instance.Assists.MirrorMode)
@@ -238,20 +227,19 @@ public class ParallaxHiResSnow : Backdrop {
 
             // zoom out support
             if (Util.ZoomOutActive)
-                //matrix *= Matrix.CreateTranslation(1920 * -0.5f, 1080 * -0.5f, 0f) * Matrix.CreateScale(Math.Min(level.Zoom, 1f)) * Matrix.CreateTranslation(1920 * 0.5f, 1080 * 0.5f, 0f);
                 matrix *= Matrix.CreateScale(320f / Util.CameraWidth);
 
             // watchtower/etc edge padding
             if (level.ScreenPadding != 0f) {
                 float paddingScale = (320f - level.ScreenPadding * 2f) / 320f;
-                Vector2 paddingOffset = new(level.ScreenPadding, level.ScreenPadding * 0.5625f);
+                Vector2 paddingOffset = new Vector2(level.ScreenPadding, level.ScreenPadding * 0.5625f);
                 matrix *= Matrix.CreateTranslation(1920 * -0.5f, 1080 * -0.5f, 0f) * Matrix.CreateScale(paddingScale) * Matrix.CreateTranslation(1920 * 0.5f + paddingOffset.X, 1080 * 0.5f + paddingOffset.Y, 0f);
             }
 
             SubHudRenderer.EndRender();
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, matrix * (SubHudRenderer.DrawToBuffer ? Matrix.Identity : Engine.ScreenMatrix));
 
-            Backdrop.DrawSelf(Scene);
+            backdrop.DrawSelf(Scene);
 
             Draw.SpriteBatch.End();
             SubHudRenderer.BeginRender();
