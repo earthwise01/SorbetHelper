@@ -15,6 +15,7 @@ trigger.placements = {
 
         mode = "OnPlayerEnter",
         onlyOnce = true,
+        removeOnLeave = true,
         flag = ""
     }
 }
@@ -36,7 +37,7 @@ trigger.fieldInformation = {
         allowXNAColors = false
     },
     mode = {
-        options = { "OnPlayerEnter", "OnFlagEnabled", "OnFlagDisabled" },
+        options = { "OnPlayerEnter", "OnFlagEnabled", "OnFlagDisabled", "WhilePlayerInside" },
         editable = false
     }
 }
@@ -49,7 +50,7 @@ trigger.fieldOrder = {
     "activeTime", "baseColor",
     "mode", "iconTexture",
     "flag", "texturePath",
-    "onlyOnce"
+    "onlyOnce", "removeOnLeave"
 }
 
 return trigger
