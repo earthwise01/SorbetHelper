@@ -54,7 +54,6 @@ public class SorbetHelperModule : EverestModule {
         WingedStrawberryDirectionController.Load();
         DisplacementEffectBlocker.Load();
         AlternateInteractPromptWrapper.TalkComponentAltUI.Load();
-        MiniPopupDisplay.Load();
         ReturnBubbleBehaviorController.Load();
         StylegroundDepthController.Load();
         MusicSyncControllerFMOD.Load();
@@ -91,7 +90,6 @@ public class SorbetHelperModule : EverestModule {
         WingedStrawberryDirectionController.Unload();
         DisplacementEffectBlocker.Unload();
         AlternateInteractPromptWrapper.TalkComponentAltUI.Unload();
-        MiniPopupDisplay.Unload();
         ReturnBubbleBehaviorController.Unload();
         StylegroundDepthController.Unload();
         MusicSyncControllerFMOD.Unload();

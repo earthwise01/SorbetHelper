@@ -223,7 +223,7 @@ Entities:
         Description: Whether objects such as spikes that are attached to the block should be affected as well.
       fadeInTime:
         Description: How long (in seconds) the block takes to visually fade back in when (re)appearing.
-  
+
   SorbetHelper/BigWaterfall:
     Placements:
       normal:
@@ -263,7 +263,7 @@ Entities:
           Ranges from 0.0 to 1.0, values closer to 1.0 result in faster waves. Vanilla small waterfalls use 0.8 and big waterfalls use 1.0.
       rippleWater:
         Description: Whether the waterfall should create ripples when it lands in water.
-  
+
   SorbetHelper/CustomLightbeam:
     Placements:
       customlightbeam:
@@ -350,7 +350,7 @@ Entities:
     Attributes:
       direction:
         Description: The direction winged strawberries in the room will fly.
-  
+
   SorbetHelper/StylegroundOverHudController:
     # Replaced by Styleground Depth Controller
     #
@@ -396,12 +396,12 @@ Entities:
         #      'Pause Above' if you still want the stylegrounds above the pause menu, but don't have moving stylegrounds or find the stylegrounds moving while paused weird/distracting.
         # currently additive blend mode stylegrounds doesn't work properly, and colorgrading doesn't have any effect on affected stylegrounds due to technical limitations.
         # i'm still looking to see if i can get them working but if i do theres a good chance there'll probably be some sort of jank (at least on the code side).
-        
+
         # by default the controller will disable itself when the game is paused.
         # this can be adjusted to either stop the stylegrounds from pausing altogether, or to keep them pausing but still render them above the pause menu.
         # see the tooltip as well but personally: use Update When Paused if your stylegrounds have some movement, aren't insanely busy and you want ~maximum atmosphere~, and,
         # use Disable When Paused otherwise or if your stylegrounds are kinda busy and would cover too much of the pause menu. (or just, yknow, try all 3 and see which you prefer idk)
-  
+
   SorbetHelper/ReturnBubbleBehaviorController:
     Placements:
       controller:
@@ -440,7 +440,7 @@ Entities:
           - NoCollide
               Same as TriggersOnly, but also including triggers. Fully disables *all* collision.
           Vanilla value is Vanilla.
-  
+
   SorbetHelper/LightCoverController:
     Placements:
       controller:
@@ -450,7 +450,7 @@ Entities:
     Attributes:
       alpha:
         Description: How strong the light cover is.
-  
+
   SorbetHelper/DepthAdheringDisplacementWrapper:
     Placements:
       # names probably still kinda suck but i literally cant think of anything better
@@ -480,7 +480,7 @@ Entities:
         Description: |-
           Makes it so that the wrapper needs to be touching the top left corner of entities in order to affect them.
           Allows for more precision when choosing which entities to affect when there are many close together, although at the cost of being less intuitive.
-  
+
   SorbetHelper/DisplacementEffectBlocker:
     Placements:
       normal:
@@ -564,7 +564,7 @@ Entities:
           - be prepared to very occasionally find that some entities don't work correctly, especially if they have particularly complex rendering-
             this is likely not the fault of either me or whoever made the entity,
             but just a consequence of it (very reasonably) not expecting to be in these conditions, sorry!
-  
+
   SorbetHelper/StylegroundEntityController:
     # Replaced by Styleground Depth Controller
     #
@@ -734,7 +734,7 @@ Entities:
       linkTag:
         Name: Flag On Activate
         Description: An optional session flag to enable when the block activates.
-  
+
   SorbetHelper/TouchGateBlock:
     Placements:
       normal:
@@ -817,7 +817,7 @@ Entities:
       coloUr:
         Name: Colour Dash Block
     Attributes:
-      index: 
+      index:
         Description: The index of the block.
       switchOnDreamTunnel:
         Description: Whether the block should switch if the player dashes through it with a Communal Helper Dream Tunnel Dash.
@@ -839,7 +839,7 @@ Triggers:
         Description: Replaces the normal interaction/talk prompt with one that slides in from the bottom corner.
       altTalkUISmallArrow:
         Name: Alt Style Interact Prompt (Small Arrow)
-        Description: Replaces the normal interaction/talk prompt with a smaller floaty arrow that expands to reveal the prompt when approached. 
+        Description: Replaces the normal interaction/talk prompt with a smaller floaty arrow that expands to reveal the prompt when approached.
       altNameAltTalkUI:
         Name: Alternate Interact Prompt
     Attributes:
@@ -860,14 +860,16 @@ Triggers:
         Description: |-
           Whether the prompt (in the BottomCorner style) should come from the left side of the screen, instead of the right.
           For the sake of consistency this is recommended to be left off unless necessary.
-  
+
   SorbetHelper/MiniPopupTrigger:
     Placements:
       miniPopup:
         Name: Mini Popup Trigger
     Attributes:
       activeTime:
-        Description: How long (in seconds) the mini popup should stay visible for.
+        Description: |-
+          How long (in seconds) the mini popup should stay visible for.
+          Not used if activation mode is set to while player inside.
       titleText:
         Description: The dialog ID to use for the title of the mini popup.
       subText:
@@ -881,7 +883,7 @@ Triggers:
       iconTexture:
         Description: |-
           An optional icon to display on the mini popup, relative to 'Graphics/Atlases/Gui/'.
-          The texture should be square shaped to prevent it from being awkwardly stretched.
+          The texture should be square shaped to prevent it from being stretched awkwardly to fit.
       texturePath:
         Description: |-
           The path to the base texture for for the popup, relative to 'Graphics/Atlases/Gui/'.
@@ -891,7 +893,10 @@ Triggers:
         Name: Activation Mode
         Description: Determines how the trigger will activate.
       onlyOnce:
-        Description: Whether the mini popup should only be able to trigger once per session.
+        Name: Once Per Session
+        Description: Whether the trigger will not be reloaded on room load if it was activated previously in the session.
+      removeOnLeave:
+        Description: Whether the trigger can only be activated once per room load.
       flag:
         Description: |-
           A session flag.
@@ -988,7 +993,7 @@ Effects:
           Format is "FromPosition-ToPosition,FromAlpha-ToAlpha". Example "n500-500,1-0".
           Negative numbers in position are denoted with "n" rather than minus. Position numbers are in pixels and use map coordinates.
           Multiple zones can be set up by using ":" as separator.
-  
+
   SorbetHelper/SpiralStars:
     Name: Spiral Stars
     Attributes:
@@ -1024,7 +1029,7 @@ Effects:
           Negative values will make the stars move away from the center instead.
       rotationSpeed:
         Description: The speed (in degrees / second) at which the stars will rotate around the center.
-  
+
   SorbetHelper/HiResGodrays:
     Name: Godrays (Hi-Res)
     Attributes:
@@ -1096,7 +1101,7 @@ Effects:
           Format is "FromPosition-ToPosition,FromAlpha-ToAlpha". Example "n500-500,1-0".
           Negative numbers in position are denoted with "n" rather than minus. Position numbers are in pixels and use map coordinates.
           Multiple zones can be set up by using ":" as separator.
-  
+
   SorbetHelper/EntityStylegroundRenderer:
     Name: Entity As Styleground Renderer
     Attributes:

@@ -8,91 +8,77 @@ using System;
 namespace Celeste.Mod.SorbetHelper.Triggers;
 
 [CustomEntity("SorbetHelper/MiniPopupTrigger")]
-public class MiniPopupTrigger : Trigger {
-    public enum Modes {
+public class MiniPopupTrigger(EntityData data, Vector2 offset, EntityID entityId) : Trigger(data, offset) {
+    private enum Modes {
         OnPlayerEnter,
         OnFlagEnabled,
         OnFlagDisabled,
         WhilePlayerInside
     }
-    private readonly Modes Mode;
 
-    private readonly string flag;
+    private readonly Modes mode = data.Enum("mode", Modes.OnPlayerEnter);
 
-    private readonly bool onlyOnce, removeOnLeave;
-    private readonly EntityID id;
+    private readonly string flag = data.Attr("flag", "");
+    private readonly bool onlyOnce = data.Bool("onlyOnce", false);
+    private readonly bool removeOnLeave = data.Bool("removeOnLeave", true);
 
-    private readonly float activeTime;
-    private readonly string mainTextId, subTextId;
-    private readonly Color baseColor, accentColor, titleColor;
-    private readonly string iconPath;
-    private readonly string texturePath;
+    private readonly float activeTime = data.Float("activeTime", 8f);
+    private readonly string mainTextId = data.Attr("titleText", "AREA_7"), subTextId = data.Attr("subText", "CHECKPOINT_7_3");
+    private readonly Color baseColor = data.HexColor("baseColor", Color.Black);
+    private readonly Color accentColor = data.HexColor("accentColor", Color.LightCoral);
+    private readonly Color titleColor = data.HexColor("titleColor", Color.White);
+    private readonly string iconPath = data.Attr("iconTexture", "");
+    private readonly string texturePath = data.Attr("texturePath", "");
 
     private bool currentFlagState;
     private bool triggered;
 
-    private Action onLeave;
-
-    public MiniPopupTrigger(EntityData data, Vector2 offset, EntityID entityId) : base(data, offset) {
-        Mode = data.Enum("mode", Modes.OnPlayerEnter);
-
-        flag = data.Attr("flag", "");
-
-        onlyOnce = data.Bool("onlyOnce", false);
-        removeOnLeave = data.Bool("removeOnLeave", true);
-        id = entityId;
-
-        activeTime = data.Float("activeTime", 8f);
-        mainTextId = data.Attr("titleText", "AREA_7");
-        subTextId = data.Attr("subText", "CHECKPOINT_7_3");
-        baseColor = data.HexColor("baseColor", Color.Black);
-        accentColor = data.HexColor("accentColor", Color.LightCoral);
-        titleColor = data.HexColor("titleColor", Color.White);
-        iconPath = data.Attr("iconTexture", "");
-        texturePath = data.Attr("texturePath", "");
-    }
+    private Action disablePopup;
 
     public override void Awake(Scene scene) {
         base.Awake(scene);
+
         if (!string.IsNullOrEmpty(flag))
-            currentFlagState = (scene as Level).Session.GetFlag(flag);
+            currentFlagState = SceneAs<Level>().Session.GetFlag(flag);
     }
 
     public override void Update() {
         base.Update();
 
-        if (!string.IsNullOrEmpty(flag) && (Scene as Level).Session.GetFlag(flag) != currentFlagState) {
-            currentFlagState = !currentFlagState;
+        if (string.IsNullOrEmpty(flag) || SceneAs<Level>().Session.GetFlag(flag) == currentFlagState)
+            return;
 
-            switch (Mode) {
-                case Modes.OnPlayerEnter:
-                    Collidable = currentFlagState;
-                    break;
+        currentFlagState = !currentFlagState;
 
-                case Modes.OnFlagEnabled:
-                    if (currentFlagState)
-                        Trigger();
-                    break;
+        switch (mode) {
+            case Modes.OnPlayerEnter or Modes.WhilePlayerInside:
+                Collidable = currentFlagState;
+                break;
 
-                case Modes.OnFlagDisabled:
-                    if (!currentFlagState)
-                        Trigger();
-                    break;
-            }
+            case Modes.OnFlagEnabled:
+                if (currentFlagState)
+                    Trigger();
+                break;
+
+            case Modes.OnFlagDisabled:
+                if (!currentFlagState)
+                    Trigger();
+                break;
         }
     }
 
     public override void OnEnter(Player player) {
         base.OnEnter(player);
 
-        if (Mode is Modes.OnPlayerEnter || Mode is Modes.WhilePlayerInside)
+        if (mode is Modes.OnPlayerEnter or Modes.WhilePlayerInside)
             Trigger();
     }
 
     public override void OnLeave(Player player) {
         base.OnLeave(player);
 
-        if (Mode is Modes.WhilePlayerInside && onLeave != null) onLeave();
+        if (mode is Modes.WhilePlayerInside && disablePopup is not null)
+            disablePopup();
     }
 
     private void Trigger() {
@@ -100,9 +86,10 @@ public class MiniPopupTrigger : Trigger {
             return;
 
         triggered = true;
-        onLeave = Scene.Tracker.GetEntity<MiniPopupDisplay>()?.CreatePopup(Mode is Modes.WhilePlayerInside ? -1 : activeTime, mainTextId, subTextId, baseColor, accentColor, titleColor, iconPath, texturePath);
+        disablePopup = MiniPopupDisplay.GetMiniPopupDisplay(Scene)
+                                       .CreatePopup(mode is Modes.WhilePlayerInside ? -1 : activeTime, mainTextId, subTextId, baseColor, accentColor, titleColor, iconPath, texturePath);
 
         if (onlyOnce)
-            (Scene as Level).Session.DoNotLoad.Add(id);
+            SceneAs<Level>().Session.DoNotLoad.Add(entityId);
     }
 }

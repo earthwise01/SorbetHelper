@@ -421,11 +421,13 @@ triggers.SorbetHelper/MiniPopupTrigger.attributes.description.subText=The dialog
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.baseColor=The base color of the mini popup.
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.accentColor=The color of the subtitle text and accent of the mini popup.
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.titleColor=The color of the title text of the mini popup.
-triggers.SorbetHelper/MiniPopupTrigger.attributes.description.iconTexture=An optional icon to display on the mini popup, relative to 'Graphics/Atlases/Gui/'.\nThe texture should be square shaped to prevent it from being awkwardly stretched.
+triggers.SorbetHelper/MiniPopupTrigger.attributes.description.iconTexture=An optional icon to display on the mini popup, relative to 'Graphics/Atlases/Gui/'.\nThe texture should be square shaped to prevent it from being stretched awkwardly to fit.
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.texturePath=The path to the base texture for for the popup, relative to 'Graphics/Atlases/Gui/'.\nExpects 2 textures to exist, both the specified base texture and an accent texture.\ne.g. inputting 'SorbetHelper/popup' means to use the two textures 'SorbetHelper/popup' and 'SorbetHelper/popupAccent'
 triggers.SorbetHelper/MiniPopupTrigger.attributes.name.mode=Activation Mode
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.mode=Determines how the trigger will activate.
-triggers.SorbetHelper/MiniPopupTrigger.attributes.description.onlyOnce=Whether the mini popup should only be able to trigger once per session.
+triggers.SorbetHelper/MiniPopupTrigger.attributes.name.onlyOnce=Once Per Session
+triggers.SorbetHelper/MiniPopupTrigger.attributes.description.onlyOnce=Whether the trigger will not be reloaded on room load if it was activated previously in the session.
+triggers.SorbetHelper/MiniPopupTrigger.attributes.description.removeOnLeave=Whether the trigger can only be activated once per room load.
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.flag=A session flag.\nUsed as needed for the activation mode, otherwise determines whether or not the player can collide with the trigger.
 
 # Color Dash Block State Trigger
