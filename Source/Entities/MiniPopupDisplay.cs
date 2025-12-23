@@ -30,11 +30,19 @@ public class MiniPopupDisplay : Entity {
     }
 
     // i wonder if i shd add a cooldown for adding popups so if multiple are added simultaneously they slide in more gradually vs all at once,
-    public void CreatePopup(float activeTime, string mainTextId, string subTextId) =>
-        Popups.Add(new Popup(activeTime, mainTextId, subTextId, Color.Black, Color.LightCoral, Color.White));
+    // Creating the popup returns an action that removes the popup so the respective MiniPopupTrigger can remove it if its mode is set to WhilePlayerInside - grog
+    public Action CreatePopup(float activeTime, string mainTextId, string subTextId) {
+        Popup popup = new Popup(activeTime, mainTextId, subTextId, Color.Black, Color.LightCoral, Color.White);
+        Popups.Add(popup);
+        return () => {popup.active = false;};
+    }
 
-    public void CreatePopup(float activeTime, string mainTextId, string subTextId, Color baseColor, Color accentColor, Color titleColor, string iconPath = null, string texturePath = null, int widthOverride = -1) =>
-        Popups.Add(new Popup(activeTime, mainTextId, subTextId, baseColor, accentColor, titleColor, iconPath, texturePath, widthOverride));
+    public Action CreatePopup(float activeTime, string mainTextId, string subTextId, Color baseColor, Color accentColor, Color titleColor, string iconPath = null, string texturePath = null, int widthOverride = -1) {
+        Popup popup = new Popup(activeTime, mainTextId, subTextId, baseColor, accentColor, titleColor, iconPath,
+            texturePath, widthOverride);
+        Popups.Add(popup);
+        return () => {popup.active = false;};
+    }
 
 
     public override void Update() {
@@ -181,6 +189,7 @@ public class MiniPopupDisplay : Entity {
         public int WidthOverride;
 
         private readonly float activeTime;
+        public bool active = true;
 
         public Popup(float activeTime, string mainTextId, string subTextId, Color baseColor, Color accentColor, Color titleColor, string iconPath = null, string texturePath = null, int widthOverride = -1) {
             this.activeTime = activeTime;
@@ -211,11 +220,17 @@ public class MiniPopupDisplay : Entity {
             }
 
             // stay around for a bit
+            // (if the mode is WhilePlayerInside listen for when active is set to false by the trigger, otherwise do the normal behavior
             float activeTimer = activeTime;
-            while (activeTimer > 0f) {
-                yield return null;
-                activeTimer -= Engine.DeltaTime;
-            }
+            if (activeTimer == -1)
+                while (active) {
+                    yield return null;
+                }
+            else
+                while (activeTimer > 0f) {
+                    yield return null;
+                    activeTimer -= Engine.DeltaTime;
+                }
 
             // slide out
             while (SlideLerp > 0f) {

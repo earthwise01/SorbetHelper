@@ -3,6 +3,7 @@ using Celeste.Mod.SorbetHelper.Utils;
 using Celeste.Mod.SorbetHelper.Entities;
 using Celeste.Mod.Entities;
 using Monocle;
+using System;
 
 namespace Celeste.Mod.SorbetHelper.Triggers;
 
@@ -11,13 +12,14 @@ public class MiniPopupTrigger : Trigger {
     public enum Modes {
         OnPlayerEnter,
         OnFlagEnabled,
-        OnFlagDisabled
+        OnFlagDisabled,
+        WhilePlayerInside
     }
     private readonly Modes Mode;
 
     private readonly string flag;
 
-    private readonly bool onlyOnce;
+    private readonly bool onlyOnce, removeOnLeave;
     private readonly EntityID id;
 
     private readonly float activeTime;
@@ -29,12 +31,15 @@ public class MiniPopupTrigger : Trigger {
     private bool currentFlagState;
     private bool triggered;
 
+    private Action onLeave;
+
     public MiniPopupTrigger(EntityData data, Vector2 offset, EntityID entityId) : base(data, offset) {
         Mode = data.Enum("mode", Modes.OnPlayerEnter);
 
         flag = data.Attr("flag", "");
 
         onlyOnce = data.Bool("onlyOnce", false);
+        removeOnLeave = data.Bool("removeOnLeave", true);
         id = entityId;
 
         activeTime = data.Float("activeTime", 8f);
@@ -80,16 +85,22 @@ public class MiniPopupTrigger : Trigger {
     public override void OnEnter(Player player) {
         base.OnEnter(player);
 
-        if (Mode is Modes.OnPlayerEnter)
+        if (Mode is Modes.OnPlayerEnter || Mode is Modes.WhilePlayerInside)
             Trigger();
     }
 
+    public override void OnLeave(Player player) {
+        base.OnLeave(player);
+
+        if (Mode is Modes.WhilePlayerInside && onLeave != null) onLeave();
+    }
+
     private void Trigger() {
-        if (triggered)
+        if (triggered && removeOnLeave)
             return;
 
         triggered = true;
-        Scene.Tracker.GetEntity<MiniPopupDisplay>()?.CreatePopup(activeTime, mainTextId, subTextId, baseColor, accentColor, titleColor, iconPath, texturePath);
+        onLeave = Scene.Tracker.GetEntity<MiniPopupDisplay>()?.CreatePopup(Mode is Modes.WhilePlayerInside ? -1 : activeTime, mainTextId, subTextId, baseColor, accentColor, titleColor, iconPath, texturePath);
 
         if (onlyOnce)
             (Scene as Level).Session.DoNotLoad.Add(id);
