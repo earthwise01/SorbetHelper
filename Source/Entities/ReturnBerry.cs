@@ -1,7 +1,4 @@
-using System;
-using System.Reflection;
 using System.Collections;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Monocle;
 using Celeste.Mod.Entities;
@@ -28,9 +25,8 @@ public class ReturnBerry : Strawberry {
         Seeds.Clear();
 
         if (data.Nodes is { Length: > 2 }) {
-            for (int i = 0; i < data.Nodes.Length - 2; i++) {
+            for (int i = 0; i < data.Nodes.Length - 2; i++)
                 Seeds.Add(new StrawberrySeed(this, offset + data.Nodes[i + 2], i, isGhostBerry));
-            }
         }
     }
 
@@ -43,10 +39,10 @@ public class ReturnBerry : Strawberry {
             return;
 
         if (Scene.OnInterval(0.75f, ID.ID / 9f)) // not sure abt speed still or whether it shd be fast or slow
-            (Scene as Level).Particles.Emit(Player.P_CassetteFly, 2, Center + new Vector2(0f, 1f), new Vector2(4f, 5f));
+            SceneAs<Level>().Particles.Emit(Player.P_CassetteFly, 2, Center + new Vector2(0f, 1f), new Vector2(4f, 5f));
     }
 
-    public new void OnPlayer(Player player) {
+    private new void OnPlayer(Player player) {
         // not an override method but still need to call "base" because the original playercollider get removed
         base.OnPlayer(player);
 
@@ -62,7 +58,7 @@ public class ReturnBerry : Strawberry {
 
         // if maddy is still alive put her in a bubble
         if (!player.Dead && player.StateMachine.State != Player.StCassetteFly) {
-            Audio.Play("event:/game/general/cassette_bubblereturn", (Scene as Level).Camera.GetCenter());
+            Audio.Play("event:/game/general/cassette_bubblereturn", SceneAs<Level>().Camera.GetCenter());
             player.StartCassetteFly(nodes[1], nodes[0]);
         }
     }

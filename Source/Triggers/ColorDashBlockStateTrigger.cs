@@ -1,8 +1,7 @@
-using System.Linq;
-using Celeste.Mod.Entities;
-using Celeste.Mod.SorbetHelper.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
+using Celeste.Mod.Entities;
+using Celeste.Mod.SorbetHelper.Entities;
 
 namespace Celeste.Mod.SorbetHelper.Triggers;
 
@@ -23,7 +22,7 @@ public class ColorDashBlockStateTrigger : Trigger {
         base.Added(scene);
 
         if (Mode is Modes.OnLevelLoad)
-            ColorDashBlock.SetColorDashBlockIndex((Scene as Level).Session, Index);
+            ColorDashBlock.SetColorDashBlockIndex(SceneAs<Level>().Session, Index);
     }
 
     public override void OnEnter(Player player) {
@@ -32,16 +31,12 @@ public class ColorDashBlockStateTrigger : Trigger {
         if (Mode is not Modes.OnPlayerEnter)
             return;
 
-        ColorDashBlock.SetColorDashBlockIndex((Scene as Level).Session, Index);
+        ColorDashBlock.SetColorDashBlockIndex(SceneAs<Level>().Session, Index);
         foreach (ColorDashBlock colorDashBlock in Scene.Tracker.GetEntities<ColorDashBlock>())
             colorDashBlock.UpdateState(playEffects: false);
     }
 
-    private static void Event_Player_Spawn(Player player) {
-        var trigger = player.CollideFirst<ColorDashBlockStateTrigger>();
-        if (trigger is { Mode: Modes.OnPlayerSpawn })
-            ColorDashBlock.SetColorDashBlockIndex((trigger.Scene as Level).Session, trigger.Index);
-    }
+    #region Hooks
 
     internal static void Load() {
         Everest.Events.Player.OnSpawn += Event_Player_Spawn;
@@ -49,4 +44,13 @@ public class ColorDashBlockStateTrigger : Trigger {
     internal static void Unload() {
         Everest.Events.Player.OnSpawn -= Event_Player_Spawn;
     }
+
+    private static void Event_Player_Spawn(Player player) {
+        ColorDashBlockStateTrigger trigger = player.CollideFirst<ColorDashBlockStateTrigger>();
+        if (trigger is { Mode: Modes.OnPlayerSpawn })
+            ColorDashBlock.SetColorDashBlockIndex(trigger.SceneAs<Level>().Session, trigger.Index);
+    }
+
+    #endregion
+
 }

@@ -3,9 +3,9 @@ using Monocle;
 namespace Celeste.Mod.SorbetHelper;
 
 public class SorbetHelperSettings : EverestModuleSettings {
-    public float MiniPopupScale { get; set; } = 1f;
+    public float MiniPopupScale { get; private set; } = 1f;
     public void CreateMiniPopupScaleEntry(TextMenu menu, bool inGame) {
-        var option = new TextMenu.Option<float>(Dialog.Clean("modsettings_sorbethelper_minipopupscale_name"));
+        TextMenu.Option<float> option = new TextMenu.Option<float>(Dialog.Clean("modsettings_sorbethelper_minipopupscale_name"));
         for (float f = 0.75f; f <= 1.25f; f += 0.05f)
             option.Add((f * 100).ToString("n0") +  "%", f, f == MiniPopupScale);
 

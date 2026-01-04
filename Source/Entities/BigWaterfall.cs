@@ -1,12 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 using Celeste.Mod.Entities;
-using MonoMod.Utils;
 using Celeste.Mod.SorbetHelper.Utils;
 
 namespace Celeste.Mod.SorbetHelper.Entities;
@@ -76,7 +72,7 @@ public class BigWaterfall : Entity {
 
     public override void Awake(Scene scene) {
         base.Awake(scene);
-        Level level = Scene as Level;
+        Level level = SceneAs<Level>();
 
         height = 8f;
         while (Y + height < level.Bounds.Bottom
@@ -108,20 +104,19 @@ public class BigWaterfall : Entity {
 
         Color waveColor = new Color(0.5f, 0.5f, wavePercent, 1f);
 
-        if (water is not { TopSurface: not null }) {
+        if (water?.TopSurface is null) {
             Draw.Rect(X, Y, width, height, waveColor);
             return;
         }
 
         Water.Surface waterSurface = water.TopSurface;
         float heightWithWater = height + water.TopSurface.Position.Y - water.Y;
-        for (int i = 0; i < width; i++) {
+        for (int i = 0; i < width; i++)
             Draw.Rect(X + i, Y, 1f, heightWithWater - waterSurface.GetSurfaceHeight(new Vector2(X + 1f + i, water.Y)), waveColor);
-        }
     }
 
     public override void Update() {
-        Level level = Scene as Level;
+        Level level = SceneAs<Level>();
 
         visibleOnCamera = InView(level.Camera);
 
@@ -164,15 +159,14 @@ public class BigWaterfall : Entity {
         int innerEdgeSize = edgeSize - 1;
         int fillShrink = width <= 8f ? 1 : 0;
 
-        if (water == null || water.TopSurface == null) {
+        if (water?.TopSurface is null) {
             Draw.Rect(X + fillShrink, Y, width - fillShrink, height, fillColor);
 
             Draw.Rect(X - 1f, Y, edgeSize, height, surfaceColor);
             Draw.Rect(X + width - innerEdgeSize, Y, edgeSize, height, surfaceColor);
             if (hasLines) {
-                foreach (float line in lines) {
+                foreach (float line in lines)
                     Draw.Rect(X + line, Y, 1f, height, surfaceColor);
-                }
             }
 
             return;
@@ -180,20 +174,18 @@ public class BigWaterfall : Entity {
 
         Water.Surface waterSurface = water.TopSurface;
         float heightWithWater = height + water.TopSurface.Position.Y - water.Y;
-        for (int i = fillShrink; i < width - fillShrink; i++) {
+        for (int i = fillShrink; i < width - fillShrink; i++)
             Draw.Rect(X + i, Y, 1f, heightWithWater - waterSurface.GetSurfaceHeight(new Vector2(X + 1f + i, water.Y)), fillColor);
-        }
 
         Draw.Rect(X - 1f, Y, edgeSize, heightWithWater - waterSurface.GetSurfaceHeight(new Vector2(X, water.Y)), surfaceColor);
         Draw.Rect(X + width - innerEdgeSize, Y, edgeSize, heightWithWater - waterSurface.GetSurfaceHeight(new Vector2(X + width - 1f, water.Y)), surfaceColor);
 
         if (hasLines) {
-            foreach (float line in lines) {
+            foreach (float line in lines)
                 Draw.Rect(X + line, Y, 1f, heightWithWater - waterSurface.GetSurfaceHeight(new Vector2(X + line + 1f, water.Y)), surfaceColor);
-            }
         }
     }
 
-    private bool InView(Camera camera) =>
-        X < camera.Right + 24f && X + width > camera.Left - 24f && Y < camera.Bottom + 24f && Y + height > camera.Top - 24f;
+    private bool InView(Camera camera) => X < camera.Right + 24f && X + width > camera.Left - 24f &&
+                                          Y < camera.Bottom + 24f && Y + height > camera.Top - 24f;
 }

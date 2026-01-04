@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Monocle;
 using Celeste.Mod.Entities;
@@ -16,12 +13,12 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [GlobalEntity(              EntityDataID + "Global")] // global version is swapped to in mapdataprocessor based on data.Bool("global")
 [CustomEntity(EntityDataID, EntityDataID + "Global")]
 public class EntityStylegroundController : Entity {
-    private const string EntityDataID = "SorbetHelper/EntityStylegroundController";
+    public const string EntityDataID = "SorbetHelper/EntityStylegroundController";
 
-    private readonly string StylegroundTag;
+    private readonly string stylegroundTag;
 
     public EntityStylegroundController(EntityData data, Vector2 _) {
-        StylegroundTag = data.Attr("tag", "");
+        stylegroundTag = data.Attr("tag", "");
 
         if (data.Bool("global", false))
             Add(new GlobalTypeNameProcessor(data, ProcessEntity));
@@ -31,6 +28,6 @@ public class EntityStylegroundController : Entity {
 
     private void ProcessEntity(Entity entity) {
         if (entity.Get<EntityStylegroundMarker>() is null)
-            entity.Add(new EntityStylegroundMarker(StylegroundTag));
+            entity.Add(new EntityStylegroundMarker(stylegroundTag));
     }
 }

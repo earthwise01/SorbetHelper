@@ -1,9 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 using Celeste.Mod.Entities;
 
@@ -38,7 +33,7 @@ public class TouchGateBlock : GateBlock {
 
     public override void Update() {
         // maybe kinda messy but i dont rlly care enough to try and fix it rn
-        if (!Triggered && ((moveOnGrab && HasPlayerRider()) || (!moveOnGrab && HasPlayerOnTop()))) {
+        if (!Triggered && (moveOnGrab ? HasPlayerRider() : HasPlayerOnTop())) {
             Activate();
             if (smoke)
                 ActivateParticles();
@@ -61,7 +56,7 @@ public class TouchGateBlock : GateBlock {
         base.Render();
     }
 
-    public override void RenderOutline() {
+    protected override void RenderOutline() {
         Draw.Rect(Position + Offset - new Vector2(1f, 1f), Collider.Width + 2f, Collider.Height + 2f, Color.Black);
     }
 }

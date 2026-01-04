@@ -15,10 +15,12 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [CustomEntity("SorbetHelper/ColorDashBlock")]
 [Tracked]
 public class ColorDashBlock : Solid {
-    public readonly int Index;
+    private const string CounterName = "SorbetHelper_ColorDashBlockIndex";
+
+    private readonly int index;
     private Color color;
 
-    public bool Activated;
+    private bool activated;
 
     private List<ColorDashBlock> group;
     private bool groupLeader;
@@ -35,11 +37,11 @@ public class ColorDashBlock : Solid {
 
     public ColorDashBlock(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, data.Height, false) {
         SurfaceSoundIndex = 35;
-        Index = data.Int("index", 0);
-        color = Index switch {
+        index = data.Int("index", 0);
+        color = index switch {
             0 => Calc.HexToColor("00c2c2"),
             1 => Calc.HexToColor("fca700"),
-            _ => throw new NotImplementedException($"Index {Index} is not supported!"),
+            _ => throw new NotImplementedException($"Index {index} is not supported!"),
         };
 
         Add(lightOcclude = new LightOcclude(0.8f));
@@ -49,8 +51,8 @@ public class ColorDashBlock : Solid {
         // switch if communal helper dream tunnel dashed
         bool switchOnDreamTunnel = data.Bool("switchOnDreamTunnel", false);
         if (switchOnDreamTunnel && CommunalHelperDashStatesInterop.IsImported) {
-            void onEnter(Player player) { }
-            void onExit(Player player) {
+            void OnEnter(Player player) { }
+            void OnExit(Player player) {
                 Switch();
                 Add(new Coroutine(GlitchSequence(), true));
             }
@@ -64,229 +66,18 @@ public class ColorDashBlock : Solid {
                 Glitch.Value = 0.0f;
             }
 
-            Add(CommunalHelperDashStatesInterop.DreamTunnelInteraction(onEnter, onExit));
+            Add(CommunalHelperDashStatesInterop.DreamTunnelInteraction(OnEnter, OnExit));
         }
     }
 
-    private DashCollisionResults OnDashed(Player player, Vector2 dir) {
-        if (!SaveData.Instance.Assists.Invincible && player.CollideCheck<Spikes>())
-            return DashCollisionResults.NormalCollision;
-
-        SceneAs<Level>().DirectionalShake(dir, 0.25f);
-        Switch();
-
-        return DashCollisionResults.Rebound;
-    }
-
-    public void Switch(bool playSfx = true) {
-        if (playSfx) {
-            Input.Rumble(RumbleStrength.Strong, RumbleLength.Long);
-            Audio.Play("event:/game/03_resort/forcefield_bump", Center);
-            Audio.Play("event:/game/05_mirror_temple/button_activate", Center);
-        }
-
-        var session = (Scene as Level).Session;
-        var currentIndex = GetColorDashBlockIndex(session);
-        var nextIndex = (currentIndex + 1) % 2;
-        SetColorDashBlockIndex(session, nextIndex);
-
-        foreach (ColorDashBlock colorDashBlock in Scene.Tracker.GetEntities<ColorDashBlock>())
-            colorDashBlock.UpdateState(playEffects: true);
-    }
-
-    private bool BlockedCheck() {
-        var player = Scene.Tracker.GetEntity<Player>();
-        if (player is null)
-            return true;
-
-        foreach (var colorDashBlock in group) {
-            if (colorDashBlock.CollideCheck(player))
-                return false;
-
-            // sometime i wonder if this rly should've just been a map specific entity
-            // idk hopefully this doesn't end up causing issues in the future even though most other similar blocks dont do this
-            foreach (var staticMover in colorDashBlock.staticMovers) {
-                if (staticMover.Entity is Spikes spikes && spikes.CollideCheck(player))
-                    return false;
-            }
-        }
-
-        return true;
-    }
-
-    public void UpdateState(bool playEffects = false) {
-        var currentIndex = GetColorDashBlockIndex((Scene as Level).Session);
-        Activated = Index == currentIndex;
-
-        if (groupLeader && Activated && !Collidable) {
-            bool canActivate = BlockedCheck();
-            if (canActivate) {
-                foreach (var colorDashBlock in group) {
-                    colorDashBlock.Collidable = true;
-                    colorDashBlock.EnableStaticMovers();
-
-                    if (playEffects)
-                        colorDashBlock.ActivateEffects();
-                }
-
-                if (playEffects)
-                    wiggler.Start();
-            }
-        } else if (!Activated && Collidable) {
-            Collidable = false;
-            DisableStaticMovers();
-
-            if (playEffects)
-                DeactivateEffects();
-        }
-
-        UpdateVisualState();
-    }
-
-    private void UpdateVisualState() {
-        Depth = Collidable ? Depths.Player - 10 : (Activated ? 9870 : 9880);
-
-        foreach (StaticMover staticMover in staticMovers)
-            staticMover.Entity.Depth = Depth + 1;
-
-        lightOcclude.Visible = Collidable;
-
-        foreach (var image in solidImages)
-            image.Visible = Collidable;
-        foreach (var image in pressedImages)
-            image.Visible = !Collidable;
-
-        if (groupLeader) {
-            // shake when blocked from activating
-            if (Activated && !Collidable)
-                StartShaking();
-            else
-                StopShaking();
-
-            var scale = new Vector2(1f + wiggler.Value * 0.05f * wigglerScaler.X, 1f + wiggler.Value * 0.15f * wigglerScaler.Y);
-            foreach (var colorDashBlock in group) {
-                colorDashBlock.shakeAmount = shakeAmount;
-
-                foreach (var image in colorDashBlock.allImages)
-                    image.Scale = scale;
-
-                foreach (var staticMover in colorDashBlock.staticMovers)
-                    if (staticMover.Entity is Spikes spikes)
-                        foreach (Component component in spikes.Components)
-                            if (component is Image image)
-                                image.Scale = scale;
-            }
-        }
-    }
-
-    public override void OnShake(Vector2 amount) {
-        base.OnShake(amount);
-
-        if (groupLeader) {
-            foreach (var colorDashBlock in group) {
-                if (!colorDashBlock.groupLeader) {
-                    colorDashBlock.OnShake(amount);
-                }
-            }
-        }
-    }
-
-    private void ActivateEffects() {
-
-    }
-
-    private void DeactivateEffects() {
-        Level level = Scene as Level;
-
-        var particle = new ParticleType(Lightning.P_Shatter) {
-            Color = Color.Lerp(color, Color.White, 0.75f),
-            Color2 = Color.White,
-            ColorMode = ParticleType.ColorModes.Fade
-        };
-
-        for (int x = 0; x < Width / 8f; x++) {
-            for (int y = 0; y < Height / 8f; y++) {
-                var position = Position + new Vector2(x * 8 + 5, y * 8 + 3);
-
-                level.ParticlesFG.Emit(particle, 1, position, Vector2.One * 4f, color, (position - Center).Angle());
-            }
-        }
-    }
-
-    public override void Update() {
-        base.Update();
-
-        UpdateState(playEffects: true);
-
-        if (Activated && Scene.OnInterval(0.1f))
-            noiseSeed++;
-    }
-
-    public override void Render() {
-        var position = Position;
-        Position += Shake;
-
-        uint seed = noiseSeed;
-        DrawNoise(ref seed);
-
-        base.Render();
-
-        Position = position;
-    }
-
-    // taken and slighly modified from PlaybackBillboard
-    private void DrawNoise(ref uint seed) {
-        // todo: make this scale properly with the bounce effect
-        Rectangle bounds = new Rectangle((int)X, (int)Y, (int)Width, (int)Height);
-        string texture = Collidable ? "objects/SorbetHelper/colorDashBlock/solidNoise" : "objects/SorbetHelper/colorDashBlock/pressedNoise";
-
-        MTexture noiseTexture = GFX.Game[texture];
-        Vector2 noiseRandPos = new Vector2(PseudoRandRange(ref seed, 0f, noiseTexture.Width / 2), PseudoRandRange(ref seed, 0f, noiseTexture.Height / 2));
-        Vector2 noiseHalfSize = new Vector2(noiseTexture.Width, noiseTexture.Height) / 2f;
-        for (float x = 0f; x < bounds.Width; x += noiseHalfSize.X) {
-            float sourceWidth = Math.Min(bounds.Width - x, noiseHalfSize.X);
-            for (float y = 0f; y < bounds.Height; y += noiseHalfSize.Y) {
-                float sourceHeight = Math.Min(bounds.Height - y, noiseHalfSize.Y);
-                int sourceX = (int)(noiseTexture.ClipRect.X + noiseRandPos.X);
-                int sourceY = (int)(noiseTexture.ClipRect.Y + noiseRandPos.Y);
-                Rectangle sourceRect = new Rectangle(sourceX, sourceY, (int)sourceWidth, (int)sourceHeight);
-                Draw.SpriteBatch.Draw(noiseTexture.Texture.Texture_Safe, new Vector2(bounds.X + x, bounds.Y + y), sourceRect, color);
-            }
-        }
-
-        switch (Index) {
-            case 0:
-                for (int y = bounds.Y; (float)y < bounds.Bottom; y += 2) {
-                    float alpha = 0.05f + (1f + (float)Math.Sin(y / 16f + Scene.TimeActive * 2f)) / 2f * 0.2f;
-                    Draw.Line(bounds.X, y, bounds.X + bounds.Width, y, Color.Black * alpha);
-                }
-                break;
-            case 1:
-                for (int x = bounds.X; (float)x < bounds.Right; x += 2) {
-                    float alpha = 0.05f + (1f + (float)Math.Sin(x / 16f + Scene.TimeActive * 2f)) / 2f * 0.2f;
-                    Draw.Line(x + 1, bounds.Y, x + 1, bounds.Y + bounds.Height, Color.Black * alpha);
-                }
-                break;
-        }
-    }
-
-    private static uint PseudoRand(ref uint seed) {
-        seed ^= seed << 13;
-        seed ^= seed >> 17;
-        return seed;
-    }
-
-    private static float PseudoRandRange(ref uint seed, float min, float max) =>
-        min + PseudoRand(ref seed) % 1000 / 1000f * (max - min);
-
-    // -- SETUP --
+    #region Setup
 
     public override void Awake(Scene scene) {
         base.Awake(scene);
 
         // setup colours for static movers
-        var fadeColor = Calc.HexToColor("667da5");
-        var disabledColor = new Color(fadeColor.R / 255f * (color.R / 255f), fadeColor.G / 255f * (color.G / 255f), fadeColor.B / 255f * (color.B / 255f), 1f);
+        Color fadeColor = Calc.HexToColor("667da5");
+        Color disabledColor = new Color(fadeColor.R / 255f * (color.R / 255f), fadeColor.G / 255f * (color.G / 255f), fadeColor.B / 255f * (color.B / 255f), 1f);
         foreach (StaticMover staticMover in staticMovers) {
             if (staticMover.Entity is Spikes spikes) {
                 spikes.EnabledColor = color;
@@ -311,7 +102,7 @@ public class ColorDashBlock : Solid {
             float groupRight = float.MinValue;
             float groupTop = float.MaxValue;
             float groupBottom = float.MinValue;
-            foreach (var colorDashBlock in group) {
+            foreach (ColorDashBlock colorDashBlock in group) {
                 if (colorDashBlock.Left < groupLeft)
                     groupLeft = colorDashBlock.Left;
                 if (colorDashBlock.Right > groupRight)
@@ -326,7 +117,7 @@ public class ColorDashBlock : Solid {
             wigglerScaler = new Vector2(Calc.ClampedMap(groupRight - groupLeft, 32f, 96f, 1f, 0.2f), Calc.ClampedMap(groupBottom - groupTop, 32f, 96f, 1f, 0.2f));
             Add(wiggler = Wiggler.Create(0.3f, 3f));
 
-            foreach (var colorDashBlock in group) {
+            foreach (ColorDashBlock colorDashBlock in group) {
                 colorDashBlock.wiggler = wiggler;
                 colorDashBlock.wigglerScaler = wigglerScaler;
                 colorDashBlock.groupOrigin = groupOrigin;
@@ -334,10 +125,9 @@ public class ColorDashBlock : Solid {
         }
 
         // setup spike origins
-        foreach (var staticMover in staticMovers) {
-            if (staticMover.Entity is Spikes spikes) {
+        foreach (StaticMover staticMover in staticMovers) {
+            if (staticMover.Entity is Spikes spikes)
                 spikes.SetOrigins(groupOrigin);
-            }
         }
 
         // cassette block autotiling
@@ -386,7 +176,7 @@ public class ColorDashBlock : Solid {
 
     private void FindInGroup(ColorDashBlock block) {
         foreach (ColorDashBlock otherBlock in Scene.Tracker.GetEntities<ColorDashBlock>()) {
-            if (otherBlock != this && otherBlock != block && otherBlock.Index == Index && (otherBlock.CollideRect(new Rectangle((int)block.X - 1, (int)block.Y, (int)block.Width + 2, (int)block.Height)) || otherBlock.CollideRect(new Rectangle((int)block.X, (int)block.Y - 1, (int)block.Width, (int)block.Height + 2))) && !group.Contains(otherBlock)) {
+            if (otherBlock != this && otherBlock != block && otherBlock.index == index && (otherBlock.CollideRect(new Rectangle((int)block.X - 1, (int)block.Y, (int)block.Width + 2, (int)block.Height)) || otherBlock.CollideRect(new Rectangle((int)block.X, (int)block.Y - 1, (int)block.Width, (int)block.Height + 2))) && !group.Contains(otherBlock)) {
                 group.Add(otherBlock);
                 FindInGroup(otherBlock);
                 otherBlock.group = group;
@@ -396,24 +186,23 @@ public class ColorDashBlock : Solid {
 
     private bool CheckForSame(float x, float y) {
         foreach (ColorDashBlock otherBlock in Scene.Tracker.GetEntities<ColorDashBlock>()) {
-            if (otherBlock.Index == Index && otherBlock.Collider.Collide(new Rectangle((int)x, (int)y, 8, 8))) {
+            if (otherBlock.index == index && otherBlock.Collider.Collide(new Rectangle((int)x, (int)y, 8, 8)))
                 return true;
-            }
         }
 
         return false;
     }
 
     private void SetImage(float x, float y, int tx, int ty) {
-        var atlasSubtextures = GFX.Game.GetAtlasSubtextures("objects/SorbetHelper/colorDashBlock/pressed");
-        pressedImages.Add(CreateImage(x, y, tx, ty, atlasSubtextures[Index % atlasSubtextures.Count]));
+        List<MTexture> atlasSubtextures = GFX.Game.GetAtlasSubtextures("objects/SorbetHelper/colorDashBlock/pressed");
+        pressedImages.Add(CreateImage(x, y, tx, ty, atlasSubtextures[index % atlasSubtextures.Count]));
         solidImages.Add(CreateImage(x, y, tx, ty, GFX.Game["objects/SorbetHelper/colorDashBlock/solid"]));
     }
 
     private Image CreateImage(float x, float y, int tx, int ty, MTexture tex) {
-        var imageOffset = new Vector2(x - X, y - Y);
-        var image = new Image(tex.GetSubtexture(tx * 8, ty * 8, 8, 8));
-        var imageGroupOrigin = groupOrigin - Position;
+        Vector2 imageOffset = new Vector2(x - X, y - Y);
+        Image image = new Image(tex.GetSubtexture(tx * 8, ty * 8, 8, 8));
+        Vector2 imageGroupOrigin = groupOrigin - Position;
         image.Origin = imageGroupOrigin - imageOffset;
         image.Position = imageGroupOrigin;
         image.Color = color;
@@ -422,9 +211,227 @@ public class ColorDashBlock : Solid {
         return image;
     }
 
-    // -- SESSION HELPERS --
+    #endregion
+
+    #region Behaviour
 
     // todo: also set a flag depending on the index?
-    public static int GetColorDashBlockIndex(Session session) => session.GetCounter("SorbetHelper_ColorDashBlockIndex");
-    public static void SetColorDashBlockIndex(Session session, int index) => session.SetCounter("SorbetHelper_ColorDashBlockIndex", index);
+    public static int GetColorDashBlockIndex(Session session) => session.GetCounter(CounterName);
+    public static void SetColorDashBlockIndex(Session session, int index) => session.SetCounter(CounterName, index);
+
+    private DashCollisionResults OnDashed(Player player, Vector2 dir) {
+        if (!SaveData.Instance.Assists.Invincible && player.CollideCheck<Spikes>())
+            return DashCollisionResults.NormalCollision;
+
+        SceneAs<Level>().DirectionalShake(dir, 0.25f);
+        Switch();
+
+        return DashCollisionResults.Rebound;
+    }
+
+    public void Switch(bool playSfx = true) {
+        if (playSfx) {
+            Input.Rumble(RumbleStrength.Strong, RumbleLength.Long);
+            Audio.Play("event:/game/03_resort/forcefield_bump", Center);
+            Audio.Play("event:/game/05_mirror_temple/button_activate", Center);
+        }
+
+        Session session = SceneAs<Level>().Session;
+        int currentIndex = GetColorDashBlockIndex(session);
+        int nextIndex = (currentIndex + 1) % 2;
+        SetColorDashBlockIndex(session, nextIndex);
+
+        foreach (ColorDashBlock colorDashBlock in Scene.Tracker.GetEntities<ColorDashBlock>())
+            colorDashBlock.UpdateState(playEffects: true);
+    }
+
+    private bool BlockedCheck() {
+        Player player = Scene.Tracker.GetEntity<Player>();
+        if (player is null)
+            return true;
+
+        foreach (ColorDashBlock colorDashBlock in group) {
+            if (colorDashBlock.CollideCheck(player))
+                return false;
+
+            // inconsistent with cassette blocks & color switch blocks but feels nice
+            foreach (StaticMover staticMover in colorDashBlock.staticMovers) {
+                if (staticMover.Entity is Spikes spikes && spikes.CollideCheck(player))
+                    return false;
+            }
+        }
+
+        return true;
+    }
+
+    public void UpdateState(bool playEffects = false) {
+        int currentIndex = GetColorDashBlockIndex(SceneAs<Level>().Session);
+        activated = index == currentIndex;
+
+        if (groupLeader && activated && !Collidable) {
+            bool canActivate = BlockedCheck();
+            if (canActivate) {
+                foreach (ColorDashBlock colorDashBlock in group) {
+                    colorDashBlock.Collidable = true;
+                    colorDashBlock.EnableStaticMovers();
+
+                    if (playEffects)
+                        colorDashBlock.ActivateEffects();
+                }
+
+                if (playEffects)
+                    wiggler.Start();
+            }
+        } else if (!activated && Collidable) {
+            Collidable = false;
+            DisableStaticMovers();
+
+            if (playEffects)
+                DeactivateEffects();
+        }
+
+        UpdateVisualState();
+    }
+
+    private void UpdateVisualState() {
+        Depth = Collidable ? Depths.Player - 10 : (activated ? 9870 : 9880);
+
+        foreach (StaticMover staticMover in staticMovers)
+            staticMover.Entity.Depth = Depth + 1;
+
+        lightOcclude.Visible = Collidable;
+
+        foreach (Image image in solidImages)
+            image.Visible = Collidable;
+        foreach (Image image in pressedImages)
+            image.Visible = !Collidable;
+
+        if (groupLeader) {
+            // shake when blocked from activating
+            if (activated && !Collidable)
+                StartShaking();
+            else
+                StopShaking();
+
+            Vector2 scale = new Vector2(1f + wiggler.Value * 0.05f * wigglerScaler.X, 1f + wiggler.Value * 0.15f * wigglerScaler.Y);
+            foreach (ColorDashBlock colorDashBlock in group) {
+                colorDashBlock.shakeAmount = shakeAmount;
+
+                foreach (Image image in colorDashBlock.allImages)
+                    image.Scale = scale;
+
+                foreach (StaticMover staticMover in colorDashBlock.staticMovers) {
+                    if (staticMover.Entity is not Spikes spikes)
+                        continue;
+
+                    foreach (Component component in spikes.Components) {
+                        if (component is Image image)
+                            image.Scale = scale;
+                    }
+                }
+            }
+        }
+    }
+
+    public override void OnShake(Vector2 amount) {
+        base.OnShake(amount);
+
+        if (groupLeader) {
+            foreach (ColorDashBlock colorDashBlock in group) {
+                if (!colorDashBlock.groupLeader)
+                    colorDashBlock.OnShake(amount);
+            }
+        }
+    }
+
+    private void ActivateEffects() {
+
+    }
+
+    private void DeactivateEffects() {
+        Level level = SceneAs<Level>();
+
+        ParticleType particle = new ParticleType(Lightning.P_Shatter) {
+            Color = Color.Lerp(color, Color.White, 0.75f),
+            Color2 = Color.White,
+            ColorMode = ParticleType.ColorModes.Fade
+        };
+
+        for (int x = 0; x < Width / 8f; x++) {
+            for (int y = 0; y < Height / 8f; y++) {
+                Vector2 position = Position + new Vector2(x * 8 + 5, y * 8 + 3);
+
+                level.ParticlesFG.Emit(particle, 1, position, Vector2.One * 4f, color, (position - Center).Angle());
+            }
+        }
+    }
+
+    public override void Update() {
+        base.Update();
+
+        UpdateState(playEffects: true);
+
+        if (activated && Scene.OnInterval(0.1f))
+            noiseSeed++;
+    }
+
+    #endregion
+
+    public override void Render() {
+        Vector2 position = Position;
+        Position += Shake;
+
+        uint seed = noiseSeed;
+        DrawNoise(ref seed);
+
+        base.Render();
+
+        Position = position;
+    }
+
+    // taken and slighly modified from PlaybackBillboard
+    private void DrawNoise(ref uint seed) {
+        // todo: make this scale properly with the bounce effect
+        Rectangle bounds = new Rectangle((int)X, (int)Y, (int)Width, (int)Height);
+        string texture = Collidable ? "objects/SorbetHelper/colorDashBlock/solidNoise" : "objects/SorbetHelper/colorDashBlock/pressedNoise";
+
+        MTexture noiseTexture = GFX.Game[texture];
+        Vector2 noiseRandPos = new Vector2(PseudoRandRange(ref seed, 0f, noiseTexture.Width / 2f), PseudoRandRange(ref seed, 0f, noiseTexture.Height / 2f));
+        Vector2 noiseHalfSize = new Vector2(noiseTexture.Width, noiseTexture.Height) / 2f;
+        for (float x = 0f; x < bounds.Width; x += noiseHalfSize.X) {
+            float sourceWidth = Math.Min(bounds.Width - x, noiseHalfSize.X);
+            for (float y = 0f; y < bounds.Height; y += noiseHalfSize.Y) {
+                float sourceHeight = Math.Min(bounds.Height - y, noiseHalfSize.Y);
+                int sourceX = (int)(noiseTexture.ClipRect.X + noiseRandPos.X);
+                int sourceY = (int)(noiseTexture.ClipRect.Y + noiseRandPos.Y);
+                Rectangle sourceRect = new Rectangle(sourceX, sourceY, (int)sourceWidth, (int)sourceHeight);
+                Draw.SpriteBatch.Draw(noiseTexture.Texture.Texture_Safe, new Vector2(bounds.X + x, bounds.Y + y), sourceRect, color);
+            }
+        }
+
+        // todo: use Draw.Rect instead of Draw.Line
+        switch (index) {
+            case 0:
+                for (int y = bounds.Y; (float)y < bounds.Bottom; y += 2) {
+                    float alpha = 0.05f + (1f + (float)Math.Sin(y / 16f + Scene.TimeActive * 2f)) / 2f * 0.2f;
+                    Draw.Line(bounds.X, y, bounds.X + bounds.Width, y, Color.Black * alpha);
+                }
+                break;
+            case 1:
+                for (int x = bounds.X; (float)x < bounds.Right; x += 2) {
+                    float alpha = 0.05f + (1f + (float)Math.Sin(x / 16f + Scene.TimeActive * 2f)) / 2f * 0.2f;
+                    Draw.Line(x + 1, bounds.Y, x + 1, bounds.Y + bounds.Height, Color.Black * alpha);
+                }
+                break;
+        }
+    }
+
+    private static uint PseudoRand(ref uint seed) {
+        seed ^= seed << 13;
+        seed ^= seed >> 17;
+        return seed;
+    }
+
+    private static float PseudoRandRange(ref uint seed, float min, float max)
+        => min + PseudoRand(ref seed) % 1000 / 1000f * (max - min);
 }

@@ -1,12 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using Microsoft.Xna.Framework;
 using Monocle;
 using Celeste.Mod.Entities;
 using Celeste.Mod.SorbetHelper.Utils;
-using Celeste.Mod.SorbetHelper.Components;
 
 namespace Celeste.Mod.SorbetHelper.Entities;
 
@@ -23,7 +21,7 @@ public class CustomFallingBlock : FallingBlock {
     protected readonly float maxSpeed, acceleration;
     protected readonly string shakeSfx, impactSfx;
 
-    private static readonly Dictionary<string, Vector2> directionToVector = new() {
+    private static readonly Dictionary<string, Vector2> DirectionToVector = new Dictionary<string, Vector2> {
         {"down", new Vector2(0f, 1f)}, {"up", new Vector2(0f, -1f)}, {"left", new Vector2(-1f, 0f)}, {"right", new Vector2(1f, 0f)}
     };
     public Vector2 Direction;
@@ -34,17 +32,17 @@ public class CustomFallingBlock : FallingBlock {
     private bool chronoHelperGravityUp, chronoHelperGravityWasUp;
     private bool chronoHelperHasShaken;
 
-    public static Entity Load(Level level, LevelData levelData, Vector2 offset, EntityData entityData) =>
-        new CustomFallingBlock(entityData, offset, chronoHelperGravity: entityData.Bool("chronoHelperGravity", false));
+    public static Entity Load(Level level, LevelData levelData, Vector2 offset, EntityData entityData)
+        => new CustomFallingBlock(entityData, offset, chronoHelperGravity: entityData.Bool("chronoHelperGravity", false));
 
-    public static Entity LoadGravity(Level level, LevelData levelData, Vector2 offset, EntityData entityData) =>
-        new CustomFallingBlock(entityData, offset, chronoHelperGravity: true);
+    public static Entity LoadGravity(Level level, LevelData levelData, Vector2 offset, EntityData entityData)
+        => new CustomFallingBlock(entityData, offset, chronoHelperGravity: true);
 
     public CustomFallingBlock(EntityData data, Vector2 offset, bool chronoHelperGravity) : base(data, offset) {
         // remove the Coroutine added by the vanilla falling block
         Remove(Get<Coroutine>());
 
-        Direction = directionToVector[data.Attr("direction", "down").ToLower()];
+        Direction = DirectionToVector[data.Attr("direction", "down").ToLower()];
         flagOnFall = data.Attr("flagOnFall", "");
         flagOnLand = data.Attr("flagOnLand", "");
         triggerFlag = data.Attr("triggerFlag", "");
@@ -72,9 +70,8 @@ public class CustomFallingBlock : FallingBlock {
     }
 
     public override void OnStaticMoverTrigger(StaticMover sm) {
-        if (fallOnStaticMover) {
+        if (fallOnStaticMover)
             Triggered = true;
-        }
     }
 
     public override void Awake(Scene scene) {
@@ -83,7 +80,7 @@ public class CustomFallingBlock : FallingBlock {
         if (!resetFlags)
             return;
 
-        Session session = (Scene as Level).Session;
+        Session session = SceneAs<Level>().Session;
         if (!string.IsNullOrEmpty(flagOnFall) && session.GetFlag(flagOnFall))
             session.SetFlag(flagOnFall, false);
         if (!string.IsNullOrEmpty(flagOnLand) && session.GetFlag(flagOnLand))
@@ -103,7 +100,7 @@ public class CustomFallingBlock : FallingBlock {
         }
 
         // flag trigger
-        if (!string.IsNullOrEmpty(triggerFlag) && !HasStartedFalling && !Triggered && (Scene as Level).Session.GetFlag(triggerFlag))
+        if (!string.IsNullOrEmpty(triggerFlag) && !HasStartedFalling && !Triggered && SceneAs<Level>().Session.GetFlag(triggerFlag))
             Triggered = true;
 
         base.Update();
@@ -115,7 +112,7 @@ public class CustomFallingBlock : FallingBlock {
 
         HasStartedFalling = true;
         if (!string.IsNullOrEmpty(flagOnFall))
-            (Scene as Level).Session.SetFlag(flagOnFall);
+            SceneAs<Level>().Session.SetFlag(flagOnFall);
 
         while (true) {
             Audio.Play(shakeSfx, Center);
@@ -125,7 +122,7 @@ public class CustomFallingBlock : FallingBlock {
             if (!chronoHelperGravityFallingBlock || !chronoHelperHasShaken)
                 yield return initialShakeTime;
             // the consequences of my actions ...
-            else if (chronoHelperGravityChangeShakeTime > 0f && !(Scene as Level).Session.GetFlag("SorbetHelper_CorrectChronoHelperParity"))
+            else if (chronoHelperGravityChangeShakeTime > 0f && !SceneAs<Level>().Session.GetFlag("SorbetHelper_CorrectChronoHelperParity"))
                 yield return chronoHelperGravityChangeShakeTime;
 
             float shakeTimer = variableShakeTime;
@@ -140,7 +137,7 @@ public class CustomFallingBlock : FallingBlock {
 
             Vector2 speed = Vector2.Zero;
             while (true) {
-                Level level = Scene as Level;
+                Level level = SceneAs<Level>();
                 speed.X = Calc.Approach(speed.X, Direction.X * maxSpeed, acceleration * Engine.DeltaTime);
                 speed.Y = Calc.Approach(speed.Y, Direction.Y * maxSpeed, acceleration * Engine.DeltaTime);
 
@@ -163,7 +160,7 @@ public class CustomFallingBlock : FallingBlock {
                     Collidable = Visible = false;
                     yield return 0.2f;
 
-                    // checks whether the falling block fell into a screen transition (i think)
+                    // checks whether the falling block fell into a screen transition
                     if (level.Session.MapData.CanTransitionTo(level, new Vector2(Center.X, Bottom + 12f)) || level.Session.MapData.CanTransitionTo(level, new Vector2(Center.X, Top - 12f)) ||
                     level.Session.MapData.CanTransitionTo(level, new Vector2(Left - 12f, Center.Y)) || level.Session.MapData.CanTransitionTo(level, new Vector2(Right + 12f, Center.Y))) {
                         yield return 0.2f;
@@ -180,10 +177,10 @@ public class CustomFallingBlock : FallingBlock {
             }
 
             if (!string.IsNullOrEmpty(flagOnLand))
-                (Scene as Level).Session.SetFlag(flagOnLand);
+                SceneAs<Level>().Session.SetFlag(flagOnLand);
             Audio.Play(impactSfx, BottomCenter);
             Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
-            (Scene as Level).DirectionalShake(Direction, 0.3f);
+            SceneAs<Level>().DirectionalShake(Direction, 0.3f);
             StartShaking();
             DirectionalLandParticles();
             yield return 0.2f;
@@ -195,12 +192,11 @@ public class CustomFallingBlock : FallingBlock {
             else if (CollideCheck<SolidTiles>(Position + Direction))
                 break;
 
-            // disable falling block cycles on new gravity falling blocks
+            // disable falling block cycles on (new) gravity falling blocks
             bool fallingBlockCycles = !chronoHelperGravityFallingBlock || chronoHelperGravityChangeShakeTime != 0f;
             // could be a simple collidecheck but this fixes the extremely niche case of not falling if 1. sideways 2. next to a jumpthru and 3. active but landed (for using attached jumpthrus on sideways gravity falling blocks)
-            while (CollideFirst<Platform>(Position + Direction) is { } platform && (Direction.X == 0f || platform is not JumpThru)) {
+            while (CollideFirst<Platform>(Position + Direction) is { } platform && (Direction.X == 0f || platform is not JumpThru))
                 yield return fallingBlockCycles ? 0.1f : null;
-            }
 
             // makes platforms moving out of the way still behave like normal for gravity falling blocks
             if (chronoHelperGravityFallingBlock && chronoHelperGravityUp == chronoHelperGravityWasUp)
@@ -210,10 +206,10 @@ public class CustomFallingBlock : FallingBlock {
         Safe = true;
     }
 
-    public void DirectionalShakeParticles() {
+    private void DirectionalShakeParticles() {
         Vector2 dir = Direction.FourWayNormal();
 
-        Level level = Scene as Level;
+        Level level = SceneAs<Level>();
         switch (dir) {
             case { X: 1f }:
                 for (int i = 2; i < Height; i += 4) {
@@ -250,40 +246,43 @@ public class CustomFallingBlock : FallingBlock {
         }
     }
 
-    public void DirectionalLandParticles() {
+    private void DirectionalLandParticles() {
         Vector2 dir = Direction.FourWayNormal();
 
         ParticleType P_DirectionalLandDust = new ParticleType(P_LandDust) {
             Acceleration = dir * -30f
         };
 
-        Level level = Scene as Level;
+        Level level = SceneAs<Level>();
         switch (dir) {
             case { X: 1f }:
                 for (int i = 2; i <= Height; i += 4) {
-                    if (Scene.CollideCheck<Solid>(TopRight + new Vector2(3f, i))) {
-                        level.ParticlesFG.Emit(P_FallDustA, 1, new Vector2(Right, Y + i), Vector2.One * 4f, 0f);
-                        float direction = i >= Height / 2f ? MathF.PI / 2f : -MathF.PI / 2f;
-                        level.ParticlesFG.Emit(P_DirectionalLandDust, 1, new Vector2(Right, Y + i), Vector2.One * 4f, direction);
-                    }
+                    if (!Scene.CollideCheck<Solid>(TopRight + new Vector2(3f, i)))
+                        continue;
+
+                    level.ParticlesFG.Emit(P_FallDustA, 1, new Vector2(Right, Y + i), Vector2.One * 4f, 0f);
+                    float direction = i >= Height / 2f ? MathF.PI / 2f : -MathF.PI / 2f;
+                    level.ParticlesFG.Emit(P_DirectionalLandDust, 1, new Vector2(Right, Y + i), Vector2.One * 4f, direction);
                 }
                 break;
             case { X: -1f }:
                 for (int i = 2; i <= Height; i += 4) {
-                    if (Scene.CollideCheck<Solid>(TopLeft + new Vector2(-3f, i))) {
-                        level.ParticlesFG.Emit(P_FallDustA, 1, new Vector2(X, Y + i), Vector2.One * 4f, 0f);
-                        float direction = i >= Height / 2f ? MathF.PI / 2f : -MathF.PI / 2f;
-                        level.ParticlesFG.Emit(P_DirectionalLandDust, 1, new Vector2(X, Y + i), Vector2.One * 4f, direction);
-                    }
+                    if (!Scene.CollideCheck<Solid>(TopLeft + new Vector2(-3f, i)))
+                        continue;
+
+                    level.ParticlesFG.Emit(P_FallDustA, 1, new Vector2(X, Y + i), Vector2.One * 4f, 0f);
+                    float direction = i >= Height / 2f ? MathF.PI / 2f : -MathF.PI / 2f;
+                    level.ParticlesFG.Emit(P_DirectionalLandDust, 1, new Vector2(X, Y + i), Vector2.One * 4f, direction);
                 }
                 break;
             case { Y: -1f }:
                 for (int i = 2; i <= Width; i += 4) {
-                    if (Scene.CollideCheck<Solid>(TopLeft + new Vector2(i, -3f))) {
-                        level.ParticlesFG.Emit(P_FallDustA, 1, new Vector2(X + i, Y), Vector2.One * 4f, -MathF.PI / 2f);
-                        float direction = i >= Width / 2f ? 0f : MathF.PI;
-                        level.ParticlesFG.Emit(P_DirectionalLandDust, 1, new Vector2(X + i, Y), Vector2.One * 4f, direction);
-                    }
+                    if (!Scene.CollideCheck<Solid>(TopLeft + new Vector2(i, -3f)))
+                        continue;
+
+                    level.ParticlesFG.Emit(P_FallDustA, 1, new Vector2(X + i, Y), Vector2.One * 4f, -MathF.PI / 2f);
+                    float direction = i >= Width / 2f ? 0f : MathF.PI;
+                    level.ParticlesFG.Emit(P_DirectionalLandDust, 1, new Vector2(X + i, Y), Vector2.One * 4f, direction);
                 }
                 break;
             default:

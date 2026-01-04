@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Monocle;
@@ -18,15 +16,16 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 // https://github.com/CommunalHelper/CommunalHelper/tree/music-synced-entities
 
 // still dont know if ill go for this methodd but it seems to also "work" i think
-[GlobalEntity] // hm is this even necessary .   idk its probably useful though
+[GlobalEntity]
 [CustomEntity("SorbetHelper/MusicSyncControllerFMOD")]
 [Tracked]
 public class MusicSyncControllerFMOD : Entity {
-    private const string sessionPrefix = "musicSync_";
+    private const string SessionPrefix = "musicSync_";
 
     private readonly bool showDebugUI;
 
     public MusicSyncControllerFMOD(EntityData data, Vector2 _) {
+        // ReSharper disable once AssignmentInConditionalExpression
         if (Visible = showDebugUI = data.Bool("showDebugUI", false))
             Tag |= TagsExt.SubHUD;
 
@@ -39,11 +38,6 @@ public class MusicSyncControllerFMOD : Entity {
         Depth = 1;
     }
 
-    public override void Awake(Scene scene) {
-        base.Awake(scene);
-
-    }
-
     public override void Update() {
         // make sure that the music has the callback if necessary
         UpdateMusicSyncEvent();
@@ -51,19 +45,19 @@ public class MusicSyncControllerFMOD : Entity {
         base.Update();
 
         // set flags/counters
-        var session = (Scene as Level).Session;
+        Session session = SceneAs<Level>().Session;
         sessionTimelineInfo = fmodTimelineInfo;
-        session.SetCounter(sessionPrefix + "bar", sessionTimelineInfo.Bar);
-        session.SetCounter(sessionPrefix + "beat", sessionTimelineInfo.Beat);
+        session.SetCounter(SessionPrefix + "bar", sessionTimelineInfo.Bar);
+        session.SetCounter(SessionPrefix + "beat", sessionTimelineInfo.Beat);
 
-        session.SetFlag(sessionPrefix + "beatOdd", sessionTimelineInfo.Beat % 2 != 0);
+        session.SetFlag(SessionPrefix + "beatOdd", sessionTimelineInfo.Beat % 2 != 0);
 
-        var sorbetSession = SorbetHelperModule.Session;
+        SorbetHelperSession sorbetSession = SorbetHelperModule.Session;
         if (sessionTimelineInfo.Marker != sorbetSession.CurrentMusicSyncMarker) {
             if (!string.IsNullOrEmpty(sessionTimelineInfo.Marker))
-                session.SetFlag(sessionPrefix + sessionTimelineInfo.Marker, true);
+                session.SetFlag(SessionPrefix + sessionTimelineInfo.Marker, true);
             if (!string.IsNullOrEmpty(sorbetSession.CurrentMusicSyncMarker))
-                session.SetFlag(sessionPrefix + sorbetSession.CurrentMusicSyncMarker, false);
+                session.SetFlag(SessionPrefix + sorbetSession.CurrentMusicSyncMarker, false);
 
             sorbetSession.CurrentMusicSyncMarker = sessionTimelineInfo.Marker;
         }
@@ -110,17 +104,18 @@ public class MusicSyncControllerFMOD : Entity {
     }
 
     private static EventInstance musicSyncEvent = null;
-    private static bool CanAffectEvent(HashSet<string> eventNames, string eventName) => eventNames.Count == 0 || eventNames.Contains(eventName);
+    private static bool CanAffectEvent(HashSet<string> eventNames, string eventName)
+        => eventNames.Count == 0 || eventNames.Contains(eventName);
     private static void UpdateMusicSyncEvent() {
-        var eventInstance = Audio.CurrentMusicEventInstance;
-        var eventPath = Audio.CurrentMusic;
+        EventInstance eventInstance = Audio.CurrentMusicEventInstance;
+        string eventPath = Audio.CurrentMusic;
 
         if (eventInstance != musicSyncEvent) {
             musicSyncEvent?.setCallback(null, 0u);
 
             HashSet<string> eventNames = null;
-            var areaKey = SaveData.Instance?.CurrentSession_Safe?.Area; // hm is there a better way to get this
-            var hasController = areaKey.HasValue && SorbetHelperMapDataProcessor.MusicSyncEvents.TryGetValue((areaKey.Value.ID, areaKey.Value.Mode), out eventNames);
+            AreaKey? areaKey = SaveData.Instance?.CurrentSession_Safe?.Area; // hm is there a better way to get this
+            bool hasController = areaKey.HasValue && SorbetHelperMapDataProcessor.MusicSyncEvents.TryGetValue((areaKey.Value.ID, areaKey.Value.Mode), out eventNames);
 
             ResetTimelineInfo();
 
@@ -131,21 +126,15 @@ public class MusicSyncControllerFMOD : Entity {
         }
     }
 
-    private static bool On_Audio_SetMusic(On.Celeste.Audio.orig_SetMusic orig, string path, bool startPlaying, bool allowFadeOut) {
-        var result = orig(path, startPlaying, allowFadeOut);
-        UpdateMusicSyncEvent();
-        return result;
-    }
-
     private static FMOD.RESULT MusicCallback(EVENT_CALLBACK_TYPE callbackType, nint instancePtr, nint parametersPtr) {
         switch (callbackType) {
             case EVENT_CALLBACK_TYPE.TIMELINE_BEAT: {
-                    var parameters = Marshal.PtrToStructure<TIMELINE_BEAT_PROPERTIES>(parametersPtr);
+                    TIMELINE_BEAT_PROPERTIES parameters = Marshal.PtrToStructure<TIMELINE_BEAT_PROPERTIES>(parametersPtr);
                     HandleBeat(parameters);
                 }
                 break;
             case EVENT_CALLBACK_TYPE.TIMELINE_MARKER: {
-                    var parameters = Marshal.PtrToStructure<TIMELINE_MARKER_PROPERTIES>(parametersPtr);
+                    TIMELINE_MARKER_PROPERTIES parameters = Marshal.PtrToStructure<TIMELINE_MARKER_PROPERTIES>(parametersPtr);
                     HandleMarker(parameters);
                 }
                 break;
@@ -153,6 +142,8 @@ public class MusicSyncControllerFMOD : Entity {
 
         return FMOD.RESULT.OK;
     }
+
+    #region Hooks
 
     internal static void Load() {
         On.Celeste.Audio.SetMusic += On_Audio_SetMusic;
@@ -166,20 +157,28 @@ public class MusicSyncControllerFMOD : Entity {
         musicSyncEvent = null;
     }
 
+    private static bool On_Audio_SetMusic(On.Celeste.Audio.orig_SetMusic orig, string path, bool startPlaying, bool allowFadeOut) {
+        bool result = orig(path, startPlaying, allowFadeOut);
+        UpdateMusicSyncEvent();
+        return result;
+    }
+
+    #endregion
+
     public override void Render() {
         base.Render();
 
         if (!showDebugUI)
             return;
 
-        var currentEvent = Audio.CurrentMusic;
-        var areaKey = (Scene as Level).Session.Area;
-        var hasController = SorbetHelperMapDataProcessor.MusicSyncEvents.TryGetValue((areaKey.ID, areaKey.Mode), out var events);
+        string currentEvent = Audio.CurrentMusic;
+        AreaKey areaKey = SceneAs<Level>().Session.Area;
+        bool hasController = SorbetHelperMapDataProcessor.MusicSyncEvents.TryGetValue((areaKey.ID, areaKey.Mode), out HashSet<string> events);
 
         if (!hasController || !CanAffectEvent(events, currentEvent))
             return;
 
-        var debugText = currentEvent + "\n";
+        string debugText = currentEvent + "\n";
 
         // tempo marker & beat/bar
         if (sessionTimelineInfo.Beat != 0) {
@@ -193,7 +192,7 @@ public class MusicSyncControllerFMOD : Entity {
         }
 
         // marker
-        var markerString = (string)sessionTimelineInfo.Marker;
+        string markerString = (string)sessionTimelineInfo.Marker;
         if (!string.IsNullOrEmpty(markerString))
             debugText += $"Marker \"{markerString}\" @ {sessionTimelineInfo.MarkerPosition}ms";
 

@@ -1,13 +1,8 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
-using Celeste.Mod.Entities;
-using Celeste.Mod.SorbetHelper.Utils;
-using System.Runtime.InteropServices;
 
 namespace Celeste.Mod.SorbetHelper.Entities;
 
@@ -60,9 +55,8 @@ public abstract class GateBlock : Solid {
     protected readonly ParticleType P_ActivateReturn;
 
     public GateBlock(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, data.Height, safe: false) {
-        if (data.Nodes.Length > 0) {
+        if (data.Nodes.Length > 0)
             node = data.Nodes[0] + offset;
-        }
 
         shakeTime = data.Float("shakeTime", 0.5f);
         moveTime = data.Float("moveTime", 1.8f);
@@ -117,9 +111,8 @@ public abstract class GateBlock : Solid {
     public void Activate() {
         Triggered = true;
 
-        if (!string.IsNullOrEmpty(onActivateFlag)) {
+        if (!string.IsNullOrEmpty(onActivateFlag))
             SceneAs<Level>().Session.SetFlag(onActivateFlag);
-        }
     }
 
     public override void Added(Scene scene) {
@@ -157,51 +150,17 @@ public abstract class GateBlock : Solid {
         }
     }
 
-    public override void Update() {
-        VisibleOnCamera = InView((Scene as Level).Camera);
-
-        // ease scale and hitOffset towards their default values
-        scale.X = Calc.Approach(scale.X, 1f, Engine.DeltaTime * 4f);
-        scale.Y = Calc.Approach(scale.Y, 1f, Engine.DeltaTime * 4f);
-        offset.X = Calc.Approach(offset.X, 0f, Engine.DeltaTime * 15f);
-        offset.Y = Calc.Approach(offset.Y, 0f, Engine.DeltaTime * 15f);
-
-        base.Update();
-    }
-
-    public override void Render() {
-        if (!VisibleOnCamera)
-            return;
-
-        // only render the icon, any unique gate blocks should handle visuals themselves
-        Vector2 iconScale = icon.Scale;
-        icon.Scale *= Scale;
-
-        icon.Position = iconOffset + Offset;
-        icon.DrawOutline();
-
-        base.Render();
-
-        icon.Scale = iconScale;
-    }
-
-    public virtual void RenderOutline() {
-        // outline rendering should be implemented per gate block type
-        // not called if drawOutline is false
-    }
-
-    // (somewhat) stolen from maddie helping hand
+     // (somewhat) stolen from maddie helping hand
     private IEnumerator BackAndForthSequence() {
         while (true) {
             IEnumerator seq = Sequence();
 
-            while (seq.MoveNext()) {
+            while (seq.MoveNext())
                 yield return seq.Current;
-            }
         }
     }
 
-    public IEnumerator Sequence() {
+    private IEnumerator Sequence() {
         Vector2 moveFrom = Position;
         Vector2 moveTo;
         Color fromColor, toColor;
@@ -221,9 +180,8 @@ public abstract class GateBlock : Solid {
         Color toFillColorNoReturn = new((int)(toColor.R * 0.7f), (int)(toColor.G * 0.67f), (int)(toColor.B * 0.8f), 255);
 
         // wait until triggered
-        while (!Triggered) {
+        while (!Triggered)
             yield return null;
-        }
 
         if (persistent)
             SceneAs<Level>().Session.SetFlag("flag_sorbetHelper_gateBlock_persistent_" + entityId, !atNode);
@@ -358,14 +316,45 @@ public abstract class GateBlock : Solid {
             Triggered = false;
     }
 
+    public override void Update() {
+        VisibleOnCamera = InView(SceneAs<Level>().Camera);
+
+        // ease scale and hitOffset towards their default values
+        scale.X = Calc.Approach(scale.X, 1f, Engine.DeltaTime * 4f);
+        scale.Y = Calc.Approach(scale.Y, 1f, Engine.DeltaTime * 4f);
+        offset.X = Calc.Approach(offset.X, 0f, Engine.DeltaTime * 15f);
+        offset.Y = Calc.Approach(offset.Y, 0f, Engine.DeltaTime * 15f);
+
+        base.Update();
+    }
+
+    public override void Render() {
+        if (!VisibleOnCamera)
+            return;
+
+        // only render the icon, any unique gate blocks should handle visuals themselves
+        Vector2 iconScale = icon.Scale;
+        icon.Scale *= Scale;
+
+        icon.Position = iconOffset + Offset;
+        icon.DrawOutline();
+
+        base.Render();
+
+        icon.Scale = iconScale;
+    }
+
+    // outline rendering should be implemented per gate block type
+    // not called if drawOutline is false
+    protected virtual void RenderOutline() { }
 
     // i love stealing vanilla code peaceline
-    public void ActivateParticles() {
+    protected void ActivateParticles() {
         Vector2 dir = node - start;
         if (atNode)
             dir = -dir;
 
-        float direction = Calc.Angle(dir);
+        float direction = dir.Angle();
         Vector2 position;
         Vector2 positionRange;
         int num;
@@ -390,7 +379,7 @@ public abstract class GateBlock : Solid {
         }
         num += 2;
 
-        (Scene as Level).Particles.Emit(atNode ? P_ActivateReturn : P_Activate, num, position, positionRange, direction);
+        SceneAs<Level>().Particles.Emit(atNode ? P_ActivateReturn : P_Activate, num, position, positionRange, direction);
     }
 
     protected void DrawNineSlice(MTexture texture, Color color) {
@@ -421,39 +410,37 @@ public abstract class GateBlock : Solid {
         }
     }
 
-    private bool InView(Camera camera) =>
-        X < camera.Right + 16f && X + Width > camera.Left - 16f && Y < camera.Bottom + 16f && Y + Height > camera.Top - 16f;
+    private bool InView(Camera camera) => X < camera.Right + 16f && X + Width > camera.Left - 16f &&
+                                          Y < camera.Bottom + 16f && Y + Height > camera.Top - 16f;
 
     [Tracked]
     private class GateBlockOutlineRenderer : Entity {
-        private static bool rendererJustCreated = false;
+        private static bool _rendererJustCreated = false;
 
-        public GateBlockOutlineRenderer() : base() {
+        private GateBlockOutlineRenderer() : base() {
             Depth = 1;
             Tag = Tags.Persistent;
         }
 
         public override void Render() {
-            var blocks = Scene.Tracker.GetEntities<GateBlock>();
-
-            foreach (GateBlock block in blocks) {
-                if (block.Visible && block.VisibleOnCamera && block.drawOutline) {
+            foreach (GateBlock block in Scene.Tracker.GetEntities<GateBlock>()) {
+                if (block.Visible && block.VisibleOnCamera && block.drawOutline)
                     block.RenderOutline();
-                }
             }
         }
 
         public override void Awake(Scene scene) {
             base.Awake(scene);
 
-            rendererJustCreated = false;
+            _rendererJustCreated = false;
         }
 
         public static void TryCreateRenderer(Scene scene) {
-            if (!rendererJustCreated && scene.Tracker.GetEntities<GateBlockOutlineRenderer>().Count == 0) {
-                scene.Add(new GateBlockOutlineRenderer());
-                rendererJustCreated = true;
-            }
+            if (_rendererJustCreated || scene.Tracker.GetEntities<GateBlockOutlineRenderer>().Count > 0)
+                return;
+
+            scene.Add(new GateBlockOutlineRenderer());
+            _rendererJustCreated = true;
         }
     }
 }

@@ -16,15 +16,8 @@ namespace Celeste.Mod.SorbetHelper.Backdrops;
 /// </summary>
 [CustomBackdrop("SorbetHelper/EntityStylegroundRenderer")]
 public class EntityStylegroundRenderer : Backdrop {
-    // private readonly bool AccurateDepthSorting;
     public EntityStylegroundRenderer(BinaryPacker.Element data) {
-        // probablyll just cause more confusion than its worth
-        // AccurateDepthSorting = data.AttrBool("accurateDepthSorting", true);
         UseSpritebatch = false;
-    }
-
-    public override void Update(Scene scene) {
-        base.Update(scene);
     }
 
     public override void Render(Scene scene) {
@@ -44,19 +37,19 @@ public class EntityStylegroundRenderer : Backdrop {
         GameplayRenderer.End();
     }
 
-    private static readonly Comparison<EntityStylegroundMarker> CompareDepth = (EntityStylegroundMarker a, EntityStylegroundMarker b) => Math.Sign(b.Entity.actualDepth - a.Entity.actualDepth);
-    public List<EntityStylegroundMarker> GetEntitiesToRender(List<Component> components) {
+    private static readonly Comparison<EntityStylegroundMarker> CompareDepth = (a, b) => Math.Sign(b.Entity.actualDepth - a.Entity.actualDepth);
+
+    private List<EntityStylegroundMarker> GetEntitiesToRender(List<Component> components) {
         List<EntityStylegroundMarker> markers = new List<EntityStylegroundMarker>(components.Count);
 
-        for (int i = 0; i < components.Count; i++) {
-            EntityStylegroundMarker marker = (EntityStylegroundMarker)components[i];
+        foreach (Component t in components) {
+            EntityStylegroundMarker marker = (EntityStylegroundMarker)t;
 
-            if (marker.EntityVisible == true && Tags.Contains(marker.Tag))
+            if (marker.EntityVisible && Tags.Contains(marker.Tag))
                 markers.Add(marker);
         }
 
-        // if (AccurateDepthSorting)
-        // pain  (potential optimization could be to use a custom tracker entity thing which sorts depth only when needed like how entitylist.updatelists works?)
+        // todo: potential optimization could be to use a custom tracker entity thing which sorts depth only when needed like how EntityList.UpdateLists works?
         // at the very least though thankfully only needs to go through currently visible marked entities
         markers.Sort(CompareDepth);
 

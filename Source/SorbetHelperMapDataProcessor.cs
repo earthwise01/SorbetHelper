@@ -10,50 +10,51 @@ using Celeste.Mod.SorbetHelper.Backdrops;
 
 namespace Celeste.Mod.SorbetHelper;
 public class SorbetHelperMapDataProcessor : EverestMapDataProcessor {
+    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(SorbetHelperMapDataProcessor)}";
 
     public static Dictionary<(int, AreaMode), List<StylegroundDepthController.StylegroundDepthControllerData>> StylegroundDepthControllers { get; private set; } = [];
     public static Dictionary<(int, AreaMode), HashSet<string>> MusicSyncEvents { get; private set; } = [];
 
     public override Dictionary<string, Action<BinaryPacker.Element>> Init() {
-        void stylegroundDepthController(BinaryPacker.Element data) {
-            if (!StylegroundDepthControllers.TryGetValue((AreaKey.ID, AreaKey.Mode), out var depthControllers))
+        void ProcessStylegroundDepthController(BinaryPacker.Element data) {
+            if (!StylegroundDepthControllers.TryGetValue((AreaKey.ID, AreaKey.Mode), out List<StylegroundDepthController.StylegroundDepthControllerData> depthControllers))
                 StylegroundDepthControllers[(AreaKey.ID, AreaKey.Mode)] = depthControllers = [];
 
-            var stylegroundTag = data.Attr("tag");
+            string stylegroundTag = data.Attr("tag");
             if (string.IsNullOrEmpty(stylegroundTag))
                 return;
 
-            var depthAttr = data.Attr("depth", "-8500");
-            var depth = 0;
-            var mode = StylegroundDepthController.Modes.Normal;
+            string depthAttr = data.Attr("depth", "-8500");
+            int depth = 0;
+            StylegroundDepthController.Modes mode = StylegroundDepthController.Modes.Normal;
 
             if (!int.TryParse(depthAttr, out depth) && !Enum.TryParse(depthAttr, true, out mode))
-                Logger.Warn("SorbetHelper", "Invalid depth for Styleground Depth Controller! " + depthAttr);
+                Logger.Warn(LogID, "invalid depth for Styleground Depth Controller! " + depthAttr);
 
-            var depthController = new StylegroundDepthController.StylegroundDepthControllerData(stylegroundTag, depth, mode);
+            StylegroundDepthController.StylegroundDepthControllerData depthController = new StylegroundDepthController.StylegroundDepthControllerData(stylegroundTag, depth, mode);
             depthControllers.Add(depthController);
 
-            Logger.Verbose("SorbetHelper", $"[MapDataProcessor] found a StylegroundDepthController in {AreaKey.SID} {AreaKey.ID} ({AreaKey.Mode}), with depth {depthAttr}!");
+            Logger.Verbose(LogID, $"found a StylegroundDepthController in {AreaKey.SID} {AreaKey.ID} ({AreaKey.Mode}), with depth {depthAttr}!");
 
             data.Name = "SorbetHelper/MapDataProcessed"; // don't get any annoying "failed to load" warnings (see global entities loading event)
         }
 
         // convert to a styleground depth controller
-        void stylegroundOverHudController(BinaryPacker.Element entityData) {
+        void ProcessStylegroundOverHudController(BinaryPacker.Element entityData) {
             entityData.Attributes["depth"] = entityData.AttrInt("pauseBehavior", 0) < 2 ? "AbovePauseHud" : "AboveHud";
             entityData.Attributes["tag"] = "sorbetHelper_drawAboveHud";
-            stylegroundDepthController(entityData);
+            ProcessStylegroundDepthController(entityData);
         }
 
-        void musicSyncController(BinaryPacker.Element entityData) {
-            var eventNames = entityData.AttrList("eventNames", str => str).ToHashSet();
+        void ProcessMusicSyncController(BinaryPacker.Element entityData) {
+            HashSet<string> eventNames = entityData.AttrList("eventNames", str => str).ToHashSet();
             MusicSyncEvents[(AreaKey.ID, AreaKey.Mode)] = eventNames;
 
-            Logger.Verbose("SorbetHelper", $"[MapDataProcessor] found a MusicSyncController in {AreaKey.SID} ({AreaKey.Mode})!");
+            Logger.Verbose(LogID, $"found a MusicSyncController in {AreaKey.SID} ({AreaKey.Mode})!");
         }
 
         // swap to the global versions based on a "global" attribute
-        static void globalControllerSwap(BinaryPacker.Element entityData) {
+        static void ProcessGlobalOptionController(BinaryPacker.Element entityData) {
             if (entityData.AttrBool("global", false))
                 entityData.Name += "Global";
         }
@@ -61,34 +62,34 @@ public class SorbetHelperMapDataProcessor : EverestMapDataProcessor {
         return new Dictionary<string, Action<BinaryPacker.Element>> {
             // styleground depth controller
             {
-                "entity:SorbetHelper/StylegroundDepthController", stylegroundDepthController
+                "entity:SorbetHelper/StylegroundDepthController", ProcessStylegroundDepthController
             },
             // styleground over hud
             {
-                "entity:SorbetHelper/StylegroundOverHudController", stylegroundOverHudController
+                "entity:SorbetHelper/StylegroundOverHudController", ProcessStylegroundOverHudController
             },
             // styleground entity controller
             {
-                "entity:SorbetHelper/StylegroundEntityController", stylegroundDepthController
+                "entity:SorbetHelper/StylegroundEntityController", ProcessStylegroundDepthController
             },
 
             // music sync
             {
-                "entity:SorbetHelper/MusicSyncControllerFMOD", musicSyncController
+                "entity:SorbetHelper/MusicSyncControllerFMOD", ProcessMusicSyncController
             },
 
             // global controllers
             {
-                "entity:SorbetHelper/EntityStylegroundController", globalControllerSwap
+                $"entity:{EntityStylegroundController.EntityDataID}", ProcessGlobalOptionController
             },
             {
-                "entity:SorbetHelper/LightCoverController", globalControllerSwap
+                $"entity:{LightCoverController.EntityDataID}", ProcessGlobalOptionController
             },
             {
-                "entity:SorbetHelper/SliderFadeXY", globalControllerSwap
+                $"entity:{SliderFadeXY.EntityDataID}", ProcessGlobalOptionController
             },
             {
-                $"entity:{DarknessTransparencyFixController.EntityDataID}", globalControllerSwap
+                $"entity:{DarknessTransparencyFixController.EntityDataID}", ProcessGlobalOptionController
             }
         };
     }

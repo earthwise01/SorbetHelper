@@ -1,9 +1,7 @@
-using System;
 using Microsoft.Xna.Framework;
 using Monocle;
 using Celeste.Mod.Entities;
 using Celeste.Mod.SorbetHelper.Utils;
-
 
 namespace Celeste.Mod.SorbetHelper.Entities;
 
@@ -13,7 +11,6 @@ public class KillZone : Entity {
     private readonly string flag;
     private readonly bool inverted;
     private readonly bool fastKill;
-    private readonly bool collideHoldables;
 
     public KillZone(EntityData data, Vector2 offset) : base(data.Position + offset) {
         Collider = new Hitbox(data.Width, data.Height);
@@ -21,7 +18,7 @@ public class KillZone : Entity {
         flag = data.Attr("flag");
         inverted = data.Bool("inverted");
         fastKill = data.Bool("fastKill", false);
-        collideHoldables = data.Bool("collideHoldables", false);
+        bool collideHoldables = data.Bool("collideHoldables", false);
 
         Add(new LedgeBlocker());
         Add(new PlayerCollider(OnPlayer));
@@ -41,17 +38,17 @@ public class KillZone : Entity {
         base.Update();
 
         if (!string.IsNullOrEmpty(flag))
-            Collidable = (Scene as Level).Session.GetFlag(flag, inverted);
+            Collidable = SceneAs<Level>().Session.GetFlag(flag, inverted);
     }
 
-    public void OnPlayer(Player player) {
+    private void OnPlayer(Player player) {
         if (fastKill)
             player.Die(Vector2.Zero);
         else
             player.Die((player.Position - Center).SafeNormalize());
     }
 
-    public void OnHoldable(Holdable holdable) {
+    private void OnHoldable(Holdable holdable) {
         // special casing !!!!!
         switch (holdable.Entity) {
             case TheoCrystal theo:
@@ -65,7 +62,7 @@ public class KillZone : Entity {
             default:
                 holdable.OnHitSpinner(this);
                 break;
-        } // why did i get a crash here and why was is only once and never again what
+        } // why did i get a crash here and why was it only once and never again what
     }
 
     // i dont think this works with mhh respawning jellies but   oh my godwhatever ill do this better later if i feel like it
@@ -76,7 +73,7 @@ public class KillZone : Entity {
         glider.destroyed = true;
         glider.Collidable = false;
         if (glider.Hold.IsHeld) {
-            var holderSpeed = glider.Hold.Holder.Speed;
+            Vector2 holderSpeed = glider.Hold.Holder.Speed;
             glider.Hold.Holder.Drop();
             glider.Speed = holderSpeed * 0.333f;
             Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);

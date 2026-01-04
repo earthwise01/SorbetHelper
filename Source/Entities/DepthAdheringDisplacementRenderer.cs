@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -50,27 +49,24 @@ public class DepthAdheringDisplacementRenderer : Entity {
         Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, camera.Matrix);
 
         foreach (DepthAdheringDisplacementRenderHook renderHook in renderHooks) {
-            if (renderHook.EntityVisible) {
+            if (renderHook.EntityVisible)
                 renderHook.RenderDisplacement();
-            }
         }
 
         List<Entity> displacementBlockers = Scene.Tracker.GetEntities<DisplacementEffectBlocker>();
         foreach (Entity entity in displacementBlockers) {
-            if (entity is DisplacementEffectBlocker { Visible: true, DepthAdhering: true, WaterOnly: false } && entity.Depth <= Depth) {
+            if (entity is DisplacementEffectBlocker { Visible: true, DepthAdhering: true, WaterOnly: false } && entity.Depth <= Depth)
                 Draw.Rect(entity.X, entity.Y, entity.Width, entity.Height, noDisplacementColor);
-            }
         }
 
         Draw.SpriteBatch.End();
 
-        IEnumerable<Entity> waterBlockers = displacementBlockers.Where(entity => entity is DisplacementEffectBlocker { Visible: true, DepthAdhering: true, WaterOnly: true } && entity.Depth <= Depth);
-        if (waterBlockers.Any()) {
+        List<Entity> waterBlockers = displacementBlockers.Where(entity => entity is DisplacementEffectBlocker { Visible: true, DepthAdhering: true, WaterOnly: true } && entity.Depth <= Depth).ToList();
+        if (waterBlockers.Count > 0) {
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, DisplacementEffectBlocker.WaterDisplacementBlockerBlendState, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, camera.Matrix);
 
-            foreach (Entity entity in waterBlockers) {
+            foreach (Entity entity in waterBlockers)
                 Draw.Rect(entity.Position, entity.Width, entity.Height, DisplacementEffectBlocker.NoWaterDisplacementMultColor);
-            }
 
             Draw.SpriteBatch.End();
         }
@@ -86,9 +82,8 @@ public class DepthAdheringDisplacementRenderer : Entity {
             Draw.SpriteBatch.Draw(gameplayBuffer, camera.Position, Color.White);
 
         foreach (DepthAdheringDisplacementRenderHook renderHook in renderHooks) {
-            if (renderHook.EntityVisible) {
+            if (renderHook.EntityVisible)
                 renderHook.RenderEntity();
-            }
         }
 
         GameplayRenderer.End();
@@ -100,8 +95,6 @@ public class DepthAdheringDisplacementRenderer : Entity {
         if (distortBehind)
             Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
 
-        //float anxietyBackup = GFX.FxDistort.Parameters["anxiety"].GetValueSingle();
-        //GFX.FxDistort.Parameters["anxiety"].SetValue(0f);
         // temporarily trick Distort.Render into only using the "Displace" technique as to not apply the anxiety effect
         float anxietyBackup = Distort.anxiety;
         float gamerateBackup = Distort.gamerate;
@@ -113,7 +106,6 @@ public class DepthAdheringDisplacementRenderer : Entity {
 
         Distort.anxiety = anxietyBackup;
         Distort.gamerate = gamerateBackup;
-        //GFX.FxDistort.Parameters["anxiety"].SetValue(anxietyBackup);
 
         RenderTargetHelper.ReturnGameplayBuffer(entityBuffer);
         RenderTargetHelper.ReturnGameplayBuffer(displacementMapBuffer);

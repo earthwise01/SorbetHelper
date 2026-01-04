@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 using Celeste.Mod.Entities;
+using Celeste.Mod.SorbetHelper.Utils;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using TalkComponentUI = Celeste.TalkComponent.TalkComponentUI;
@@ -199,13 +200,13 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
         #region Hooks
 
         private static Hook hook_set_Highlighted = null;
+
         internal static void Load() {
-            hook_set_Highlighted = new Hook(typeof(TalkComponentUI).GetMethod("set_Highlighted"), TalkComponentAltUI.On_set_Highlighted);
+            hook_set_Highlighted = new Hook(typeof(TalkComponentUI).GetMethod("set_Highlighted"), On_set_Highlighted);
             IL.Celeste.TalkComponent.Update += IL_TalkComponent_Update;
         }
         internal static void Unload() {
-            hook_set_Highlighted?.Dispose();
-            hook_set_Highlighted = null;
+            Util.DisposeAndSetNull(ref hook_set_Highlighted);
             IL.Celeste.TalkComponent.Update -= IL_TalkComponent_Update;
         }
 

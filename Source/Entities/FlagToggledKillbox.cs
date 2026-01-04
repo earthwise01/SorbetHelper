@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using Microsoft.Xna.Framework;
 using Monocle;
 using Celeste.Mod.Entities;
 using Celeste.Mod.SorbetHelper.Utils;
-using MonoMod;
 
 namespace Celeste.Mod.SorbetHelper.Entities;
 
@@ -46,13 +42,13 @@ public class FlagToggledKillbox : Killbox {
             if (string.IsNullOrEmpty(flag))
                 Collidable = inverted;
             else
-                Collidable = (Scene as Level).Session.GetFlag(flag, inverted);
+                Collidable = SceneAs<Level>().Session.GetFlag(flag, inverted);
 
             return;
         }
 
         // normal collidability checks
-        var player = Scene.Tracker.GetEntity<Player>();
+        Player player = Scene.Tracker.GetEntity<Player>();
 
         if (!Collidable && player is not null && player.Bottom < Top - playerAboveThreshold)
             Collidable = true;
@@ -60,12 +56,12 @@ public class FlagToggledKillbox : Killbox {
             Collidable = false;
 
         // only keep collidable if the flag is set (or null/empty)
-        var canBeCollidable = string.IsNullOrEmpty(flag) || (Scene as Level).Session.GetFlag(flag, inverted);
+        bool canBeCollidable = string.IsNullOrEmpty(flag) || SceneAs<Level>().Session.GetFlag(flag, inverted);
         Collidable = Collidable && canBeCollidable;
     }
 
     // based on Level.EnforceBounds
-    public void LenientOnPlayer(Player player) {
+    private void LenientOnPlayer(Player player) {
         if (player.Top > Top && SaveData.Instance.Assists.Invincible) {
             player.Play("event:/game/general/assist_screenbottom");
             player.Bounce(Top);

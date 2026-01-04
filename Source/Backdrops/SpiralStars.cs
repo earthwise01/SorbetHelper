@@ -64,8 +64,8 @@ public class SpiralStars : Backdrop {
         for (int j = 0; j < trailAlphas.Length; j++)
             trailAlphas[j] = 0.7f * (1f - (float)j / (float)trailAlphas.Length);
 
-        backgroundColor = Util.HexToColorWithAlphaNonPremult(data.Attr("backgroundColor", "00000000"));
-        Color[] colors = data.AttrList("colors", Util.HexToColorWithAlphaNonPremult, "ffffff").ToArray();
+        backgroundColor = Calc.HexToColorWithNonPremultipliedAlpha(data.Attr("backgroundColor", "00000000"));
+        Color[] colors = data.AttrList("colors", Calc.HexToColorWithNonPremultipliedAlpha, "ffffff").ToArray();
 
         int starCount = data.AttrInt("starCount", 100);
         stars = new Star[starCount];
@@ -127,9 +127,8 @@ public class SpiralStars : Backdrop {
         if (trailLength > 0) {
             star.Trails.Clear();
 
-            for (int i = 1; i <= trailLength; i++) {
+            for (int i = 1; i <= trailLength; i++)
                 star.Trails.Add(GetTrailWithTimeOffset(star, i * -trailDelay));
-            }
         }
 
         star.Position = position;

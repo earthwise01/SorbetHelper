@@ -1,9 +1,8 @@
-using Microsoft.Xna.Framework;
-using Celeste.Mod.SorbetHelper.Utils;
-using Celeste.Mod.SorbetHelper.Entities;
-using Celeste.Mod.Entities;
-using Monocle;
 using System;
+using Microsoft.Xna.Framework;
+using Monocle;
+using Celeste.Mod.Entities;
+using Celeste.Mod.SorbetHelper.Entities;
 
 namespace Celeste.Mod.SorbetHelper.Triggers;
 
@@ -87,7 +86,8 @@ public class MiniPopupTrigger(EntityData data, Vector2 offset, EntityID entityId
 
         triggered = true;
         disablePopup = MiniPopupDisplay.GetMiniPopupDisplay(Scene)
-                                       .CreatePopup(mode is Modes.WhilePlayerInside ? -1 : activeTime, mainTextId, subTextId, baseColor, accentColor, titleColor, iconPath, texturePath);
+                                       .CreatePopup(mode is Modes.WhilePlayerInside ? -1 : activeTime, mainTextId,
+                                           subTextId, baseColor, accentColor, titleColor, iconPath, texturePath);
 
         if (onlyOnce)
             SceneAs<Level>().Session.DoNotLoad.Add(entityId);

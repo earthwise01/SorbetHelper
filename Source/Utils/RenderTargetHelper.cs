@@ -11,7 +11,7 @@ using MonoMod.Utils;
 namespace Celeste.Mod.SorbetHelper.Utils;
 
 internal static class RenderTargetHelper {
-    private static Queue<VirtualRenderTarget> RenderTargets { get; set; } = [];
+    private static Queue<VirtualRenderTarget> RenderTargets { get; } = [];
 
     /// <summary>
     /// get a gameplay buffer<br/>
@@ -22,7 +22,7 @@ internal static class RenderTargetHelper {
         if (RenderTargets.Count == 0)
             return VirtualContent.CreateRenderTarget("sorbetHelper-tempBuffer", Util.GameplayBufferWidth, Util.GameplayBufferHeight);
 
-        var cached = RenderTargets.Dequeue();
+        VirtualRenderTarget cached = RenderTargets.Dequeue();
         if (cached.IsDisposed)
             cached = VirtualContent.CreateRenderTarget("sorbetHelper-tempBuffer", Util.GameplayBufferWidth, Util.GameplayBufferHeight);
         else
@@ -33,12 +33,9 @@ internal static class RenderTargetHelper {
 
     /// <summary>
     /// return a gameplay buffer to the queue for later use<br/>
-    /// (can already be disposed as well but why would you do that what)
     /// </summary>
     /// <param name="vrt">the gameplay buffer to return</param>
-    public static void ReturnGameplayBuffer(VirtualRenderTarget vrt) {
-        RenderTargets.Enqueue(vrt);
-    }
+    public static void ReturnGameplayBuffer(VirtualRenderTarget vrt) => RenderTargets.Enqueue(vrt);
 
     /// <summary>
     /// get an array of gameplay buffers
@@ -46,7 +43,7 @@ internal static class RenderTargetHelper {
     /// <param name="count">how many gameplay buffers</param>
     /// <returns>the gameplay buffers</returns>
     public static VirtualRenderTarget[] GetGameplayBuffers(int count) {
-        var buffers = new VirtualRenderTarget[count];
+        VirtualRenderTarget[] buffers = new VirtualRenderTarget[count];
 
         for (int i = 0; i < count; i++)
             buffers[i] = GetGameplayBuffer();
@@ -60,7 +57,7 @@ internal static class RenderTargetHelper {
     /// </summary>
     /// <param name="vrts">the gameplay buffers to return</param>
     public static void ReturnGameplayBuffers(VirtualRenderTarget[] vrts) {
-        var count = vrts.Length;
+        int count = vrts.Length;
 
         for (int i = 0; i < count; i++) {
             ReturnGameplayBuffer(vrts[i]);
@@ -73,7 +70,7 @@ internal static class RenderTargetHelper {
     /// </summary>
     public static void DisposeQueue() {
         try {
-            foreach (var vrt in RenderTargets)
+            foreach (VirtualRenderTarget vrt in RenderTargets)
                 vrt?.Dispose();
 
             RenderTargets.Clear();
@@ -81,6 +78,7 @@ internal static class RenderTargetHelper {
             Logger.Error(nameof(SorbetHelper), $"???? literally how? {e}"); // this threw an error one time when reloading the mod and i cant replicate it anymore. fun!
         }
     }
+
     // private static void Log() {
     //     Engine.Commands.Log($"{RenderTargets.Count} render targets are currently queued");
     // }

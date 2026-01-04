@@ -7,7 +7,7 @@ using Celeste.Mod.SorbetHelper.Utils;
 namespace Celeste.Mod.SorbetHelper;
 
 public static class SorbetHelperDecalRegistry {
-    public class LightCoverHandler : DecalRegistryHandler {
+    private class LightCoverHandler : DecalRegistryHandler {
         public override string Name => "sorbetHelper_lightCover";
 
         private int minDepth, maxDepth;
@@ -26,7 +26,7 @@ public static class SorbetHelperDecalRegistry {
         }
     }
 
-    public class DecalStylegroundHandler : DecalRegistryHandler {
+    private class DecalStylegroundHandler : DecalRegistryHandler {
         public override string Name => "sorbetHelper_styleground";
 
         private int minDepth, maxDepth;

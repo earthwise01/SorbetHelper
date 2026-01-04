@@ -97,7 +97,7 @@ public class HiResGodrays : Backdrop {
         maxDuration = data.AttrFloat("maxDuration", 12f);
         minScale = data.AttrFloat("minScale", 1f);
         maxScale = data.AttrFloat("maxScale", 1f);
-        colors = data.AttrList("colors", Util.HexToColorWithAlphaNonPremult, "f52b6380").ToArray();
+        colors = data.AttrList("colors", Calc.HexToColorWithNonPremultipliedAlpha, "f52b6380").ToArray();
         fadeNearPlayer = data.AttrBool("fadeNearPlayer", true);
 
         string texturePath = data.Attr("texturePath", "");
@@ -121,9 +121,7 @@ public class HiResGodrays : Backdrop {
         Reset();
     }
 
-    private void Added(Scene scene) {
-        Level level = scene as Level;
-
+    private void Added(Level level) {
         level.Add(new HiResGodraysRenderer(this));
         visibleFade = IsVisible(level) ? 1f : 0f;
     }
@@ -198,9 +196,8 @@ public class HiResGodrays : Backdrop {
                     //  need to do this here so that the correct godray fades etc etc,
                     if (fadeNearPlayer && player != null) {
                         float playerDistance = (renderPos + cameraPos - player.Position).Length();
-                        if (playerDistance < 64f) {
+                        if (playerDistance < 64f)
                             renderColor *= 0.25f + 0.75f * (playerDistance / 64f);
-                        }
                     }
 
                     VertexPositionColor v1 = new VertexPositionColor(new Vector3(renderPos + skew2 * rayWidth + skew1 * rayLength, 0f), renderColor);
@@ -228,9 +225,8 @@ public class HiResGodrays : Backdrop {
     }
 
     private void DrawGodrays(Matrix matrix) {
-        if (vertexCount > 0) {
+        if (vertexCount > 0)
             GFX.DrawVertices(matrix, vertices, vertexCount);
-        }
     }
 
     private void DrawTextureParticles(Scene scene, Matrix matrix) {
@@ -254,9 +250,8 @@ public class HiResGodrays : Backdrop {
                     //  need to do this here so that the correct godray fades etc etc,
                     if (fadeNearPlayer && player != null) {
                         float playerDistance = (renderPos + cameraPos - player.Position).Length();
-                        if (playerDistance < 64f) {
+                        if (playerDistance < 64f)
                             renderColor *= 0.25f + 0.75f * (playerDistance / 64f);
-                        }
                     }
 
                     particleTexture.DrawCentered(renderPos, renderColor, ray.Scale * 1f / UpscaleAmount, ray.TexRotation);
@@ -299,7 +294,7 @@ public class HiResGodrays : Backdrop {
             if (!backdrop.Visible)
                 return;
 
-            Level level = Scene as Level;
+            Level level = SceneAs<Level>();
             Matrix matrix = Matrix.CreateScale(UpscaleAmount);
 
             // mirror mode

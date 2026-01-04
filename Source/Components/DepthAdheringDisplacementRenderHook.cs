@@ -4,6 +4,7 @@ using Monocle;
 using Celeste.Mod.SorbetHelper.Entities;
 using MonoMod.RuntimeDetour;
 using System.Reflection;
+using Celeste.Mod.SorbetHelper.Utils;
 
 namespace Celeste.Mod.SorbetHelper.Components;
 
@@ -14,8 +15,8 @@ public class DepthAdheringDisplacementRenderHook : Component {
 
     private readonly bool distortBehind;
 
-    private readonly VisibleOverride VisibleOverride;
-    public bool EntityVisible => VisibleOverride?.EntityVisible != false;
+    private readonly VisibleOverride visibleOverride;
+    public bool EntityVisible => visibleOverride?.EntityVisible != false;
 
     public DepthAdheringDisplacementRenderHook(Action renderEntity, Action renderDisplacement, bool distortBehind, bool respectVisible) : base(false, false) {
         RenderEntity = renderEntity;
@@ -23,7 +24,7 @@ public class DepthAdheringDisplacementRenderHook : Component {
         this.distortBehind = distortBehind;
 
         if (respectVisible)
-            VisibleOverride = new VisibleOverride();
+            visibleOverride = new VisibleOverride();
     }
 
     public DepthAdheringDisplacementRenderHook(Action renderEntity, Action renderDisplacement, bool distortBehind) : this(renderEntity, renderDisplacement, distortBehind, true) { }
@@ -37,8 +38,8 @@ public class DepthAdheringDisplacementRenderHook : Component {
         if (Scene is not null)
             TrackSelf();
 
-        if (VisibleOverride is not null)
-            entity.Add(VisibleOverride);
+        if (visibleOverride is not null)
+            entity.Add(visibleOverride);
         else
             entity.Visible = false;
     }
@@ -51,8 +52,8 @@ public class DepthAdheringDisplacementRenderHook : Component {
     public override void Removed(Entity entity) {
         UntrackSelf();
 
-        if (VisibleOverride is not null)
-            entity.Remove(VisibleOverride);
+        if (visibleOverride is not null)
+            entity.Remove(visibleOverride);
 
         base.Removed(entity);
     }
@@ -71,8 +72,7 @@ public class DepthAdheringDisplacementRenderHook : Component {
     }
 
     internal static void Unload() {
-        hook_Entity_set_Depth?.Dispose();
-        hook_Entity_set_Depth = null;
+        Util.DisposeAndSetNull(ref hook_Entity_set_Depth);
     }
 
     // i'm kinda bleh on hooking this but any other approaches seem slightly too unreliable + i guess depth doesn't change that oftenn and communal helper dream sprites take this approach too

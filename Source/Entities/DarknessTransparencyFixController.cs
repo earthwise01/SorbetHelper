@@ -12,6 +12,8 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 public class DarknessTransparencyFixController : Entity {
     public const string EntityDataID = "SorbetHelper/DarknessTransparencyFixController";
 
+    #region Hooks
+
     internal static void Load() {
         // guarantee hook order with style mask helper
         using (new DetourConfigContext(new DetourConfig("SorbetHelper", before: ["StyleMaskHelper"])).Use())
@@ -33,4 +35,6 @@ public class DarknessTransparencyFixController : Entity {
             orig(self, scene);
         }
     }
+
+    #endregion
 }

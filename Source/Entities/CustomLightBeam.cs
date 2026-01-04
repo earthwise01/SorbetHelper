@@ -1,297 +1,287 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 using Celeste.Mod.Entities;
 using Celeste.Mod.SorbetHelper.Utils;
-using System.Globalization;
-using System.Linq;
 
-namespace Celeste.Mod.SorbetHelper.Entities {
+namespace Celeste.Mod.SorbetHelper.Entities;
 
-    [CustomEntity("SorbetHelper/CustomLightbeam")]
-    public class CustomLightBeam : Entity {
-        private readonly string flag;
-        private readonly bool invertFlag;
-        private readonly float flagFadeTime;
+[CustomEntity("SorbetHelper/CustomLightbeam")]
+public class CustomLightBeam : Entity {
+    private readonly string flag;
+    private readonly bool invertFlag;
+    private readonly float flagFadeTime;
 
-        private readonly float rotation;
+    private readonly float rotation;
 
-        private readonly bool fadeWhenNear;
-        private readonly bool fadeOnTransition;
-        private readonly bool noParticles;
+    private readonly bool fadeWhenNear;
+    private readonly bool fadeOnTransition;
+    private readonly bool noParticles;
 
-        private Color color;
+    private Color color;
 
-        private readonly bool rainbow;
-        private const int rainbowSegmentSize = 4;
+    private readonly bool rainbow;
+    private const int RainbowSegmentSize = 4;
 
-        private readonly bool useCustomRainbowColors;
+    private readonly bool useCustomRainbowColors;
 
-        private readonly List<Color> rainbowColors = [];
-        private readonly float rainbowGradientSize;
-        private readonly float rainbowGradientSpeed;
-        private readonly bool rainbowLoopColors;
-        private readonly Vector2 rainbowCenter;
-        private readonly bool rainbowSingleColor;
+    private readonly List<Color> rainbowColors = [];
+    private readonly float rainbowGradientSize;
+    private readonly float rainbowGradientSpeed;
+    private readonly bool rainbowLoopColors;
+    private readonly Vector2 rainbowCenter;
+    private readonly bool rainbowSingleColor;
 
-        private readonly float scroll;
-        private readonly Vector2 scrollAnchor;
-        private Vector2 RenderPosition {
-            get {
-                // edge case so normal lightbeams dont need to bother with anything
-                if (scroll == 1f)
-                    return Position;
+    private readonly float scroll;
+    private readonly Vector2 scrollAnchor;
+    private Vector2 RenderPosition {
+        get {
+            // don't need to do anything special for non-parallax lightbeams
+            if (scroll == 1f)
+                return Position;
 
-                // hopefully i   mathed right and this actually fully does what i think it does
-                var cam = (Scene as Level).Camera.GetCenter();
-                return cam + (Position - scrollAnchor * (1f - scroll) - cam * scroll);
-            }
+            // hopefully i   mathed right and this actually fully does what i think it does
+            Vector2 cam = SceneAs<Level>().Camera.GetCenter();
+            return cam + (Position - scrollAnchor * (1f - scroll) - cam * scroll);
+        }
+    }
+
+    private readonly float baseAlpha;
+    private float distanceAlpha = 1f;
+    private float flagAlpha = 1f;
+    private float alpha;
+
+    private readonly int lightWidth;
+    private readonly int lightLength;
+
+    private float timer = Calc.Random.NextFloat(1000f);
+
+    private readonly MTexture beamTexture;
+    private readonly float offset;
+
+    private readonly float cullRectTop, cullRectBottom, cullRectLeft, cullRectRight;
+    private const int VisibilityPadding = 16;
+
+    public CustomLightBeam(EntityData data, Vector2 offset) : base(data.Position + offset) {
+        Tag = Tags.TransitionUpdate;
+        this.offset = Calc.Random.NextFloat();
+
+        lightWidth = data.Width;
+        lightLength = data.Height;
+        Depth = data.Int("depth", -9998);
+
+        flag = data.Attr("flag");
+        invertFlag = data.Bool("inverted", false);
+        flagFadeTime = Math.Max(data.Float("flagFadeTime", 0.25f), 0f);
+        rotation = data.Float("rotation", 0f) * (MathF.PI / 180f);
+
+        fadeWhenNear = data.Bool("fadeWhenNear", true);
+        fadeOnTransition = data.Bool("fadeOnTransition", true);
+
+        scroll = data.Float("scroll", 1f);
+        if (data.Nodes?.Length >= 1)
+            scrollAnchor = data.Nodes[0] + offset;
+        else
+            scrollAnchor = Position;
+
+        baseAlpha = Math.Clamp(data.Float("alpha", 1f), 0f, 1f);
+
+        beamTexture = GFX.Game[data.Attr("texture", "util/lightbeam")];
+        noParticles = data.Bool("noParticles", false);
+        color = data.HexColorWithNonPremultipliedAlpha("color", Calc.HexToColor("CCFFFF"));
+        rainbow = data.Bool("rainbow", false);
+        useCustomRainbowColors = data.Bool("useCustomRainbowColors", false);
+
+        if (rainbow) {
+            rainbowGradientSize = data.Float("gradientSize", 280f);
+            rainbowGradientSpeed = data.Float("gradientSpeed", 50f);
+            rainbowLoopColors = data.Bool("loopColors", false);
+            rainbowCenter = new Vector2(data.Float("centerX", 0), data.Float("centerY", 0));
+            rainbowSingleColor = data.Bool("singleColor", false);
+
+            string[] colorsAsStrings = data.Attr("colors", "89E5AE,88E0E0,87A9DD,9887DB,D088E2").Split(',');
+            foreach (string t in colorsAsStrings)
+                rainbowColors.Add(Calc.HexToColorWithNonPremultipliedAlpha(t));
+
+            if (rainbowLoopColors)
+                rainbowColors.Add(rainbowColors[0]);
         }
 
-        private readonly float baseAlpha = 1f;
-        private float distanceAlpha = 1f;
-        private float flagAlpha = 1f;
-        private float alpha;
+        // offscreen culling bounds
+        Vector2 baseCornerA = -Calc.AngleToVector(rotation, 1f) * (lightWidth / 2f); // would be top left with a rotation of 0f
+        Vector2 baseCornerB = Calc.AngleToVector(rotation, 1f) * (lightWidth / 2f); // would be top right with a rotation of 0f
+        Vector2 edgeCornerA = baseCornerA + Calc.AngleToVector(rotation + (float)Math.PI / 2f, 1f) * lightLength; // would be bottom left with a rotation of 0f
+        Vector2 edgeCornerB = baseCornerB + Calc.AngleToVector(rotation + (float)Math.PI / 2f, 1f) * lightLength; // would be bottom right with a rotation of 0f
 
-        private readonly int lightWidth;
-        private readonly int lightLength;
+        cullRectTop = Math.Min(Math.Min(baseCornerA.Y, baseCornerB.Y), Math.Min(edgeCornerA.Y, edgeCornerB.Y));
+        cullRectBottom = Math.Max(Math.Max(baseCornerA.Y, baseCornerB.Y), Math.Max(edgeCornerA.Y, edgeCornerB.Y));
+        cullRectLeft = Math.Min(Math.Min(baseCornerA.X, baseCornerB.X), Math.Min(edgeCornerA.X, edgeCornerB.X));
+        cullRectRight = Math.Max(Math.Max(baseCornerA.X, baseCornerB.X), Math.Max(edgeCornerA.X, edgeCornerB.X));
+    }
 
-        private float timer = Calc.Random.NextFloat(1000f);
+    public override void Awake(Scene scene) {
+        base.Awake(scene);
+        Level level = SceneAs<Level>();
 
-        private readonly MTexture beamTexture;
-        private readonly float offset;
+        if (!string.IsNullOrEmpty(flag) && !level.Session.GetFlag(flag, invertFlag))
+            flagAlpha = 0f;
+        else
+            flagAlpha = 1f;
 
-        private readonly float rectangleTop, rectangleBottom, rectangleLeft, rectangleRight;
-        private const int visibilityPadding = 16;
+        if (level.Transitioning && fadeOnTransition)
+            distanceAlpha = 0f;
 
-        public CustomLightBeam(EntityData data, Vector2 offset) : base(data.Position + offset) {
-            base.Tag = Tags.TransitionUpdate;
-            this.offset = Calc.Random.NextFloat();
+        alpha = baseAlpha * distanceAlpha * flagAlpha;
+    }
 
-            lightWidth = data.Width;
-            lightLength = data.Height;
-            base.Depth = data.Int("depth", -9998);
+    public override void Update() {
+        base.Update();
 
-            flag = data.Attr("flag");
-            invertFlag = data.Bool("inverted", false);
-            flagFadeTime = Math.Max(data.Float("flagFadeTime", 0.25f), 0f);
-            rotation = data.Float("rotation", 0f) * ((float)Math.PI / 180f);
+        timer += Engine.DeltaTime;
+        Level level = SceneAs<Level>();
+        Player player = Scene.Tracker.GetEntity<Player>();
 
-            fadeWhenNear = data.Bool("fadeWhenNear", true);
-            fadeOnTransition = data.Bool("fadeOnTransition", true);
+        Vector2 actualPosition = Position;
+        Position = RenderPosition;
 
-            // eh - now less but   eh,
-            scroll = data.Float("scroll", 1f);
-            if (data.Nodes?.Length >= 1)
-                scrollAnchor = data.Nodes[0] + offset;
-            else
-                scrollAnchor = Position;
-            //ScrollAnchor = Position + new Vector2(data.Float("scrollAnchorX"), data.Float("scrollAnchorY"));
+        Visible = InView(level.Camera);
 
-            baseAlpha = Math.Clamp(data.Float("alpha", 1f), 0f, 1f);
+        // vanilla proximity/transition fading
+        if (player is not null) {
+            float targetAlpha = 1f;
 
-            beamTexture = GFX.Game[data.Attr("texture", "util/lightbeam")];
-            noParticles = data.Bool("noParticles", false);
-            color = Util.HexToColorWithAlphaNonPremult(data.Attr("color", "CCFFFF"));
-            rainbow = data.Bool("rainbow", false);
-            useCustomRainbowColors = data.Bool("useCustomRainbowColors", false);
+            if (fadeWhenNear) {
+                Vector2 direction = Calc.AngleToVector(rotation + MathF.PI / 2f, 1f);
+                Vector2 playerDistancePoint = Calc.ClosestPointOnLine(Position, Position + direction * 10000f, player.Center);
 
-            if (rainbow) {
-                rainbowGradientSize = data.Float("gradientSize", 280f);
-                rainbowGradientSpeed = data.Float("gradientSpeed", 50f);
-                rainbowLoopColors = data.Bool("loopColors", false);
-                rainbowCenter = new Vector2(data.Float("centerX", 0), data.Float("centerY", 0));
-                rainbowSingleColor = data.Bool("singleColor", false);
-
-                string[] colorsAsStrings = data.Attr("colors", "89E5AE,88E0E0,87A9DD,9887DB,D088E2").Split(',');
-                for (int i = 0; i < colorsAsStrings.Length; i++)
-                    rainbowColors.Add(Util.HexToColorWithAlphaNonPremult(colorsAsStrings[i]));
-                if (rainbowLoopColors)
-                    rainbowColors.Add(rainbowColors[0]);
+                if ((playerDistancePoint - player.Center).Length() <= lightWidth / 2f)
+                    targetAlpha = Math.Min(1f, Math.Max(0f, (playerDistancePoint - Position).Length() - 8f) / lightLength);
             }
-
-            // offscreen culling stuff
-            // kinda janky i think but it works
-            var baseCornerA = -Calc.AngleToVector(rotation, 1f) * (lightWidth / 2f); // would be top left with a rotation of 0f
-            var baseCornerB = Calc.AngleToVector(rotation, 1f) * (lightWidth / 2); // would be top right with a rotation of 0f
-            var edgeCornerA = baseCornerA + Calc.AngleToVector(rotation + (float)Math.PI / 2f, 1f) * lightLength; // would be bottom left with a rotation of 0f
-            var edgeCornerB = baseCornerB + Calc.AngleToVector(rotation + (float)Math.PI / 2f, 1f) * lightLength; // would be bottom right with a rotation of 0f
-
-            rectangleTop = Math.Min(Math.Min(baseCornerA.Y, baseCornerB.Y), Math.Min(edgeCornerA.Y, edgeCornerB.Y));
-            rectangleBottom = Math.Max(Math.Max(baseCornerA.Y, baseCornerB.Y), Math.Max(edgeCornerA.Y, edgeCornerB.Y));
-            rectangleLeft = Math.Min(Math.Min(baseCornerA.X, baseCornerB.X), Math.Min(edgeCornerA.X, edgeCornerB.X));
-            rectangleRight = Math.Max(Math.Max(baseCornerA.X, baseCornerB.X), Math.Max(edgeCornerA.X, edgeCornerB.X));
-        }
-
-        public override void Awake(Scene scene) {
-            base.Awake(scene);
-            var level = Scene as Level;
-
-            if (!string.IsNullOrEmpty(flag) && !level.Session.GetFlag(flag, invertFlag))
-                flagAlpha = 0f;
-            else
-                flagAlpha = 1f;
 
             if (level.Transitioning && fadeOnTransition)
-                distanceAlpha = 0f;
+                targetAlpha = 0f;
 
-            alpha = baseAlpha * distanceAlpha * flagAlpha;
+            distanceAlpha = Calc.Approach(distanceAlpha, targetAlpha, Engine.DeltaTime * 4f);
         }
 
-        public override void Update() {
-            base.Update();
-
-            timer += Engine.DeltaTime;
-            var level = Scene as Level;
-            var player = Scene.Tracker.GetEntity<Player>();
-
-            var pos = Position;
-            Position = RenderPosition;
-
-            Visible = InView(level.Camera);
-
-            // vanilla lightbeam fading
-            if (player != null) {
-                float targetAlpha = 1f;
-                if (fadeWhenNear) {
-                    var direction = Calc.AngleToVector(rotation + (float)Math.PI / 2f, 1f);
-                    var playerDistancePoint = Calc.ClosestPointOnLine(Position, Position + direction * 10000f, player.Center);
-
-                    targetAlpha = Math.Min(1f, Math.Max(0f, (playerDistancePoint - Position).Length() - 8f) / lightLength);
-                    if ((playerDistancePoint - player.Center).Length() > lightWidth / 2f)
-                        targetAlpha = 1f;
-                }
-
-                if (level.Transitioning && fadeOnTransition)
-                    targetAlpha = 0f;
-
-                distanceAlpha = Calc.Approach(distanceAlpha, targetAlpha, Engine.DeltaTime * 4f);
-            }
-
-            // fade flagAlpha towards either 0f or 1f depending on the flag state.
-            if (!string.IsNullOrEmpty(flag)) {
-                float targetAlpha = level.Session.GetFlag(flag, invertFlag) ? 1f : 0f;
-                flagAlpha = Calc.Approach(flagAlpha, targetAlpha, Engine.DeltaTime / flagFadeTime);
-            }
-
-            // multiply baseAlpha, distanceAlpha, and flagAlpha together to get the actual alpha of the lightbeam.
-            alpha = baseAlpha * distanceAlpha * flagAlpha;
-
-            // emit particles
-            if (Visible && !noParticles && alpha >= 0.5f && level.OnInterval(0.8f, offset)) {
-                var direction = Calc.AngleToVector(rotation + (float)Math.PI / 2f, 1f);
-                var particlePos = Position - direction * 4f;
-                float emitX = Calc.Random.Next(lightWidth - 4) + 2 - lightWidth / 2;
-                particlePos += emitX * direction.Perpendicular();
-                // if rainbow is enabled and rainbowSingleColor is disabled, call GetHue for the particle's color, otherwise use the color variable.
-                var particleColor = ((rainbow && !rainbowSingleColor) ? GetHue(particlePos) : color) * alpha;
-                // doesn't track properly with parallax but idk
-                level.Particles.Emit(LightBeam.P_Glow, particlePos, particleColor, rotation + (float)Math.PI / 2f);
-            }
-
-            Position = pos;
+        // flag fading
+        if (!string.IsNullOrEmpty(flag)) {
+            float targetAlpha = level.Session.GetFlag(flag, invertFlag) ? 1f : 0f;
+            flagAlpha = Calc.Approach(flagAlpha, targetAlpha, Engine.DeltaTime / flagFadeTime);
         }
 
-        /* public override void DebugRender(Camera camera) {
-            base.DebugRender(camera);
+        // multiply baseAlpha, distanceAlpha, and flagAlpha together to get the actual alpha of the lightbeam.
+        alpha = baseAlpha * distanceAlpha * flagAlpha;
 
-            Vector2 baseCornerA = Position - Calc.AngleToVector(rotation, 1f) * (lightWidth / 2f); // would be top left with a rotation of 0f
-            Vector2 baseCornerB = Position + Calc.AngleToVector(rotation, 1f) * (lightWidth / 2); // would be top right with a rotation of 0f
-            Vector2 edgeCornerA = baseCornerA + Calc.AngleToVector(rotation + (float)Math.PI / 2f, 1f) * lightLength; // would be bottom left with a rotation of 0f
-            Vector2 edgeCornerB = baseCornerB + Calc.AngleToVector(rotation + (float)Math.PI / 2f, 1f) * lightLength; // would be bottom right with a rotation of 0f
-            Draw.Line(baseCornerA, baseCornerB, Color.GreenYellow * 0.5f);
-            Draw.Line(baseCornerA, edgeCornerA, Color.GreenYellow * 0.5f);
-            Draw.Line(baseCornerB, edgeCornerB, Color.GreenYellow * 0.5f);
-            Draw.Line(edgeCornerA, edgeCornerB, Color.GreenYellow * 0.5f);
-
-            Draw.HollowRect(rectangleLeft - visibilityPadding / 2, rectangleTop - visibilityPadding / 2, rectangleRight - rectangleLeft + visibilityPadding, rectangleBottom - rectangleTop + visibilityPadding, Color.Yellow * 0.5f);
-        } */
-
-        public override void Render() {
-            base.Render();
-
-            if (alpha <= 0f)
-                return;
-
-            var pos = Position;
-            Position = RenderPosition;
-
-            // update the hue of the rainbow lightbeam when rainbowSingleColor is enabled, otherwise GetHue is called directly whenever a color is needed.
-            if (rainbow && rainbowSingleColor)
-                color = GetHue(Position);
-
-            // render the lightbeam
-            // base
-            if (rainbow && !rainbowSingleColor) {
-                // draw the base in 4px segments to make a gradient effect
-                for (int i = 0; i < lightWidth; i += rainbowSegmentSize) {
-                    DrawBeam(i - lightWidth / 2f, rainbowSegmentSize, lightLength - 4 + (float)Math.Sin(timer * 2f) * 4f, 0.4f);
-                }
-            } else {
-                DrawBeam(0f, lightWidth, lightLength - 4 + (float)Math.Sin(timer * 2f) * 4f, 0.4f);
-            }
-
-            // beams
-            for (int i = 0; i < lightWidth; i += 4) {
-                float num = timer + i * 0.6f;
-                float num2 = 4f + (float)Math.Sin(num * 0.5f + 1.2f) * 4f;
-                float offset = (float)Math.Sin((double)((num + i * 32) * 0.1f) + Math.Sin(num * 0.05f + i * 0.1f) * 0.25) * (lightWidth / 2f - num2 / 2f);
-                float length = lightLength + (float)Math.Sin(num * 0.25f) * 8f;
-                float a = 0.6f + (float)Math.Sin(num + 0.8f) * 0.3f;
-                DrawBeam(offset, num2, length, a);
-            }
-
-            Position = pos;
+        // emit particles
+        if (Visible && !noParticles && alpha >= 0.5f && level.OnInterval(0.8f, offset)) {
+            Vector2 direction = Calc.AngleToVector(rotation + MathF.PI / 2f, 1f);
+            Vector2 particlePos = Position - direction * 4f;
+            float emitX = Calc.Random.Next(lightWidth - 4) + 2 - lightWidth / 2f;
+            particlePos += emitX * direction.Perpendicular();
+            // if rainbow is enabled and rainbowSingleColor is disabled, call GetHue for the particle's color, otherwise use the color variable.
+            Color particleColor = ((rainbow && !rainbowSingleColor) ? GetHue(particlePos) : color) * alpha;
+            // todo: maybe transfer over the lightbeam's parallax somehow?
+            level.Particles.Emit(LightBeam.P_Glow, particlePos, particleColor, rotation + MathF.PI / 2f);
         }
 
-        private void DrawBeam(float offset, float width, float length, float a) {
-            float beamRotation = rotation + (float)Math.PI / 2f;
-            // if rainbow is enabled and rainbowSingleColor is disabled, call GetHue for the beam's color, otherwise use the color variable.
-            var beamColor = ((rainbow && !rainbowSingleColor) ? GetHue(Position + Calc.AngleToVector(rotation, 1f) * offset) : color) * a * alpha;
+        Position = actualPosition;
+    }
 
-            if (width >= 1f) {
-                beamTexture.Draw(Position + Calc.AngleToVector(rotation, 1f) * offset, new Vector2(0f, 0.5f), beamColor, new Vector2(1f / beamTexture.Width * length, width), beamRotation);
-            }
+    /*
+     public override void DebugRender(Camera camera) {
+        base.DebugRender(camera);
+
+        Vector2 baseCornerA = Position - Calc.AngleToVector(rotation, 1f) * (lightWidth / 2f); // would be top left with a rotation of 0f
+        Vector2 baseCornerB = Position + Calc.AngleToVector(rotation, 1f) * (lightWidth / 2); // would be top right with a rotation of 0f
+        Vector2 edgeCornerA = baseCornerA + Calc.AngleToVector(rotation + (float)Math.PI / 2f, 1f) * lightLength; // would be bottom left with a rotation of 0f
+        Vector2 edgeCornerB = baseCornerB + Calc.AngleToVector(rotation + (float)Math.PI / 2f, 1f) * lightLength; // would be bottom right with a rotation of 0f
+        Draw.Line(baseCornerA, baseCornerB, Color.GreenYellow * 0.5f);
+        Draw.Line(baseCornerA, edgeCornerA, Color.GreenYellow * 0.5f);
+        Draw.Line(baseCornerB, edgeCornerB, Color.GreenYellow * 0.5f);
+        Draw.Line(edgeCornerA, edgeCornerB, Color.GreenYellow * 0.5f);
+
+        Draw.HollowRect(rectangleLeft - visibilityPadding / 2, rectangleTop - visibilityPadding / 2, rectangleRight - rectangleLeft + visibilityPadding, rectangleBottom - rectangleTop + visibilityPadding, Color.Yellow * 0.5f);
+    }
+    */
+
+    public override void Render() {
+        base.Render();
+
+        if (alpha <= 0f)
+            return;
+
+        Vector2 actualPosition = Position;
+        Position = RenderPosition;
+
+        if (rainbow && rainbowSingleColor)
+            color = GetHue(Position);
+
+        // render the base
+        if (rainbow && !rainbowSingleColor) {
+            // draw the base in 4px segments to make a gradient effect
+            for (int i = 0; i < lightWidth; i += RainbowSegmentSize)
+                DrawBeam(i - lightWidth / 2f, RainbowSegmentSize, lightLength - 4 + (float)Math.Sin(timer * 2f) * 4f, 0.4f);
+        } else {
+            DrawBeam(0f, lightWidth, lightLength - 4 + (float)Math.Sin(timer * 2f) * 4f, 0.4f);
         }
 
-        private Color GetHue(Vector2 position) {
-            // use vanilla/rainbow spinner color controller colors by default
-            if (!useCustomRainbowColors)
-                return Util.GetRainbowHue(Scene, position);
-
-            // stolen from MaddieHelpingHand's RainbowSpinnerColorController
-            // https://github.com/maddie480/MaddieHelpingHand/blob/master/Entities/RainbowSpinnerColorController.cs#L311
-            if (rainbowColors.Count == 1) {
-                return rainbowColors[0];
-            }
-
-            float progress = (position - rainbowCenter).Length() + this.Scene.TimeActive * rainbowGradientSpeed;
-            while (progress < 0) {
-                progress += rainbowGradientSize;
-            }
-            progress = progress % rainbowGradientSize / rainbowGradientSize;
-            if (!rainbowLoopColors) {
-                progress = Calc.YoYo(progress);
-            }
-
-            if (progress == 1) {
-                return rainbowColors[rainbowColors.Count - 1];
-            }
-
-            float globalProgress = (rainbowColors.Count - 1) * progress;
-            int colorIndex = (int)globalProgress;
-            float progressInIndex = globalProgress - colorIndex;
-            return Color.Lerp(rainbowColors[colorIndex], rainbowColors[colorIndex + 1], progressInIndex);
+        // render the beams
+        for (int i = 0; i < lightWidth; i += 4) {
+            float num = timer + i * 0.6f;
+            float beamWidth = 4f + (float)Math.Sin(num * 0.5f + 1.2f) * 4f;
+            float beamPosition = (float)Math.Sin((num + i * 32) * 0.1f + Math.Sin(num * 0.05f + i * 0.1f) * 0.25) * (lightWidth / 2f - beamWidth / 2f);
+            float beamLength = lightLength + (float)Math.Sin(num * 0.25f) * 8f;
+            float beamAlpha = 0.6f + (float)Math.Sin(num + 0.8f) * 0.3f;
+            DrawBeam(beamPosition, beamWidth, beamLength, beamAlpha);
         }
 
-        private bool InView(Camera camera) {
-            var pos = Position;
-            if (pos.X + rectangleRight > camera.X - visibilityPadding && pos.X + rectangleLeft < camera.X + camera.Viewport.Width + visibilityPadding)
-                return pos.Y + rectangleBottom > camera.Y - visibilityPadding && pos.Y + rectangleTop < camera.Y + camera.Viewport.Height + visibilityPadding;
+        Position = actualPosition;
+    }
 
-            return false;
-        }
+    private void DrawBeam(float position, float width, float length, float beamAlpha) {
+        if (width < 1f)
+            return;
+
+        Vector2 beamPosition = Position + Calc.AngleToVector(rotation, 1f) * position;
+        float beamRotation = rotation + (float)Math.PI / 2f;
+        Color beamColor = ((rainbow && !rainbowSingleColor) ? GetHue(beamPosition) : color) * beamAlpha * alpha;
+        beamTexture.Draw(beamPosition, new Vector2(0f, 0.5f), beamColor, new Vector2(1f / beamTexture.Width * length, width), beamRotation);
+    }
+
+    private Color GetHue(Vector2 position) {
+        // use vanilla/rainbow spinner color controller colors by default
+        if (!useCustomRainbowColors)
+            return Util.GetRainbowHue(Scene, position);
+
+        // stolen from MaddieHelpingHand's RainbowSpinnerColorController
+        // https://github.com/maddie480/MaddieHelpingHand/blob/master/Entities/RainbowSpinnerColorController.cs#L311
+        if (rainbowColors.Count == 1)
+            return rainbowColors[0];
+
+        float progress = (position - rainbowCenter).Length() + Scene.TimeActive * rainbowGradientSpeed;
+        while (progress < 0)
+            progress += rainbowGradientSize;
+        progress = progress % rainbowGradientSize / rainbowGradientSize;
+
+        if (!rainbowLoopColors)
+            progress = Calc.YoYo(progress);
+
+        if (progress == 1f)
+            return rainbowColors[rainbowColors.Count - 1];
+
+        float globalProgress = (rainbowColors.Count - 1) * progress;
+        int colorIndex = (int)globalProgress;
+        float progressInIndex = globalProgress - colorIndex;
+        return Color.Lerp(rainbowColors[colorIndex], rainbowColors[colorIndex + 1], progressInIndex);
+    }
+
+    private bool InView(Camera camera) {
+        Vector2 pos = Position;
+        if (pos.X + cullRectRight > camera.X - VisibilityPadding && pos.X + cullRectLeft < camera.X + camera.Viewport.Width + VisibilityPadding)
+            return pos.Y + cullRectBottom > camera.Y - VisibilityPadding && pos.Y + cullRectTop < camera.Y + camera.Viewport.Height + VisibilityPadding;
+
+        return false;
     }
 }

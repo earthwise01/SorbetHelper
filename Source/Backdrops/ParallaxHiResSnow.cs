@@ -59,9 +59,8 @@ public class ParallaxHiResSnow : Backdrop {
     private readonly MTexture particleTexture;
 
     public void Reset() {
-        for (int i = 0; i < particles.Length; i++) {
+        for (int i = 0; i < particles.Length; i++)
             particles[i].Reset(this);
-        }
     }
 
     public ParallaxHiResSnow(BinaryPacker.Element data) : base() {
@@ -92,9 +91,7 @@ public class ParallaxHiResSnow : Backdrop {
         Reset();
     }
 
-    private void Added(Scene scene) {
-        Level level = scene as Level;
-
+    private void Added(Level level) {
         level.Add(new ParallaxHiResSnowRenderer(this));
         visibleFade = IsVisible(level) ? 1f : 0f;
     }
@@ -216,7 +213,7 @@ public class ParallaxHiResSnow : Backdrop {
             if (!backdrop.Visible)
                 return;
 
-            Level level = Scene as Level;
+            Level level = SceneAs<Level>();
             Matrix matrix = Matrix.Identity;
 
             // mirror mode

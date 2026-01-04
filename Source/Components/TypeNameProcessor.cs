@@ -12,6 +12,8 @@ using Celeste.Mod.Helpers;
 
 namespace Celeste.Mod.SorbetHelper.Components;
 
+// todo: allow entity sids
+
 /// <summary>
 /// component for per-room controllers that affect entities based on their runtime class type<br/>
 /// <br/>

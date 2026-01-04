@@ -10,6 +10,7 @@ using MonoMod;
 using MonoMod.ModInterop;
 
 namespace Celeste.Mod.SorbetHelper;
+
 public class SorbetHelperModule : EverestModule {
     public static SorbetHelperModule Instance { get; private set; }
 
@@ -44,10 +45,8 @@ public class SorbetHelperModule : EverestModule {
 
         // sorbet helper misc stuff
         On.Celeste.GameplayBuffers.Unload += On_GameplayBuffers_Unload;
-
-        GlobalEntities.ProcessAttributes();
+        GlobalEntities.ProcessAttributes(typeof(SorbetHelperModule).Assembly);
         GlobalEntities.Load();
-
         SorbetHelperDecalRegistry.LoadHandlers();
 
         // entities
@@ -83,7 +82,6 @@ public class SorbetHelperModule : EverestModule {
 
         On.Celeste.GameplayBuffers.Unload -= On_GameplayBuffers_Unload;
         RenderTargetHelper.DisposeQueue();
-
         GlobalEntities.Unload();
 
         // entities
@@ -122,8 +120,8 @@ public class SorbetHelperModule : EverestModule {
         FxAlphaMask = LoadShader("AlphaMask");
     }
 
-    private static Effect LoadShader(string id) =>
-        new(Engine.Graphics.GraphicsDevice, Everest.Content.Get($"SorbetHelper:/Effects/SorbetHelper/{id}.cso").Data);
+    private static Effect LoadShader(string id)
+        => new Effect(Engine.Graphics.GraphicsDevice, Everest.Content.Get($"SorbetHelper:/Effects/SorbetHelper/{id}.cso").Data);
 
     // unload any leftover queued buffers with the normal gameplay buffers
     private static void On_GameplayBuffers_Unload(On.Celeste.GameplayBuffers.orig_Unload orig) {
