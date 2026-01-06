@@ -131,13 +131,12 @@ public class MusicSyncController : Entity {
 
             // get marker (null means no marker)
             currentTimelineMarker = null;
-            foreach (TimelineMarker marker in timelineMarkers)
-            {
-                if (currentTimelinePos >= marker.Position &&
+            foreach (TimelineMarker marker in timelineMarkers) {
+                if (currentTimelinePos >= marker.Position
                     // don't replace the current marker with one earlier
-                    currentTimelineMarker.GetValueOrDefault().Position <= marker.Position &&
+                    && currentTimelineMarker.GetValueOrDefault().Position <= marker.Position
                     // only care about the end position if it's greater than the start position
-                    (marker.EndPosition <= marker.Position || currentTimelinePos < marker.EndPosition))
+                    && (marker.EndPosition <= marker.Position || currentTimelinePos < marker.EndPosition))
                     currentTimelineMarker = marker;
             }
         }

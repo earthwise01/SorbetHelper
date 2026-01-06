@@ -4,16 +4,11 @@ namespace Celeste.Mod.SorbetHelper.Triggers;
 
 [CustomEntity("SorbetHelper/ColorDashBlockStateTrigger")]
 [Tracked]
-public class ColorDashBlockStateTrigger : Trigger {
+public class ColorDashBlockStateTrigger(EntityData data, Vector2 offset) : Trigger(data, offset) {
     public enum Modes { OnLevelLoad, OnPlayerSpawn, OnPlayerEnter }
 
-    public readonly Modes Mode;
-    public readonly int Index;
-
-    public ColorDashBlockStateTrigger(EntityData data, Vector2 offset) : base(data, offset) {
-        Mode = data.Enum("mode", Modes.OnPlayerEnter);
-        Index = data.Int("index", 0);
-    }
+    public readonly Modes Mode = data.Enum("mode", Modes.OnPlayerEnter);
+    public readonly int Index = data.Int("index", 0);
 
     public override void Added(Scene scene) {
         base.Added(scene);

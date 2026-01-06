@@ -182,6 +182,6 @@ public class BigWaterfall : Entity {
         }
     }
 
-    private bool InView(Camera camera) => X < camera.Right + 24f && X + width > camera.Left - 24f &&
-                                          Y < camera.Bottom + 24f && Y + height > camera.Top - 24f;
+    private bool InView(Camera camera) => X < camera.Right + 24f && X + width > camera.Left - 24f
+                                          && Y < camera.Bottom + 24f && Y + height > camera.Top - 24f;
 }

@@ -66,11 +66,14 @@ public class DepthAdheringDisplacementRenderHook : Component {
     private static Hook hook_Entity_set_Depth;
 
     internal static void Load() {
-        hook_Entity_set_Depth = new Hook(typeof(Entity).GetMethod("set_Depth", BindingFlags.Instance | BindingFlags.Public), On_Entity_set_Depth);
+        hook_Entity_set_Depth = new Hook(
+            typeof(Entity).GetProperty(nameof(Entity.Depth), HookHelper.Bind.PublicInstance)!.GetSetMethod()!,
+            On_Entity_set_Depth
+        );
     }
 
     internal static void Unload() {
-        Util.DisposeAndSetNull(ref hook_Entity_set_Depth);
+        HookHelper.DisposeAndSetNull(ref hook_Entity_set_Depth);
     }
 
     // i'm kinda bleh on hooking this but any other approaches seem slightly too unreliable + i guess depth doesn't change that oftenn and communal helper dream sprites take this approach too

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
+using Celeste.Mod.Helpers;
 using Celeste.Mod.SorbetHelper.Utils;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
@@ -13,14 +14,6 @@ public class StylegroundDepthController : Entity {
 
     public enum Modes { Normal, AboveColorgrade, AboveHud, AbovePauseHud }
 
-    // only stored in the first added StylegroundDepthController (aka the one returned by Tracker.GetEntity)
-    private readonly HashSet<Backdrop> _current = [];
-    private StylegroundDepthController _aboveColorgrade, _aboveHud, _abovePauseHud;
-
-    public readonly Modes Mode;
-    public readonly HashSet<string> StylegroundTags = [];
-    private readonly List<Backdrop> backdropsBg = [], backdropsFg = [];
-
     // modified additive blendstate that still works after being rendered to a transparent render target
     private static readonly BlendState AdditiveFix = new BlendState() {
         ColorSourceBlend = Blend.SourceAlpha,
@@ -28,7 +21,16 @@ public class StylegroundDepthController : Entity {
         ColorDestinationBlend = Blend.One,
         AlphaDestinationBlend = Blend.One
     };
+
+    // only stored in the first added StylegroundDepthController (aka the one returned by Tracker.GetEntity)
+    private readonly HashSet<Backdrop> _current = [];
+    private StylegroundDepthController _aboveColorgrade, _aboveHud, _abovePauseHud;
+
+    public readonly Modes Mode;
+    public readonly HashSet<string> StylegroundTags = [];
+    private readonly List<Backdrop> backdropsBg = [], backdropsFg = [];
     private VirtualRenderTarget buffer;
+
     private static Matrix scaleMatrix;
     private static Vector2 paddingOffset;
     private static Vector2 zoomFocusOffset;
@@ -130,15 +132,13 @@ public class StylegroundDepthController : Entity {
     public override void Removed(Scene scene) {
         base.Removed(scene);
 
-        buffer?.Dispose();
-        buffer = null;
+        RenderTargetHelper.DisposeAndSetNull(ref buffer);
     }
 
     public override void SceneEnd(Scene scene) {
         base.SceneEnd(scene);
 
-        buffer?.Dispose();
-        buffer = null;
+        RenderTargetHelper.DisposeAndSetNull(ref buffer);
     }
 
     // for the AbovePauseHud mode, we need to manually update the stylegrounds
@@ -218,7 +218,8 @@ public class StylegroundDepthController : Entity {
         cursor.EmitDelegate(GetDepthRenderedBackdrops);
         cursor.EmitStloc(depthRenderedBackdropsVar);
 
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<Backdrop>("Visible"))) {
+        if (!cursor.TryGotoNext(MoveType.After,
+                instr => instr.MatchLdfld<Backdrop>(nameof(Backdrop.Visible)))) {
             Logger.Warn(LogID, $"ilhook error! failed to find backdrop visible check in CIL code for {cursor.Method.Name}!");
             return;
         }
@@ -250,7 +251,9 @@ public class StylegroundDepthController : Entity {
     private static void IL_Level_Render(ILContext il) {
         ILCursor cursor = new ILCursor(il);
 
-        if (!cursor.TryGotoNext(MoveType.Before, i => i.MatchLdarg0(), i => i.MatchLdfld<Level>(nameof(Level.Pathfinder)))) {
+        if (!cursor.TryGotoNextBestFit(MoveType.Before,
+                instr => instr.MatchLdarg0(),
+                instr => instr.MatchLdfld<Level>(nameof(Level.Pathfinder)))) {
             Logger.Warn(LogID, $"ilhook error! failed to inject above colorgrade rendering in CIL code for {cursor.Method.Name}!");
             return;
         }
@@ -275,14 +278,16 @@ public class StylegroundDepthController : Entity {
         cursor.EmitStloc(firstDepthController);
 
         cursor.EmitLdarg0();
-        cursor.EmitLdfld(typeof(Level).GetField(nameof(Level.Paused)));
+        cursor.EmitLdfld(typeof(Level).GetField(nameof(Level.Paused), HookHelper.Bind.PublicInstance)!);
         cursor.EmitStloc(pausedLocal);
 
         // render above colorgrade
         cursor.EmitLdloc(firstDepthController);
         cursor.EmitDelegate(RenderAboveColorgrade);
 
-        if (!cursor.TryGotoNext(MoveType.AfterLabel, instr => instr.MatchLdarg0(), instr => instr.MatchLdfld<Level>("SubHudRenderer"))) {
+        if (!cursor.TryGotoNextBestFit(MoveType.AfterLabel,
+                instr => instr.MatchLdarg0(),
+                instr => instr.MatchLdfld<Level>(nameof(Level.SubHudRenderer)))) {
             Logger.Warn(LogID, $"ilhook error! failed to inject below hud rendering in CIL code for {cursor.Method.Name}!");
             return;
         }
@@ -294,7 +299,10 @@ public class StylegroundDepthController : Entity {
         cursor.EmitLdloc(pausedLocal);
         cursor.EmitDelegate(RenderBelowHud);
 
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<Level>("HudRenderer"), instr => instr.MatchLdarg0(), instr => instr.MatchCallOrCallvirt<Renderer>("Render"))) {
+        if (!cursor.TryGotoNextBestFit(MoveType.After,
+                instr => instr.MatchLdfld<Level>(nameof(Level.HudRenderer)),
+                instr => instr.MatchLdarg0(),
+                instr => instr.MatchCallOrCallvirt<Renderer>(nameof(Renderer.Render)))) {
             Logger.Warn(LogID, $"ilhook error! failed to inject above hud rendering in CIL code for {cursor.Method.Name}!");
             return;
         }

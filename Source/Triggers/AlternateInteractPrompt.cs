@@ -198,11 +198,14 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
         private static Hook hook_set_Highlighted = null;
 
         internal static void Load() {
-            hook_set_Highlighted = new Hook(typeof(TalkComponentUI).GetMethod("set_Highlighted"), On_set_Highlighted);
+            hook_set_Highlighted = new Hook(
+                typeof(TalkComponentUI).GetProperty(nameof(TalkComponentUI.Highlighted), HookHelper.Bind.PublicInstance)!.GetSetMethod()!,
+                On_set_Highlighted
+            );
             IL.Celeste.TalkComponent.Update += IL_TalkComponent_Update;
         }
         internal static void Unload() {
-            Util.DisposeAndSetNull(ref hook_set_Highlighted);
+            HookHelper.DisposeAndSetNull(ref hook_set_Highlighted);
             IL.Celeste.TalkComponent.Update -= IL_TalkComponent_Update;
         }
 
@@ -235,7 +238,7 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
             cursor.Index = -1;
             cursor.GotoPrev(MoveType.After, instr => instr.MatchLdcR4(0.1f));
             cursor.EmitLdarg0();
-            cursor.EmitLdfld(typeof(TalkComponent).GetField(nameof(TalkComponent.UI)));
+            cursor.EmitLdfld(typeof(TalkComponent).GetField(nameof(TalkComponent.UI), HookHelper.Bind.PublicInstance)!);
             cursor.EmitDelegate(AdjustCustomUiHoverTimer);
 
             return;

@@ -153,14 +153,17 @@ public class CustomFallingBlock : FallingBlock {
                 // checks whether the falling block fell out of bounds
                 // all of these checks are done on any custom falling block regardless of its direction so hopefully that wont break anything somewhere
                 // todo: maybe allow disabling this for gravity falling blocks?
-                if (Top > level.Bounds.Bottom + 16 || Bottom < level.Bounds.Top - 16 || Right < level.Bounds.Left - 16 || Left > level.Bounds.Right + 16 ||
-                ((Top > level.Bounds.Bottom - 1 || Bottom < level.Bounds.Top + 1 || Right < level.Bounds.Left + 1 || Left > level.Bounds.Right - 1) && CollideCheck<Solid>(Position + Direction))) {
+                if (Top > level.Bounds.Bottom + 16 || Bottom < level.Bounds.Top - 16 || Right < level.Bounds.Left - 16 || Left > level.Bounds.Right + 16
+                    || ((Top > level.Bounds.Bottom - 1 || Bottom < level.Bounds.Top + 1 || Right < level.Bounds.Left + 1 || Left > level.Bounds.Right - 1)
+                        && CollideCheck<Solid>(Position + Direction))) {
                     Collidable = Visible = false;
                     yield return 0.2f;
 
                     // checks whether the falling block fell into a screen transition
-                    if (level.Session.MapData.CanTransitionTo(level, new Vector2(Center.X, Bottom + 12f)) || level.Session.MapData.CanTransitionTo(level, new Vector2(Center.X, Top - 12f)) ||
-                    level.Session.MapData.CanTransitionTo(level, new Vector2(Left - 12f, Center.Y)) || level.Session.MapData.CanTransitionTo(level, new Vector2(Right + 12f, Center.Y))) {
+                    if (level.Session.MapData.CanTransitionTo(level, new Vector2(Center.X, Bottom + 12f))
+                        || level.Session.MapData.CanTransitionTo(level, new Vector2(Center.X, Top - 12f))
+                        || level.Session.MapData.CanTransitionTo(level, new Vector2(Left - 12f, Center.Y))
+                        || level.Session.MapData.CanTransitionTo(level, new Vector2(Right + 12f, Center.Y))) {
                         yield return 0.2f;
                         level.Shake();
                         Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);

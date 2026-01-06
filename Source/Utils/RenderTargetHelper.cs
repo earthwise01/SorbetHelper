@@ -11,7 +11,7 @@ internal static class RenderTargetHelper {
     /// get a gameplay buffer<br/>
     /// make sure to either dispose it manually at some point or return it for later use
     /// </summary>
-    /// <returns>a virtual render target with dimensions matching the vanilla gameplay buffers (usually 320x180)</returns>
+    /// <returns>a <see cref="VirtualRenderTarget"/> with dimensions matching the vanilla gameplay buffer <see cref="GameplayBuffers.Gameplay"/> (usually 320x180)</returns>
     public static VirtualRenderTarget GetGameplayBuffer() {
         if (RenderTargets.Count == 0)
             return VirtualContent.CreateRenderTarget("sorbetHelper-tempBuffer", SorbetHelperGFX.GameplayBufferWidth, SorbetHelperGFX.GameplayBufferHeight);
@@ -57,6 +57,15 @@ internal static class RenderTargetHelper {
             ReturnGameplayBuffer(vrts[i]);
             vrts[i] = null;
         }
+    }
+
+    /// <summary>
+    /// dispose a <see cref="VirtualRenderTarget"/> and set it to null
+    /// </summary>
+    /// <param name="renderTarget">the <see cref="VirtualRenderTarget"/> to dispose</param>
+    public static void DisposeAndSetNull(ref VirtualRenderTarget renderTarget) {
+        renderTarget?.Dispose();
+        renderTarget = null;
     }
 
     private static void DisposeQueue() {

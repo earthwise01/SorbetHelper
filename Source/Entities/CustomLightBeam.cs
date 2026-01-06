@@ -131,6 +131,18 @@ public class CustomLightBeam : Entity {
         alpha = baseAlpha * distanceAlpha * flagAlpha;
     }
 
+    public override void Removed(Scene scene) {
+        base.Removed(scene);
+        if (rainbow)
+            RainbowHelper.SetGetHueScene(null);
+    }
+
+    public override void SceneEnd(Scene scene) {
+        base.SceneEnd(scene);
+        if (rainbow)
+            RainbowHelper.SetGetHueScene(null);
+    }
+
     public override void Update() {
         base.Update();
 
@@ -176,8 +188,16 @@ public class CustomLightBeam : Entity {
             Vector2 particlePos = Position - direction * 4f;
             float emitX = Calc.Random.Next(lightWidth - 4) + 2 - lightWidth / 2f;
             particlePos += emitX * direction.Perpendicular();
+
             // if rainbow is enabled and rainbowSingleColor is disabled, call GetHue for the particle's color, otherwise use the color variable.
-            Color particleColor = ((rainbow && !rainbowSingleColor) ? GetHue(particlePos) : color) * alpha;
+            Color particleColor;
+            if (rainbow && !rainbowSingleColor) {
+                RainbowHelper.SetGetHueScene(Scene);
+                particleColor = GetHue(particlePos);
+            } else {
+                particleColor = color;
+            }
+
             // todo: maybe transfer over the lightbeam's parallax somehow?
             level.Particles.Emit(LightBeam.P_Glow, particlePos, particleColor, rotation + MathF.PI / 2f);
         }
@@ -210,6 +230,9 @@ public class CustomLightBeam : Entity {
 
         Vector2 actualPosition = Position;
         Position = RenderPosition;
+
+        if (rainbow)
+            RainbowHelper.SetGetHueScene(Scene);
 
         if (rainbow && rainbowSingleColor)
             color = GetHue(Position);
@@ -249,7 +272,7 @@ public class CustomLightBeam : Entity {
     private Color GetHue(Vector2 position) {
         // use vanilla/rainbow spinner color controller colors by default
         if (!useCustomRainbowColors)
-            return Util.GetRainbowHue(Scene, position);
+            return RainbowHelper.GetHue(position);
 
         // stolen from MaddieHelpingHand's RainbowSpinnerColorController
         // https://github.com/maddie480/MaddieHelpingHand/blob/master/Entities/RainbowSpinnerColorController.cs#L311
@@ -273,8 +296,8 @@ public class CustomLightBeam : Entity {
         return Color.Lerp(rainbowColors[colorIndex], rainbowColors[colorIndex + 1], progressInIndex);
     }
 
-    private bool InView(Camera camera) => X + cullRectRight > camera.X - VisibilityPadding &&
-                                          X + cullRectLeft < camera.X + camera.Width + VisibilityPadding &&
-                                          Y + cullRectBottom > camera.Y - VisibilityPadding &&
-                                          Y + cullRectTop < camera.Y + camera.Height + VisibilityPadding;
+    private bool InView(Camera camera) => X + cullRectRight > camera.X - VisibilityPadding
+                                          && X + cullRectLeft < camera.X + camera.Width + VisibilityPadding
+                                          && Y + cullRectBottom > camera.Y - VisibilityPadding
+                                          && Y + cullRectTop < camera.Y + camera.Height + VisibilityPadding;
 }

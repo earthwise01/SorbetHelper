@@ -407,8 +407,8 @@ public abstract class GateBlock : Solid {
         }
     }
 
-    private bool InView(Camera camera) => X < camera.Right + 16f && X + Width > camera.Left - 16f &&
-                                          Y < camera.Bottom + 16f && Y + Height > camera.Top - 16f;
+    private bool InView(Camera camera) => X < camera.Right + 16f && X + Width > camera.Left - 16f
+                                          && Y < camera.Bottom + 16f && Y + Height > camera.Top - 16f;
 
     [Tracked]
     private class GateBlockOutlineRenderer : Entity {

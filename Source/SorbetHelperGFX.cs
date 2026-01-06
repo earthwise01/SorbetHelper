@@ -9,9 +9,9 @@ public static class SorbetHelperGFX {
     public static int GameplayBufferWidth => GameplayBuffers.Gameplay?.Width ?? 320;
     public static int GameplayBufferHeight => GameplayBuffers.Gameplay?.Height ?? 180;
 
-    public static bool ZoomOutActive => UsingExtendedCameraDynamics ||
-                                        GameplayBufferWidth != 320 || GameplayBufferHeight != 180 ||
-                                        (Engine.Scene is Level level && (level.Camera.Width != 320 || level.Camera.Height != 180));
+    public static bool ZoomOutActive => UsingExtendedCameraDynamics
+                                        || GameplayBufferWidth != 320 || GameplayBufferHeight != 180
+                                        || (Engine.Scene is Level level && (level.Camera.Width != 320 || level.Camera.Height != 180));
     public static bool UsingExtendedCameraDynamics => ExtendedCameraDynamicsInterop.IsImported && ExtendedCameraDynamicsInterop.ExtendedCameraHooksEnabled();
     public static Vector2 GetZoomOutCameraCenterOffset(Camera camera) => new Vector2(camera.Width / 2f - 320f / 2f, camera.Height / 2f - 180f / 2f);
 
@@ -48,8 +48,7 @@ public static class SorbetHelperGFX {
 #if DEBUG
 
     [Command("sorbethelper_reloadgfx", "Reloads SorbetHelper GFX")]
-    public static void ReloadContentCommand()
-    {
+    public static void ReloadContentCommand() {
         Logger.Info(LogID, "Reloading GFX...");
 
         UnloadContent();

@@ -25,14 +25,14 @@ public class ExplodeHittable(ExplodeHittable.ExplodeHitCallback onHit) : Compone
     internal static void Load() {
         IL.Celeste.Puffer.Explode += IL_Puffer_Explode;
         ilHook_Seeker_RegenerateCoroutine = new ILHook(
-            typeof(Seeker).GetMethod(nameof(Seeker.RegenerateCoroutine), BindingFlags.NonPublic | BindingFlags.Instance).GetStateMachineTarget(),
+            typeof(Seeker).GetMethod(nameof(Seeker.RegenerateCoroutine), HookHelper.Bind.NonPublicInstance)!.GetStateMachineTarget()!,
             IL_Seeker_RegenerateCoroutine
         );
     }
 
     internal static void Unload() {
         IL.Celeste.Puffer.Explode -= IL_Puffer_Explode;
-        Util.DisposeAndSetNull(ref ilHook_Seeker_RegenerateCoroutine);
+        HookHelper.DisposeAndSetNull(ref ilHook_Seeker_RegenerateCoroutine);
     }
 
     private static void IL_Puffer_Explode(ILContext il) {

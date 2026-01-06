@@ -12,7 +12,7 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 public class WingedStrawberryDirectionController(EntityData data, Vector2 offset) : Entity(data.Position + offset) {
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(WingedStrawberryDirectionController)}";
 
-    private static readonly Dictionary<string, Vector2> DirectionToVector = new Dictionary<string, Vector2>{
+    private static readonly Dictionary<string, Vector2> DirectionToVector = new Dictionary<string, Vector2> {
         {"up", new Vector2(0f, -1f)}, {"down", new Vector2(0f, 1f)}, {"left", new Vector2(-1f, 0f)}, {"right", new Vector2(1f, 0f)},
         {"upleft", new Vector2(-1f, -1f)}, {"upright", new Vector2(1f, -1f)}, {"downleft", new Vector2(-1f, 1f)}, {"downright", new Vector2(1f, 1f)}
     };
@@ -24,11 +24,11 @@ public class WingedStrawberryDirectionController(EntityData data, Vector2 offset
     private static ILHook ilHook_Strawberry_orig_Update;
 
     internal static void Load() {
-        ilHook_Strawberry_orig_Update = new ILHook(typeof(Strawberry).GetMethod("orig_Update"), IL_Strawberry_orig_Update);
+        ilHook_Strawberry_orig_Update = new ILHook(typeof(Strawberry).GetMethod("orig_Update", HookHelper.Bind.PublicInstance)!, IL_Strawberry_orig_Update);
     }
 
     internal static void Unload() {
-        Util.DisposeAndSetNull(ref ilHook_Strawberry_orig_Update);
+        HookHelper.DisposeAndSetNull(ref ilHook_Strawberry_orig_Update);
     }
 
     private static void IL_Strawberry_orig_Update(ILContext il) {
@@ -41,8 +41,8 @@ public class WingedStrawberryDirectionController(EntityData data, Vector2 offset
         ILLabel afterVanillaMovementLabel = cursor.DefineLabel();
 
         if (!cursor.TryGotoNext(MoveType.After,
-                instr => instr.MatchLdfld<Strawberry>(nameof(Strawberry.flyingAway))) ||
-            !cursor.TryGotoPrev(MoveType.Before,
+                instr => instr.MatchLdfld<Strawberry>(nameof(Strawberry.flyingAway)))
+            || !cursor.TryGotoPrev(MoveType.Before,
                 instr => instr.MatchLdarg0(),
                 instr => instr.MatchLdarg0(),
                 instr => instr.MatchCall<Entity>("get_Y"))) {
@@ -60,7 +60,7 @@ public class WingedStrawberryDirectionController(EntityData data, Vector2 offset
         // inject custom movement code
         cursor.EmitLdarg0();
         cursor.EmitLdarg0();
-        cursor.EmitLdfld(typeof(Strawberry).GetField(nameof(Strawberry.flapSpeed), BindingFlags.NonPublic | BindingFlags.Instance));
+        cursor.EmitLdfld(typeof(Strawberry).GetField(nameof(Strawberry.flapSpeed), HookHelper.Bind.NonPublicInstance)!);
         cursor.EmitLdloc(controllerVariable);
         cursor.EmitDelegate(DirectionalMovement);
 
@@ -77,6 +77,7 @@ public class WingedStrawberryDirectionController(EntityData data, Vector2 offset
             Logger.Warn(LogID, $"Failed to inject additional out of room bounds checks in CIL code for {cursor.Method.FullName}!");
             return;
         }
+
         Logger.Verbose(LogID, $"Injecting additional out of room bounds checks at {cursor.Index} in CIL code for {cursor.Method.FullName}");
 
         // use custom oob checks if a controller exists and skip past the vanilla ones if necessary
@@ -99,7 +100,7 @@ public class WingedStrawberryDirectionController(EntityData data, Vector2 offset
 
         cursor.EmitLdarg0();
         cursor.EmitLdarg0();
-        cursor.EmitLdfld(typeof(Strawberry).GetField(nameof(Strawberry.start), BindingFlags.NonPublic | BindingFlags.Instance));
+        cursor.EmitLdfld(typeof(Strawberry).GetField(nameof(Strawberry.start), HookHelper.Bind.NonPublicInstance)!);
         cursor.EmitLdloc(controllerVariable);
         cursor.EmitDelegate(HorizontalIdleBoundsCheck);
 
@@ -119,23 +120,21 @@ public class WingedStrawberryDirectionController(EntityData data, Vector2 offset
         }
 
         // returns true if vanilla oob check should be skipped
-        static bool DirectionalOutOfBoundsCheck(Entity self, WingedStrawberryDirectionController controller)
-        {
+        static bool DirectionalOutOfBoundsCheck(Entity self, WingedStrawberryDirectionController controller) {
             if (controller is null)
                 return false;
 
             Rectangle levelBounds = self.SceneAs<Level>().Bounds;
-            if (controller.direction.Y < 0f && self.Y < levelBounds.Top - 16 ||
-                controller.direction.Y > 0f && self.Y > levelBounds.Bottom + 16 ||
-                controller.direction.X < 0f && self.X < levelBounds.Left - 24 ||
-                controller.direction.X > 0f && self.X > levelBounds.Right + 24)
+            if (controller.direction.Y < 0f && self.Y < levelBounds.Top - 16
+                || controller.direction.Y > 0f && self.Y > levelBounds.Bottom + 16
+                || controller.direction.X < 0f && self.X < levelBounds.Left - 24
+                || controller.direction.X > 0f && self.X > levelBounds.Right + 24)
                 self.RemoveSelf();
 
             return true;
         }
 
-        static void HorizontalIdleBoundsCheck(Entity self, Vector2 start, WingedStrawberryDirectionController controller)
-        {
+        static void HorizontalIdleBoundsCheck(Entity self, Vector2 start, WingedStrawberryDirectionController controller) {
             // only perform horizontal idle bounds checks if a controller exists
             if (controller is null)
                 return;

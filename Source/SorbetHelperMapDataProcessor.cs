@@ -4,6 +4,7 @@ using Celeste.Mod.SorbetHelper.Utils;
 using Celeste.Mod.SorbetHelper.Entities;
 
 namespace Celeste.Mod.SorbetHelper;
+
 public class SorbetHelperMapDataProcessor : EverestMapDataProcessor {
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(SorbetHelperMapDataProcessor)}";
 

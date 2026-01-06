@@ -109,8 +109,8 @@ public class DashGateBlock : GateBlock {
         return DashCollisionResults.Rebound;
     }
 
-    private bool CanActivate(Vector2 direction) =>
-        (direction.X != 0f && canMoveHorizontally) || (direction.Y != 0f && canMoveVertically);
+    private bool CanActivate(Vector2 direction)
+        => (direction.X != 0f && canMoveHorizontally) || (direction.Y != 0f && canMoveVertically);
 
     public override void Update() {
         base.Update();
