@@ -97,7 +97,7 @@ public class ParallaxHiResSnow : Backdrop {
     }
 
     public override void Update(Scene scene) {
-        Level level = scene as Level;
+        Level level = (scene as Level)!;
 
         base.Update(scene);
 
@@ -112,9 +112,9 @@ public class ParallaxHiResSnow : Backdrop {
 
         cameraFade = 1f;
         if (FadeX != null)
-            cameraFade *= FadeX.Value(level.Camera.X + Util.CameraWidth / 2f);
+            cameraFade *= FadeX.Value(level.Camera.X + level.Camera.Width / 2f);
         if (FadeY != null)
-            cameraFade *= FadeY.Value(level.Camera.Y + Util.CameraHeight / 2f);
+            cameraFade *= FadeY.Value(level.Camera.Y + level.Camera.Height / 2f);
 
         for (int i = 0; i < particles.Length; i++) {
             ref Particle particle = ref particles[i];
@@ -146,8 +146,9 @@ public class ParallaxHiResSnow : Backdrop {
         // could've maybe gone for a depth based approach where the "distance" of the particles determines how affected they are by the "zoom" but eh idk this works
 
         // bwehh
-        Vector2 zoomCenterOffset = Util.ZoomCenterOffset * UpscaleAmount;
-        Vector2 cameraPosLarge = (scene as Level).Camera.Position.Floor() * UpscaleAmount + zoomCenterOffset;
+        Camera camera = (scene as Level)!.Camera;
+        Vector2 zoomCenterOffset = SorbetHelperGFX.GetZoomOutCameraCenterOffset(camera) * UpscaleAmount;
+        Vector2 cameraPosLarge = camera.Position.Floor() * UpscaleAmount + zoomCenterOffset;
 
         for (int i = 0; i < particles.Length; i++) {
             ref Particle particle = ref particles[i];
@@ -158,7 +159,7 @@ public class ParallaxHiResSnow : Backdrop {
             };
 
             // i dont remember why i did so much stuff again here and i dont feel like testing rn so   yay
-            if (Util.ZoomOutActive) {
+            if (SorbetHelperGFX.ZoomOutActive) {
                 renderPosition += zoomCenterOffset;
                 renderPosition.X = -OffscreenPaddingSize + Mod(OffscreenPaddingSize + renderPosition.X, 1920 + OffscreenPaddingSize * 2);
                 renderPosition.Y = -OffscreenPaddingSize + Mod(OffscreenPaddingSize + renderPosition.Y, 1080 + OffscreenPaddingSize * 2);
@@ -172,11 +173,11 @@ public class ParallaxHiResSnow : Backdrop {
             if (additiveMultiplier < 1f)
                 particleColor = new Color(particleColor.R, particleColor.G, particleColor.B, (int)(particleColor.A * additiveMultiplier));
 
-            if (!Util.ZoomOutActive) {
+            if (!SorbetHelperGFX.ZoomOutActive) {
                 particleTexture.DrawCentered(renderPosition, particleColor, stretchScale * particle.Scale, shouldStretch ? stretchRotate : particle.Rotation);
             } else {
-                for (int x = 0; x < Util.CameraWidth * UpscaleAmount + OffscreenPaddingSize; x += 1920 + OffscreenPaddingSize * 2)
-                for (int y = 0; y < Util.CameraHeight * UpscaleAmount + OffscreenPaddingSize; y += 1080 + OffscreenPaddingSize * 2)
+                for (int x = 0; x < camera.Width * UpscaleAmount + OffscreenPaddingSize; x += 1920 + OffscreenPaddingSize * 2)
+                for (int y = 0; y < camera.Height * UpscaleAmount + OffscreenPaddingSize; y += 1080 + OffscreenPaddingSize * 2)
                     particleTexture.DrawCentered(renderPosition + new Vector2(x, y), particleColor, stretchScale * particles[i].Scale, shouldStretch ? stretchRotate : particles[i].Rotation);
             }
         }
@@ -223,8 +224,8 @@ public class ParallaxHiResSnow : Backdrop {
                 matrix *= Matrix.CreateScale(1f, -1f, 1f) * Matrix.CreateTranslation(0f, 1080, 0f);
 
             // zoom out support
-            if (Util.ZoomOutActive)
-                matrix *= Matrix.CreateScale(320f / Util.CameraWidth);
+            if (SorbetHelperGFX.ZoomOutActive)
+                matrix *= Matrix.CreateScale(level.Zoom);
 
             // watchtower/etc edge padding
             if (level.ScreenPadding != 0f) {

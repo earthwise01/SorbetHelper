@@ -1,13 +1,22 @@
 using System;
-using Microsoft.Xna.Framework;
-using Monocle;
-using Celeste;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Xna.Framework;
+using Monocle;
 
 namespace Celeste.Mod.SorbetHelper.Utils;
 
 internal static class Extensions {
+
+    #region Misc Extensions
+
+    public static bool IsInRange(this int value, int min, int max) => value >= min && value <= max;
+    public static bool IsInRange(this float value, float min, float max) => value >= min && value <= max;
+
+    #endregion
+
+    #region Calc Extensions
+
     extension(Calc) {
         public static Color HexToColorWithNonPremultipliedAlpha(string hex) {
             int consumed = 0;
@@ -46,10 +55,98 @@ internal static class Extensions {
         }
     }
 
-    extension(Session self) {
-        public bool GetFlag(string flag, bool inverted)
-            => self.GetFlag(flag) != inverted;
+    #endregion
+
+    #region Level Extensions
+
+    extension(Level self)
+    {
+        /// <summary>
+        /// Adds a custom entity to a Level and copies a reference to all newly loaded entities into a list.
+        /// </summary>
+        /// <param name="entityData">The EntityData to load.</param>
+        /// <param name="level">The Level to load the EntityData into, using Level.LoadCustomEntity.</param>
+        /// <param name="addTo">The list to add any loaded entities to.</param>
+        /// <param name="addToLevel">Whether the loaded entities should be added to the Level.</param>
+        /// <returns>Whether an entity was loaded.</returns>
+        public static bool LoadAndGetCustomEntity(EntityData entityData, Level level, List<Entity> addTo, bool addToLevel = true) {
+            List<Entity> toAdd = level.Entities.ToAdd;
+            int prevToAddCount = toAdd.Count;
+
+            if (!Level.LoadCustomEntity(entityData, level))
+                return false;
+
+            for (int i = prevToAddCount; i < toAdd.Count; i++)
+                addTo.Add(toAdd[i]);
+
+            if (!addToLevel && prevToAddCount <= toAdd.Count)
+                toAdd.RemoveRange(prevToAddCount, toAdd.Count - prevToAddCount);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Adds a custom entity to a Level and returns a reference to it.<br/>
+        /// If loading the entity results in muliple entities being created at the same time, this only returns the first one loaded.
+        /// </summary>
+        /// <param name="entityData">The EntityData to load.</param>
+        /// <param name="level">The Level to load the EntityData into, using Level.LoadCustomEntity.</param>
+        /// <param name="addToLevel">Whether to automatically add the loaded entity to the level.</param>
+        /// <returns>The loaded entity, or null if none was created.</returns>
+        public static Entity LoadAndGetCustomEntity(EntityData entityData, Level level, bool addToLevel = true) {
+            List<Entity> toAdd = level.Entities.ToAdd;
+            int prevToAddCount = toAdd.Count;
+
+            if (!Level.LoadCustomEntity(entityData, level) || prevToAddCount <= toAdd.Count)
+                return null;
+
+            Entity entity = toAdd[prevToAddCount];
+
+            if (!addToLevel)
+                toAdd.RemoveAt(prevToAddCount);
+
+            return entity;
+        }
     }
+
+    #endregion
+
+    #region Entity Extensions
+
+    extension(Entity self) {
+        public T GetComponentFromEnd<T>() where T : Component {
+            List<Component> components = self.Components.components;
+
+            for (int i = components.Count - 1; i >= 0; i--) {
+                if (components[i] is T t)
+                    return t;
+            }
+
+            return null;
+        }
+    }
+
+    #endregion
+
+    #region Session Extensions
+
+    extension(Session self) {
+        public bool GetFlag(string flag, bool inverted) => self.GetFlag(flag) != inverted;
+    }
+
+    #endregion
+
+    #region Camera Extensions
+
+    extension(Camera self) {
+        public int Width => self.Viewport.Width;
+        public int Height => self.Viewport.Height;
+        public Vector2 Center => self.Position + new Vector2(self.Viewport.Width / 2f, self.Viewport.Height / 2f);
+    }
+
+    #endregion
+
+    #region EntityData Extensions
 
     extension(EntityData self) {
         public Color HexColorWithAlpha(string key, Color defaultValue = default) {
@@ -85,6 +182,10 @@ internal static class Extensions {
             => self.Attr(key, defaultValue).Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(transform);
     }
 
+    #endregion
+
+    #region BinaryPacker.Element Extensions
+
     extension(BinaryPacker.Element self) {
         public Color AttrHexColorWithAlpha(string key, Color defaultValue = default) {
             if (!self.Attributes.TryGetValue(key, out object value))
@@ -110,81 +211,15 @@ internal static class Extensions {
 
         public Ease.Easer AttrEaser(string key, Ease.Easer defaultValue)
             => Util.Easers.GetValueOrDefault(self.Attr(key, ""), defaultValue);
-
         public Ease.Easer AttrEaser(string key)
             => Util.Easers.GetValueOrDefault(self.Attr(key, ""), Ease.Linear);
 
         public IEnumerable<T> AttrList<T>(string key, Func<string, T> transform, string defaultValue = "")
             => self.Attr(key, defaultValue).Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(transform);
-
         public IEnumerable<T> AttrList<T>(string key, Func<string, int, T> transform, string defaultValue = "")
             => self.Attr(key, defaultValue).Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(transform);
     }
 
-    extension(Entity entity) {
-        public T GetComponentFromEnd<T>() where T : Component {
-            List<Component> components = entity.Components.components;
+    #endregion
 
-            for (int i = components.Count - 1; i >= 0; i--) {
-                if (components[i] is T t)
-                    return t;
-            }
-
-            return null;
-        }
-    }
-
-    extension(Level level)
-    {
-        /// <summary>
-        /// Adds a custom entity to a Level and copies a reference to all newly loaded entities into a list.
-        /// </summary>
-        /// <param name="entityData">The EntityData to load.</param>
-        /// <param name="addTo">A list to add any loaded entities to.</param>
-        /// <param name="addToLevel">Whether to automatically any the loaded entities to the level.</param>
-        /// <returns>Whether an entity was loaded.</returns>
-        public bool LoadAndGetCustomEntity(EntityData entityData, List<Entity> addTo, bool addToLevel = true) {
-            List<Entity> toAdd = level.Entities.ToAdd;
-            int prevToAddCount = toAdd.Count;
-
-            if (!Level.LoadCustomEntity(entityData, level))
-                return false;
-
-            for (int i = prevToAddCount; i < toAdd.Count; i++)
-                addTo.Add(toAdd[i]);
-
-            if (!addToLevel && prevToAddCount <= toAdd.Count)
-                toAdd.RemoveRange(prevToAddCount, toAdd.Count - prevToAddCount);
-
-            return true;
-        }
-
-        /// <summary>
-        /// Adds a custom entity to a Level and returns a reference to it.<br/>
-        /// If loading the entity results in muliple entities being created at the same time, this only returns the first one loaded.
-        /// </summary>
-        /// <param name="entityData">The EntityData to load.</param>
-        /// <param name="addToLevel">Whether to automatically add the loaded entity to the level.</param>
-        /// <returns>The loaded entity, or null if none was created.</returns>
-        public Entity LoadAndGetCustomEntity(EntityData entityData, bool addToLevel = true) {
-            List<Entity> toAdd = level.Entities.ToAdd;
-            int prevToAddCount = toAdd.Count;
-
-            if (!Level.LoadCustomEntity(entityData, level) || prevToAddCount <= toAdd.Count)
-                return null;
-
-            Entity entity = toAdd[prevToAddCount];
-
-            if (!addToLevel)
-                toAdd.RemoveAt(prevToAddCount);
-
-            return entity;
-        }
-    }
-
-    // misc
-    public static bool IsInRange(this int value, int min, int max)=> value >= min && value <= max;
-    public static bool IsInRange(this float value, float min, float max) => value >= min && value <= max;
-    public static Vector2 GetCenter(this Camera camera)
-        => camera.Position + new Vector2(camera.Viewport.Width / 2f, camera.Viewport.Height / 2f);
 }

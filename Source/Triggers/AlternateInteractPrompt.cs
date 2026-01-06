@@ -75,70 +75,70 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
 
             switch (options.Style) {
                 case Styles.BottomCorner: {
-                        float slideEase = Math.Min(highlightedEase, slide);
+                    float slideEase = Math.Min(highlightedEase, slide);
 
-                        if (slideEase <= 0f)
-                            return;
+                    if (slideEase <= 0f)
+                        return;
 
-                        string label = Dialog.Clean(options.LabelDialogId);
+                    string label = Dialog.Clean(options.LabelDialogId);
 
-                        const int offscreenPaddingX = 16;
-                        const int edgePaddingX = 100;
-                        const int edgePaddingY = 80;
-                        float width = GetPromptWidth(label);
-                        Vector2 drawPos = new Vector2(
-                            x: 1920f - edgePaddingX + (edgePaddingX + width + offscreenPaddingX) * (1f - Ease.CubeOut(slideEase)),
-                            y: 1080f - edgePaddingY
-                        );
+                    const int offscreenPaddingX = 16;
+                    const int edgePaddingX = 100;
+                    const int edgePaddingY = 80;
+                    float width = GetPromptWidth(label);
+                    Vector2 drawPos = new Vector2(
+                        x: 1920f - edgePaddingX + (edgePaddingX + width + offscreenPaddingX) * (1f - Ease.CubeOut(slideEase)),
+                        y: 1080f - edgePaddingY
+                    );
 
-                        if (options.OnLeftCorner)
-                            drawPos.X = 1920 - drawPos.X;
+                    if (options.OnLeftCorner)
+                        drawPos.X = 1920 - drawPos.X;
 
-                        RenderPrompt(
-                            drawPos, label, 1f,
-                            justifyX: options.OnLeftCorner ? 0f : 1f,
-                            flipX: options.OnLeftCorner,
-                            wiggle: selectWiggle.Value * 0.05f,
-                            alpha: slideEase * 0.5f + 0.5f,
-                            backgroundAlpha: 0f
-                        );
+                    RenderPrompt(
+                        drawPos, label, 1f,
+                        justifyX: options.OnLeftCorner ? 0f : 1f,
+                        flipX: options.OnLeftCorner,
+                        wiggle: selectWiggle.Value * 0.05f,
+                        alpha: slideEase * 0.5f + 0.5f,
+                        backgroundAlpha: 0f
+                    );
 
-                        break;
-                    }
+                    break;
+                }
                 case Styles.SmallArrow: {
-                        Vector2 camPos = level.Camera.Position.Floor();
-                        Vector2 drawPos = Handler.Entity.Position + Handler.DrawAt - camPos;
-                        if (SaveData.Instance != null && SaveData.Instance.Assists.MirrorMode)
-                            drawPos.X = level.Camera.Viewport.Width - drawPos.X;
+                    Vector2 camPos = level.Camera.Position.Floor();
+                    Vector2 drawPos = Handler.Entity.Position + Handler.DrawAt - camPos;
+                    if (SaveData.Instance != null && SaveData.Instance.Assists.MirrorMode)
+                        drawPos.X = level.Camera.Width - drawPos.X;
 
-                        drawPos *= 6f;
-                        drawPos.Y += (float)Math.Sin(timer * 4f) * MathHelper.Lerp(12f, 6f, highlightedEase);
+                    drawPos *= 6f;
+                    drawPos.Y += (float)Math.Sin(timer * 4f) * MathHelper.Lerp(12f, 6f, highlightedEase);
 
-                        float zoomScale = level.Camera.Viewport.Width != 320 ? level.Zoom : 1f;
+                    float zoomScale = SorbetHelperGFX.ZoomOutActive ? level.Zoom : 1f;
 
-                        float arrowWiggle = (!Highlighted) ? (1f + wiggler.Value * 0.4f) : (1f - wiggler.Value * 0.4f);
-                        float promptWiggle = (!Highlighted) ? (1f + wiggler.Value * 0.275f) : (1f - wiggler.Value * 0.275f);
+                    float arrowWiggle = (!Highlighted) ? (1f + wiggler.Value * 0.4f) : (1f - wiggler.Value * 0.4f);
+                    float promptWiggle = (!Highlighted) ? (1f + wiggler.Value * 0.275f) : (1f - wiggler.Value * 0.275f);
 
-                        float arrowAlpha = Ease.CubeInOut(slide) * alpha;
+                    float arrowAlpha = Ease.CubeInOut(slide) * alpha;
 
-                        Vector2 arrowPos = drawPos + new Vector2(0f, 64f * (1f - Ease.CubeOut(slide))); // - new Vector2(0f, 48f * Ease.CubeInOut(highlightedEase));
-                        GFX.Gui["SorbetHelper/smallTalkArrow"].DrawJustified(arrowPos * zoomScale, new Vector2(0.5f, 1f), lineColor * arrowAlpha, arrowWiggle * zoomScale);
+                    Vector2 arrowPos = drawPos + new Vector2(0f, 64f * (1f - Ease.CubeOut(slide))); // - new Vector2(0f, 48f * Ease.CubeInOut(highlightedEase));
+                    GFX.Gui["SorbetHelper/smallTalkArrow"].DrawJustified(arrowPos * zoomScale, new Vector2(0.5f, 1f), lineColor * arrowAlpha, arrowWiggle * zoomScale);
 
-                        string label = Dialog.Clean(options.LabelDialogId);
-                        Vector2 promptPos = (drawPos - new Vector2(0, 80f)) * zoomScale;
-                        float promptScale = promptWiggle * zoomScale;
+                    string label = Dialog.Clean(options.LabelDialogId);
+                    Vector2 promptPos = (drawPos - new Vector2(0, 80f)) * zoomScale;
+                    float promptScale = promptWiggle * zoomScale;
 
-                        RenderPrompt(
-                            promptPos, label, promptScale,
-                            justifyX: 0.5f,
-                            flipX: true,
-                            wiggle: selectWiggle.Value * 0.05f,
-                            alpha: arrowAlpha * highlightedEase,
-                            backgroundAlpha: 0f
-                        );
+                    RenderPrompt(
+                        promptPos, label, promptScale,
+                        justifyX: 0.5f,
+                        flipX: true,
+                        wiggle: selectWiggle.Value * 0.05f,
+                        alpha: arrowAlpha * highlightedEase,
+                        backgroundAlpha: 0f
+                    );
 
-                        break;
-                    }
+                    break;
+                }
             }
         }
 

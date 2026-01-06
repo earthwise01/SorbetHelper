@@ -1,12 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-using Microsoft.Xna.Framework;
 using Monocle;
-using Celeste;
-using Celeste.Mod.SorbetHelper.Entities;
-using MonoMod.Utils;
 
 namespace Celeste.Mod.SorbetHelper.Utils;
 
@@ -20,13 +14,13 @@ internal static class RenderTargetHelper {
     /// <returns>a virtual render target with dimensions matching the vanilla gameplay buffers (usually 320x180)</returns>
     public static VirtualRenderTarget GetGameplayBuffer() {
         if (RenderTargets.Count == 0)
-            return VirtualContent.CreateRenderTarget("sorbetHelper-tempBuffer", Util.GameplayBufferWidth, Util.GameplayBufferHeight);
+            return VirtualContent.CreateRenderTarget("sorbetHelper-tempBuffer", SorbetHelperGFX.GameplayBufferWidth, SorbetHelperGFX.GameplayBufferHeight);
 
         VirtualRenderTarget cached = RenderTargets.Dequeue();
         if (cached.IsDisposed)
-            cached = VirtualContent.CreateRenderTarget("sorbetHelper-tempBuffer", Util.GameplayBufferWidth, Util.GameplayBufferHeight);
+            cached = VirtualContent.CreateRenderTarget("sorbetHelper-tempBuffer", SorbetHelperGFX.GameplayBufferWidth, SorbetHelperGFX.GameplayBufferHeight);
         else
-            Util.EnsureBufferSize(cached);
+            SorbetHelperGFX.EnsureBufferSize(cached);
 
         return cached;
     }
@@ -65,10 +59,7 @@ internal static class RenderTargetHelper {
         }
     }
 
-    /// <summary>
-    /// dispose any gameplay buffers currently in the queue
-    /// </summary>
-    public static void DisposeQueue() {
+    private static void DisposeQueue() {
         try {
             foreach (VirtualRenderTarget vrt in RenderTargets)
                 vrt?.Dispose();
@@ -82,5 +73,24 @@ internal static class RenderTargetHelper {
     // private static void Log() {
     //     Engine.Commands.Log($"{RenderTargets.Count} render targets are currently queued");
     // }
-}
 
+    #region Hooks
+
+    internal static void Load() {
+        On.Celeste.GameplayBuffers.Unload += On_GameplayBuffers_Unload;
+    }
+
+    internal static void Unload() {
+        On.Celeste.GameplayBuffers.Unload -= On_GameplayBuffers_Unload;
+        DisposeQueue();
+    }
+
+    // unload any leftover queued buffers with the normal gameplay buffers
+    private static void On_GameplayBuffers_Unload(On.Celeste.GameplayBuffers.orig_Unload orig) {
+        orig();
+        DisposeQueue();
+    }
+
+    #endregion
+
+}

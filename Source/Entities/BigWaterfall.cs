@@ -121,7 +121,7 @@ public class BigWaterfall : Entity {
         visibleOnCamera = InView(level.Camera);
 
         if (loopingSfx is not null) {
-            Vector2 cameraPos = level.Camera.GetCenter();
+            Vector2 cameraPos = level.Camera.Center;
             loopingSfx.Position.Y = Calc.Clamp(cameraPos.Y, Y, height);
         }
 

@@ -130,7 +130,7 @@ public class StylegroundDepthController : Entity {
     public override void Added(Scene scene) {
         base.Added(scene);
 
-        RegisterStylegrounds(scene as Level);
+        RegisterStylegrounds(SceneAs<Level>());
     }
 
     public override void Removed(Scene scene) {
@@ -151,7 +151,7 @@ public class StylegroundDepthController : Entity {
     public override void Update() {
         base.Update();
 
-        if (Mode != Modes.AbovePauseHud || !(Scene as Level).Paused)
+        if (Mode != Modes.AbovePauseHud || SceneAs<Level>().Paused)
             return;
 
         foreach (Backdrop backdrop in BackdropsBG.Concat(BackdropsFG))
@@ -163,8 +163,8 @@ public class StylegroundDepthController : Entity {
         if (Mode == Modes.Normal)
             return;
 
-        Buffer ??= VirtualContent.CreateRenderTarget("sorbetHelper_stylegroundDepthControllerBuffer", Util.GameplayBufferWidth, Util.GameplayBufferHeight);
-        Util.EnsureBufferSize(Buffer);
+        Buffer ??= VirtualContent.CreateRenderTarget("sorbetHelper_stylegroundDepthControllerBuffer", SorbetHelperGFX.GameplayBufferWidth, SorbetHelperGFX.GameplayBufferHeight);
+        SorbetHelperGFX.EnsureBufferSize(Buffer);
 
         Engine.Instance.GraphicsDevice.SetRenderTarget(Buffer);
         Engine.Instance.GraphicsDevice.Clear(Color.Transparent);

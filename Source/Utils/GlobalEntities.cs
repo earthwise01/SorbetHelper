@@ -81,7 +81,7 @@ internal static class GlobalEntities {
                     if (!IsGlobalEntity(entityData) || onlyOneLoaded.Contains(name))
                         continue;
 
-                    level.LoadAndGetCustomEntity(entityData, loaded);
+                    Level.LoadAndGetCustomEntity(entityData, level, loaded);
 
                     // wonder if i should make this result in only adding the entity with the highest id instead of the first found in the map,
                     // actually i wonder if this would be a good place for like    a mapdataprocessor or something idk

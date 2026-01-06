@@ -100,7 +100,7 @@ public class DisplacementEffectBlocker : Entity {
             if (waterBlockers.Count <= 0)
                 return;
 
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, WaterDisplacementBlockerBlendState, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, (scene as Level).Camera.Matrix);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, WaterDisplacementBlockerBlendState, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, (scene as Level)!.Camera.Matrix);
 
             foreach (Entity entity in waterBlockers)
                 Draw.Rect(entity.Position, entity.Width, entity.Height, NoWaterDisplacementMultColor);

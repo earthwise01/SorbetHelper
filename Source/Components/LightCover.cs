@@ -83,7 +83,7 @@ public class LightCover(float alpha) : Component(false, true) {
             Color baseColor = level.Lighting.BaseColor;
 
             Engine.Instance.GraphicsDevice.SetRenderTargets(initalBuffer);
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, SorbetHelperModule.FxAlphaMask);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, SorbetHelperGFX.FxAlphaMask);
 
             for (int i = 0; i < batchCount; i++) {
                 VirtualRenderTarget tempBuffer = tempBuffers[i];

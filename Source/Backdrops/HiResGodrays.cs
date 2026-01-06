@@ -127,7 +127,7 @@ public class HiResGodrays : Backdrop {
     }
 
     public override void Update(Scene scene) {
-        Level level = scene as Level;
+        Level level = (scene as Level)!;
 
         base.Update(scene);
 
@@ -142,14 +142,14 @@ public class HiResGodrays : Backdrop {
 
         cameraFade = 1f;
         if (FadeX != null)
-            cameraFade *= FadeX.Value(level.Camera.X + Util.CameraWidth / 2f);
+            cameraFade *= FadeX.Value(level.Camera.X + level.Camera.Width / 2f);
         if (FadeY != null)
-            cameraFade *= FadeY.Value(level.Camera.Y + Util.CameraHeight / 2f);
+            cameraFade *= FadeY.Value(level.Camera.Y + level.Camera.Height / 2f);
 
         float alpha = visibleFade * cameraFade * ExtendedVariantsCompat.ForegroundEffectOpacity;
 
         // resize vertex buffer for zoom out if needed,
-        int visibleScreens = (int)Math.Ceiling((Util.CameraWidth + offscreenPadding * 2f) / (320f + offscreenPadding * 2f));
+        int visibleScreens = (int)Math.Ceiling((level.Camera.Width + offscreenPadding * 2f) / (320f + offscreenPadding * 2f));
         int expectedBufferLength = rayCount * 6 * visibleScreens * visibleScreens;
         if (!usingTextureParticles && vertices.Length != expectedBufferLength)
             vertices = new VertexPositionColor[expectedBufferLength];
@@ -233,11 +233,11 @@ public class HiResGodrays : Backdrop {
         Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, matrix);
 
         // im realising there mightt be some inconsistency between godrays/texture particles since one is setup in update and the other partly in render   fun
-        int cameraWidth = Util.CameraWidth;
-        int cameraHeight = Util.CameraHeight;
-        Level level = scene as Level;
-        Player player = level.Tracker.GetEntity<Player>();
+        Level level = (scene as Level)!;
         Vector2 cameraPos = level.Camera.Position.Floor();
+        int cameraWidth = level.Camera.Width;
+        int cameraHeight = level.Camera.Height;
+        Player player = level.Tracker.GetEntity<Player>();
 
         for (int i = 0; i < rays.Length; i++) {
             ref Ray ray = ref rays[i];
@@ -304,8 +304,8 @@ public class HiResGodrays : Backdrop {
                 matrix *= Matrix.CreateScale(1f, -1f, 1f) * Matrix.CreateTranslation(0f, 1080, 0f);
 
             // zoom out support
-            if (Util.ZoomOutActive)
-                matrix *= Matrix.CreateScale(320f / Util.CameraWidth);
+            if (SorbetHelperGFX.ZoomOutActive)
+                matrix *= Matrix.CreateScale(level.Zoom);
 
             // watchtower/etc edge padding
             if (level.ScreenPadding != 0f) {

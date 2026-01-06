@@ -42,7 +42,7 @@ public class CustomLightBeam : Entity {
                 return Position;
 
             // hopefully i   mathed right and this actually fully does what i think it does
-            Vector2 cam = SceneAs<Level>().Camera.GetCenter();
+            Vector2 cam = SceneAs<Level>().Camera.Center;
             return cam + (Position - scrollAnchor * (1f - scroll) - cam * scroll);
         }
     }
@@ -277,11 +277,8 @@ public class CustomLightBeam : Entity {
         return Color.Lerp(rainbowColors[colorIndex], rainbowColors[colorIndex + 1], progressInIndex);
     }
 
-    private bool InView(Camera camera) {
-        Vector2 pos = Position;
-        if (pos.X + cullRectRight > camera.X - VisibilityPadding && pos.X + cullRectLeft < camera.X + camera.Viewport.Width + VisibilityPadding)
-            return pos.Y + cullRectBottom > camera.Y - VisibilityPadding && pos.Y + cullRectTop < camera.Y + camera.Viewport.Height + VisibilityPadding;
-
-        return false;
-    }
+    private bool InView(Camera camera) => X + cullRectRight > camera.X - VisibilityPadding &&
+                                          X + cullRectLeft < camera.X + camera.Width + VisibilityPadding &&
+                                          Y + cullRectBottom > camera.Y - VisibilityPadding &&
+                                          Y + cullRectTop < camera.Y + camera.Height + VisibilityPadding;
 }

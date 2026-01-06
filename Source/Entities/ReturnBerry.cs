@@ -58,7 +58,7 @@ public class ReturnBerry : Strawberry {
 
         // if maddy is still alive put her in a bubble
         if (!player.Dead && player.StateMachine.State != Player.StCassetteFly) {
-            Audio.Play("event:/game/general/cassette_bubblereturn", SceneAs<Level>().Camera.GetCenter());
+            Audio.Play("event:/game/general/cassette_bubblereturn", SceneAs<Level>().Camera.Center);
             player.StartCassetteFly(nodes[1], nodes[0]);
         }
     }

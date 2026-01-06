@@ -1,12 +1,9 @@
 ﻿using System;
-using Microsoft.Xna.Framework.Graphics;
-using Monocle;
 using Celeste.Mod.SorbetHelper.Utils;
 using Celeste.Mod.SorbetHelper.Entities;
 using Celeste.Mod.SorbetHelper.Triggers;
 using Celeste.Mod.SorbetHelper.Components;
 using Celeste.Mod.SorbetHelper.Backdrops;
-using MonoMod;
 using MonoMod.ModInterop;
 
 namespace Celeste.Mod.SorbetHelper;
@@ -18,8 +15,6 @@ public class SorbetHelperModule : EverestModule {
     public static SorbetHelperSettings Settings => (SorbetHelperSettings)Instance._Settings;
     public override Type SessionType => typeof(SorbetHelperSession);
     public static SorbetHelperSession Session => (SorbetHelperSession)Instance._Session;
-
-    public static Effect FxAlphaMask { get; private set; }
 
     public SorbetHelperModule() {
         Instance = this;
@@ -44,7 +39,7 @@ public class SorbetHelperModule : EverestModule {
         typeof(SorbetHelperExports).ModInterop();
 
         // sorbet helper misc stuff
-        On.Celeste.GameplayBuffers.Unload += On_GameplayBuffers_Unload;
+        RenderTargetHelper.Load();
         GlobalEntities.ProcessAttributes(typeof(SorbetHelperModule).Assembly);
         GlobalEntities.Load();
         SorbetHelperDecalRegistry.LoadHandlers();
@@ -75,13 +70,14 @@ public class SorbetHelperModule : EverestModule {
         HiResGodrays.Load();
     }
 
+    public override void LoadContent(bool firstLoad) {
+        SorbetHelperGFX.LoadContent();
+    }
+
     public override void Unload() {
         // sorbet helper misc stuff
-        FxAlphaMask?.Dispose();
-        FxAlphaMask = null;
-
-        On.Celeste.GameplayBuffers.Unload -= On_GameplayBuffers_Unload;
-        RenderTargetHelper.DisposeQueue();
+        SorbetHelperGFX.UnloadContent();
+        RenderTargetHelper.Unload();
         GlobalEntities.Unload();
 
         // entities
@@ -114,18 +110,5 @@ public class SorbetHelperModule : EverestModule {
         base.PrepareMapDataProcessors(context);
 
         context.Add<SorbetHelperMapDataProcessor>();
-    }
-
-    public override void LoadContent(bool firstLoad) {
-        FxAlphaMask = LoadShader("AlphaMask");
-    }
-
-    private static Effect LoadShader(string id)
-        => new Effect(Engine.Graphics.GraphicsDevice, Everest.Content.Get($"SorbetHelper:/Effects/SorbetHelper/{id}.cso").Data);
-
-    // unload any leftover queued buffers with the normal gameplay buffers
-    private static void On_GameplayBuffers_Unload(On.Celeste.GameplayBuffers.orig_Unload orig) {
-        orig();
-        RenderTargetHelper.DisposeQueue();
     }
 }

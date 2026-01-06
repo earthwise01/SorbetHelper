@@ -103,10 +103,10 @@ public class ReturnBubbleBehaviorController : Entity {
         self.Sprite.Scale = new Vector2(1.25f); // madeline scales back to 1x automatically so this just makes a little bounce effect
         self.Depth = Depths.FormationSequences;
 
-        Audio.Play("event:/sorbethelper/sfx/bubblereturn_split/start", self.level.Camera.GetCenter());
+        Audio.Play("event:/sorbethelper/sfx/bubblereturn_split/start", self.level.Camera.Center);
         yield return 0.4f;
 
-        Audio.Play("event:/sorbethelper/sfx/bubblereturn_split/slide", self.level.Camera.GetCenter());
+        Audio.Play("event:/sorbethelper/sfx/bubblereturn_split/slide", self.level.Camera.Center);
         float time = behavior.UseSpeed ? self.cassetteFlyCurve.GetLengthParametric(100) / behavior.Speed : behavior.Time;
         while (self.cassetteFlyLerp < 1f) {
             if (self.level.OnInterval(0.03f))
@@ -137,7 +137,7 @@ public class ReturnBubbleBehaviorController : Entity {
             self.Sprite.Y -= 5f; behavior.PlayerYOffsetApplied = false;
         self.Sprite.Play("fallFast");
 
-        Audio.Play("event:/sorbethelper/sfx/bubblereturn_split/pop", self.level.Camera.GetCenter());
+        Audio.Play("event:/sorbethelper/sfx/bubblereturn_split/pop", self.level.Camera.Center);
         yield return 0.2f;
 
         self.level.CanRetry = true;
