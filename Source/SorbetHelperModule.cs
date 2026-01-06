@@ -70,8 +70,7 @@ public class SorbetHelperModule : EverestModule {
         GlobalTypeNameProcessor.Load();
 
         // backdrops
-        ParallaxHiResSnow.Load();
-        HiResGodrays.Load();
+        HiResBackdrop.Load();
     }
 
     public override void LoadContent(bool firstLoad) {
@@ -106,8 +105,7 @@ public class SorbetHelperModule : EverestModule {
         GlobalTypeNameProcessor.Unload();
 
         // backdrops
-        ParallaxHiResSnow.Unload();
-        HiResGodrays.Unload();
+        HiResBackdrop.Unload();
     }
 
     public override void PrepareMapDataProcessors(MapDataFixup context) {

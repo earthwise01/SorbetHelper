@@ -246,7 +246,7 @@ internal static class Extensions {
 
     extension(Ease) {
         /// <summary>
-        /// maps all Monocle.Ease Easers to their names (i.e. "SineInOut" => Ease.SineInOut)
+        /// maps all Monocle <see cref="Ease.Easer"/>s to their names (i.e. <c>"SineInOut"</c> => <see cref="Ease.SineInOut"/>)
         /// </summary>
         public static ReadOnlyDictionary<string, Ease.Easer> StringToEaser => EaseExtensions_StringToEaser;
     }
