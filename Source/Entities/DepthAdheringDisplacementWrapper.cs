@@ -41,12 +41,12 @@ public class DepthAdheringDisplacementWrapper : Entity {
 
                 // if the entity has private fields called "width" or "height" try to use those for the temporary hitbox dimensions instead of the default of 8px
                 Type entityType = entity.GetType();
-                FieldInfo widthInfo = entityType.GetField("width", BindingFlags.NonPublic | BindingFlags.Instance);
-                FieldInfo heightInfo = entityType.GetField("height", BindingFlags.NonPublic | BindingFlags.Instance);
+                FieldInfo f_width = entityType.GetField("width", BindingFlags.NonPublic | BindingFlags.Instance);
+                FieldInfo f_height = entityType.GetField("height", BindingFlags.NonPublic | BindingFlags.Instance);
 
-                if (widthInfo?.GetValue(entity) is float width)
+                if (f_width?.GetValue(entity) is float width)
                     tempWidth = width;
-                if (heightInfo?.GetValue(entity) is float height)
+                if (f_height?.GetValue(entity) is float height)
                     tempHeight = height;
 
                 entityCollider = new Hitbox(tempWidth, tempHeight, entity.X, entity.Y);

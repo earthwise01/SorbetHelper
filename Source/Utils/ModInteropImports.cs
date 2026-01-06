@@ -59,15 +59,17 @@ public static class ExtendedVariantsCompat {
 }
 
 public static class ChronoHelperCompat {
+    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(ChronoHelperCompat)}";
+
     public static bool IsLoaded { get; private set; } = false;
 
-    private static MethodInfo Module_get_Session;
-    private static MethodInfo Session_get_gravityModeUp;
-    private static bool ReflectionSucceeded;
+    private static MethodInfo m_Module_get_Session;
+    private static MethodInfo m_Session_get_gravityModeUp;
+    private static bool reflectionSucceeded;
 
     // just using an assembly reference might be more performant?? but doing this with reflection gives a bit more control over error checking in case of an update
     internal static void Load() {
-        IsLoaded = ReflectionSucceeded = false;
+        IsLoaded = reflectionSucceeded = false;
 
         Everest.Loader.TryGetDependency(new EverestModuleMetadata {
             Name = "ChronoHelper",
@@ -79,20 +81,20 @@ public static class ChronoHelperCompat {
             return;
 
         Assembly assembly = chronoHelper.GetType().Assembly;
-        Module_get_Session = assembly.GetType("Celeste.Mod.ChronoHelper.ChronoHelper")?.GetMethod("get_Session");
-        Session_get_gravityModeUp = assembly.GetType("ChronoHelperSessionModule")?.GetMethod("get_gravityModeUp");
+        m_Module_get_Session = assembly.GetType("Celeste.Mod.ChronoHelper.ChronoHelper")?.GetMethod("get_Session");
+        m_Session_get_gravityModeUp = assembly.GetType("ChronoHelperSessionModule")?.GetMethod("get_gravityModeUp");
 
         // chrono helper is loaded, but getting the falling block gravity property getter with reflection failed!
-        if (Module_get_Session is null || Session_get_gravityModeUp is null) {
-            Logger.Error($"{nameof(SorbetHelper)}/{nameof(ChronoHelperCompat)}", "loading support for chrono helper gravity falling block switches failed even though chrono helper is installed! expect a crash if using custom/dash falling blocks with chrono helper gravity enabled");
+        if (m_Module_get_Session is null || m_Session_get_gravityModeUp is null) {
+            Logger.Error(LogID, "loading support for chrono helper gravity falling block switches failed even though chrono helper is installed! expect a crash if using custom/dash falling blocks with chrono helper gravity enabled");
 
             IsLoaded = true;
-            ReflectionSucceeded = false;
+            reflectionSucceeded = false;
             return;
         }
 
         // chrono helper compat is loaded
-        IsLoaded = ReflectionSucceeded = true;
+        IsLoaded = reflectionSucceeded = true;
     }
 
     public static bool SessionGravityModeUp {
@@ -100,10 +102,10 @@ public static class ChronoHelperCompat {
             if (!IsLoaded)
                 throw new Exception("failed to get chrono helper falling block gravity: chrono helper is not installed!");
 
-            if (!ReflectionSucceeded) // maybe change to a postcard???
+            if (!reflectionSucceeded) // maybe change to a postcard???
                 throw new Exception("failed to get chrono helper gravity!     this is likely due to an unexpected code change, please report this   to @earthwise_ in the celeste discord, or on SorbetHelper's github!");
 
-            return (bool)Session_get_gravityModeUp.Invoke(Module_get_Session.Invoke(null, null), null);
+            return (bool)m_Session_get_gravityModeUp.Invoke(m_Module_get_Session.Invoke(null, null), null);
         }
     }
 }

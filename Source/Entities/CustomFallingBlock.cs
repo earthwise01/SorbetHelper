@@ -7,6 +7,8 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [TrackedAs(typeof(FallingBlock))]
 [CustomEntity("SorbetHelper/CustomFallingBlock", "SorbetHelper/CustomGravityFallingBlock = LoadGravity")]
 public class CustomFallingBlock : FallingBlock {
+    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(CustomFallingBlock)}";
+
     protected readonly string flagOnFall, flagOnLand, triggerFlag;
     protected readonly bool resetFlags;
     protected bool fallOnTouch;
@@ -57,7 +59,7 @@ public class CustomFallingBlock : FallingBlock {
 
         chronoHelperGravityFallingBlock = chronoHelperGravity;
         if (chronoHelperGravity && !ChronoHelperCompat.IsLoaded)
-            Logger.Warn(nameof(SorbetHelper), "Trying to load a Custom Gravity Falling Block without Chrono Helper enabled!");
+            Logger.Warn(LogID, "Trying to load a Custom Gravity Falling Block without Chrono Helper enabled!");
         chronoHelperGravityChangeShakeTime = data.Float("chronoHelperGravityChangeShakeTime", 0.1f);
 
         Add(new Coroutine(Sequence()));

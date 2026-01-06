@@ -4,6 +4,8 @@ using System.Reflection;
 namespace Celeste.Mod.SorbetHelper.Utils;
 
 internal static class GlobalEntities {
+    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(GlobalEntities)}";
+
     public const string ForceGlobalAttribute = "sorbetHelper_makeGlobal"; // could be useful idk
 
     private static readonly HashSet<string> GlobalEntityIDs = [];
@@ -89,7 +91,7 @@ internal static class GlobalEntities {
                 foreach (Entity entity in loaded)
                     entity.Tag |= Tags.Global;
             } catch (Exception e) {
-                Logger.Error(nameof(SorbetHelper), $"error while loading global entities for room {levelData.Name} in map {mapData.Area.SID}!\n{e}");
+                Logger.Error(LogID, $"error while loading global entities for room {levelData.Name} in map {mapData.Area.SID}!\n{e}");
             }
 
             loadingGlobalEntities = false;

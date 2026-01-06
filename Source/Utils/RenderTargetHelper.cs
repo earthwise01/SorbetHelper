@@ -3,6 +3,8 @@ using System.Collections.Generic;
 namespace Celeste.Mod.SorbetHelper.Utils;
 
 internal static class RenderTargetHelper {
+    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(RenderTargetHelper)}";
+
     private static Queue<VirtualRenderTarget> RenderTargets { get; } = [];
 
     /// <summary>
@@ -64,7 +66,7 @@ internal static class RenderTargetHelper {
 
             RenderTargets.Clear();
         } catch (Exception e) {
-            Logger.Error(nameof(SorbetHelper), $"???? literally how? {e}"); // this threw an error one time when reloading the mod and i cant replicate it anymore. fun!
+            Logger.Error(LogID, $"???? literally how? {e}"); // this threw an error one time when reloading the mod and i cant replicate it anymore. fun!
         }
     }
 

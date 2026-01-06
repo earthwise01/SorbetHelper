@@ -6,6 +6,8 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [GlobalEntity(              EntityDataID + "Global")] // global version is swapped to in mapdataprocessor based on data.Bool("global")
 [CustomEntity(EntityDataID, EntityDataID + "Global")]
 public class SliderFadeXY : Entity {
+    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(SliderFadeXY)}";
+
     public const string EntityDataID = "SorbetHelper/SliderFadeXY";
 
     private readonly string sliderName;
@@ -47,9 +49,9 @@ public class SliderFadeXY : Entity {
                 string[] values = zone[1].Split('-');
                 if (values.Length != 2) {
                     if (values.Length < 2)
-                        Logger.Warn(nameof(SorbetHelper), $"Fader formatting error! Less than 2 values specified for zone {i + 1}.");
+                        Logger.Warn(LogID, $"Fader formatting error! Less than 2 values specified for zone {i + 1}.");
                     if (values.Length > 2)
-                        Logger.Warn(nameof(SorbetHelper), $"Fader formatting error! More than 2 values specified for zone {i + 1}.");
+                        Logger.Warn(LogID, $"Fader formatting error! More than 2 values specified for zone {i + 1}.");
 
                     continue;
                 }
@@ -61,9 +63,9 @@ public class SliderFadeXY : Entity {
                 string[] positions = zone[0].Split('-');
                 if (positions.Length != 2) {
                     if (positions.Length < 2)
-                        Logger.Warn(nameof(SorbetHelper), $"Fader formatting error! Less than 2 positions specified for zone {i + 1}.");
+                        Logger.Warn(LogID, $"Fader formatting error! Less than 2 positions specified for zone {i + 1}.");
                     if (positions.Length > 2)
-                        Logger.Warn(nameof(SorbetHelper), $"Fader formatting error! More than 2 positions specified for zone {i + 1}. (Remember that negative numbers are prefixed with 'n' and not '-'!)");
+                        Logger.Warn(LogID, $"Fader formatting error! More than 2 positions specified for zone {i + 1}. (Remember that negative numbers are prefixed with 'n' and not '-'!)");
 
                     continue;
                 }
@@ -82,7 +84,7 @@ public class SliderFadeXY : Entity {
 
                 fader.Add(posFrom * int.Parse(positions[0]), posTo * int.Parse(positions[1]), fromValue, toValue);
             } else if (zone.Length != 0) {
-                Logger.Warn(nameof(SorbetHelper), $"Fader formatting error! Zone {i + 1} has wrong number of arguments. (Remember that each zone needs 1 pair of positions followed by 1 pair of values!)");
+                Logger.Warn(LogID, $"Fader formatting error! Zone {i + 1} has wrong number of arguments. (Remember that each zone needs 1 pair of positions followed by 1 pair of values!)");
             }
         }
 

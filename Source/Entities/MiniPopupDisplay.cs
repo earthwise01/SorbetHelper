@@ -6,6 +6,8 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 
 [Tracked]
 public class MiniPopupDisplay : Entity {
+    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(MiniPopupDisplay)}";
+
     private readonly MTexture fallbackBaseTex, fallbackAccentTex;
     private readonly List<Popup> popups = [];
     private readonly HashSet<Popup> toRemove = [];
@@ -145,11 +147,11 @@ public class MiniPopupDisplay : Entity {
 
     public static MiniPopupDisplay GetMiniPopupDisplay(Scene scene) {
         if (scene.Tracker.GetEntities<MiniPopupDisplay>()
-                 .Concat(scene.Entities.ToAdd)
-                 .FirstOrDefault(e => e is MiniPopupDisplay)
+                         .Concat(scene.Entities.ToAdd)
+                         .FirstOrDefault(e => e is MiniPopupDisplay)
             is not MiniPopupDisplay miniPopupDisplay) {
             scene.Add(miniPopupDisplay = new MiniPopupDisplay());
-            Logger.Info("SorbetHelper", $"creating new {nameof(MiniPopupDisplay)}.");
+            Logger.Info(LogID, $"creating new {nameof(MiniPopupDisplay)}.");
         }
 
         return miniPopupDisplay;

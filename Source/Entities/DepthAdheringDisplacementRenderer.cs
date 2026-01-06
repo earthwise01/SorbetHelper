@@ -8,6 +8,8 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 
 [Tracked]
 public class DepthAdheringDisplacementRenderer : Entity {
+    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(DepthAdheringDisplacementRenderer)}";
+
     private readonly List<DepthAdheringDisplacementRenderHook> renderHooks = [];
 
     private readonly bool distortBehind;
@@ -115,9 +117,9 @@ public class DepthAdheringDisplacementRenderer : Entity {
         if (scene.Tracker.GetEntities<DepthAdheringDisplacementRenderer>()
                          .Concat(scene.Entities.ToAdd)
                          .FirstOrDefault(e => e is DepthAdheringDisplacementRenderer r && r.Depth == depth && r.distortBehind == distortBehind)
-                         is not DepthAdheringDisplacementRenderer renderer) {
+            is not DepthAdheringDisplacementRenderer renderer) {
             scene.Add(renderer = new DepthAdheringDisplacementRenderer(depth, distortBehind));
-            Logger.Info("SorbetHelper", $"creating new DepthAdheringDisplacementRenderer at depth {depth} with distort behind {(distortBehind ? "enabled" : "disabled")}.");
+            Logger.Info(LogID, $"creating new {nameof(DepthAdheringDisplacementRenderer)} at depth {depth} with distort behind {(distortBehind ? "enabled" : "disabled")}.");
         }
 
         return renderer;
