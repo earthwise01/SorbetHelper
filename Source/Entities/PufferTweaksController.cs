@@ -1,7 +1,3 @@
-using System;
-using Celeste.Mod.Entities;
-using Microsoft.Xna.Framework;
-using Monocle;
 using MonoMod.Cil;
 
 namespace Celeste.Mod.SorbetHelper.Entities;

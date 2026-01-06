@@ -1,8 +1,4 @@
-using System;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Monocle;
-using Celeste.Mod.Entities;
 using Celeste.Mod.SorbetHelper.Utils;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;

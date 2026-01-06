@@ -1,13 +1,9 @@
 using System.Collections.Generic;
 using System.Reflection;
-using Microsoft.Xna.Framework;
-using Monocle;
-using Celeste.Mod.Entities;
-using FMOD.Studio;
+using Celeste.Mod.SorbetHelper.Utils;
 using MonoMod.Cil;
-using Mono.Cecil.Cil;
 using MonoMod.RuntimeDetour;
-using Util = Celeste.Mod.SorbetHelper.Utils.Util;
+using Mono.Cecil.Cil;
 
 namespace Celeste.Mod.SorbetHelper.Entities {
 
@@ -38,7 +34,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
         private static void IL_Strawberry_orig_Update(ILContext il) {
             ILCursor cursor = new ILCursor(il);
 
-            VariableDefinition controllerVariable = new(il.Import(typeof(WingedStrawberryDirectionController)));
+            VariableDefinition controllerVariable = new VariableDefinition(il.Import(typeof(WingedStrawberryDirectionController)));
             il.Body.Variables.Add(controllerVariable);
 
             // inject direction non-specific movement code
@@ -105,7 +101,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
             cursor.EmitLdarg0();
             cursor.EmitLdfld(typeof(Strawberry).GetField(nameof(Strawberry.start), BindingFlags.NonPublic | BindingFlags.Instance));
             cursor.EmitLdloc(controllerVariable);
-            cursor.EmitDelegate(CheckHorizontalIdleBounds);
+            cursor.EmitDelegate(HorizontalIdleBoundsCheck);
 
             return;
 
@@ -138,7 +134,7 @@ namespace Celeste.Mod.SorbetHelper.Entities {
                 return true;
             }
 
-            static void CheckHorizontalIdleBounds(Entity self, Vector2 start, WingedStrawberryDirectionController controller)
+            static void HorizontalIdleBoundsCheck(Entity self, Vector2 start, WingedStrawberryDirectionController controller)
             {
                 // only perform horizontal idle bounds checks if a controller exists
                 if (controller is null)

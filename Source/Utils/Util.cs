@@ -1,12 +1,4 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-using Microsoft.Xna.Framework;
-using Monocle;
-using Celeste;
-using Celeste.Mod.SorbetHelper.Entities;
-using MonoMod.Utils;
 using System.Collections.ObjectModel;
 using MonoMod.RuntimeDetour;
 

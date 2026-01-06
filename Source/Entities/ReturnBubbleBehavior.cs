@@ -1,8 +1,4 @@
-using System;
 using System.Collections;
-using Microsoft.Xna.Framework;
-using Monocle;
-using Celeste.Mod.Entities;
 using Celeste.Mod.Helpers;
 using Celeste.Mod.SorbetHelper.Utils;
 using MonoMod.Utils;

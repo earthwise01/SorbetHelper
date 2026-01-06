@@ -1,7 +1,3 @@
-using Microsoft.Xna.Framework;
-using Monocle;
-using Celeste.Mod.Entities;
-
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/TouchGateBlock")]

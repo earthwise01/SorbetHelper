@@ -1,9 +1,3 @@
-using System;
-using Microsoft.Xna.Framework;
-using Monocle;
-using Celeste.Mod.SorbetHelper.Utils;
-using Celeste.Mod.SorbetHelper.Entities;
-
 namespace Celeste.Mod.SorbetHelper.Components;
 
 /// <summary>
@@ -15,14 +9,14 @@ public class EntityStylegroundMarker : Component {
     public readonly string Tag;
     // public Action EntityRender { get; private set; }
 
-    private readonly VisibleOverride VisibleOverride;
-    public bool EntityVisible => VisibleOverride?.EntityVisible != false;
+    private readonly VisibleOverride visibleOverride;
+    public bool EntityVisible => visibleOverride?.EntityVisible != false;
 
     public EntityStylegroundMarker(string tag, bool respectVisible) : base(false, false) {
         Tag = tag;
 
         if (respectVisible)
-            VisibleOverride = new VisibleOverride();
+            visibleOverride = new VisibleOverride();
     }
 
     public EntityStylegroundMarker(string tag) : this(tag, true) { }
@@ -35,8 +29,8 @@ public class EntityStylegroundMarker : Component {
             return;
         }
 
-        if (VisibleOverride is not null)
-            entity.Add(VisibleOverride);
+        if (visibleOverride is not null)
+            entity.Add(visibleOverride);
         else
             entity.Visible = false;
 
@@ -60,8 +54,8 @@ public class EntityStylegroundMarker : Component {
     }
 
     public override void Removed(Entity entity) {
-        if (VisibleOverride is not null)
-            entity.Remove(VisibleOverride);
+        if (visibleOverride is not null)
+            entity.Remove(visibleOverride);
 
         base.Removed(entity);
     }

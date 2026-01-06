@@ -1,12 +1,6 @@
-using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Monocle;
 using Celeste.Mod.Backdrops;
-using Celeste.Mod.SorbetHelper.Entities;
 using Celeste.Mod.SorbetHelper.Components;
-using Celeste.Mod.SorbetHelper.Utils;
-using FMOD.Studio;
 
 namespace Celeste.Mod.SorbetHelper.Backdrops;
 

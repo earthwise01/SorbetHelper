@@ -1,8 +1,5 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework;
-using Monocle;
-using Celeste.Mod.Entities;
 using Celeste.Mod.SorbetHelper.Utils;
 using FMOD.Studio;
 

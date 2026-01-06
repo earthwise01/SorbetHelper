@@ -1,9 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Microsoft.Xna.Framework;
-using Monocle;
-using Celeste.Mod.Entities;
 using Celeste.Mod.SorbetHelper.Components;
 
 namespace Celeste.Mod.SorbetHelper.Entities;

@@ -1,9 +1,13 @@
-﻿using System;
-using Celeste.Mod.SorbetHelper.Utils;
+﻿global using System;
+global using Microsoft.Xna.Framework;
+global using Monocle;
+global using Celeste.Mod.Entities;
+
+using Celeste.Mod.SorbetHelper.Backdrops;
+using Celeste.Mod.SorbetHelper.Components;
 using Celeste.Mod.SorbetHelper.Entities;
 using Celeste.Mod.SorbetHelper.Triggers;
-using Celeste.Mod.SorbetHelper.Components;
-using Celeste.Mod.SorbetHelper.Backdrops;
+using Celeste.Mod.SorbetHelper.Utils;
 using MonoMod.ModInterop;
 
 namespace Celeste.Mod.SorbetHelper;

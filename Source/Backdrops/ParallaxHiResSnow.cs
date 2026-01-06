@@ -1,7 +1,4 @@
-using System;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Monocle;
 using Celeste.Mod.Backdrops;
 using Celeste.Mod.UI;
 using Celeste.Mod.SorbetHelper.Utils;

@@ -1,9 +1,6 @@
-using System;
-using Microsoft.Xna.Framework;
-using Monocle;
-using ModInteropImportGenerator;
 using System.Runtime.CompilerServices;
 using System.Reflection;
+using ModInteropImportGenerator;
 using ExtendedVariants.Module;
 
 namespace Celeste.Mod.SorbetHelper.Utils;

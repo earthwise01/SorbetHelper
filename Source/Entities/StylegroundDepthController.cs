@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Monocle;
 using Celeste.Mod.SorbetHelper.Utils;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;

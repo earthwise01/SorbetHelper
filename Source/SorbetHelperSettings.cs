@@ -1,5 +1,3 @@
-using Monocle;
-
 namespace Celeste.Mod.SorbetHelper;
 
 public class SorbetHelperSettings : EverestModuleSettings {

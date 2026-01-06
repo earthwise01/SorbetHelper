@@ -1,6 +1,5 @@
 using System.Xml;
 using Celeste.Mod.Registry.DecalRegistryHandlers;
-using Celeste.Mod.SorbetHelper.Entities;
 using Celeste.Mod.SorbetHelper.Components;
 using Celeste.Mod.SorbetHelper.Utils;
 

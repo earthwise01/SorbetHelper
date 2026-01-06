@@ -1,7 +1,5 @@
 using System.Reflection;
 using Celeste.Mod.SorbetHelper.Utils;
-using Microsoft.Xna.Framework;
-using Monocle;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using MonoMod.Utils;

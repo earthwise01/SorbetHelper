@@ -1,12 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xna.Framework;
-using Monocle;
 using Celeste.Mod.SorbetHelper.Utils;
 using Celeste.Mod.SorbetHelper.Entities;
-using Celeste.Mod.SorbetHelper.Components;
-using Celeste.Mod.SorbetHelper.Backdrops;
 
 namespace Celeste.Mod.SorbetHelper;
 public class SorbetHelperMapDataProcessor : EverestMapDataProcessor {
@@ -61,36 +56,20 @@ public class SorbetHelperMapDataProcessor : EverestMapDataProcessor {
 
         return new Dictionary<string, Action<BinaryPacker.Element>> {
             // styleground depth controller
-            {
-                "entity:SorbetHelper/StylegroundDepthController", ProcessStylegroundDepthController
-            },
+            { "entity:SorbetHelper/StylegroundDepthController", ProcessStylegroundDepthController },
             // styleground over hud
-            {
-                "entity:SorbetHelper/StylegroundOverHudController", ProcessStylegroundOverHudController
-            },
+            { "entity:SorbetHelper/StylegroundOverHudController", ProcessStylegroundOverHudController },
             // styleground entity controller
-            {
-                "entity:SorbetHelper/StylegroundEntityController", ProcessStylegroundDepthController
-            },
+            { "entity:SorbetHelper/StylegroundEntityController", ProcessStylegroundDepthController },
 
             // music sync
-            {
-                "entity:SorbetHelper/MusicSyncControllerFMOD", ProcessMusicSyncController
-            },
+            { "entity:SorbetHelper/MusicSyncControllerFMOD", ProcessMusicSyncController },
 
             // global controllers
-            {
-                $"entity:{EntityStylegroundController.EntityDataID}", ProcessGlobalOptionController
-            },
-            {
-                $"entity:{LightCoverController.EntityDataID}", ProcessGlobalOptionController
-            },
-            {
-                $"entity:{SliderFadeXY.EntityDataID}", ProcessGlobalOptionController
-            },
-            {
-                $"entity:{DarknessTransparencyFixController.EntityDataID}", ProcessGlobalOptionController
-            }
+            { $"entity:{EntityStylegroundController.EntityDataID}", ProcessGlobalOptionController },
+            { $"entity:{LightCoverController.EntityDataID}", ProcessGlobalOptionController },
+            { $"entity:{SliderFadeXY.EntityDataID}", ProcessGlobalOptionController },
+            { $"entity:{DarknessTransparencyFixController.EntityDataID}", ProcessGlobalOptionController }
         };
     }
 
