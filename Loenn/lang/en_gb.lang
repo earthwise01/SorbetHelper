@@ -398,6 +398,25 @@ entities.SorbetHelper/DarknessTransparencyFixController.placements.name.controll
 entities.SorbetHelper/DarknessTransparencyFixController.placements.description.controller=Fixes darkness causing transparent objects (e.g. waterfalls, lightbeams, dash trails) to fade towards black as they get more transparent.
 entities.SorbetHelper/DarknessTransparencyFixController.attributes.description.global=Whether this controller should work globally.
 
+# Sparkling Water
+entities.SorbetHelper/SparklingWater.placements.name.normal=Sparkling Water
+entities.SorbetHelper/SparklingWater.attributes.description.depth=The visual depth of the water.\nHigher values mean farther behind in the scene, default value is -9999.\nIt is recommended to keep this value consistent between different water entities as much as possible for performance reasons.
+entities.SorbetHelper/SparklingWater.attributes.description.collidable=Whether water is collidable and can be swam in.\nWaterfalls will still collide with the water, but only if placed before it.
+entities.SorbetHelper/SparklingWater.attributes.description.canSplash=Whether the water will ripple when the player touches it.
+entities.SorbetHelper/SparklingWater.attributes.description.topSurface=Whether the water has a top surface.
+entities.SorbetHelper/SparklingWater.attributes.description.bottomSurface=Whether the water has a bottom surface.
+
+# Sparkling Water Color Controller
+entities.SorbetHelper/SparklingWaterColorController.placements.name.normal=Sparkling Water Color Controller
+entities.SorbetHelper/SparklingWaterColorController.attributes.description.outlineColor=The color to use for the outline and details of the water.
+entities.SorbetHelper/SparklingWaterColorController.attributes.description.edgeColor=The color to use near the edges of the water.
+entities.SorbetHelper/SparklingWaterColorController.attributes.description.fillColor=The color to use in the center of the water.
+entities.SorbetHelper/SparklingWaterColorController.attributes.description.detailTexture=The detail texture to use for the water.\nThis is a 128x128 texture where each color channel contains texture data for a different detail layer:\n- The red channel contains a noise texture used to subtly animate the foam at the top of the water.\n- The green channel contains a caustic texture which is slowly scrolled across the water (with linear sampling), and is squished vertically near its surface.\n- The blue channel contains a bubble texture which slowly moves upwards (with point sampling).
+entities.SorbetHelper/SparklingWaterColorController.attributes.description.causticScale=The scale of the caustic detail layer.
+entities.SorbetHelper/SparklingWaterColorController.attributes.description.causticAlpha=The alpha of the caustic detail layer.
+entities.SorbetHelper/SparklingWaterColorController.attributes.description.bubbleAlpha=The alpha of the bubble detail layer.
+entities.SorbetHelper/SparklingWaterColorController.attributes.description.displacementSpeed=The speed of the wavy displacement effect.\nA value of 0 disables the displacement altogether.
+
 # -- Triggers --
 
 # Alternate Interact Prompt
@@ -415,7 +434,7 @@ triggers.SorbetHelper/AlternateInteractPrompt.attributes.description.onLeft=Whet
 
 # Mini Popup Trigger
 triggers.SorbetHelper/MiniPopupTrigger.placements.name.miniPopup=Mini Popup Trigger
-triggers.SorbetHelper/MiniPopupTrigger.attributes.description.activeTime=How long (in seconds) the mini popup should stay visible for.
+triggers.SorbetHelper/MiniPopupTrigger.attributes.description.activeTime=How long (in seconds) the mini popup should stay visible for.\nNot used if activation mode is set to while player inside.
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.titleText=The dialog ID to use for the title of the mini popup.
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.subText=The dialog ID to use for the subtitle of the mini popup.
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.baseColor=The base color of the mini popup.

@@ -831,6 +831,55 @@ Entities:
       global:
         Description: Whether this controller should work globally.
 
+  SorbetHelper/SparklingWater:
+    Placements:
+      normal:
+        Name: Sparkling Water
+    Attributes:
+      depth:
+        Description: |-
+          The visual depth of the water.
+          Higher values mean farther behind in the scene, default value is -9999.
+          It is recommended to keep this value consistent between different water entities as much as possible for performance reasons.
+      collidable:
+        Description: |-
+          Whether water is collidable and can be swam in.
+          Waterfalls will still collide with the water, but only if placed before it.
+      canSplash:
+        Description: Whether the water will ripple when the player touches it.
+      topSurface:
+        Description: Whether the water has a top surface.
+      bottomSurface:
+        Description: Whether the water has a bottom surface.
+  SorbetHelper/SparklingWaterColorController:
+    Placements:
+      normal:
+        Name: Sparkling Water Color Controller
+    Attributes:
+      outlineColor:
+        Description: The color to use for the outline and details of the water.
+      edgeColor:
+        Description: The color to use near the edges of the water.
+      fillColor:
+        Description: The color to use in the center of the water.
+      detailTexture:
+        Description: |-
+          The detail texture to use for the water.
+          This is a 128x128 texture where each color channel contains texture data for a different detail layer:
+          - The red channel contains a noise texture used to subtly animate the foam at the top of the water.
+          - The green channel contains a caustic texture which is slowly scrolled across the water (with linear sampling), and is squished vertically near its surface.
+          - The blue channel contains a bubble texture which slowly moves upwards (with point sampling).
+      causticScale:
+        Description: The scale of the caustic detail layer.
+      causticAlpha:
+        Description: The alpha of the caustic detail layer.
+      bubbleAlpha:
+        Description: The alpha of the bubble detail layer.
+      displacementSpeed:
+        Description: |-
+          The speed of the wavy displacement effect.
+          A value of 0 disables the displacement altogether.
+
 Triggers:
   SorbetHelper/AlternateInteractPrompt:
     Placements:

@@ -16,14 +16,22 @@ public static class SorbetHelperGFX {
     public static Vector2 GetZoomOutCameraCenterOffset(Camera camera) => new Vector2(camera.Width / 2f - 320f / 2f, camera.Height / 2f - 180f / 2f);
 
     public static Effect FxAlphaMask { get; private set; }
+    public static Effect FxSparklingWater { get; private set; }
+    public static Effect FxSparklingWaterDistort { get; private set; }
 
     internal static void LoadContent() {
-        FxAlphaMask = LoadEffect("AlphaMask");
+        FxAlphaMask = LoadEffect("alpha_mask");
+        FxSparklingWater = LoadEffect("sparkling_water");
+        FxSparklingWaterDistort = LoadEffect("sparkling_water_distort");
     }
 
     internal static void UnloadContent() {
         FxAlphaMask?.Dispose();
         FxAlphaMask = null;
+        FxSparklingWater?.Dispose();
+        FxSparklingWater = null;
+        FxSparklingWaterDistort?.Dispose();
+        FxSparklingWaterDistort = null;
     }
 
     private static Effect LoadEffect(string id) {
