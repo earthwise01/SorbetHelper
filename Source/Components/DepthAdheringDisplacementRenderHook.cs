@@ -16,7 +16,7 @@ public class DepthAdheringDisplacementRenderHook : Component {
     private readonly VisibleOverride visibleOverride;
     public bool EntityVisible => visibleOverride?.EntityVisible != false;
 
-    public DepthAdheringDisplacementRenderHook(Action renderEntity, Action renderDisplacement, bool distortBehind, bool respectVisible) : base(false, false) {
+    public DepthAdheringDisplacementRenderHook(Action renderEntity, Action renderDisplacement, bool distortBehind, bool respectVisible) : base(false, true) {
         RenderEntity = renderEntity;
         RenderDisplacement = renderDisplacement;
         this.distortBehind = distortBehind;

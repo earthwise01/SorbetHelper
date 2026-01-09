@@ -29,8 +29,8 @@ public class SparklingWater : Water {
             borderStartIndex = mesh.Length + segments * 6;
             Array.Resize(ref mesh, mesh.Length + segments * 6 * 2);
 
-            Color edgeColor = outwards.Y <= 0 ? SparklingWaterRenderer.TopEdgeColor : SparklingWaterRenderer.BottomEdgeColor;
-            Color fillColor = Color.Lerp(edgeColor, SparklingWaterRenderer.FillColor, (float)surfaceHeight / (float)SurfaceMaxHeight);
+            Color edgeColor = outwards.Y <= 0 ? SparklingWaterRenderer.TopEdgeMaskColor : SparklingWaterRenderer.BottomEdgeMaskColor;
+            Color fillColor = Color.Lerp(edgeColor, SparklingWaterRenderer.FillMaskColor, (float)surfaceHeight / (float)SurfaceMaxHeight);
 
             // edge colors
             for (int i = edgeStartIndex; i < edgeStartIndex + segments * 6; i += 6) {
@@ -44,7 +44,7 @@ public class SparklingWater : Water {
 
             // border colors
             for (int i = borderStartIndex; i < borderStartIndex + segments * 6; i++)
-                mesh[i].Color = SparklingWaterRenderer.BorderColor;
+                mesh[i].Color = SparklingWaterRenderer.OutlineMaskColor;
         }
 
         public void Update(Rectangle cameraRect, VertexPositionColor[] mesh) {
@@ -195,7 +195,7 @@ public class SparklingWater : Water {
         if (fill.Height > 0) {
             const int fillStartIndex = 0;
             for (int i = fillStartIndex; i < fillStartIndex + 6; i++)
-                mesh[i].Color = SparklingWaterRenderer.FillColor;
+                mesh[i].Color = SparklingWaterRenderer.FillMaskColor;
 
             float fillLeft = X + fill.X, fillRight  = X + fill.X + fill.Width;
             float fillTop  = Y + fill.Y, fillBottom = Y + fill.Y + fill.Height;
@@ -213,8 +213,8 @@ public class SparklingWater : Water {
                data.Bool("topSurface", true), data.Bool("bottomSurface", false),
                data.Int("depth", -9999), data.Bool("collidable", true), data.Bool("canSplash", true)) { }
 
-    private void TrackSelf() => SparklingWaterRenderer.GetSparklingWaterRenderer(Scene, Depth).Track(this);
-    private void UntrackSelf() => SparklingWaterRenderer.GetSparklingWaterRenderer(Scene, Depth).Untrack(this);
+    private void TrackSelf() => SparklingWaterRenderer.GetRenderer(Scene, Depth).Track(this);
+    private void UntrackSelf() => SparklingWaterRenderer.GetRenderer(Scene, Depth).Untrack(this);
 
     [MonoModLinkTo("Monocle.Entity", "System.Void Added(Monocle.Scene)")]
     private extern void base_Added(Scene scene);
@@ -317,7 +317,7 @@ public class SparklingWater : Water {
         }
 
         ParticleSystem particles = SceneAs<Level>().ParticlesFG;
-        Color splashColor = SparklingWaterRenderer.Settings.GetSettings(Scene).OutlineColor;
+        Color splashColor = SparklingWaterRenderer.GetSettings(Scene, Depth).OutlineColor;
         float splashY = onTop ? Top : Bottom;
         float splashDirection = onTop ? -MathF.PI / 2f : MathF.PI / 2f;
         for (int x = 0; x < width; x += 4)

@@ -17,12 +17,10 @@ public static class SorbetHelperGFX {
 
     public static Effect FxAlphaMask { get; private set; }
     public static Effect FxSparklingWater { get; private set; }
-    public static Effect FxSparklingWaterDistort { get; private set; }
 
     internal static void LoadContent() {
         FxAlphaMask = LoadEffect("alpha_mask");
         FxSparklingWater = LoadEffect("sparkling_water");
-        FxSparklingWaterDistort = LoadEffect("sparkling_water_distort");
     }
 
     internal static void UnloadContent() {
@@ -30,8 +28,6 @@ public static class SorbetHelperGFX {
         FxAlphaMask = null;
         FxSparklingWater?.Dispose();
         FxSparklingWater = null;
-        FxSparklingWaterDistort?.Dispose();
-        FxSparklingWaterDistort = null;
     }
 
     private static Effect LoadEffect(string id) {

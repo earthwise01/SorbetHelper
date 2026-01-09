@@ -24,7 +24,8 @@ public class DepthAdheringDisplacementRenderer : Entity {
     public void Untrack(DepthAdheringDisplacementRenderHook renderHook) => renderHooks.Remove(renderHook);
 
     public override void Render() {
-        if (renderHooks.Count == 0)
+        List<DepthAdheringDisplacementRenderHook> visibleRenderHooks = renderHooks.Where(renderHook => renderHook.EntityVisible).ToList();
+        if (visibleRenderHooks.Count == 0)
             return;
 
         GameplayRenderer.End();
@@ -39,17 +40,17 @@ public class DepthAdheringDisplacementRenderer : Entity {
         if (prevRenderTargets.Length > 0)
             gameplayBuffer = prevRenderTargets[0].RenderTarget as RenderTarget2D ?? gameplayBuffer;
 
-        // step 1: prepare the displacement map
+
+        // prepare the displacement map
 
         Color noDisplacementColor = DisplacementEffectBlocker.NoDisplacementColor;
-
         Engine.Instance.GraphicsDevice.SetRenderTarget(displacementMapBuffer);
         Engine.Instance.GraphicsDevice.Clear(noDisplacementColor);
 
         Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, camera.Matrix);
 
         foreach (DepthAdheringDisplacementRenderHook renderHook in renderHooks) {
-            if (renderHook.EntityVisible)
+            if (renderHook.Visible)
                 renderHook.RenderDisplacement();
         }
 
@@ -71,6 +72,7 @@ public class DepthAdheringDisplacementRenderer : Entity {
             Draw.SpriteBatch.End();
         }
 
+
         // prepare the entity buffer
 
         Engine.Instance.GraphicsDevice.SetRenderTarget(entityBuffer);
@@ -81,12 +83,11 @@ public class DepthAdheringDisplacementRenderer : Entity {
         if (distortBehind)
             Draw.SpriteBatch.Draw(gameplayBuffer, camera.Position, Color.White);
 
-        foreach (DepthAdheringDisplacementRenderHook renderHook in renderHooks) {
-            if (renderHook.EntityVisible)
-                renderHook.RenderEntity();
-        }
+        foreach (DepthAdheringDisplacementRenderHook renderHook in renderHooks)
+            renderHook.RenderEntity();
 
         GameplayRenderer.End();
+
 
         // distort and render the result to the gameplay buffer
 
@@ -100,10 +101,7 @@ public class DepthAdheringDisplacementRenderer : Entity {
         float gamerateBackup = Distort.gamerate;
         Distort.anxiety = 0f;
         Distort.gamerate = 1f;
-
-        // apply the displacement effect to the entity buffer and render the result to the gameplay buffer
         Distort.Render((RenderTarget2D)entityBuffer, (RenderTarget2D)displacementMapBuffer, hasDistortion: true);
-
         Distort.anxiety = anxietyBackup;
         Distort.gamerate = gamerateBackup;
 

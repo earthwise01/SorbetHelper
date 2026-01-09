@@ -1,4 +1,4 @@
-# Lönn language file for Sorbet Helper, generated from en_gb.yaml using LönnLangGenerator.
+# Lönn language file for Sorbet Helper, generated using LönnLangGenerator.
 
 # -- Mod Name --
 mods.SorbetHelper.name=Sorbet Helper
@@ -411,11 +411,13 @@ entities.SorbetHelper/SparklingWaterColorController.placements.name.normal=Spark
 entities.SorbetHelper/SparklingWaterColorController.attributes.description.outlineColor=The color to use for the outline and details of the water.
 entities.SorbetHelper/SparklingWaterColorController.attributes.description.edgeColor=The color to use near the edges of the water.
 entities.SorbetHelper/SparklingWaterColorController.attributes.description.fillColor=The color to use in the center of the water.
-entities.SorbetHelper/SparklingWaterColorController.attributes.description.detailTexture=The detail texture to use for the water.\nThis is a 128x128 texture where each color channel contains texture data for a different detail layer:\n- The red channel contains a noise texture used to subtly animate the foam at the top of the water.\n- The green channel contains a caustic texture which is slowly scrolled across the water (with linear sampling), and is squished vertically near its surface.\n- The blue channel contains a bubble texture which slowly moves upwards (with point sampling).
+entities.SorbetHelper/SparklingWaterColorController.attributes.description.detailTexture=The detail texture to use for the water.\nThis is a looping texture where each color channel contains texture data for a different detail layer:\n- The red channel contains a noise texture used to subtly animate the foam at the top of the water.\n- The green channel contains a caustic texture which is slowly scrolled across the water (with linear sampling), and is squished vertically near its surface.\n- The blue channel contains a bubble texture which slowly moves upwards (with point sampling).
 entities.SorbetHelper/SparklingWaterColorController.attributes.description.causticScale=The scale of the caustic detail layer.
 entities.SorbetHelper/SparklingWaterColorController.attributes.description.causticAlpha=The alpha of the caustic detail layer.
 entities.SorbetHelper/SparklingWaterColorController.attributes.description.bubbleAlpha=The alpha of the bubble detail layer.
 entities.SorbetHelper/SparklingWaterColorController.attributes.description.displacementSpeed=The speed of the wavy displacement effect.\nA value of 0 disables the displacement altogether.
+entities.SorbetHelper/SparklingWaterColorController.attributes.description.affectedDepth=The depth of Sparkling Water entities to affect.\nLeave empty to affect all depths that don't have their own color controller.
+entities.SorbetHelper/SparklingWaterColorController.attributes.description.global=Whether this controller should be loaded globally.
 
 # -- Triggers --
 

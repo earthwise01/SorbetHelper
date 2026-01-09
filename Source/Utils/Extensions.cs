@@ -155,7 +155,7 @@ internal static class Extensions {
 
     extension(EntityData self) {
         public Color HexColorWithAlpha(string key, Color defaultValue = default) {
-            if (!self.Values.TryGetValue(key, out object value))
+            if (self.Values is null || !self.Values.TryGetValue(key, out object value))
                 return defaultValue;
 
             string hexColor = value.ToString();
@@ -166,7 +166,7 @@ internal static class Extensions {
         }
 
         public Color HexColorWithNonPremultipliedAlpha(string key, Color defaultValue = default) {
-            if (!self.Values.TryGetValue(key, out object value))
+            if (self.Values is null || !self.Values.TryGetValue(key, out object value))
                 return defaultValue;
 
             string hexColor = value.ToString();
@@ -174,6 +174,32 @@ internal static class Extensions {
                 return Calc.HexToColorWithNonPremultipliedAlpha(hexColor);
 
             return defaultValue;
+        }
+
+        public int? NullableInt(string key) {
+            if (self.Values is null || !self.Values.TryGetValue(key, out object value))
+                return null;
+
+            if (value is int num)
+                return num;
+
+            if (int.TryParse(value.ToString(), out int result))
+                return result;
+
+            return null;
+        }
+
+        public float? NullableFloat(string key) {
+            if (self.Values is null || !self.Values.TryGetValue(key, out object value))
+                return null;
+
+            if (value is float num)
+                return num;
+
+            if (float.TryParse(value.ToString(), out float result))
+                return result;
+
+            return null;
         }
 
         public Ease.Easer Easer(string key, Ease.Easer defaultValue)

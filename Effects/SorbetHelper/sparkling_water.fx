@@ -21,11 +21,11 @@ struct pixel_output
     float4 displacement : COLOR1;
 };
 
-static const float texture_size = 128.0;
-
 uniform float4 outline_color;
 uniform float4 edge_color;
 uniform float4 fill_color;
+
+uniform float2 texture_size = float2(128.0, 128.0);
 
 // caustic scale, caustic alpha, bubble alpha, displacement speed
 uniform float4 detail_config = float4(0.8, 0.15, 0.3, 0.25);

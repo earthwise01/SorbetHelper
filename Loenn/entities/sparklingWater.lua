@@ -1,5 +1,6 @@
 local drawableRectangle = require("structs.drawable_rectangle")
 local utils = require("utils")
+local loadedState = require("loaded_state")
 local depths = require("mods").requireFromPlugin("libraries.depths")
 
 local water = {}
@@ -40,13 +41,32 @@ function water.rectangle(room, entity)
     return utils.rectangle(entity.x, entity.y, entity.width or 8, entity.height or 16)
 end
 
-local function getColors(room)
-    local defaultOutline, defaultFill = utils.getColor("a0ddeeff"), utils.getColor("549cd17d")
+local defaultOutline, defaultFill = utils.getColor("9ce4f7de"), utils.getColor("4289bd97")
 
-    for _, entity in pairs(room.entities) do
-        if entity._name == "SorbetHelper/SparklingWaterColorController" then
-            return utils.getColor(entity.outlineColor) or defaultOutline, utils.getColor(entity.fillColor) or defaultFill
+local function getColors(currentRoom, self)
+
+    local map = loadedState.map
+    if not map then
+        return defaultOutline, defaultFill
+     end
+
+    local allDepthsController = nil
+    for _, room in pairs(map.rooms) do
+        for _, entity in pairs(room.entities) do
+            if entity._name == "SorbetHelper/SparklingWaterColorController" and (room == currentRoom or entity.global or utils.startsWith(room.name, "_bb_global")) then
+                if entity.affectedDepth == self.depth then
+                    return utils.getColor(entity.outlineColor) or defaultOutline, utils.getColor(entity.fillColor) or defaultFill
+                end
+
+                if not entity.affectedDepth and not allDepthsController then
+                    allDepthsController = entity
+                end
+            end
         end
+    end
+
+    if allDepthsController then
+        return utils.getColor(allDepthsController.outlineColor) or defaultOutline, utils.getColor(allDepthsController.fillColor) or defaultFill
     end
 
     return defaultOutline, defaultFill
@@ -56,7 +76,7 @@ function water.sprite(room, entity)
     local x, y = entity.x or 0, entity.y or 0
     local width, height = entity.width or 8, entity.height or 16
 
-    local outlineColor, fillColor = getColors(room)
+    local outlineColor, fillColor = getColors(room, entity)
     -- reduce alpha slightly
     outlineColor[4] = outlineColor[4] * 0.8;
     fillColor[4] = fillColor[4] * 0.8;
