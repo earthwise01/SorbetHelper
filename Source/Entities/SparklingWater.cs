@@ -110,41 +110,44 @@ public class SparklingWater : Water {
         }
 
         private (bool surfaceOnCamera, int visibleStart, int visibleEnd) GetVisibility(Rectangle cameraRect) {
-            // this sucks sososo bad and awful and terrible but im so eepyyy weh
-            // Need to remember to rewrite this at some point
-            bool bottomSurface = Outwards.Y > 0f;
+            // todo but in like the far far future probably cus it doesnt sound fun in general: support left and right surfaces
+            int left, right, top, bottom;
+            int visibleStart, visibleEnd;
 
-            int left = (int)(Position.X - Width / 2f);
-            int right = (int)(Position.X + Width / 2f);
+            left = (int)(Position.X - Width / 2f);
+            right = (int)(Position.X + Width / 2f);
 
-            int top, bottom;
-            if (bottomSurface) {
-                top = (int)(Position.Y - surfaceHeight + PositionYOffset);
-                bottom = (int)(Position.Y + PositionYOffset);
-            } else {
-                top = (int)(Position.Y - PositionYOffset);
-                bottom = (int)(Position.Y + surfaceHeight - PositionYOffset);
+            switch (Outwards) {
+                // top surface
+                case { Y: < 0f }:
+                    top = (int)(Position.Y - PositionYOffset);
+                    bottom = (int)(Position.Y + surfaceHeight - PositionYOffset);
+
+                    visibleStart = Math.Clamp(cameraRect.Left, left, right) - left;
+                    visibleEnd = Math.Clamp(cameraRect.Right, left, right) - left;
+
+                    break;
+                // bottom surface
+                case { Y: > 0f }:
+                    top = (int)(Position.Y - surfaceHeight + PositionYOffset);
+                    bottom = (int)(Position.Y + PositionYOffset);
+
+                    visibleStart = right - Math.Clamp(cameraRect.Right, left, right);
+                    visibleEnd = right - Math.Clamp(cameraRect.Left, left, right);
+
+                    break;
+                default:
+                    throw new IndexOutOfRangeException($"Sparkling water surface outwards vector {Outwards.ToString()} is not supported!");
             }
 
             bool surfaceOnCamera = left < cameraRect.Right && right > cameraRect.Left
                                    && top < cameraRect.Bottom && bottom > cameraRect.Top;
 
-            if (!surfaceOnCamera)
-                return (false, 0, 0);
-
-            int visibleStart, visibleEnd;
-            if (bottomSurface) {
-                visibleStart = right - Math.Clamp(cameraRect.Right, left, right);
-                visibleEnd = right - Math.Clamp(cameraRect.Left, left, right);
-            } else {
-                visibleStart = Math.Clamp(cameraRect.Left, left, right) - left;
-                visibleEnd = Math.Clamp(cameraRect.Right, left, right) - left;
-            }
-
+            // align visibleStart and visibleEnd with the surface resolution
             visibleStart = (int)MathF.Floor((float)visibleStart / (float)Resolution) * Resolution;
             visibleEnd = (int)MathF.Ceiling((float)visibleEnd / (float)Resolution) * Resolution;
 
-            return (true, visibleStart, visibleEnd);
+            return (surfaceOnCamera, visibleStart, visibleEnd);
         }
     }
 
