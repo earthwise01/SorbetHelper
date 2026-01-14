@@ -315,8 +315,8 @@ public class SparklingWater : Water {
         surface.DoRipple(position, strength);
         const int rippleDistance = 48;
         for (int x = rippleDistance; x < width / 2f; x += rippleDistance) {
-            surface.DoRipple(position with { X = position.X + x }, strength);
-            surface.DoRipple(position with { X = position.X - x }, strength);
+            surface.DoRipple(new Vector2(position.X + x, position.Y), strength);
+            surface.DoRipple(new Vector2(position.X - x, position.Y), strength);
         }
 
         ParticleSystem particles = SceneAs<Level>().ParticlesFG;

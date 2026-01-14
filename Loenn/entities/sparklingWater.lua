@@ -41,9 +41,8 @@ function water.rectangle(room, entity)
     return utils.rectangle(entity.x, entity.y, entity.width or 8, entity.height or 16)
 end
 
-local defaultOutline, defaultFill = utils.getColor("9ce4f7de"), utils.getColor("4289bd97")
-
 local function getColors(currentRoom, self)
+    local defaultOutline, defaultFill = utils.getColor("9ce4f7de"), utils.getColor("4289bd97")
 
     local map = loadedState.map
     if not map then
