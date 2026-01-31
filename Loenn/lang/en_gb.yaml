@@ -601,7 +601,7 @@ Entities:
   SorbetHelper/SliderFadeXY:
     Placements:
       sliderFadeXY:
-        Name: Slider Camera Fade X/Y
+        Name: Camera Fade XY To Slider Controller
     Attributes:
       slider:
         Description: The name of the session slider to control.
@@ -644,10 +644,10 @@ Entities:
 
   SorbetHelper/MusicSyncControllerFMOD:
     Placements:
+      markerToFlag:
+        Name: FMOD Marker to Flag/Counter Controller
       controller:
         Name: Music Session Sync Controller
-      markerToFlag:
-        Name: FMOD Marker to Flag Controller
     Attributes:
       eventNames:
         Description: A comma seperated list of music events this controller should affect. Leave empty to affect all events.

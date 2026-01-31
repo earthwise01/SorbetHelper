@@ -42,7 +42,7 @@ function sorbetUtils.getControllerSprites(x, y, texture, global, warning)
     texture = texture and "editorSprites/SorbetHelper/" .. texture or "@Internal@/northern_lights"
 
     local sprite = drawableSprite.fromTexture(texture, {x = x, y = y})
-    local sprites = { sprite }
+    local sprites = {sprite}
 
     if global then
         table.insert(sprites, drawableText.fromText("Global", x - 16, y - 21, 32, 8, nil, 1))
@@ -60,7 +60,7 @@ function sorbetUtils.getControllerSpriteFunction(textureName, globalCheck, noDup
 
     return function (room, entity)
         local warning = noDuplicates and sorbetUtils.checkForDuplicateInMap(entity) and "!Duplicate!" or nil
-        local global = type(globalCheck) == "boolean" and globalCheck or globalCheck(room, entity)
+        local global = type(globalCheck) == "function" and globalCheck(room, entity) or globalCheck
         return sorbetUtils.getControllerSprites(entity.x or 0, entity.y or 0, textureName, global, warning)
     end
 end

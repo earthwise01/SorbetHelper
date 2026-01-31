@@ -20,9 +20,9 @@ effect.defaultData = {
 }
 
 effect.fieldOrder = {
-    "only", "exclude", "tag", "flag", 
+    "only", "exclude", "tag", "flag",
     "color", "alpha", "additive", "notflag",
-    "texturePath", "particleCount", "fadex", "fadey", 
+    "texturePath", "particleCount", "fadex", "fadey",
     "minScrollX", "minScrollY", "directionX", "directionY",
     "maxScrollX", "maxScrollY", "minSpeed", "maxSpeed",
     "sineAmplitude", "sineFrequency", "minScale", "maxScale",

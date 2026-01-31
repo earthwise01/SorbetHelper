@@ -48,7 +48,7 @@ trigger.fieldInformation = {
 
 function trigger.ignoredFields(entity)
     local ignored = { "_id", "_name" }
-    
+
     if entity.style ~= "BottomCorner" then
         table.insert(ignored, "onLeft")
     end

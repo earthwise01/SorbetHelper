@@ -15,12 +15,12 @@ effect.defaultData = {
 }
 
 effect.fieldOrder = {
-    "only", "exclude", "tag", "flag", 
+    "only", "exclude", "tag", "flag",
     "colors", "fadex", "fadey", "notflag",
-    "scrollX", "scrollY", "minDuration", "maxDuration", 
+    "scrollX", "scrollY", "minDuration", "maxDuration",
     "speedX", "speedY", "minWidth", "maxWidth",
     "minScale", "maxScale", "minLength", "maxLength",
-    "rayCount", "texturePath", "texMinRotate", "texMaxRotate", 
+    "rayCount", "texturePath", "texMinRotate", "texMaxRotate",
     "offscreenPadding", "fadeNearPlayer",  "fadeInOut", "texStartRotated"
 }
 

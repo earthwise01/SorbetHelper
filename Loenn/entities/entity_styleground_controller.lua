@@ -44,7 +44,7 @@ entityStylegroundController.fieldOrder = {
     "tag", "maxDepth",
     "classNames", "minDepth",
     "useFullClassNames", "global",
-    "_instructionsButton", 
+    "_instructionsButton",
 }
 
 return entityStylegroundController

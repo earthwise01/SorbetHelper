@@ -24,7 +24,7 @@ returnBubbleBehavior.fieldInformation = {
         minimumValue = 0.0
     },
     easing = {
-        options = easings,
+        options = easings.all,
         editable = false
     },
     collisionMode = {

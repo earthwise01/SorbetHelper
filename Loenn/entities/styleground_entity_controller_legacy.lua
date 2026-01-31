@@ -7,7 +7,7 @@ local stylegroundEntityController = {}
 stylegroundEntityController.name = "SorbetHelper/StylegroundEntityController"
 stylegroundEntityController.sprite = sorbetUtils.getControllerSpriteFunction("stylegroundEntityController", true)
 stylegroundEntityController.depth = -1000010
--- Replaced by the Styleground Depth Controller 
+-- Replaced by the Styleground Depth Controller
 --
 -- stylegroundEntityController.placements = {
 --     name = "controller",

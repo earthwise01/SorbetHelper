@@ -133,7 +133,7 @@ local customFallingBlockFieldOrder = {
     "flagOnFall", "flagOnLand",
     "initialShakeTime", "variableShakeTime",
     "acceleration", "maxSpeed",
-    "tiletype", "direction", 
+    "tiletype", "direction",
     "fallOnTouch", "climbFall", "fallOnStaticMover", "breakDashBlocks",
     "ignoreSolids", "resetFlags", "chronoHelperGravity"
 }
