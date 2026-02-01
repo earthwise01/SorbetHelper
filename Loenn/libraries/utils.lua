@@ -60,7 +60,7 @@ function sorbetUtils.getControllerSpriteFunction(textureName, globalCheck, noDup
 
     return function (room, entity)
         local warning = noDuplicates and sorbetUtils.checkForDuplicateInMap(entity) and "!Duplicate!" or nil
-        local global = type(globalCheck) == "function" and globalCheck(room, entity) or globalCheck
+        local global = type(globalCheck) == "boolean" and globalCheck or globalCheck(room, entity)
         return sorbetUtils.getControllerSprites(entity.x or 0, entity.y or 0, textureName, global, warning)
     end
 end
