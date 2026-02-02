@@ -61,6 +61,7 @@ controller.fieldInformation = {
     }
 }
 
+-- todo: would b cool if the water color was previewed on the controller sprite    uses shaders tho so might be evil weh
 function controller.sprite(room, entity)
     local x, y = entity.x or 0, entity.y or 0
 
