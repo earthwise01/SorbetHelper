@@ -5,9 +5,9 @@ local stylegroundOverHudController = {}
 stylegroundOverHudController.name = "SorbetHelper/StylegroundOverHudController"
 stylegroundOverHudController.sprite = sorbetUtils.getControllerSpriteFunction("stylegroundOverHudController", true, true)
 stylegroundOverHudController.depth = -1000010
--- Replaced by the Styleground Depth Controller 
+-- Replaced by the Styleground Depth Controller
 --
--- stylegroundOverHudController.placements = {    
+-- stylegroundOverHudController.placements = {
 --     name = "stylegroundOverHud",
 --     alternativeName = "altname",
 --     data = {

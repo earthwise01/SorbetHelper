@@ -1,6 +1,6 @@
 local depths = {}
 
-function depths.getDepths()    
+function depths.getDepths()
     local list = {
         {"BG Terrain (10000)", 10000},
         {"BG Mirrors (9500)", 9500},
@@ -42,21 +42,23 @@ end
 
 function depths.addDepth(list, name, depth)
     name = name .. " (" .. depth .. ")"
-    local newList = {}
-
 
     for i,p in ipairs(list) do
-        if depth == p[2] then
+        -- rename if depth already exists in the list
+        if p[2] == depth then
             list[i][1] = name
-            break
+            return list
         end
 
-        if depth > p[2] then
+        -- otherwise insert before the first lower depth in the list
+        if p[2] < depth then
             table.insert(list, i, {name, depth})
-            break
+            return list
         end
     end
 
+    -- if the list was empty or the new depth would be the lowest depth, insert it at the end of the list
+    table.insert(list, {name, depth})
     return list
 end
 

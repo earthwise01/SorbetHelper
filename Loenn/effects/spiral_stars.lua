@@ -18,7 +18,7 @@ effect.defaultData = {
 }
 
 effect.fieldOrder = {
-    "only", "exclude", "tag", "flag", 
+    "only", "exclude", "tag", "flag",
     "spritePath", "colors", "backgroundColor", "notflag",
     "starCount", "centerX", "spawnRadius", "speed",
     "trailLength", "centerY", "centerRadius", "rotationSpeed",

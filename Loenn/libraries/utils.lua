@@ -42,7 +42,7 @@ function sorbetUtils.getControllerSprites(x, y, texture, global, warning)
     texture = texture and "editorSprites/SorbetHelper/" .. texture or "@Internal@/northern_lights"
 
     local sprite = drawableSprite.fromTexture(texture, {x = x, y = y})
-    local sprites = { sprite }
+    local sprites = {sprite}
 
     if global then
         table.insert(sprites, drawableText.fromText("Global", x - 16, y - 21, 32, 8, nil, 1))

@@ -225,7 +225,7 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
 
             ILLabel skipOrigTalkComponentUI = cursor.DefineLabel();
 
-            cursor.EmitDelegate(TryGetCustomUi);
+            cursor.EmitDelegate(TryGetCustomUI);
             cursor.EmitDup();
             cursor.EmitBrtrue(skipOrigTalkComponentUI);
             cursor.EmitPop();
@@ -239,20 +239,25 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
             cursor.GotoPrev(MoveType.After, instr => instr.MatchLdcR4(0.1f));
             cursor.EmitLdarg0();
             cursor.EmitLdfld(typeof(TalkComponent).GetField(nameof(TalkComponent.UI), HookHelper.Bind.PublicInstance)!);
-            cursor.EmitDelegate(AdjustCustomUiHoverTimer);
+            cursor.EmitDelegate(AdjustHoverTimerForCustomUI);
 
             return;
 
-            static TalkComponentAltUI TryGetCustomUi(TalkComponent self) {
+            static TalkComponentAltUI TryGetCustomUI(TalkComponent self) {
                 if (self.Entity is not { } entity)
                     return null;
 
-                return entity.Scene.CollideFirst<AlternateInteractPromptWrapper>(entity.Position) is { } wrapper
-                    ? new TalkComponentAltUI(self, wrapper.options)
-                    : null;
+                AlternateInteractPromptWrapper wrapper = entity.Collider is not null
+                    ? entity.CollideFirst<AlternateInteractPromptWrapper>()
+                    : entity.Scene.CollideFirst<AlternateInteractPromptWrapper>(entity.Position);
+
+                if (wrapper is not null)
+                    return new TalkComponentAltUI(self, wrapper.options);
+
+                return null;
             }
 
-            static float AdjustCustomUiHoverTimer(float orig, TalkComponentUI ui) {
+            static float AdjustHoverTimerForCustomUI(float orig, TalkComponentUI ui) {
                 if (ui is TalkComponentAltUI altUi) {
                     return altUi.options.Style switch {
                         Styles.BottomCorner => 0f,

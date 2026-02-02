@@ -299,7 +299,7 @@ entities.SorbetHelper/StylegroundDepthController.attributes.description.tag=The 
 entities.SorbetHelper/StylegroundDepthController.attributes.description.depth=The visual depth the stylegrounds should be drawn at.\nHigher values mean farther behind in the scene.
 
 # Slider Fade XY
-entities.SorbetHelper/SliderFadeXY.placements.name.sliderFadeXY=Slider Camera Fade X/Y
+entities.SorbetHelper/SliderFadeXY.placements.name.sliderFadeXY=Camera Fade XY To Slider Controller
 entities.SorbetHelper/SliderFadeXY.attributes.description.slider=The name of the session slider to control.
 entities.SorbetHelper/SliderFadeXY.attributes.name.fadeX=Fade X
 entities.SorbetHelper/SliderFadeXY.attributes.description.fadeX=Format is "FromPosition-ToPosition,FromValue-ToValue", e.g. "n500-500,1-0".\nNegative numbers are denoted with "n" rather than minus. Camera positions are in pixels and use map coordinates.\nMultiple zones can be set up by using ":" as the separator.\nThe final value is calculated by multiplying together the outputs of all the zones.
@@ -315,8 +315,8 @@ entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.tryFillBehi
 entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.backgroundTiles=Whether to split background tiles instead of solid tiles.\nChanging this requires clicking save changes and reopening this menu for the tiletype menu to show the correct options.
 
 # Music Sync Controller FMOD
+entities.SorbetHelper/MusicSyncControllerFMOD.placements.name.markerToFlag=FMOD Marker to Flag/Counter Controller
 entities.SorbetHelper/MusicSyncControllerFMOD.placements.name.controller=Music Session Sync Controller
-entities.SorbetHelper/MusicSyncControllerFMOD.placements.name.markerToFlag=FMOD Marker to Flag Controller
 entities.SorbetHelper/MusicSyncControllerFMOD.attributes.description.eventNames=A comma seperated list of music events this controller should affect. Leave empty to affect all events.
 entities.SorbetHelper/MusicSyncControllerFMOD.attributes.description.showDebugUI=Whether to show the current state of the controller on-screen.
 entities.SorbetHelper/MusicSyncControllerFMOD.attributes.name._infoButton=Info

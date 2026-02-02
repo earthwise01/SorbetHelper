@@ -14,7 +14,7 @@ local function valueValidator(raw, value, enum, allowEmpty, minimum, maximum)
         return allowEmpty
     end
 
-    if enum[value] ~= nill then 
+    if enum[value] ~= nil then
         return true
     end
 

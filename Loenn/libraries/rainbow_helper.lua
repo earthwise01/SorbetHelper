@@ -14,18 +14,18 @@ local function clamp(value, min, max)
     return value
 end
 
-local function lerp(value1, value2, amount)
-    return value1 * (1 - amount) + value2 * amount
+local function lerp(a, b, amount)
+    return a * (1 - amount) + b * amount
 end
 
-local function lerpColor(value1, value2, amount)
+local function lerpColor(a, b, amount)
     amount = clamp(amount, 0, 1)
 
     return {
-        lerp(value1[1], value2[1], amount),
-        lerp(value1[2], value2[2], amount),
-        lerp(value1[3], value2[3], amount),
-        lerp(value1[4] or 1, value2[4] or 1, amount)
+        lerp(a[1], b[1], amount),
+        lerp(a[2], b[2], amount),
+        lerp(a[3], b[3], amount),
+        lerp(a[4] or 1, b[4] or 1, amount)
     }
 end
 
