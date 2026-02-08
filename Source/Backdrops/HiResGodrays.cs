@@ -122,7 +122,8 @@ public class HiResGodrays : HiResBackdrop {
     }
 
     public override void Added(Level level) {
-        visibleFade = IsVisible(level) ? 1f : 0f;
+        if (doVisibleFade)
+            visibleFade = IsVisible(level) ? 1f : 0f;
     }
 
     public override void Update(Scene scene) {
