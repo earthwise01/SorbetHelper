@@ -97,7 +97,7 @@ public class SolidTilesDepthSplitter : Entity {
             // otherwise, try the topleft/bottomleft/topright/bottomright neighbours
             // otherwise, return the original tile
             return TryGetFillFrom([origTiles[x, y - 1], origTiles[x, y + 1], origTiles[x - 1, y], origTiles[x + 1, y]])
-                   ?? TryGetFillFrom([origTiles[x - 1, y - 1], origTiles[x - 1, y + 1], origTiles[x + 1, y + 1], origTiles[x + 1, y - 1]])
+                   ?? TryGetFillFrom([origTiles[x - 1, y - 1], origTiles[x - 1, y + 1], origTiles[x + 1, y - 1], origTiles[x + 1, y + 1]])
                    ?? origTile;
 
             // returns whichever neighbour that connects to the original tile ignores the most of the others
