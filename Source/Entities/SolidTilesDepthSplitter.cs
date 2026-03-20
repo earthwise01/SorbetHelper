@@ -7,17 +7,16 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [GlobalEntity]
 [CustomEntity("SorbetHelper/SolidTilesDepthSplitter")]
 public class SolidTilesDepthSplitter : Entity {
-    // i feel like this  Works as a way to add bgtile support ?? hopefully not a messy 3am brain moment
     public static Entity Load(Level level, LevelData levelData, Vector2 position, EntityData entityData) {
-        SolidTilesDepthSplitter entity = new SolidTilesDepthSplitter(entityData.Int("depth", Depths.FGDecals - 10),
+        SolidTilesDepthSplitter depthSplitter = new SolidTilesDepthSplitter(entityData.Int("depth", Depths.FGDecals - 10),
             entityData.Attr("tiletypes", "3").ToHashSet(), entityData.Bool("tryFillBehind", false));
 
-        if (entityData.Bool("backgroundTiles", false))
-            entity.SplitTiles(level.BgTiles.Position, level.BgData, level.BgTiles.Tiles, level.BgTiles.AnimatedTiles, GFX.BGAutotiler);
+        if (!entityData.Bool("backgroundTiles", false))
+            depthSplitter.SplitTiles(level.SolidTiles.Position, level.SolidsData, level.SolidTiles.Tiles, level.SolidTiles.AnimatedTiles, GFX.FGAutotiler);
         else
-            entity.SplitTiles(level.SolidTiles.Position, level.SolidsData, level.SolidTiles.Tiles, level.SolidTiles.AnimatedTiles, GFX.FGAutotiler);
+            depthSplitter.SplitTiles(level.BgTiles.Position, level.BgData, level.BgTiles.Tiles, level.BgTiles.AnimatedTiles, GFX.BGAutotiler);
 
-        return entity;
+        return depthSplitter;
     }
 
     private readonly HashSet<char> tiletypes;
@@ -50,15 +49,15 @@ public class SolidTilesDepthSplitter : Entity {
             VisualExtend = origTiles.VisualExtend
         };
 
-        Func<int, int, MTexture> fillBehind = null;
+        Func<int, int, MTexture> tryGetFillBehind = null;
         if (tryFillBehind)
-            fillBehind = GenerateFillBehind(tileData, autotiler);
+            tryGetFillBehind = GenerateFillBehind(tileData, autotiler);
 
         for (int x = 0; x < tileData.Columns; x++)
         for (int y = 0; y < tileData.Rows; y++) {
             if (tiletypes.Contains(tileData[x, y])) {
                 tiles.Tiles[x, y] = origTiles.Tiles[x, y];
-                origTiles.Tiles[x, y] = tryFillBehind ? fillBehind(x, y) : null;
+                origTiles.Tiles[x, y] = tryGetFillBehind?.Invoke(x, y);
 
                 // only create anim tiles if necessary
                 if (origAnimTiles.tiles.AnyInSegmentAtTile(x, y)) {
@@ -73,70 +72,51 @@ public class SolidTilesDepthSplitter : Entity {
             }
         }
 
-        // Tiles.Alpha = 0.4f;
+        // tiles.Alpha = 0.4f;
         Add(tiles);
         if (animatedTiles is not null)
             Add(animatedTiles);
     }
 
-    private Func<int, int, MTexture> GenerateFillBehind(VirtualMap<char> tileData, Autotiler autotiler) {
-        VirtualMap<char> modified = new VirtualMap<char>(tileData.Columns, tileData.Rows, tileData.EmptyValue);
-        for (int x = 0; x < tileData.Columns; x++)
-        for (int y = 0; y < tileData.Rows; y++)
-            modified[x, y] = GetTile(x, y);
+    private Func<int, int, MTexture> GenerateFillBehind(VirtualMap<char> origTiles, Autotiler autotiler) {
+        VirtualMap<char> newTiles = new VirtualMap<char>(origTiles.Columns, origTiles.Rows, origTiles.EmptyValue);
+        for (int x = 0; x < origTiles.Columns; x++)
+        for (int y = 0; y < origTiles.Rows; y++)
+            newTiles[x, y] = GetTile(x, y);
 
+        Autotiler.Generated generated = autotiler.GenerateMap(newTiles, paddingIgnoreOutOfLevel: true);
 
-        Autotiler.Generated generated = autotiler.GenerateMap(modified, paddingIgnoreOutOfLevel: true);
+        return (int x, int y) => tiletypes.Contains(newTiles[x, y]) ? null : generated.TileGrid.Tiles[x, y];
 
-        return (x, y) => {
-            if (tiletypes.Contains(modified[x, y]))
-                return null;
-
-            return generated.TileGrid.Tiles[x, y];
-        };
-
-        // todo: look into why this sometimes breaks when depth splitting two tilesets that don't ignore each other
         char GetTile(int x, int y) {
-            char c = tileData[x, y];
-            if (!tiletypes.Contains(c))
-                return c;
+            char origTile = origTiles[x, y];
+            if (!tiletypes.Contains(origTile))
+                return origTile;
 
-            Dictionary<char, Autotiler.TerrainType> lookup = autotiler.lookup;
-            // up, down, left, right (no diagonals)
-            char[] neighbours = [tileData[x, y - 1], tileData[x, y + 1], tileData[x - 1, y], tileData[x + 1, y]];
+            // try to get the fill tile from top/bottom/left/right neighbours
+            // otherwise, try the topleft/bottomleft/topright/bottomright neighbours
+            // otherwise, return the original tile
+            return TryGetFillFrom([origTiles[x, y - 1], origTiles[x, y + 1], origTiles[x - 1, y], origTiles[x + 1, y]])
+                   ?? TryGetFillFrom([origTiles[x - 1, y - 1], origTiles[x - 1, y + 1], origTiles[x + 1, y - 1], origTiles[x + 1, y + 1]])
+                   ?? origTile;
 
-            // if all neighbours are c, return c
-            // if all neighbours are either c or air, teturn '0'
-            // otherwise, return whichever neighbour ignores the most of the others
-            char result = '0';
-            bool neighboursAir = false;
-            foreach (char n in neighbours) {
-                if (n == c)
-                    continue;
+            // returns whichever neighbour that connects to the original tile ignores the most of the others
+            char? TryGetFillFrom(char[] neighbours) {
+                char? fillTile = null;
+                foreach (char neighbour in neighbours) {
+                    // ignore any neighbours that are also being split
+                    if (tiletypes.Contains(neighbour))
+                        continue;
 
-                bool isValidTile = lookup.TryGetValue(n, out Autotiler.TerrainType data);
-
-                // neighbours that ignore c count as '0'
-                if (n == '0' || !isValidTile || data.Ignore(c)) {
-                    neighboursAir = true;
-                    continue;
+                    // air ('0') isn't in the lookup but is treated as always connecting to origTile and always ignored by the other neighbours
+                    if ((neighbour == '0' && fillTile is null)
+                        || autotiler.lookup.TryGetValue(neighbour, out Autotiler.TerrainType neighbourData)
+                        && !neighbourData.Ignore(origTile)
+                        && (fillTile is null || fillTile == '0' || neighbourData.Ignore(fillTile.Value)))
+                        fillTile = neighbour;
                 }
-
-                // result should be equal to whichever neighbour ignores the most of the others
-                if (result == '0' || data.Ignore(result))
-                    result = n;
+                return fillTile;
             }
-
-            // if all neighbours are c, result will still be 0 but neighboursAir will be false
-            // if all neighbours are either c or air, result will be 0 and neighboursAir will be true
-            // otherwise, result will not be 0 and neighboursAir is not relevant
-            if (result == '0')
-                if (neighboursAir)
-                    return '0';
-                else
-                    return c;
-            else
-                return result;
         }
     }
 }
