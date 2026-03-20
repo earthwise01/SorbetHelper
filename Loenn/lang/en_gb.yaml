@@ -237,10 +237,19 @@ Entities:
       bigwaterfall:
         Name: Big Waterfall Custom Waterfall
     Attributes:
+      lines:
+        Name: Detail Lines
+        Description: |-
+          Whether the waterfall should have additional lines near the edges and randomly in the center for detail.
+          This makes the waterfall appear closer in appearance to a vanilla big waterfall as opposed to a small waterfall.
       color:
         Description: The color of the waterfall.
       alpha:
         Description: The alpha of the waterfall.
+      wavePercent:
+        Description: |-
+          Determines the speed of the waterfall.
+          Ranges from 0.0 to 1.0, values closer to 1.0 result in faster waves. Vanilla small waterfalls use 0.8 and big waterfalls use 1.0.
       depth:
         Description: |-
           Determines what visual layer the waterfall should be on.
@@ -249,14 +258,9 @@ Entities:
       splashParticleDepth:
         Description: The visual depth to render the splash particles at, or whether to disable them completely.
       ignoreSolids:
-        Description: When checked, the waterfall will ignore any solid objects in its way (e.g. foreground tiles). Water can still block it.
-      lines:
-        Name: Detail Lines
-        Description: Determines whether the waterfall will have any additional lines for detail, disabling this will make the waterfall appear closer in appearance to a vanilla small waterfall as opposed to a big waterfall.
-      wavePercent:
-        Description: |-
-          Determines the speed of the waterfall.
-          Ranges from 0.0 to 1.0, values closer to 1.0 result in faster waves. Vanilla small waterfalls use 0.8 and big waterfalls use 1.0.
+        Description: Whether the waterfall can collide with solids (such as foreground tiles).
+      ignoreWater:
+        Description: Whether the waterfall can collide with water.
       rippleWater:
         Description: Whether the waterfall should create ripples when it lands in water.
 
