@@ -17,9 +17,9 @@ public class SparklingWaterRenderer : Entity {
         float bubbleAlpha,
         float displacementSpeed) {
 
-        private static readonly Color DefaultOutlineColor = Calc.HexToColorWithNonPremultipliedAlpha("9ce4f7de");
-        private static readonly Color DefaultEdgeColor = Calc.HexToColorWithNonPremultipliedAlpha("8dceeb79");
-        private static readonly Color DefaultFillColor = Calc.HexToColorWithNonPremultipliedAlpha("4289bd97");
+        private static readonly Color DefaultOutlineColor = Calc.HexToColorWithNonPremultipliedAlpha("87cefaf0");
+        private static readonly Color DefaultEdgeColor = Calc.HexToColorWithNonPremultipliedAlpha("87cefa80");
+        private static readonly Color DefaultFillColor = Calc.HexToColorWithNonPremultipliedAlpha("4480b890");
         private const string DefaultDetailTexture = "objects/SorbetHelper/sparklingWater/detail";
         private const float DefaultCausticScale = 0.8f, DefaultCausticAlpha = 0.15f;
         private const float DefaultBubbleAlpha = 0.3f;
@@ -85,7 +85,7 @@ public class SparklingWaterRenderer : Entity {
     public void BeforeRender() {
         List<SparklingWater> visibleWater = sparklingWater.Where(water => water.Visible && water.VisibleOnCamera).ToList();
 
-        // setting Visible to false when no water is visible will prevent the depth adhering displacement from still interrupting the spritebatch unnecessarily
+        // don't attempt to render if no water is visible
         Visible = visibleWater.Count > 0;
         if (!Visible)
             return;

@@ -9,7 +9,7 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [TrackedAs(typeof(Water))]
 public class SparklingWater : Water {
     private class SparklingSurface : Surface {
-        // size of the "distance from center" gradient used by the shader
+        // size of the "distance from edge" gradient used by the shader
         public const int SurfaceMaxHeight = 16;
         // surfaces have their positions 8px beneath their edge
         public const int PositionYOffset = 8;
@@ -19,8 +19,8 @@ public class SparklingWater : Water {
         private readonly int edgeStartIndex, borderStartIndex;
 
         public SparklingSurface(Vector2 position, Vector2 outwards, float width, float bodyHeight, ref VertexPositionColor[] mesh) : base(position, outwards, width, bodyHeight) {
+            base.mesh = null;
             Rays.Clear();
-            this.mesh = null;
 
             surfaceHeight = Math.Clamp(BodyHeight, 8, SurfaceMaxHeight);
             int segments = (int)(width / Resolution);
@@ -73,14 +73,13 @@ public class SparklingWater : Water {
                 return;
 
             // update mesh
-            int edgeIndex = edgeStartIndex + 6 * visibleStart / Resolution;
-            int borderIndex = borderStartIndex + 6 * visibleStart / Resolution;
-
             Vector2 perpendicular = Outwards.Perpendicular();
-
             int surfacePos = visibleStart;
             Vector2 worldPos = Position + perpendicular * (-Width / 2 + surfacePos);
             float height = GetSurfaceHeight(surfacePos);
+            int edgeIndex = edgeStartIndex + 6 * visibleStart / Resolution;
+            int borderIndex = borderStartIndex + 6 * visibleStart / Resolution;
+
             while (surfacePos < visibleEnd) {
                 int surfacePosNext = Math.Min(surfacePos + Resolution, Width);
                 Vector2 worldPosNext = Position + perpendicular * (-Width / 2 + surfacePosNext);
@@ -137,7 +136,7 @@ public class SparklingWater : Water {
 
                     break;
                 default:
-                    throw new IndexOutOfRangeException($"Sparkling water surface outwards vector {Outwards.ToString()} is not supported!");
+                    throw new InvalidOperationException($"Sparkling water surface outwards vector {Outwards.ToString()} is not supported!");
             }
 
             bool surfaceOnCamera = left < cameraRect.Right && right > cameraRect.Left
@@ -155,6 +154,8 @@ public class SparklingWater : Water {
     private readonly bool canSplash;
 
     private readonly VertexPositionColor[] mesh;
+
+    private bool initializedWaterInteractionsInside;
 
     private new SparklingSurface TopSurface => base.TopSurface as SparklingSurface;
     private new SparklingSurface BottomSurface => base.BottomSurface as SparklingSurface;
@@ -177,7 +178,7 @@ public class SparklingWater : Water {
         Remove(Get<DisplacementRenderHook>());
         Depth = depth;
 
-        this.collidable = collidable; // the actual `Entity.Collidable` field is set later to allow waterfalls to collide first
+        this.collidable = collidable; // the actual Collidable field is set later to allow waterfalls to collide first
         this.canSplash = canSplash;
 
         mesh = new VertexPositionColor[6];
@@ -228,6 +229,7 @@ public class SparklingWater : Water {
 
     public override void Awake(Scene scene) {
         base.Awake(scene);
+        // todo: change awake priority (once that exists) to always go after waterfalls
         Collidable = collidable;
     }
 
@@ -255,33 +257,27 @@ public class SparklingWater : Water {
         foreach (SparklingSurface surface in Surfaces)
             surface.Update(cameraRect, mesh);
 
-        // ripples & splash sfx
+        // ripples & splash sfx for water interaction components
         if (canSplash) {
             foreach (WaterInteraction waterInteraction in Scene.Tracker.GetComponents<WaterInteraction>()) {
-                Vector2 interactionCenter = waterInteraction.AbsoluteCenter;
                 Entity interactionEntity = waterInteraction.Entity;
 
                 bool wasInside = contains.Contains(waterInteraction);
                 bool isInside = waterInteraction.Check(this);
 
-                if (wasInside != isInside) {
-                    DoSplash(interactionCenter, interactionEntity.Width, 1f);
+                if (!initializedWaterInteractionsInside && isInside)
+                    contains.Add(waterInteraction);
+                else if (wasInside != isInside) {
+                    Vector2 interactionPos = waterInteraction.AbsoluteCenter;
+                    DoSplash(interactionPos, interactionEntity.Width, 1f);
 
                     bool isDashing = waterInteraction.IsDashing();
-                    int deepParam = (interactionCenter.Y < Center.Y && !Scene.CollideCheck<Solid>(new Vector2(waterInteraction.Bounds.Left, Top + 8f), new Vector2(waterInteraction.Bounds.Right, Top + 8f))) ? 1 : 0;
+                    int deepParam = (interactionPos.Y < Center.Y && !Scene.CollideCheck<Solid>(new Vector2(waterInteraction.Bounds.Left, Top + 8f), new Vector2(waterInteraction.Bounds.Right, Top + 8f))) ? 1 : 0;
                     if (wasInside) {
-                        if (isDashing)
-                            Audio.Play("event:/char/madeline/water_dash_out", interactionCenter, "deep", deepParam);
-                        else
-                            Audio.Play("event:/char/madeline/water_out", interactionCenter, "deep", deepParam);
-
+                        Audio.Play(isDashing ? "event:/char/madeline/water_dash_out" : "event:/char/madeline/water_out", interactionPos, "deep", deepParam);
                         waterInteraction.DrippingTimer = 2f;
                     } else {
-                        if (isDashing && deepParam == 1)
-                            Audio.Play("event:/char/madeline/water_dash_in", interactionCenter, "deep", deepParam);
-                        else
-                            Audio.Play("event:/char/madeline/water_in", interactionCenter, "deep", deepParam);
-
+                        Audio.Play((isDashing && deepParam == 1) ? "event:/char/madeline/water_dash_in" : "event:/char/madeline/water_in", interactionPos, "deep", deepParam);
                         waterInteraction.DrippingTimer = 0f;
                     }
 
@@ -303,6 +299,8 @@ public class SparklingWater : Water {
                     }
                 }
             }
+
+            initializedWaterInteractionsInside = true;
         }
     }
 
