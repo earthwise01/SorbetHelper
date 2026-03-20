@@ -14,6 +14,57 @@ resizableWaterfall.name = "SorbetHelper/BigWaterfall"
 resizableWaterfall.canResize = {true, false}
 resizableWaterfall.minimumSize = {8, 0}
 
+resizableWaterfall.placements = {
+    {
+        name = "normal",
+        alternativeName = "bigwaterfall",
+        data = {
+            width = 8,
+            lines = true,
+            color = "87cefa",
+            alpha = 1.0,
+            wavePercent = 1.0,
+            depth = -9999,
+            splashParticleDepth = "ParticlesFG",
+            ignoreSolids = false,
+            ignoreWater = false,
+            rippleWater = true
+        }
+    },
+    {
+        name = "small",
+        alternativeName = "bigwaterfall",
+        data = {
+            width = 8,
+            lines = false,
+            color = "87cefa",
+            alpha = 1.0,
+            wavePercent = 0.8,
+            depth = -9999,
+            splashParticleDepth = "ParticlesFG",
+            ignoreSolids = false,
+            ignoreWater = false,
+            rippleWater = true
+        }
+    },
+    {
+        name = "abovefg",
+        alternativeName = "bigwaterfall",
+        data = {
+            width = 8,
+            lines = true,
+            color = "87cefa",
+            alpha = 1.0,
+            wavePercent = 1.0,
+            depth = -49900,
+            splashParticleDepth = "ParticlesFG",
+            ignoreSolids = true,
+            ignoreWater = false,
+            rippleWater = true
+        }
+    }
+}
+
 resizableWaterfall.fieldInformation = {
     color = {
         fieldType = "color",
@@ -48,78 +99,30 @@ resizableWaterfall.fieldOrder = {
     "width", "color",
     "depth", "alpha",
     "splashParticleDepth", "wavePercent",
-    "ignoreSolids", "lines", "rippleWater"
+    "ignoreSolids", "ignoreWater", "rippleWater", "lines"
 }
 
 resizableWaterfall.ignoredFields = {
     "height", "_id", "_name"
 }
 
-resizableWaterfall.placements = {
-    {
-        name = "normal",
-        alternativeName = "bigwaterfall",
-        data = {
-            width = 8,
-            color = "87cefa",
-            alpha = 1.0,
-            depth = -9999,
-            splashParticleDepth = "ParticlesFG",
-            ignoreSolids = false,
-            lines = true,
-            wavePercent = 1.0,
-            rippleWater = true
-        }
-    },
-    {
-        name = "small",
-        alternativeName = "bigwaterfall",
-        data = {
-            width = 8,
-            color = "87cefa",
-            alpha = 1.0,
-            depth = -9999,
-            splashParticleDepth = "ParticlesFG",
-            ignoreSolids = false,
-            lines = false,
-            wavePercent = 0.8,
-            rippleWater = true
-        }
-    },
-    {
-        name = "abovefg",
-        alternativeName = "bigwaterfall",
-        data = {
-            width = 8,
-            color = "87cefa",
-            alpha = 1.0,
-            depth = -49900,
-            splashParticleDepth = "ParticlesFG",
-            ignoreSolids = true,
-            lines = true,
-            wavePercent = 1.0,
-            rippleWater = true
-        }
-    }
-}
-
 -- normally loenn doesnt check for pandoras box water but i do here anyway bc itd look weird sometimes otherwise
 local function waterSearchPredicate(entity)
-    return entity._name == "water" or entity._name == "pandorasBox/coloredWater"
+    return entity._name == "water" or entity._name == "pandorasBox/coloredWater" or entity._name == "SorbetHelper/SparklingWater"
 end
 
-local function anyCollisions(rectangle, rectangles)
+local function collideFirst(rectangle, rectangles)
     for _, rect in ipairs(rectangles) do
         if utils.aabbCheck(rect, rectangle) then
-            return true
+            return rect
         end
     end
 
-    return false
+    return nil
 end
 
 -- stolen from loenn waterfallHelper but with the ability to ignore tiles
-local function getWaterfallHeight(room, entity, ignoreTiles)
+local function getWaterfallHeight(room, entity, ignoreTiles, ignoreWater)
     local waterBlocks = utils.filter(waterSearchPredicate, room.entities)
     local waterRectangles = connectedEntities.getEntityRectangles(waterBlocks)
 
@@ -132,10 +135,13 @@ local function getWaterfallHeight(room, entity, ignoreTiles)
     local tileMatrix = room.tilesFg.matrix
 
     while wantedHeight < roomHeight - y do
-        local rectangle = utils.rectangle(x, y + wantedHeight, 8, 8)
-
-        if anyCollisions(rectangle, waterRectangles) then
-            break
+        if not ignoreWater then
+            local waterfallRect = utils.rectangle(x, y + wantedHeight, 8, 8)
+            local waterRect = collideFirst(waterfallRect, waterRectangles)
+            if waterRect then
+                wantedHeight = waterRect.y - y
+                break
+            end
         end
 
         if not ignoreTiles and tileMatrix:get(tileX, tileY + 1, "0") ~= "0" then
@@ -149,14 +155,10 @@ local function getWaterfallHeight(room, entity, ignoreTiles)
     return wantedHeight
 end
 
-local function getWithAlpha(color, alpha)
-    return { color[1] * alpha, color[2] * alpha, color[3] * alpha, alpha }
-end
-
 -- adapted from loenn's waterfall helper with some edits
 local function getWaterfallSprite(room, entity, fillColor, borderColor)
     local x, y = entity.x or 0, entity.y or 0
-    local width, height = entity.width or 16, getWaterfallHeight(room, entity, entity.ignoreSolids)
+    local width, height = entity.width or 16, getWaterfallHeight(room, entity, entity.ignoreSolids or false, entity.ignoreWater or false)
 
     local hasLines = entity.lines or false
     -- local linesOffset = (width <= 8 ? 1 : 2)
@@ -201,14 +203,25 @@ local function getWaterfallSprite(room, entity, fillColor, borderColor)
     return sprites
 end
 
+local function multiplyAlpha(color, alpha)
+    -- loenn premultiplies waterfall colors normally even though it draws with alphamultiply blending
+    -- return { color[1] * alpha, color[2] * alpha, color[3] * alpha, alpha }
+    -- don't do that for better visual consistency with the game
+    return {color[1], color[2], color[3], (color[4] or 1) * alpha}
+end
+
 function resizableWaterfall.sprite(room, entity)
-    local color = utils.getColor(entity.color)
-    local fillColor = getWithAlpha(color, 0.3)
-    local borderColor = getWithAlpha(color, 0.8)
+    local color = multiplyAlpha(utils.getColor(entity.color), entity.alpha or 1)
+    local fillColor = multiplyAlpha(color, 0.3)
+    local borderColor = multiplyAlpha(color, 0.8)
 
     local result = getWaterfallSprite(room, entity, fillColor, borderColor)
 
     return result
+end
+
+function resizableWaterfall.depth(room, entity)
+    return entity.depth or (entity.ignoreSolids and -49900 or -9999)
 end
 
 function resizableWaterfall.rectangle(room, entity)
@@ -216,10 +229,6 @@ function resizableWaterfall.rectangle(room, entity)
     local height = getWaterfallHeight(room, entity, entity.ignoreSolids)
 
     return utils.rectangle(x, y, entity.width, height)
-end
-
-function resizableWaterfall.depth(room, entity)
-    return entity.depth or (entity.ignoreSolids and -49900 or -9999)
 end
 
 return resizableWaterfall

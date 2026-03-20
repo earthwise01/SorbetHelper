@@ -13,6 +13,7 @@ public class BigWaterfall : Entity {
     private float height;
 
     private readonly bool ignoreSolids;
+    private readonly bool ignoreWater;
     private readonly bool hasLines;
     private readonly float wavePercent;
     private readonly bool rippleWater;
@@ -44,6 +45,7 @@ public class BigWaterfall : Entity {
         splashParticleDepth = data.Enum("splashParticleDepth", SplashParticleDepths.ParticlesFG);
 
         ignoreSolids = data.Bool("ignoreSolids", false);
+        ignoreWater = data.Bool("ignoreWater", false);
         hasLines = data.Bool("lines", true);
         wavePercent = data.Float("wavePercent", 1f);
         rippleWater = data.Bool("rippleWater", true);
@@ -72,8 +74,8 @@ public class BigWaterfall : Entity {
 
         height = 8f;
         while (Y + height < level.Bounds.Bottom
-                && (water = Scene.CollideFirst<Water>(new Rectangle((int)X, (int)(Y + height), 8, 8))) is null
-                && (ignoreSolids || (solid = Scene.CollideFirst<Solid>(new Rectangle((int)X, (int)(Y + height), 8, 8))) is null || !solid.BlockWaterfalls)) {
+               && (ignoreWater || (water = Scene.CollideFirst<Water>(new Rectangle((int)X, (int)(Y + height), 8, 8))) is null)
+               && (ignoreSolids || (solid = Scene.CollideFirst<Solid>(new Rectangle((int)X, (int)(Y + height), 8, 8))) is null || !solid.BlockWaterfalls)) {
             height += 8f;
             solid = null;
         }
@@ -86,7 +88,7 @@ public class BigWaterfall : Entity {
         loopingSfx.Play(width <= 24 ? "event:/env/local/waterfall_small_main" : "event:/env/local/waterfall_big_main");
         loopingSfx.Position.X = width / 2f;
         Add(enteringSfx = new SoundSource());
-        enteringSfx.Play((water != null && !Scene.CollideCheck<Solid>(new Rectangle((int)X, (int)(Y + height), 8, 16))) ? "event:/env/local/waterfall_small_in_deep" : "event:/env/local/waterfall_small_in_shallow");
+        enteringSfx.Play((water is not null && !Scene.CollideCheck<Solid>(new Rectangle((int)X, (int)(Y + height), 8, 16))) ? "event:/env/local/waterfall_small_in_deep" : "event:/env/local/waterfall_small_in_shallow");
         enteringSfx.Position.X = width / 2f;
         enteringSfx.Position.Y = height;
 
@@ -94,38 +96,39 @@ public class BigWaterfall : Entity {
     }
 
     public override void Update() {
+        base.Update();
+
         Level level = SceneAs<Level>();
+
+        loopingSfx?.Position.Y = Calc.Clamp(level.Camera.Center.Y, Y, height);
 
         // if changing Visible here explodes im gonna do     something
         // (also using Visible makes depth adhering displacement not interrupt the spritebatch unnecessarily if the waterfall is offscreen)
         Visible = visibleOnCamera = InView(level.Camera);
 
-        loopingSfx?.Position.Y = Calc.Clamp(level.Camera.Center.Y, Y, height);
+        if (!Visible)
+            return;
 
-        if (Visible) {
-            if (rippleWater && water is { Active: true, TopSurface: not null } && Scene.OnInterval(0.3f)) {
-                water.TopSurface.DoRipple(new Vector2(X + (width / 2f), water.Y), 0.75f);
-                if (width >= 32) {
-                    water.TopSurface.DoRipple(new Vector2(X + 8f, water.Y), 0.75f);
-                    water.TopSurface.DoRipple(new Vector2(X + width - 8f, water.Y), 0.75f);
-                }
-            }
-
-            if (splashParticleDepth != SplashParticleDepths.None && (water is not null || solid is not null) && !level.Transitioning) {
-                Vector2 particlesPosition = new Vector2(X + (width / 2f), Y + height + 2f);
-
-                ParticleSystem particles = splashParticleDepth switch {
-                    SplashParticleDepths.ParticlesBG => level.ParticlesBG,
-                    SplashParticleDepths.Particles   => level.Particles,
-                    SplashParticleDepths.ParticlesFG => level.ParticlesFG,
-                    _ => throw new ArgumentOutOfRangeException()
-                };
-
-                particles.Emit(Water.P_Splash, 1, particlesPosition, new Vector2((width / 2f) + 4f, 2f), baseColor, new Vector2(0f, -1f).Angle());
+        if (rippleWater && water is { Active: true, TopSurface: not null } && Scene.OnInterval(0.3f)) {
+            water.TopSurface.DoRipple(new Vector2(X + width / 2f, water.Y), 0.75f);
+            if (width >= 32) {
+                water.TopSurface.DoRipple(new Vector2(X + 8f, water.Y), 0.75f);
+                water.TopSurface.DoRipple(new Vector2(X + width - 8f, water.Y), 0.75f);
             }
         }
 
-        base.Update();
+        if (splashParticleDepth != SplashParticleDepths.None && (water is not null || solid is not null) && !level.Transitioning) {
+            Vector2 particlesPosition = new Vector2(X + width / 2f, Y + height + 2f);
+
+            ParticleSystem particles = splashParticleDepth switch {
+                SplashParticleDepths.ParticlesBG => level.ParticlesBG,
+                SplashParticleDepths.Particles   => level.Particles,
+                SplashParticleDepths.ParticlesFG => level.ParticlesFG,
+                _                                => throw new ArgumentOutOfRangeException()
+            };
+
+            particles.Emit(Water.P_Splash, 1, particlesPosition, new Vector2((width / 2f) + 4f, 2f), baseColor, new Vector2(0f, -1f).Angle());
+        }
     }
 
     public void RenderDisplacement() {
