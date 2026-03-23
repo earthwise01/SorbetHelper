@@ -1,13 +1,13 @@
+using Celeste.Mod.SorbetHelper.Backdrops;
+
 namespace Celeste.Mod.SorbetHelper.Components;
 
 /// <summary>
-/// Marks an entity to be rendered by an EntityStylegroundRenderer backdrop.<br/>
-/// See also Backdrops.EntityStylegroundRenderer and Entities.EntityStylegroundController.
+/// Marks an entity to be rendered by an <see cref="EntityStylegroundRenderer"/> backdrop.<br/>
 /// </summary>
 [Tracked]
 public class EntityStylegroundMarker : Component {
     public readonly string Tag;
-    // public Action EntityRender { get; private set; }
 
     private readonly VisibleOverride visibleOverride;
     public bool EntityVisible => visibleOverride?.EntityVisible != false;

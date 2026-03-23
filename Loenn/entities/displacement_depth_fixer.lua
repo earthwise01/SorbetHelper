@@ -1,33 +1,72 @@
-local depthAdheringDisplacementWrapper = {}
+local sorbetUtils = require("mods").requireFromPlugin("libraries.utils")
 
-depthAdheringDisplacementWrapper.name = "SorbetHelper/DepthAdheringDisplacementWrapper"
-depthAdheringDisplacementWrapper.depth = -1000010
-depthAdheringDisplacementWrapper.placements = {
+local displacementDepthFixer = {}
+
+displacementDepthFixer.name = "SorbetHelper/DepthAdheringDisplacementWrapper"
+displacementDepthFixer.placements = {
     {
         name = "entityOnly",
-        alternativeName = "entityOnlyAlt",
+        alternativeName = "altName",
         data = {
             width = 8,
             height = 8,
             distortBehind = false,
-            -- onlyCollideTopLeft = false
+            ignoreBounds = false,
+            minDepth = "",
+            maxDepth = "",
+            affectedTypes = ""
         }
     },
     {
         name = "distortBehind",
-        alternativeName = "distortBehindAlt",
+        alternativeName = "altName",
         data = {
             width = 8,
             height = 8,
             distortBehind = true,
-            -- onlyCollideTopLeft = false
+            ignoreBounds = false,
+            minDepth = "",
+            maxDepth = "",
+            affectedTypes = ""
         }
     }
 }
 
-depthAdheringDisplacementWrapper.canResize = {true, true}
+displacementDepthFixer.fieldInformation = function()
+    return {
+        ignoreBounds = {
+            default = false
+        },
+        affectedTypes = {
+            fieldType = "list",
+            elementSeparator = ",",
+            elementDefault = "",
+            elementOptions = {
+                 options = sorbetUtils.getMapSIDs(),
+                 searchable = true,
+            },
 
-depthAdheringDisplacementWrapper.fillColor = {100 / 255, 225 / 255, 245 / 255, 0.25}
-depthAdheringDisplacementWrapper.borderColor = {183 / 255, 250 / 255, 221 / 255, 0.5}
+            default = ""
+        },
+        minDepth = {
+            fieldType = "integer",
+            allowEmpty = true
+        },
+        maxDepth = {
+            fieldType = "integer",
+            allowEmpty = true
+        }
+    }
+end
 
-return depthAdheringDisplacementWrapper
+displacementDepthFixer.fieldOrder = {
+    "x", "y", "width", "height",
+    "maxDepth", "affectedTypes",
+    "minDepth", "ignoreBounds", "distortBehind"
+}
+
+displacementDepthFixer.depth = -1000010
+displacementDepthFixer.fillColor = {100 / 255, 225 / 255, 245 / 255, 0.25}
+displacementDepthFixer.borderColor = {183 / 255, 250 / 255, 221 / 255, 0.5}
+
+return displacementDepthFixer

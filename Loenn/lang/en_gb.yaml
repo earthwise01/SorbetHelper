@@ -10,21 +10,17 @@ Entities:
   $TypeNameController:
     Attributes:
       classNames:
+        Name: Affected Types
         Description: |-
-          A comma separated list of C# entity class names the controller should affect.
-          You can use something like CelesteTAS or Mapping Utils to try and find these.
-      useFullClassNames:
-        Description: |-
-          Whether the controller should check for the fully qualified class names or just the name of the class.
-          e.g. Celeste.SummitCloud vs SummitCloud
+          A comma separated list of entity SIDs (e.g. SorbetHelper/CustomLightbeam) or C# entity class names (e.g. CustomLightBeam or Celeste.Mod.SorbetHelper.Entities.CustomLightBeam) the controller should affect.
       minDepth:
         Description: |-
-          The minimum (closest to the camera) depth an entity can have while being affected by the controller.
+          The controller will not attempt to affect entities with a depth lower (closer to the camera) than this value.
           Allows restricting the controller to specific entities if you have multiple of the same type but with different depths.
           Leave empty to make uncapped.
       maxDepth:
         Description: |-
-          The maximum (farthest from the camera) depth an entity can have while being affected by the controller.
+          The controller will not attempt to affect entities with a depth higher (farther from the camera) than this value.
           Allows restricting the controller to specific entities if you have multiple of the same type but with different depths.
           Leave empty to make uncapped.
       global:
@@ -459,31 +455,40 @@ Entities:
     Placements:
       # names probably still kinda suck but i literally cant think of anything better
       # update: renamed from displacement wrappers to displacement depth fixers which i think im actually somewhat happy with,,
-      entityOnly:
-        Name: Displacement Depth Fixer (Only Distort Entity)
-        Description: |-
-          Makes the displacement effects of entities which use any (e.g. water and waterfalls) only affect their entity and nothing else.
-          (for reference vanilla displacement doesn't care about depth and just affects everything touching it)
       distortBehind:
         Name: Displacement Depth Fixer
         Description: |-
-          Makes the displacement effects of entities which use any (e.g. water and waterfalls) only affect their entity and anything behind it.
-          (for reference vanilla displacement doesn't care about depth and just affects everything touching it)
-      entityOnlyAlt:
-        Name: Depth Adhering Displacement Wrapper (Only Distort Entity)
-      distortBehindAlt:
-        Name: Depth Adhering Displacement Wrapper (Depth Adhering)
+          Makes the displacement effects from certain entities (e.g. water and waterfalls) only affect their entities and everything behind them.
+          For reference, vanilla displacement always affects everything both below *and above* its entity.
+      entityOnly:
+        Name: Displacement Depth Fixer (Only Distort Entity)
+        Description: |-
+          Makes the displacement effects from certain entities (e.g. water and waterfalls) only affect their entities and nothing else.
+          For reference, vanilla displacement always affects everything *both below and above* its entity.
+      altName:
+        Name: Depth Adhering Displacement Wrapper
     Attributes:
       distortBehind:
         Name: Distort Behind
         Description: |-
-          Whether affected entities should also apply their displacement effects to things behind them.
-          Disabling this makes entities only affect themselves.
-      # unused
-      onlyCollideTopLeft:
+          Whether affected entities should apply their displacement effects to everything behind them.
+          Disabling this makes the displacement only apply to the affected entities.
+      ignoreBounds:
+        Name: Ignore Wrapper Bounds
         Description: |-
-          Makes it so that the wrapper needs to be touching the top left corner of entities in order to affect them.
-          Allows for more precision when choosing which entities to affect when there are many close together, although at the cost of being less intuitive.
+          Whether to attempt to affect all entities in the room, even if the wrapper isn't touching them.
+      minDepth:
+        Description: |-
+          The wrapper will not attempt to affect entities with a depth lower (closer to the camera) than this value.
+          Leave empty to make uncapped.
+      maxDepth:
+        Description: |-
+          The wrapper will not attempt to affect entities with a depth higher (farther from the camera) than this value.
+          Leave empty to make uncapped.
+      affectedTypes:
+        Description: |-
+          An optional comma separated list of entity SIDs (e.g. SorbetHelper/BigWaterfall) or C# entity class names (e.g. BigWaterfall or Celeste.Mod.SorbetHelper.Entities.BigWaterfall) to attempt to affect.
+          Leave empty to affect all entities that use DisplacementRenderHooks.
 
   SorbetHelper/DisplacementEffectBlocker:
     Placements:

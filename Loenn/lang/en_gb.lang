@@ -237,23 +237,26 @@ entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.coll
 
 # Light Cover Controller
 entities.SorbetHelper/LightCoverController.placements.name.controller=Light Cover Controller
-entities.SorbetHelper/LightCoverController.attributes.description.classNames=A comma separated list of C# entity class names the controller should affect.\nYou can use something like CelesteTAS or Mapping Utils to try and find these.
-entities.SorbetHelper/LightCoverController.attributes.description.useFullClassNames=Whether the controller should check for the fully qualified class names or just the name of the class.\ne.g. Celeste.SummitCloud vs SummitCloud
-entities.SorbetHelper/LightCoverController.attributes.description.minDepth=The minimum (closest to the camera) depth an entity can have while being affected by the controller.\nAllows restricting the controller to specific entities if you have multiple of the same type but with different depths.\nLeave empty to make uncapped.
-entities.SorbetHelper/LightCoverController.attributes.description.maxDepth=The maximum (farthest from the camera) depth an entity can have while being affected by the controller.\nAllows restricting the controller to specific entities if you have multiple of the same type but with different depths.\nLeave empty to make uncapped.
+entities.SorbetHelper/LightCoverController.attributes.name.classNames=Affected Types
+entities.SorbetHelper/LightCoverController.attributes.description.classNames=A comma separated list of entity SIDs (e.g. SorbetHelper/CustomLightbeam) or C# entity class names (e.g. CustomLightBeam or Celeste.Mod.SorbetHelper.Entities.CustomLightBeam) the controller should affect.
+entities.SorbetHelper/LightCoverController.attributes.description.minDepth=The controller will not attempt to affect entities with a depth lower (closer to the camera) than this value.\nAllows restricting the controller to specific entities if you have multiple of the same type but with different depths.\nLeave empty to make uncapped.
+entities.SorbetHelper/LightCoverController.attributes.description.maxDepth=The controller will not attempt to affect entities with a depth higher (farther from the camera) than this value.\nAllows restricting the controller to specific entities if you have multiple of the same type but with different depths.\nLeave empty to make uncapped.
 entities.SorbetHelper/LightCoverController.attributes.description.global=Whether the controller should apply globally, to every entity as they are loaded.\nAllows even affecting entities added after room load, and automatically across the whole map.
 entities.SorbetHelper/LightCoverController.attributes.description.alpha=How strong the light cover is.
 
 # Depth Adhering Displacement Wrapper
-entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.entityOnly=Displacement Depth Fixer (Only Distort Entity)
-entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.description.entityOnly=Makes the displacement effects of entities which use any (e.g. water and waterfalls) only affect their entity and nothing else.\n(for reference vanilla displacement doesn't care about depth and just affects everything touching it)
 entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.distortBehind=Displacement Depth Fixer
-entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.description.distortBehind=Makes the displacement effects of entities which use any (e.g. water and waterfalls) only affect their entity and anything behind it.\n(for reference vanilla displacement doesn't care about depth and just affects everything touching it)
-entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.entityOnlyAlt=Depth Adhering Displacement Wrapper (Only Distort Entity)
-entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.distortBehindAlt=Depth Adhering Displacement Wrapper (Depth Adhering)
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.description.distortBehind=Makes the displacement effects from certain entities (e.g. water and waterfalls) only affect their entities and everything behind them.\nFor reference, vanilla displacement always affects everything both below *and above* its entity.
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.entityOnly=Displacement Depth Fixer (Only Distort Entity)
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.description.entityOnly=Makes the displacement effects from certain entities (e.g. water and waterfalls) only affect their entities and nothing else.\nFor reference, vanilla displacement always affects everything *both below and above* its entity.
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.placements.name.altName=Depth Adhering Displacement Wrapper
 entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.name.distortBehind=Distort Behind
-entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.description.distortBehind=Whether affected entities should also apply their displacement effects to things behind them.\nDisabling this makes entities only affect themselves.
-entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.description.onlyCollideTopLeft=Makes it so that the wrapper needs to be touching the top left corner of entities in order to affect them.\nAllows for more precision when choosing which entities to affect when there are many close together, although at the cost of being less intuitive.
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.description.distortBehind=Whether affected entities should apply their displacement effects to everything behind them.\nDisabling this makes the displacement only apply to the affected entities.
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.name.ignoreBounds=Ignore Wrapper Bounds
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.description.ignoreBounds=Whether to attempt to affect all entities in the room, even if the wrapper isn't touching them.
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.description.minDepth=The wrapper will not attempt to affect entities with a depth lower (closer to the camera) than this value.\nLeave empty to make uncapped.
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.description.maxDepth=The wrapper will not attempt to affect entities with a depth higher (farther from the camera) than this value.\nLeave empty to make uncapped.
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.description.affectedTypes=An optional comma separated list of entity SIDs (e.g. SorbetHelper/BigWaterfall) or C# entity class names (e.g. BigWaterfall or Celeste.Mod.SorbetHelper.Entities.BigWaterfall) to attempt to affect.\nLeave empty to affect all entities that use DisplacementRenderHooks.
 
 # Displacement Effect Blocker
 entities.SorbetHelper/DisplacementEffectBlocker.placements.name.normal=Displacement Effect Blocker (Full)
@@ -280,10 +283,10 @@ entities.SorbetHelper/DisplacementEffectArea.attributes.description.flag=A sessi
 # Entity Styleground Controller
 entities.SorbetHelper/EntityStylegroundController.placements.name.controller=Entity As Styleground Controller
 entities.SorbetHelper/EntityStylegroundController.placements.description.controller=Marks specified entity types to be drawn as a styleground layer by an Entity As Styleground Renderer styleground.
-entities.SorbetHelper/EntityStylegroundController.attributes.description.classNames=A comma separated list of C# entity class names the controller should affect.\nYou can use something like CelesteTAS or Mapping Utils to try and find these.
-entities.SorbetHelper/EntityStylegroundController.attributes.description.useFullClassNames=Whether the controller should check for the fully qualified class names or just the name of the class.\ne.g. Celeste.SummitCloud vs SummitCloud
-entities.SorbetHelper/EntityStylegroundController.attributes.description.minDepth=The minimum (closest to the camera) depth an entity can have while being affected by the controller.\nAllows restricting the controller to specific entities if you have multiple of the same type but with different depths.\nLeave empty to make uncapped.
-entities.SorbetHelper/EntityStylegroundController.attributes.description.maxDepth=The maximum (farthest from the camera) depth an entity can have while being affected by the controller.\nAllows restricting the controller to specific entities if you have multiple of the same type but with different depths.\nLeave empty to make uncapped.
+entities.SorbetHelper/EntityStylegroundController.attributes.name.classNames=Affected Types
+entities.SorbetHelper/EntityStylegroundController.attributes.description.classNames=A comma separated list of entity SIDs (e.g. SorbetHelper/CustomLightbeam) or C# entity class names (e.g. CustomLightBeam or Celeste.Mod.SorbetHelper.Entities.CustomLightBeam) the controller should affect.
+entities.SorbetHelper/EntityStylegroundController.attributes.description.minDepth=The controller will not attempt to affect entities with a depth lower (closer to the camera) than this value.\nAllows restricting the controller to specific entities if you have multiple of the same type but with different depths.\nLeave empty to make uncapped.
+entities.SorbetHelper/EntityStylegroundController.attributes.description.maxDepth=The controller will not attempt to affect entities with a depth higher (farther from the camera) than this value.\nAllows restricting the controller to specific entities if you have multiple of the same type but with different depths.\nLeave empty to make uncapped.
 entities.SorbetHelper/EntityStylegroundController.attributes.description.global=Whether the controller should apply globally, to every entity as they are loaded.\nAllows even affecting entities added after room load, and automatically across the whole map.
 entities.SorbetHelper/EntityStylegroundController.attributes.description.tag=The styleground tag used to match with an Entity As Styleground Renderer styleground.\nRequired in order for the controller to have any effect.
 entities.SorbetHelper/EntityStylegroundController.attributes.name._instructionsButton=Info

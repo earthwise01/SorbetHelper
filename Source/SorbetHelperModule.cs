@@ -67,7 +67,7 @@ public class SorbetHelperModule : EverestModule {
         MovingPlatformHittable.Load();
         ExplodeHittable.Load();
         LightCover.Load();
-        GlobalTypeNameProcessor.Load();
+        EntityAwakeProcessor.Load();
 
         // backdrops
         HiResBackdrop.Load();
@@ -102,7 +102,7 @@ public class SorbetHelperModule : EverestModule {
         MovingPlatformHittable.Unload();
         ExplodeHittable.Unload();
         LightCover.Unload();
-        GlobalTypeNameProcessor.Unload();
+        EntityAwakeProcessor.Unload();
 
         // backdrops
         HiResBackdrop.Unload();
