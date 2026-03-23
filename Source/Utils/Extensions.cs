@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Celeste.Mod.Registry;
 
 namespace Celeste.Mod.SorbetHelper.Utils;
 
@@ -10,6 +11,10 @@ internal static class Extensions {
 
     public static bool IsInRange(this int value, int min, int max) => value >= min && value <= max;
     public static bool IsInRange(this float value, float min, float max) => value >= min && value <= max;
+
+    extension(StringSplitOptions) {
+        public static StringSplitOptions TrimAndRemoveEmpty => StringSplitOptions.RemoveEmptyEntries |  StringSplitOptions.TrimEntries;
+    }
 
     #endregion
 
@@ -129,6 +134,12 @@ internal static class Extensions {
 
             return null;
         }
+
+        public bool CheckTypeName(params HashSet<string> typeNames) {
+            Type type = self.GetType();
+            IReadOnlySet<string> knownSidsFromType = EntityRegistry.GetKnownSidsFromType(type);
+            return typeNames.Any(typeName => knownSidsFromType.Contains(typeName) || type.Name == typeName || type.FullName == typeName);
+        }
     }
 
     #endregion
@@ -181,10 +192,12 @@ internal static class Extensions {
         public Ease.Easer Easer(string key)
             => Ease.StringToEaser.GetValueOrDefault(self.Attr(key, ""), Ease.Linear);
 
+        public IEnumerable<string> List(string key, string defaultValue = "")
+            => self.Attr(key, defaultValue).Split(',', StringSplitOptions.TrimAndRemoveEmpty);
         public IEnumerable<T> List<T>(string key, Func<string, T> transform, string defaultValue = "")
-            => self.Attr(key, defaultValue).Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(transform);
+            => self.Attr(key, defaultValue).Split(',', StringSplitOptions.TrimAndRemoveEmpty).Select(transform);
         public IEnumerable<T> List<T>(string key, Func<string, int, T> transform, string defaultValue = "")
-            => self.Attr(key, defaultValue).Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(transform);
+            => self.Attr(key, defaultValue).Split(',', StringSplitOptions.TrimAndRemoveEmpty).Select(transform);
     }
 
     #endregion
@@ -220,9 +233,9 @@ internal static class Extensions {
             => Ease.StringToEaser.GetValueOrDefault(self.Attr(key, ""), Ease.Linear);
 
         public IEnumerable<T> AttrList<T>(string key, Func<string, T> transform, string defaultValue = "")
-            => self.Attr(key, defaultValue).Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(transform);
+            => self.Attr(key, defaultValue).Split(',', StringSplitOptions.TrimAndRemoveEmpty).Select(transform);
         public IEnumerable<T> AttrList<T>(string key, Func<string, int, T> transform, string defaultValue = "")
-            => self.Attr(key, defaultValue).Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(transform);
+            => self.Attr(key, defaultValue).Split(',', StringSplitOptions.TrimAndRemoveEmpty).Select(transform);
     }
 
     #endregion

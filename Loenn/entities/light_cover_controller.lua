@@ -9,7 +9,6 @@ lightCover.placements = {
     name = "controller",
     data = {
         classNames = "",
-        useFullClassNames = false,
         minDepth = "",
         maxDepth = "",
         global = false,
@@ -18,31 +17,41 @@ lightCover.placements = {
     }
 }
 
-lightCover.fieldInformation = {
-    classNames = {
-        fieldType = "list",
-        minimumElements = 0,
-        elementDefault = "",
-    },
-    minDepth = {
-        fieldType = "integer",
-        allowEmpty = true
-    },
-    maxDepth = {
-        fieldType = "integer",
-        allowEmpty = true
-    },
-    alpha = {
-        minimumValue = 0,
-        maximumValue = 1
+lightCover.fieldInformation = function()
+    return {
+        classNames = {
+            fieldType = "list",
+            elementSeparator = ",",
+            elementDefault = "",
+            elementOptions = {
+                 options = sorbetUtils.getAllSIDs(),
+                 searchable = true,
+            }
+        },
+        minDepth = {
+            fieldType = "integer",
+            allowEmpty = true
+        },
+        maxDepth = {
+            fieldType = "integer",
+            allowEmpty = true
+        },
+        alpha = {
+            minimumValue = 0,
+            maximumValue = 1
+        }
     }
+end
+
+lightCover.ignoredFields = {
+    "_id", "_name",
+    "useFullClassNames"
 }
 
 lightCover.fieldOrder = {
     "x", "y",
     "alpha", "maxDepth",
-    "classNames", "minDepth",
-    "useFullClassNames"
+    "classNames", "minDepth"
 }
 
 return lightCover

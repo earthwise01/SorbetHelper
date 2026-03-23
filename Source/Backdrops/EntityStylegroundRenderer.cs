@@ -5,8 +5,7 @@ using Celeste.Mod.SorbetHelper.Components;
 namespace Celeste.Mod.SorbetHelper.Backdrops;
 
 /// <summary>
-/// Renders entities with an EntityStylegroundMarker component as if they were part of a styleground.<br/>
-/// See also Components.EntityStylegroundMarker and Entities.EntityStylegroundController.
+/// Renders entities with an <see cref="EntityStylegroundMarker"/> component as if they were part of a styleground.<br/>
 /// </summary>
 [CustomBackdrop("SorbetHelper/EntityStylegroundRenderer")]
 public class EntityStylegroundRenderer : Backdrop {

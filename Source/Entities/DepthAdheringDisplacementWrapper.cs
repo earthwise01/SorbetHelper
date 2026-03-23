@@ -1,6 +1,7 @@
-using System.Collections.Generic;
-using System.Reflection;
+using System.Linq;
 using Celeste.Mod.SorbetHelper.Components;
+using Celeste.Mod.SorbetHelper.Utils;
+using MonoMod.Utils;
 
 namespace Celeste.Mod.SorbetHelper.Entities;
 
@@ -8,54 +9,58 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [Tracked]
 public class DepthAdheringDisplacementWrapper : Entity {
     private readonly bool distortBehind;
+    private readonly bool ignoreBounds;
 
     public DepthAdheringDisplacementWrapper(EntityData data, Vector2 offset) : base(data.Position + offset) {
         Collider = new Hitbox(data.Width, data.Height);
         distortBehind = data.Bool("distortBehind");
-        // todo: maybe add an option to affect entities based on their SIDs/type names instead of their colliders?
+        ignoreBounds = data.Bool("ignoreBounds");
+
+        EntityAwakeProcessor processor = new EntityAwakeProcessor(ProcessEntity)
+            .WithDepthCheck(data.Int("minDepth", int.MinValue), data.Int("maxDepth", int.MaxValue));
+
+        if (data.Attr("affectedTypes").Split(',', StringSplitOptions.TrimAndRemoveEmpty).ToHashSet() is { Count: > 0 } affectedTypes)
+            processor.WithTypeNameCheck(affectedTypes);
+
+        Add(processor);
     }
 
-    public override void Awake(Scene scene) {
-        base.Awake(scene);
+    private void ProcessEntity(Entity entity) {
+        if (!ignoreBounds && !CollideCheckWithNullHitboxFallback(entity))
+            return;
 
-        foreach (DisplacementRenderHook component in CollideAllByComponentWithNullHitboxFallback<DisplacementRenderHook>()) {
-            component.Entity.Add(new DepthAdheringDisplacementRenderHook(component.Entity.Render, component.RenderDisplacement, distortBehind));
-            component.RemoveSelf();
+        DisplacementRenderHook[] displacementRenderHooks = entity.Components.GetAll<DisplacementRenderHook>().ToArray();
+        if (displacementRenderHooks.Length == 0)
+            return;
+
+        Action renderDisplacement = null;
+        foreach (DisplacementRenderHook displacementRenderHook in displacementRenderHooks) {
+            renderDisplacement += displacementRenderHook.RenderDisplacement;
+            displacementRenderHook.RemoveSelf();
         }
 
-        RemoveSelf();
+        entity.Add(new DepthAdheringDisplacementRenderHook(entity.Render, renderDisplacement, distortBehind));
     }
 
-    private List<T> CollideAllByComponentWithNullHitboxFallback<T>() where T : Component {
-        List<T> result = [];
+    private bool CollideCheckWithNullHitboxFallback(Entity entity) {
+        Collider entityCollider = entity.Collider;
 
-        foreach (Component item in Scene.Tracker.Components[typeof(T)]) {
-            Entity entity = item.Entity;
-            Collider entityCollider = entity.Collider;
+        // if the entity doesn't have a collider (since waterfalls unfortunately don't while also being one of the main things you'd want to affect)
+        // try and make a fallback collider so that it's still possible to give them depth adhering displacement
+        if (entityCollider is null) {
+            float tempWidth = 8f;
+            float tempHeight = 8f;
 
-            // if the entity doesn't have a collider (since waterfalls unfortunately don't while also being one of the main things you'd want to affect)
-            // try and make a fallback collider so that it's still possible to give them depth adhering displacement
-            if (entityCollider is null) {
-                float tempWidth = 8f;
-                float tempHeight = 8f;
+            // if the entity has fields called "width" or "height" try to use those for the temporary hitbox dimensions instead of the default of 8px
+            DynamicData dynamicData = DynamicData.For(entity);
+            if (dynamicData.Get("width") is float width)
+                tempWidth = width;
+            if (dynamicData.Get("height") is float height)
+                tempHeight = height;
 
-                // if the entity has private fields called "width" or "height" try to use those for the temporary hitbox dimensions instead of the default of 8px
-                Type entityType = entity.GetType();
-                FieldInfo f_width = entityType.GetField("width", BindingFlags.NonPublic | BindingFlags.Instance);
-                FieldInfo f_height = entityType.GetField("height", BindingFlags.NonPublic | BindingFlags.Instance);
-
-                if (f_width?.GetValue(entity) is float width)
-                    tempWidth = width;
-                if (f_height?.GetValue(entity) is float height)
-                    tempHeight = height;
-
-                entityCollider = new Hitbox(tempWidth, tempHeight, entity.X, entity.Y);
-            }
-
-            if (entityCollider.Collide(this))
-                result.Add(item as T);
+            entityCollider = new Hitbox(tempWidth, tempHeight, entity.X, entity.Y);
         }
 
-        return result;
+        return entityCollider.Collide(this);
     }
 }

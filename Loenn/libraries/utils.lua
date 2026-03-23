@@ -2,6 +2,7 @@ local drawableSprite = require("structs.drawable_sprite")
 local drawableText = require("structs.drawable_text")
 local colors = require("consts.colors")
 local loadedState = require("loaded_state")
+local entities = require("entities")
 
 local sorbetUtils = {}
 
@@ -15,7 +16,16 @@ function sorbetUtils.getGenericNodeSprite(x, y, color)
     return sprite
 end
 
--- praying this isnt stupidly laggy
+function sorbetUtils.getAllSIDs()
+    local sids = {}
+    for k,v in pairs(entities.registeredEntities) do
+        table.insert(sids, k)
+    end
+    table.sort(sids)
+
+    return sids
+end
+
 function sorbetUtils.checkForDuplicateInMap(self, isTrigger, duplicateCheck)
     isTrigger = isTrigger or false
     local map = loadedState.map

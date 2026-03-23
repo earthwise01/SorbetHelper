@@ -9,7 +9,6 @@ entityStylegroundController.placements = {
     name = "controller",
     data = {
         classNames = "",
-        useFullClassNames = false,
         minDepth = "",
         maxDepth = "",
         global = false,
@@ -20,31 +19,42 @@ entityStylegroundController.placements = {
     }
 }
 
-entityStylegroundController.fieldInformation = {
-    classNames = {
-        fieldType = "list",
-        minimumElements = 0,
-        elementDefault = "",
-    },
-    minDepth = {
-        fieldType = "integer",
-        allowEmpty = true
-    },
-    maxDepth = {
-        fieldType = "integer",
-        allowEmpty = true
-    },
-    _instructionsButton = {
-        fieldType = "sorbetHelper.infoButton"
+entityStylegroundController.fieldInformation = function()
+    return {
+        classNames = {
+            fieldType = "list",
+            elementSeparator = ",",
+            elementDefault = "",
+            elementOptions = {
+                 options = sorbetUtils.getAllSIDs(),
+                 searchable = true,
+            }
+        },
+        minDepth = {
+            fieldType = "integer",
+            allowEmpty = true
+        },
+        maxDepth = {
+            fieldType = "integer",
+            allowEmpty = true
+        },
+        _instructionsButton = {
+            fieldType = "sorbetHelper.infoButton"
+        }
     }
+end
+
+entityStylegroundController.ignoredFields = {
+    "_id", "_name",
+    "useFullClassNames"
 }
 
 entityStylegroundController.fieldOrder = {
     "x", "y",
     "tag", "maxDepth",
     "classNames", "minDepth",
-    "useFullClassNames", "global",
-    "_instructionsButton",
+    "global",
+    "_instructionsButton"
 }
 
 return entityStylegroundController

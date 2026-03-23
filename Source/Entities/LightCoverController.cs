@@ -1,3 +1,4 @@
+using System.Linq;
 using Celeste.Mod.SorbetHelper.Components;
 using Celeste.Mod.SorbetHelper.Utils;
 
@@ -13,10 +14,9 @@ public class LightCoverController : Entity {
     public LightCoverController(EntityData data, Vector2 _) {
         alpha = data.Float("alpha", 1f);
 
-        if (data.Bool("global", false))
-            Add(new GlobalTypeNameProcessor(data, ProcessEntity));
-        else
-            Add(new TypeNameProcessor(data, ProcessEntity));
+        Add(new EntityAwakeProcessor(ProcessEntity, data.Bool("global", false) ? EntityAwakeProcessor.ProcessModes.OnEntityAwake : EntityAwakeProcessor.ProcessModes.OnProcessorAwake)
+            .WithTypeNameCheck(data.Attr("classNames").Split(',', StringSplitOptions.TrimAndRemoveEmpty).ToHashSet())
+            .WithDepthCheck(data.Int("minDepth", int.MinValue), data.Int("maxDepth", int.MaxValue)));
     }
 
     private void ProcessEntity(Entity entity) {
