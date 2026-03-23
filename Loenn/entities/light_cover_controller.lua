@@ -24,7 +24,7 @@ lightCover.fieldInformation = function()
             elementSeparator = ",",
             elementDefault = "",
             elementOptions = {
-                 options = sorbetUtils.getAllSIDs(),
+                 options = sorbetUtils.getMapSIDs(),
                  searchable = true,
             }
         },

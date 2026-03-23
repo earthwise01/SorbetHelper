@@ -18,7 +18,26 @@ end
 
 function sorbetUtils.getAllSIDs()
     local sids = {}
-    for k,v in pairs(entities.registeredEntities) do
+    for k, v in pairs(entities.registeredEntities) do
+        table.insert(sids, k)
+    end
+    table.sort(sids)
+
+    return sids
+end
+
+function sorbetUtils.getMapSIDs()
+    if not loadedState.map then return sorbetUtils.getAllSIDs() end
+
+    local sidsInMap = {}
+    for _, room in pairs(loadedState.map.rooms) do
+        for _, entity in pairs(room.entities) do
+            sidsInMap[entity._name] = true
+        end
+    end
+
+    local sids = {}
+    for k, v in pairs(sidsInMap) do
         table.insert(sids, k)
     end
     table.sort(sids)
