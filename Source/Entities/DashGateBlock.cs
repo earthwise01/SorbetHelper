@@ -4,8 +4,10 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/DashGateBlock")]
 [Tracked]
-public class DashGateBlock : GateBlock {
-    private enum Axes {
+public class DashGateBlock : GateBlock
+{
+    private enum Axes
+    {
         Both,
         Horizontal,
         Vertical
@@ -24,14 +26,16 @@ public class DashGateBlock : GateBlock {
     private readonly ParticleType P_RefillDash;
     private readonly ParticleType P_RefillDashReturn;
 
-    public DashGateBlock(EntityData data, Vector2 offset) : base(data, offset) {
+    public DashGateBlock(EntityData data, Vector2 offset) : base(data, offset)
+    {
         allowWavedash = data.Bool("allowWavedash", false);
         dashCornerCorrection = data.Bool("dashCornerCorrection", false);
         refillDash = data.Bool("refillDash", false);
 
         Axes axes = data.Enum("axes", Axes.Both);
         string blockSprite = data.Attr("blockSprite", "SorbetHelper/gateblock/dash/block");
-        switch (axes) {
+        switch (axes)
+        {
             default:
                 canMoveHorizontally = canMoveVertically = true;
                 break;
@@ -51,19 +55,22 @@ public class DashGateBlock : GateBlock {
 
         OnDashCollide = OnDashed;
 
-        P_RefillDash = new ParticleType(Refill.P_Shatter) {
+        P_RefillDash = new ParticleType(Refill.P_Shatter)
+        {
             Color = P_Activate.Color2,
             Color2 = P_Activate.Color,
             SpeedMin = 120f,
             SpeedMax = 190f
         };
-        P_RefillDashReturn = new ParticleType(P_RefillDash) {
+        P_RefillDashReturn = new ParticleType(P_RefillDash)
+        {
             Color = P_ActivateReturn.Color2,
             Color2 = P_ActivateReturn.Color
         };
     }
 
-    public DashCollisionResults OnDashed(Player player, Vector2 dir) {
+    public DashCollisionResults OnDashed(Player player, Vector2 dir)
+    {
         if (Triggered || !CanActivate(dir))
             return DashCollisionResults.NormalCollision;
 
@@ -78,7 +85,8 @@ public class DashGateBlock : GateBlock {
         // trigger the gate
         Activate();
 
-        if (refillDash && player.Dashes < player.MaxDashes) {
+        if (refillDash && player.Dashes < player.MaxDashes)
+        {
             player.RefillDash();
             Audio.Play(SFX.game_gen_diamond_return, player.Center);
 
@@ -112,14 +120,16 @@ public class DashGateBlock : GateBlock {
     private bool CanActivate(Vector2 direction)
         => (direction.X != 0f && canMoveHorizontally) || (direction.Y != 0f && canMoveVertically);
 
-    public override void Update() {
+    public override void Update()
+    {
         base.Update();
 
         if (activationFlash > 0f)
             activationFlash -= Engine.DeltaTime * 5f;
     }
 
-    public override void Render() {
+    public override void Render()
+    {
         if (!VisibleOnCamera)
             return;
 
@@ -131,7 +141,8 @@ public class DashGateBlock : GateBlock {
         base.Render();
     }
 
-    protected override void RenderOutline() {
+    protected override void RenderOutline()
+    {
         Vector2 scaledTopLeft = Center + Offset - (new Vector2(Collider.Width / 2f, Collider.Height / 2f) * Scale);
         float scaledWidth = Collider.Width * Scale.X;
         float scaledHeight = Collider.Height * Scale.Y;

@@ -5,29 +5,32 @@ using Celeste.Mod.Registry;
 
 namespace Celeste.Mod.SorbetHelper.Utils;
 
-internal static class Extensions {
-
+internal static class Extensions
+{
     #region Misc Extensions
 
     public static bool IsInRange(this int value, int min, int max) => value >= min && value <= max;
     public static bool IsInRange(this float value, float min, float max) => value >= min && value <= max;
 
-    extension(StringSplitOptions) {
-        public static StringSplitOptions TrimAndRemoveEmpty => StringSplitOptions.RemoveEmptyEntries |  StringSplitOptions.TrimEntries;
+    extension(StringSplitOptions)
+    {
+        public static StringSplitOptions TrimAndRemoveEmpty => StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
     }
 
     #endregion
 
     #region Calc Extensions
 
-    extension(Calc) {
+    extension(Calc)
+    {
         // Modified from HexToColorWithAlpha in https://github.com/EverestAPI/Everest/blob/dev/Celeste.Mod.mm/Patches/Monocle/Calc.cs
         /// <summary>
         /// Convert a hex color, possibly including a non-premultiplied alpha value, into an XNA <see cref="Color"/>.
         /// </summary>
         /// <param name="hex">a hex color, in either <c>RRGGBB</c>, <c>RRGGBBAA</c>, or <c>AA</c> form.</param>
         /// <returns>an XNA <see cref="Color"/>, defaulting to <see cref="Color.White"/>.</returns>
-        public static Color HexToColorWithNonPremultipliedAlpha(string hex) {
+        public static Color HexToColorWithNonPremultipliedAlpha(string hex)
+        {
             int consumed = 0;
 
             if (hex.Length >= 1 && hex[0] == '#')
@@ -35,7 +38,8 @@ internal static class Extensions {
 
             int r, g, b, a;
 
-            switch (hex.Length - consumed) {
+            switch (hex.Length - consumed)
+            {
                 case 2:
                     // one byte of data, for the alpha channel
                     a = Calc.HexToByte(hex[consumed++]) * 16 + Calc.HexToByte(hex[consumed++]);
@@ -79,7 +83,8 @@ internal static class Extensions {
         /// <param name="addTo">The list to add any loaded entities to.</param>
         /// <param name="addToLevel">Whether the loaded entities should be added to the level.</param>
         /// <returns>Whether an entity was loaded.</returns>
-        public static bool LoadAndGetCustomEntity(EntityData entityData, Level level, List<Entity> addTo, bool addToLevel = true) {
+        public static bool LoadAndGetCustomEntity(EntityData entityData, Level level, List<Entity> addTo, bool addToLevel = true)
+        {
             List<Entity> toAdd = level.Entities.ToAdd;
             int prevToAddCount = toAdd.Count;
 
@@ -103,7 +108,8 @@ internal static class Extensions {
         /// <param name="level">The <see cref="Level"/> to use for loading the <see cref="EntityData"/>, using <see cref="Level.LoadCustomEntity"/>.</param>
         /// <param name="addToLevel">Whether the loaded entity should be added to the level.</param>
         /// <returns>The loaded entity, or null if none was created.</returns>
-        public static Entity LoadAndGetCustomEntity(EntityData entityData, Level level, bool addToLevel = true) {
+        public static Entity LoadAndGetCustomEntity(EntityData entityData, Level level, bool addToLevel = true)
+        {
             List<Entity> toAdd = level.Entities.ToAdd;
             int prevToAddCount = toAdd.Count;
 
@@ -123,11 +129,14 @@ internal static class Extensions {
 
     #region Entity Extensions
 
-    extension(Entity self) {
-        public T GetComponentFromEnd<T>() where T : Component {
+    extension(Entity self)
+    {
+        public T GetComponentFromEnd<T>() where T : Component
+        {
             List<Component> components = self.Components.components;
 
-            for (int i = components.Count - 1; i >= 0; i--) {
+            for (int i = components.Count - 1; i >= 0; i--)
+            {
                 if (components[i] is T t)
                     return t;
             }
@@ -135,7 +144,8 @@ internal static class Extensions {
             return null;
         }
 
-        public bool CheckTypeName(params HashSet<string> typeNames) {
+        public bool CheckTypeName(params HashSet<string> typeNames)
+        {
             Type type = self.GetType();
             IReadOnlySet<string> knownSidsFromType = EntityRegistry.GetKnownSidsFromType(type);
             return typeNames.Any(typeName => knownSidsFromType.Contains(typeName) || type.Name == typeName || type.FullName == typeName);
@@ -146,7 +156,8 @@ internal static class Extensions {
 
     #region Session Extensions
 
-    extension(Session self) {
+    extension(Session self)
+    {
         public bool GetFlag(string flag, bool inverted) => self.GetFlag(flag) != inverted;
     }
 
@@ -154,7 +165,8 @@ internal static class Extensions {
 
     #region Camera Extensions
 
-    extension(Camera self) {
+    extension(Camera self)
+    {
         public int Width => self.Viewport.Width;
         public int Height => self.Viewport.Height;
         public Vector2 Center => self.Position + new Vector2(self.Viewport.Width / 2f, self.Viewport.Height / 2f);
@@ -164,8 +176,10 @@ internal static class Extensions {
 
     #region EntityData Extensions
 
-    extension(EntityData self) {
-        public Color HexColorWithAlpha(string key, Color defaultValue = default) {
+    extension(EntityData self)
+    {
+        public Color HexColorWithAlpha(string key, Color defaultValue = default)
+        {
             if (!self.Values.TryGetValue(key, out object value))
                 return defaultValue;
 
@@ -176,7 +190,8 @@ internal static class Extensions {
             return defaultValue;
         }
 
-        public Color HexColorWithNonPremultipliedAlpha(string key, Color defaultValue = default) {
+        public Color HexColorWithNonPremultipliedAlpha(string key, Color defaultValue = default)
+        {
             if (!self.Values.TryGetValue(key, out object value))
                 return defaultValue;
 
@@ -204,8 +219,10 @@ internal static class Extensions {
 
     #region BinaryPacker.Element Extensions
 
-    extension(BinaryPacker.Element self) {
-        public Color AttrHexColorWithAlpha(string key, Color defaultValue = default) {
+    extension(BinaryPacker.Element self)
+    {
+        public Color AttrHexColorWithAlpha(string key, Color defaultValue = default)
+        {
             if (!self.Attributes.TryGetValue(key, out object value))
                 return defaultValue;
 
@@ -216,7 +233,8 @@ internal static class Extensions {
             return defaultValue;
         }
 
-        public Color AttrHexColorWithNonPremultipliedAlpha(string key, Color defaultValue = default) {
+        public Color AttrHexColorWithNonPremultipliedAlpha(string key, Color defaultValue = default)
+        {
             if (!self.Attributes.TryGetValue(key, out object value))
                 return defaultValue;
 
@@ -244,20 +262,22 @@ internal static class Extensions {
 
     // grrr this kind of sucks but oh well
     private static readonly ReadOnlyDictionary<string, Ease.Easer> EaseExtensions_StringToEaser
-        = new ReadOnlyDictionary<string, Ease.Easer>(new Dictionary<string, Ease.Easer> {
-        { "Linear", Ease.Linear },
-        { "SineIn", Ease.SineIn }, { "SineOut", Ease.SineOut }, { "SineInOut", Ease.SineInOut },
-        { "QuadIn", Ease.QuadIn }, { "QuadOut", Ease.QuadOut }, { "QuadInOut", Ease.QuadInOut },
-        { "CubeIn", Ease.CubeIn }, { "CubeOut", Ease.CubeOut }, { "CubeInOut", Ease.CubeInOut },
-        { "QuintIn", Ease.QuintIn }, { "QuintOut", Ease.QuintOut }, { "QuintInOut", Ease.QuintInOut },
-        { "ExpoIn", Ease.ExpoIn }, { "ExpoOut", Ease.ExpoOut }, { "ExpoInOut", Ease.ExpoInOut },
-        { "BackIn", Ease.BackIn }, { "BackOut", Ease.BackOut }, { "BackInOut", Ease.BackInOut },
-        { "BigBackIn", Ease.BigBackIn }, { "BigBackOut", Ease.BigBackOut }, { "BigBackInOut", Ease.BigBackInOut },
-        { "ElasticIn", Ease.ElasticIn }, { "ElasticOut", Ease.ElasticOut }, { "ElasticInOut", Ease.ElasticInOut },
-        { "BounceIn", Ease.BounceIn }, { "BounceOut", Ease.BounceOut }, { "BounceInOut", Ease.BounceInOut },
-    });
+        = new ReadOnlyDictionary<string, Ease.Easer>(new Dictionary<string, Ease.Easer>
+        {
+            { "Linear", Ease.Linear },
+            { "SineIn", Ease.SineIn }, { "SineOut", Ease.SineOut }, { "SineInOut", Ease.SineInOut },
+            { "QuadIn", Ease.QuadIn }, { "QuadOut", Ease.QuadOut }, { "QuadInOut", Ease.QuadInOut },
+            { "CubeIn", Ease.CubeIn }, { "CubeOut", Ease.CubeOut }, { "CubeInOut", Ease.CubeInOut },
+            { "QuintIn", Ease.QuintIn }, { "QuintOut", Ease.QuintOut }, { "QuintInOut", Ease.QuintInOut },
+            { "ExpoIn", Ease.ExpoIn }, { "ExpoOut", Ease.ExpoOut }, { "ExpoInOut", Ease.ExpoInOut },
+            { "BackIn", Ease.BackIn }, { "BackOut", Ease.BackOut }, { "BackInOut", Ease.BackInOut },
+            { "BigBackIn", Ease.BigBackIn }, { "BigBackOut", Ease.BigBackOut }, { "BigBackInOut", Ease.BigBackInOut },
+            { "ElasticIn", Ease.ElasticIn }, { "ElasticOut", Ease.ElasticOut }, { "ElasticInOut", Ease.ElasticInOut },
+            { "BounceIn", Ease.BounceIn }, { "BounceOut", Ease.BounceOut }, { "BounceInOut", Ease.BounceInOut },
+        });
 
-    extension(Ease) {
+    extension(Ease)
+    {
         /// <summary>
         /// maps all Monocle <see cref="Ease.Easer"/>s to their names (i.e. <c>"SineInOut"</c> => <see cref="Ease.SineInOut"/>)
         /// </summary>
@@ -265,5 +285,4 @@ internal static class Extensions {
     }
 
     #endregion
-
 }

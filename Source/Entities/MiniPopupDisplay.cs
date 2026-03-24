@@ -5,7 +5,8 @@ using System.Linq;
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [Tracked]
-public class MiniPopupDisplay : Entity {
+public class MiniPopupDisplay : Entity
+{
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(MiniPopupDisplay)}";
 
     private readonly MTexture fallbackBaseTex, fallbackAccentTex;
@@ -17,7 +18,8 @@ public class MiniPopupDisplay : Entity {
     private static int MiniPopupVisibleCap => Math.Min(SorbetHelperModule.Settings.MiniPopupVisibleCap, (int)(720f / (90f * MiniPopupScale)));
     private static float MiniPopupScale => SorbetHelperModule.Settings.MiniPopupScale + 0.1f;
 
-    private MiniPopupDisplay() : base() {
+    private MiniPopupDisplay() : base()
+    {
         Tag |= Tags.Global | Tags.TransitionUpdate | Tags.FrozenUpdate | Tags.HUD;
         Depth = Depths.Top;
 
@@ -26,31 +28,36 @@ public class MiniPopupDisplay : Entity {
     }
 
     // Creating the popup returns an action that removes the popup so the respective MiniPopupTrigger can remove it if its mode is set to WhilePlayerInside - grog
-    public Action CreatePopup(float activeTime, string mainTextId, string subTextId) {
+    public Action CreatePopup(float activeTime, string mainTextId, string subTextId)
+    {
         Popup popup = new Popup(activeTime, mainTextId, subTextId, Color.Black, Color.LightCoral, Color.White);
         popups.Add(popup);
         return () => popup.Active = false;
     }
 
-    public Action CreatePopup(float activeTime, string mainTextId, string subTextId, Color baseColor, Color accentColor, Color titleColor, string iconPath = null, string texturePath = null, int widthOverride = -1) {
+    public Action CreatePopup(float activeTime, string mainTextId, string subTextId, Color baseColor, Color accentColor, Color titleColor, string iconPath = null, string texturePath = null, int widthOverride = -1)
+    {
         Popup popup = new Popup(activeTime, mainTextId, subTextId, baseColor, accentColor, titleColor, iconPath,
             texturePath, widthOverride);
         popups.Add(popup);
         return () => popup.Active = false;
     }
 
-    public override void Update() {
+    public override void Update()
+    {
         base.Update();
 
         int activeCount = Math.Min(popups.Count, MiniPopupVisibleCap);
         int hiddenCount = popups.Count - activeCount;
         hiddenCountSlideLerp = Calc.Approach(hiddenCountSlideLerp, hiddenCount > 0 ? 1f : 0f, Engine.DeltaTime / 0.5f);
 
-        for (int i = 0; i < popups.Count; i++) {
+        for (int i = 0; i < popups.Count; i++)
+        {
             Popup popup = popups[i];
 
             // fixes silly stuff when adjusting the visible cap with a popup out
-            if (i >= activeCount) {
+            if (i >= activeCount)
+            {
                 if (popup.Started)
                     popup.Reset();
 
@@ -66,17 +73,19 @@ public class MiniPopupDisplay : Entity {
         toRemove.Clear();
     }
 
-    public override void Render() {
+    public override void Render()
+    {
         if (SceneAs<Level>().Paused)
             return;
 
         // base.Render();
 
         float scale = MiniPopupScale;
-        float outlineStroke = SorbetHelperModule.Settings.MiniPopupScale switch {
+        float outlineStroke = SorbetHelperModule.Settings.MiniPopupScale switch
+        {
             > 1.15f => 3f,
             < 0.85f => 1f,
-            _ => 2f,
+            _       => 2f,
         };
 
         const float topYPos = 192f;
@@ -85,7 +94,8 @@ public class MiniPopupDisplay : Entity {
 
         // todo: move some of this into a render method in the popup class? maybe
         int activeCount = Math.Min(popups.Count, MiniPopupVisibleCap);
-        for (int i = 0; i < activeCount; i++) {
+        for (int i = 0; i < activeCount; i++)
+        {
             Popup popup = popups[i];
 
             string mainText = Dialog.Clean(popup.MainTextID);
@@ -122,7 +132,8 @@ public class MiniPopupDisplay : Entity {
         }
 
         int hiddenCount = popups.Count - activeCount;
-        if (hiddenCountSlideLerp > 0f) {
+        if (hiddenCountSlideLerp > 0f)
+        {
             float boxTexHeight = fallbackBaseTex.Height * 0.5f;
             float boxTexWidth = fallbackBaseTex.Width * 0.5f;
 
@@ -135,29 +146,34 @@ public class MiniPopupDisplay : Entity {
         }
     }
 
-    public override void Removed(Scene scene) {
+    public override void Removed(Scene scene)
+    {
         base.Removed(scene);
         popups.Clear();
     }
 
-    public override void SceneEnd(Scene scene) {
+    public override void SceneEnd(Scene scene)
+    {
         base.SceneEnd(scene);
         popups.Clear();
     }
 
-    public static MiniPopupDisplay GetMiniPopupDisplay(Scene scene) {
+    public static MiniPopupDisplay GetMiniPopupDisplay(Scene scene)
+    {
         if (scene.Tracker.GetEntities<MiniPopupDisplay>()
                          .Concat(scene.Entities.ToAdd)
                          .FirstOrDefault(e => e is MiniPopupDisplay)
-            is not MiniPopupDisplay miniPopupDisplay) {
-            scene.Add(miniPopupDisplay = new MiniPopupDisplay());
-            Logger.Info(LogID, $"creating new {nameof(MiniPopupDisplay)}.");
-        }
+            is MiniPopupDisplay miniPopupDisplay)
+            return miniPopupDisplay;
+
+        Logger.Info(LogID, $"creating new {nameof(MiniPopupDisplay)}.");
+        scene.Add(miniPopupDisplay = new MiniPopupDisplay());
 
         return miniPopupDisplay;
     }
 
-    private class Popup {
+    private class Popup
+    {
         public IEnumerator Routine;
         public float SlideLerp;
         public float FinishedMoveUpLerp = 1f;
@@ -173,7 +189,8 @@ public class MiniPopupDisplay : Entity {
         private readonly float activeTime;
         public bool Active = true;
 
-        public Popup(float activeTime, string mainTextId, string subTextId, Color baseColor, Color accentColor, Color titleColor, string iconPath = null, string texturePath = null, int widthOverride = -1) {
+        public Popup(float activeTime, string mainTextId, string subTextId, Color baseColor, Color accentColor, Color titleColor, string iconPath = null, string texturePath = null, int widthOverride = -1)
+        {
             this.activeTime = activeTime;
             Reset();
 
@@ -184,48 +201,56 @@ public class MiniPopupDisplay : Entity {
             TitleColor = titleColor;
             Icon = string.IsNullOrEmpty(iconPath) ? null : GFX.Gui[iconPath];
             BaseTexture = string.IsNullOrEmpty(texturePath) ? null : GFX.Gui[texturePath];
-            AccentTexture = string.IsNullOrEmpty(texturePath) ?  null : GFX.Gui[texturePath + "Accent"];
+            AccentTexture = string.IsNullOrEmpty(texturePath) ? null : GFX.Gui[texturePath + "Accent"];
 
             WidthOverride = widthOverride;
         }
 
-        private IEnumerator PopupRoutine() {
+        private IEnumerator PopupRoutine()
+        {
             Started = true;
 
             // slide in
-            while (SlideLerp < 1f) {
+            while (SlideLerp < 1f)
+            {
                 yield return null;
                 SlideLerp += Engine.DeltaTime / 0.5f;
             }
 
             // stay around for a bit
             // (if the mode is WhilePlayerInside listen for when active is set to false by the trigger, otherwise do the normal behavior)
-            if (activeTime < 0f) {
-                while (Active) {
+            if (activeTime < 0f)
+            {
+                while (Active)
                     yield return null;
-                }
-            } else {
+            }
+            else
+            {
                 float activeTimer = activeTime;
-                while (Active && activeTimer > 0f) {
+                while (Active && activeTimer > 0f)
+                {
                     yield return null;
                     activeTimer -= Engine.DeltaTime;
                 }
             }
 
             // slide out
-            while (SlideLerp > 0f) {
+            while (SlideLerp > 0f)
+            {
                 yield return null;
                 SlideLerp -= Engine.DeltaTime / 0.5f;
             }
 
             // lets any other popups below smoothly move up
-            while (FinishedMoveUpLerp > 0f) {
+            while (FinishedMoveUpLerp > 0f)
+            {
                 yield return null;
                 FinishedMoveUpLerp -= Engine.DeltaTime / 0.5f;
             }
         }
 
-        public void Reset() {
+        public void Reset()
+        {
             Started = false;
             Routine = PopupRoutine();
             SlideLerp = 0f;

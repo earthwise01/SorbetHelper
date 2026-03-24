@@ -4,12 +4,14 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 
 [Tracked]
 [CustomEntity("SorbetHelper/KillZone")]
-public class KillZone : Entity {
+public class KillZone : Entity
+{
     private readonly string flag;
     private readonly bool inverted;
     private readonly bool fastKill;
 
-    public KillZone(EntityData data, Vector2 offset) : base(data.Position + offset) {
+    public KillZone(EntityData data, Vector2 offset) : base(data.Position + offset)
+    {
         Collider = new Hitbox(data.Width, data.Height);
 
         flag = data.Attr("flag");
@@ -24,30 +26,35 @@ public class KillZone : Entity {
             Add(new HoldableCollider(OnHoldable));
     }
 
-    public override void Awake(Scene scene) {
+    public override void Awake(Scene scene)
+    {
         base.Awake(scene);
 
         if (!string.IsNullOrEmpty(flag) && !SceneAs<Level>().Session.GetFlag(flag, inverted))
             Collidable = false;
     }
 
-    public override void Update() {
+    public override void Update()
+    {
         base.Update();
 
         if (!string.IsNullOrEmpty(flag))
             Collidable = SceneAs<Level>().Session.GetFlag(flag, inverted);
     }
 
-    private void OnPlayer(Player player) {
+    private void OnPlayer(Player player)
+    {
         if (fastKill)
             player.Die(Vector2.Zero);
         else
             player.Die((player.Position - Center).SafeNormalize());
     }
 
-    private void OnHoldable(Holdable holdable) {
+    private void OnHoldable(Holdable holdable)
+    {
         // special casing !!!!!
-        switch (holdable.Entity) {
+        switch (holdable.Entity)
+        {
             case TheoCrystal theo:
                 theo.Die();
                 break;
@@ -63,13 +70,15 @@ public class KillZone : Entity {
     }
 
     // i dont think this works with mhh respawning jellies but   oh my godwhatever ill do this better later if i feel like it
-    private static void FakeGliderDieIGiveUp(Glider glider) {
+    private static void FakeGliderDieIGiveUp(Glider glider)
+    {
         if (glider.destroyed)
             return;
 
         glider.destroyed = true;
         glider.Collidable = false;
-        if (glider.Hold.IsHeld) {
+        if (glider.Hold.IsHeld)
+        {
             Vector2 holderSpeed = glider.Hold.Holder.Speed;
             glider.Hold.Holder.Drop();
             glider.Speed = holderSpeed * 0.333f;
@@ -86,7 +95,7 @@ public class KillZone : Entity {
     //         IL.Celeste.Glider.Update -= IL_Glider_Update;
     //     }
 
-            // oka y nevermind this crashes yayyy
+    // oka y nevermind this crashes yayyy
     //     private static void IL_Glider_Update(ILContext il) {
     // /*         var cursor = new ILCursor(il);
 

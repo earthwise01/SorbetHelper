@@ -4,8 +4,10 @@ using Celeste.Mod.SorbetHelper.Utils;
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/BigWaterfall")]
-public class BigWaterfall : Entity {
-    private enum SplashParticleDepths {
+public class BigWaterfall : Entity
+{
+    private enum SplashParticleDepths
+    {
         ParticlesBG, Particles, ParticlesFG, None
     }
 
@@ -31,7 +33,8 @@ public class BigWaterfall : Entity {
 
     private bool visibleOnCamera;
 
-    public BigWaterfall(EntityData data, Vector2 offset) : base(data.Position + offset) {
+    public BigWaterfall(EntityData data, Vector2 offset) : base(data.Position + offset)
+    {
         Tag = Tags.TransitionUpdate;
 
         width = data.Width;
@@ -50,17 +53,22 @@ public class BigWaterfall : Entity {
         wavePercent = data.Float("wavePercent", 1f);
         rippleWater = data.Bool("rippleWater", true);
 
-        if (hasLines) {
-            if (width <= 8f) {
+        if (hasLines)
+        {
+            if (width <= 8f)
+            {
                 lines.Add(2f);
                 lines.Add(width - 3f);
-            } else {
+            }
+            else
+            {
                 lines.Add(3f);
                 lines.Add(width - 4f);
             }
         }
 
-        if (width > 16f && hasLines) {
+        if (width > 16f && hasLines)
+        {
             int lineCount = Calc.Random.Next((int)(width / 16f));
 
             for (int i = 0; i < lineCount; i++)
@@ -68,14 +76,16 @@ public class BigWaterfall : Entity {
         }
     }
 
-    public override void Awake(Scene scene) {
+    public override void Awake(Scene scene)
+    {
         base.Awake(scene);
         Level level = SceneAs<Level>();
 
         height = 8f;
         while (Y + height < level.Bounds.Bottom
                && (ignoreWater || (water = Scene.CollideFirst<Water>(new Rectangle((int)X, (int)(Y + height), 8, 8))) is null)
-               && (ignoreSolids || (solid = Scene.CollideFirst<Solid>(new Rectangle((int)X, (int)(Y + height), 8, 8))) is null || !solid.BlockWaterfalls)) {
+               && (ignoreSolids || (solid = Scene.CollideFirst<Solid>(new Rectangle((int)X, (int)(Y + height), 8, 8))) is null || !solid.BlockWaterfalls))
+        {
             height += 8f;
             solid = null;
         }
@@ -95,7 +105,8 @@ public class BigWaterfall : Entity {
         Add(new DisplacementRenderHook(RenderDisplacement));
     }
 
-    public override void Update() {
+    public override void Update()
+    {
         base.Update();
 
         Level level = SceneAs<Level>();
@@ -109,18 +120,22 @@ public class BigWaterfall : Entity {
         if (!Visible)
             return;
 
-        if (rippleWater && water is { Active: true, TopSurface: not null } && Scene.OnInterval(0.3f)) {
+        if (rippleWater && water is { Active: true, TopSurface: not null } && Scene.OnInterval(0.3f))
+        {
             water.TopSurface.DoRipple(new Vector2(X + width / 2f, water.Y), 0.75f);
-            if (width >= 32) {
+            if (width >= 32)
+            {
                 water.TopSurface.DoRipple(new Vector2(X + 8f, water.Y), 0.75f);
                 water.TopSurface.DoRipple(new Vector2(X + width - 8f, water.Y), 0.75f);
             }
         }
 
-        if (splashParticleDepth != SplashParticleDepths.None && (water is not null || solid is not null) && !level.Transitioning) {
+        if (splashParticleDepth != SplashParticleDepths.None && (water is not null || solid is not null) && !level.Transitioning)
+        {
             Vector2 particlesPosition = new Vector2(X + width / 2f, Y + height + 2f);
 
-            ParticleSystem particles = splashParticleDepth switch {
+            ParticleSystem particles = splashParticleDepth switch
+            {
                 SplashParticleDepths.ParticlesBG => level.ParticlesBG,
                 SplashParticleDepths.Particles   => level.Particles,
                 SplashParticleDepths.ParticlesFG => level.ParticlesFG,
@@ -131,13 +146,15 @@ public class BigWaterfall : Entity {
         }
     }
 
-    public void RenderDisplacement() {
+    public void RenderDisplacement()
+    {
         if (!visibleOnCamera)
             return;
 
         Color waveColor = new Color(0.5f, 0.5f, wavePercent, 1f);
 
-        if (water?.TopSurface is null) {
+        if (water?.TopSurface is null)
+        {
             Draw.Rect(X, Y, width, height, waveColor);
             return;
         }
@@ -148,7 +165,8 @@ public class BigWaterfall : Entity {
             Draw.Rect(X + i, Y, 1f, heightWithWater - waterSurface.GetSurfaceHeight(new Vector2(X + 1f + i, water.Y)), waveColor);
     }
 
-    public override void Render() {
+    public override void Render()
+    {
         if (!visibleOnCamera)
             return;
 
@@ -156,12 +174,14 @@ public class BigWaterfall : Entity {
         int innerEdgeSize = edgeSize - 1;
         int fillShrink = width <= 8f ? 1 : 0;
 
-        if (water?.TopSurface is null) {
+        if (water?.TopSurface is null)
+        {
             Draw.Rect(X + fillShrink, Y, width - fillShrink, height, fillColor);
 
             Draw.Rect(X - 1f, Y, edgeSize, height, surfaceColor);
             Draw.Rect(X + width - innerEdgeSize, Y, edgeSize, height, surfaceColor);
-            if (hasLines) {
+            if (hasLines)
+            {
                 foreach (float line in lines)
                     Draw.Rect(X + line, Y, 1f, height, surfaceColor);
             }
@@ -177,7 +197,8 @@ public class BigWaterfall : Entity {
         Draw.Rect(X - 1f, Y, edgeSize, heightWithWater - waterSurface.GetSurfaceHeight(new Vector2(X, water.Y)), surfaceColor);
         Draw.Rect(X + width - innerEdgeSize, Y, edgeSize, heightWithWater - waterSurface.GetSurfaceHeight(new Vector2(X + width - 1f, water.Y)), surfaceColor);
 
-        if (hasLines) {
+        if (hasLines)
+        {
             foreach (float line in lines)
                 Draw.Rect(X + line, Y, 1f, heightWithWater - waterSurface.GetSurfaceHeight(new Vector2(X + line + 1f, water.Y)), surfaceColor);
         }

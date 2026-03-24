@@ -2,7 +2,6 @@
 global using Microsoft.Xna.Framework;
 global using Monocle;
 global using Celeste.Mod.Entities;
-
 using Celeste.Mod.SorbetHelper.Backdrops;
 using Celeste.Mod.SorbetHelper.Components;
 using Celeste.Mod.SorbetHelper.Entities;
@@ -12,7 +11,8 @@ using MonoMod.ModInterop;
 
 namespace Celeste.Mod.SorbetHelper;
 
-public class SorbetHelperModule : EverestModule {
+public class SorbetHelperModule : EverestModule
+{
     public static SorbetHelperModule Instance { get; private set; }
 
     public override Type SettingsType => typeof(SorbetHelperSettings);
@@ -20,11 +20,13 @@ public class SorbetHelperModule : EverestModule {
     public override Type SessionType => typeof(SorbetHelperSession);
     public static SorbetHelperSession Session => (SorbetHelperSession)Instance._Session;
 
-    public SorbetHelperModule() {
+    public SorbetHelperModule()
+    {
         Instance = this;
     }
 
-    public override void Initialize() {
+    public override void Initialize()
+    {
         base.Initialize();
 
         ExtendedVariantsCompat.Load();
@@ -33,7 +35,8 @@ public class SorbetHelperModule : EverestModule {
         DashFallingBlock.LoadParticles();
     }
 
-    public override void Load() {
+    public override void Load()
+    {
         // mod interop
         // imports
         GravityHelperInterop.Load();
@@ -73,11 +76,13 @@ public class SorbetHelperModule : EverestModule {
         HiResBackdrop.Load();
     }
 
-    public override void LoadContent(bool firstLoad) {
+    public override void LoadContent(bool firstLoad)
+    {
         SorbetHelperGFX.LoadContent();
     }
 
-    public override void Unload() {
+    public override void Unload()
+    {
         // sorbet helper misc stuff
         SorbetHelperGFX.UnloadContent();
         RenderTargetHelper.Unload();
@@ -108,7 +113,8 @@ public class SorbetHelperModule : EverestModule {
         HiResBackdrop.Unload();
     }
 
-    public override void PrepareMapDataProcessors(MapDataFixup context) {
+    public override void PrepareMapDataProcessors(MapDataFixup context)
+    {
         base.PrepareMapDataProcessors(context);
 
         context.Add<SorbetHelperMapDataProcessor>();

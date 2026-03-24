@@ -4,14 +4,15 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 
 [TrackedAs(typeof(FallingBlock))]
 [CustomEntity("SorbetHelper/DashFallingBlock", "SorbetHelper/GravityDashFallingBlock = LoadGravity")]
-public class DashFallingBlock : CustomFallingBlock {
-
+public class DashFallingBlock : CustomFallingBlock
+{
     /*
         the implementation for scale and hitOffset (and how they affect the appearance of the block) is heavily based on code from Communal Helper's Station Blocks
         https://github.com/CommunalHelper/CommunalHelper/blob/dev/src/Entities/StationBlocks/StationBlock.cs
     */
 
     private enum FallDashModes { Disabled, Push, Pull }
+
     private readonly FallDashModes fallDashMode;
 
     private readonly bool allowWavedash;
@@ -30,7 +31,8 @@ public class DashFallingBlock : CustomFallingBlock {
     public new static Entity LoadGravity(Level level, LevelData levelData, Vector2 offset, EntityData entityData)
         => new DashFallingBlock(entityData, offset, true);
 
-    public DashFallingBlock(EntityData data, Vector2 offset, bool chronoHelperGravity) : base(data, offset, chronoHelperGravity) {
+    public DashFallingBlock(EntityData data, Vector2 offset, bool chronoHelperGravity) : base(data, offset, chronoHelperGravity)
+    {
         fallOnTouch = data.Bool("fallOnTouch", false);
         fallOnStaticMover = data.Bool("fallOnStaticMover", false);
 
@@ -47,7 +49,8 @@ public class DashFallingBlock : CustomFallingBlock {
             OnDashCollide = OnDashCollision;
     }
 
-    public DashCollisionResults OnDashCollision(Player player, Vector2 dir) {
+    public DashCollisionResults OnDashCollision(Player player, Vector2 dir)
+    {
         if (HasStartedFalling || Triggered)
             return DashCollisionResults.NormalCollision;
 
@@ -61,16 +64,16 @@ public class DashFallingBlock : CustomFallingBlock {
         Level level = SceneAs<Level>();
 
         // if the falling block is set to move in the direction of madeline's dash, update the direction accordingly
-        if (fallDashMode != FallDashModes.Disabled) {
+        if (fallDashMode != FallDashModes.Disabled)
             Direction = fallDashMode == FallDashModes.Pull ? -dir : dir;
-        }
 
         // trigger the block
         level.DirectionalShake(dir);
         Triggered = true;
         Audio.Play(impactSfx, Center);
 
-        if (refillDash && player.Dashes < player.MaxDashes) {
+        if (refillDash && player.Dashes < player.MaxDashes)
+        {
             player.RefillDash();
             Audio.Play(SFX.game_gen_diamond_return, player.Center);
 
@@ -80,13 +83,15 @@ public class DashFallingBlock : CustomFallingBlock {
         }
 
         // emit the dust particles and update the scale and hitOffset
-        for (int i = 2; i <= Width; i += 4) {
+        for (int i = 2; i <= Width; i += 4)
+        {
             if (Scene.CollideCheck<Solid>(BottomLeft + new Vector2(i, 3f)))
                 continue;
 
             level.Particles.Emit(P_HitFallDust, 1, new Vector2(X + i, Bottom), Vector2.One * 4f);
             level.Particles.Emit(P_FallDustA, 1, new Vector2(X + i, Bottom), Vector2.One * 4f);
         }
+
         scale = new Vector2(
             1f + Math.Abs(dir.Y) * 0.28f - Math.Abs(dir.X) * 0.28f,
             1f + Math.Abs(dir.X) * 0.28f - Math.Abs(dir.Y) * 0.28f
@@ -97,28 +102,29 @@ public class DashFallingBlock : CustomFallingBlock {
             return DashCollisionResults.NormalCollision;
 
         return DashCollisionResults.Rebound;
-
     }
 
-    public override void Render() {
+    public override void Render()
+    {
         base.Render();
 
         // TileGrids can't have their scale changed, so we have to render the block manually
         Vector2 position = Position + tiles.Position;
         Rectangle clip = tiles.GetClippedRenderTiles();
 
-        for (int tx = clip.Left; tx < clip.Right; tx++) {
-            for (int ty = clip.Top; ty < clip.Bottom; ty++) {
-                Vector2 vec = new Vector2(position.X + tx * tiles.TileWidth, position.Y + ty * tiles.TileHeight) + (Vector2.One * 4f) + hitOffset;
-                vec.X = Center.X + (vec.X - Center.X) * scale.X;
-                vec.Y = Center.Y + (vec.Y - Center.Y) * scale.Y;
+        for (int tx = clip.Left; tx < clip.Right; tx++)
+        for (int ty = clip.Top; ty < clip.Bottom; ty++)
+        {
+            Vector2 vec = new Vector2(position.X + tx * tiles.TileWidth, position.Y + ty * tiles.TileHeight) + (Vector2.One * 4f) + hitOffset;
+            vec.X = Center.X + (vec.X - Center.X) * scale.X;
+            vec.Y = Center.Y + (vec.Y - Center.Y) * scale.Y;
 
-                tiles.Tiles[tx, ty].DrawCentered(vec, Color.White, scale);
-            }
+            tiles.Tiles[tx, ty].DrawCentered(vec, Color.White, scale);
         }
     }
 
-    public override void Update() {
+    public override void Update()
+    {
         base.Update();
 
         // ease scale and hitOffset towards their default values
@@ -128,15 +134,18 @@ public class DashFallingBlock : CustomFallingBlock {
         hitOffset.Y = Calc.Approach(hitOffset.Y, 0f, Engine.DeltaTime * 15f);
     }
 
-    internal static void LoadParticles() {
-        P_HitFallDust = new ParticleType(P_FallDustB) {
+    internal static void LoadParticles()
+    {
+        P_HitFallDust = new ParticleType(P_FallDustB)
+        {
             SpeedMin = 18f,
             SpeedMax = 24f,
             LifeMin = 0.4f,
             LifeMax = 0.55f,
             Acceleration = Vector2.UnitY * 15f
         };
-        P_RefillDash = new ParticleType(Refill.P_Shatter) {
+        P_RefillDash = new ParticleType(Refill.P_Shatter)
+        {
             SpeedMin = 120f,
             SpeedMax = 190f,
         };

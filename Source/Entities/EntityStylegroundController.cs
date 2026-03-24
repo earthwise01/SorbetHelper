@@ -10,12 +10,14 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 /// </summary>
 [GlobalEntity(              EntityDataID + "Global")] // global version is swapped to in mapdataprocessor based on data.Bool("global")
 [CustomEntity(EntityDataID, EntityDataID + "Global")]
-public class EntityStylegroundController : Entity {
+public class EntityStylegroundController : Entity
+{
     public const string EntityDataID = "SorbetHelper/EntityStylegroundController";
 
     private readonly string stylegroundTag;
 
-    public EntityStylegroundController(EntityData data, Vector2 _) {
+    public EntityStylegroundController(EntityData data, Vector2 _)
+    {
         stylegroundTag = data.Attr("tag", "");
 
         Add(new EntityAwakeProcessor(ProcessEntity, data.Bool("global", false) ? EntityAwakeProcessor.ProcessModes.OnEntityAwake : EntityAwakeProcessor.ProcessModes.OnProcessorAwake)
@@ -23,7 +25,8 @@ public class EntityStylegroundController : Entity {
             .WithDepthCheck(data.Int("minDepth", int.MinValue), data.Int("maxDepth", int.MaxValue)));
     }
 
-    private void ProcessEntity(Entity entity) {
+    private void ProcessEntity(Entity entity)
+    {
         if (entity.Get<EntityStylegroundMarker>() is null)
             entity.Add(new EntityStylegroundMarker(stylegroundTag));
     }

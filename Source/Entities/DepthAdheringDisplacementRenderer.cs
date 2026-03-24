@@ -7,14 +7,16 @@ using Celeste.Mod.SorbetHelper.Utils;
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [Tracked]
-public class DepthAdheringDisplacementRenderer : Entity {
+public class DepthAdheringDisplacementRenderer : Entity
+{
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(DepthAdheringDisplacementRenderer)}";
 
     private readonly List<DepthAdheringDisplacementRenderHook> renderHooks = [];
 
     private readonly bool distortBehind;
 
-    private DepthAdheringDisplacementRenderer(int depth, bool distortBehind) {
+    private DepthAdheringDisplacementRenderer(int depth, bool distortBehind)
+    {
         Tag = Tags.Global;
         Depth = depth;
         this.distortBehind = distortBehind;
@@ -23,7 +25,8 @@ public class DepthAdheringDisplacementRenderer : Entity {
     public void Track(DepthAdheringDisplacementRenderHook renderHook) => renderHooks.Add(renderHook);
     public void Untrack(DepthAdheringDisplacementRenderHook renderHook) => renderHooks.Remove(renderHook);
 
-    public override void Render() {
+    public override void Render()
+    {
         if (renderHooks.Count == 0)
             return;
 
@@ -48,13 +51,15 @@ public class DepthAdheringDisplacementRenderer : Entity {
 
         Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, camera.Matrix);
 
-        foreach (DepthAdheringDisplacementRenderHook renderHook in renderHooks) {
+        foreach (DepthAdheringDisplacementRenderHook renderHook in renderHooks)
+        {
             if (renderHook.EntityVisible)
                 renderHook.RenderDisplacement();
         }
 
         List<Entity> displacementBlockers = Scene.Tracker.GetEntities<DisplacementEffectBlocker>();
-        foreach (Entity entity in displacementBlockers) {
+        foreach (Entity entity in displacementBlockers)
+        {
             if (entity is DisplacementEffectBlocker { Visible: true, DepthAdhering: true, WaterOnly: false } && entity.Depth <= Depth)
                 Draw.Rect(entity.X, entity.Y, entity.Width, entity.Height, noDisplacementColor);
         }
@@ -62,7 +67,8 @@ public class DepthAdheringDisplacementRenderer : Entity {
         Draw.SpriteBatch.End();
 
         List<Entity> waterBlockers = displacementBlockers.Where(entity => entity is DisplacementEffectBlocker { Visible: true, DepthAdhering: true, WaterOnly: true } && entity.Depth <= Depth).ToList();
-        if (waterBlockers.Count > 0) {
+        if (waterBlockers.Count > 0)
+        {
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, DisplacementEffectBlocker.WaterDisplacementBlockerBlendState, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, camera.Matrix);
 
             foreach (Entity entity in waterBlockers)
@@ -81,7 +87,8 @@ public class DepthAdheringDisplacementRenderer : Entity {
         if (distortBehind)
             Draw.SpriteBatch.Draw(gameplayBuffer, camera.Position, Color.White);
 
-        foreach (DepthAdheringDisplacementRenderHook renderHook in renderHooks) {
+        foreach (DepthAdheringDisplacementRenderHook renderHook in renderHooks)
+        {
             if (renderHook.EntityVisible)
                 renderHook.RenderEntity();
         }
@@ -113,14 +120,16 @@ public class DepthAdheringDisplacementRenderer : Entity {
         GameplayRenderer.Begin();
     }
 
-    public static DepthAdheringDisplacementRenderer GetRenderer(Scene scene, int depth, bool distortBehind) {
+    public static DepthAdheringDisplacementRenderer GetRenderer(Scene scene, int depth, bool distortBehind)
+    {
         if (scene.Tracker.GetEntities<DepthAdheringDisplacementRenderer>()
                          .Concat(scene.Entities.ToAdd)
                          .FirstOrDefault(e => e is DepthAdheringDisplacementRenderer r && r.Depth == depth && r.distortBehind == distortBehind)
-            is not DepthAdheringDisplacementRenderer renderer) {
-            scene.Add(renderer = new DepthAdheringDisplacementRenderer(depth, distortBehind));
-            Logger.Info(LogID, $"creating new {nameof(DepthAdheringDisplacementRenderer)} at depth {depth} with distort behind {(distortBehind ? "enabled" : "disabled")}.");
-        }
+            is DepthAdheringDisplacementRenderer renderer)
+            return renderer;
+
+        Logger.Info(LogID, $"creating new {nameof(DepthAdheringDisplacementRenderer)} at depth {depth} with distort behind {(distortBehind ? "enabled" : "disabled")}.");
+        scene.Add(renderer = new DepthAdheringDisplacementRenderer(depth, distortBehind));
 
         return renderer;
     }

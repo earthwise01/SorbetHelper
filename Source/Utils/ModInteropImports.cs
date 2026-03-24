@@ -8,17 +8,20 @@ namespace Celeste.Mod.SorbetHelper.Utils;
 #region ModInterop Imports
 
 [GenerateImports("GravityHelper")]
-public static partial class GravityHelperInterop {
+public static partial class GravityHelperInterop
+{
     public static partial bool IsPlayerInverted();
 }
 
 [GenerateImports("ExtendedCameraDynamics")]
-public static partial class ExtendedCameraDynamicsInterop {
+public static partial class ExtendedCameraDynamicsInterop
+{
     public static partial bool ExtendedCameraHooksEnabled();
 }
 
 [GenerateImports("CommunalHelper.DashStates")]
-public static partial class CommunalHelperDashStatesInterop {
+public static partial class CommunalHelperDashStatesInterop
+{
     public static partial Component DreamTunnelInteraction(Action<Player> onPlayerEnter, Action<Player> onPlayerExit);
 }
 
@@ -26,10 +29,14 @@ public static partial class CommunalHelperDashStatesInterop {
 
 #region Mod Compat
 
-public static class ExtendedVariantsCompat {
+public static class ExtendedVariantsCompat
+{
     public static bool IsLoaded { get; private set; } = false;
-    internal static void Load() {
-        IsLoaded = Everest.Loader.DependencyLoaded(new EverestModuleMetadata {
+
+    internal static void Load()
+    {
+        IsLoaded = Everest.Loader.DependencyLoaded(new EverestModuleMetadata
+        {
             Name = "ExtendedVariantMode",
             Version = new Version(0, 38, 0)
         });
@@ -37,8 +44,10 @@ public static class ExtendedVariantsCompat {
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool GetUpsideDown() => (bool)ExtendedVariantsModule.Instance.TriggerManager.GetCurrentVariantValue(ExtendedVariantsModule.Variant.UpsideDown);
-    public static bool UpsideDown {
-        get {
+    public static bool UpsideDown
+    {
+        get
+        {
             if (!IsLoaded)
                 return false;
 
@@ -48,8 +57,10 @@ public static class ExtendedVariantsCompat {
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static float GetForegroundEffectOpacity() => (float)ExtendedVariantsModule.Instance.TriggerManager.GetCurrentVariantValue(ExtendedVariantsModule.Variant.ForegroundEffectOpacity);
-    public static float ForegroundEffectOpacity {
-        get {
+    public static float ForegroundEffectOpacity
+    {
+        get
+        {
             if (!IsLoaded)
                 return 1f;
 
@@ -58,7 +69,8 @@ public static class ExtendedVariantsCompat {
     }
 }
 
-public static class ChronoHelperCompat {
+public static class ChronoHelperCompat
+{
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(ChronoHelperCompat)}";
 
     public static bool IsLoaded { get; private set; } = false;
@@ -68,10 +80,12 @@ public static class ChronoHelperCompat {
     private static bool reflectionSucceeded;
 
     // just using an assembly reference might be more performant?? but doing this with reflection gives a bit more control over error checking in case of an update
-    internal static void Load() {
+    internal static void Load()
+    {
         IsLoaded = reflectionSucceeded = false;
 
-        Everest.Loader.TryGetDependency(new EverestModuleMetadata {
+        Everest.Loader.TryGetDependency(new EverestModuleMetadata
+        {
             Name = "ChronoHelper",
             Version = new Version(1, 2, 2)
         }, out EverestModule chronoHelper);
@@ -85,7 +99,8 @@ public static class ChronoHelperCompat {
         m_Session_get_gravityModeUp = assembly.GetType("ChronoHelperSessionModule")?.GetMethod("get_gravityModeUp");
 
         // chrono helper is loaded, but getting the falling block gravity property getter with reflection failed!
-        if (m_Module_get_Session is null || m_Session_get_gravityModeUp is null) {
+        if (m_Module_get_Session is null || m_Session_get_gravityModeUp is null)
+        {
             Logger.Error(LogID, "loading support for chrono helper gravity falling block switches failed even though chrono helper is installed! expect a crash if using custom/dash falling blocks with chrono helper gravity enabled");
 
             IsLoaded = true;
@@ -97,8 +112,10 @@ public static class ChronoHelperCompat {
         IsLoaded = reflectionSucceeded = true;
     }
 
-    public static bool SessionGravityModeUp {
-        get {
+    public static bool SessionGravityModeUp
+    {
+        get
+        {
             if (!IsLoaded)
                 throw new Exception("failed to get chrono helper falling block gravity: chrono helper is not installed!");
 

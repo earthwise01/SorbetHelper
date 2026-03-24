@@ -6,8 +6,10 @@ using Celeste.Mod.SorbetHelper.Utils;
 namespace Celeste.Mod.SorbetHelper.Backdrops;
 
 [CustomBackdrop("SorbetHelper/HiResGodrays")]
-public class HiResGodrays : HiResBackdrop {
-    private struct Ray {
+public class HiResGodrays : HiResBackdrop
+{
+    private struct Ray
+    {
         public float X, Y;
 
         public float Percent;
@@ -26,7 +28,8 @@ public class HiResGodrays : HiResBackdrop {
         public Vector2 RenderPosition;
         public Color RenderColor;
 
-        public void Reset(HiResGodrays backdrop) {
+        public void Reset(HiResGodrays backdrop)
+        {
             Percent = 0f;
             X = -backdrop.offscreenPadding + Calc.Random.NextFloat(320f + backdrop.offscreenPadding * 2f);
             Y = -backdrop.offscreenPadding + Calc.Random.NextFloat(180f + backdrop.offscreenPadding * 2f);
@@ -77,7 +80,8 @@ public class HiResGodrays : HiResBackdrop {
 
     public override bool UseHiResSpritebatch => useTextureParticles;
 
-    public HiResGodrays(BinaryPacker.Element data) : base() {
+    public HiResGodrays(BinaryPacker.Element data) : base()
+    {
         doVisibleFade = data.AttrBool("fadeInOut", true);
         offscreenPadding = data.AttrInt("offscreenPadding", 32);
         scrollX = data.AttrFloat("scrollX", 1.1f);
@@ -114,25 +118,30 @@ public class HiResGodrays : HiResBackdrop {
         Reset();
     }
 
-    private void Reset() {
-        for (int i = 0; i < rays.Length; i++) {
+    private void Reset()
+    {
+        for (int i = 0; i < rays.Length; i++)
+        {
             rays[i].Reset(this);
             rays[i].Percent = Calc.Random.NextFloat();
         }
     }
 
-    public override void Added(Level level) {
+    public override void Added(Level level)
+    {
         if (doVisibleFade)
             visibleFade = IsVisible(level) ? 1f : 0f;
     }
 
-    public override void Update(Scene scene) {
+    public override void Update(Scene scene)
+    {
         Level level = (scene as Level)!;
 
         base.Update(scene);
 
         // fading
-        if (doVisibleFade) {
+        if (doVisibleFade)
+        {
             visibleFade = Calc.Approach(visibleFade, IsVisible(level) ? 1f : 0f, Engine.DeltaTime * 2f);
 
             // force visible while fading out
@@ -160,7 +169,8 @@ public class HiResGodrays : HiResBackdrop {
         Vector2 skew1 = Calc.AngleToVector(-1.6707964f, 1f);
         Vector2 skew2 = new Vector2(0f - skew1.Y, skew1.X);
         int vertexIndex = 0;
-        for (int i = 0; i < rays.Length; i++) {
+        for (int i = 0; i < rays.Length; i++)
+        {
             ref Ray ray = ref rays[i];
 
             if (ray.Percent >= 1f)
@@ -188,12 +198,14 @@ public class HiResGodrays : HiResBackdrop {
             // loop silly this is a zoom out momemnt,,,, ,,,,
             // this  shouldd work unless im stupid and this can rarely try n render more rays than expected and exceed the vertex buffer size
             for (int x = 0; x < 320 * visibleScreens + offscreenPadding; x += 320 + offscreenPadding * 2)
-            for (int y = 0; y < 180 * visibleScreens + offscreenPadding; y += 180 + offscreenPadding * 2) {
+            for (int y = 0; y < 180 * visibleScreens + offscreenPadding; y += 180 + offscreenPadding * 2)
+            {
                 Vector2 renderPos = new Vector2(ray.RenderPosition.X + x, ray.RenderPosition.Y + y);
                 Color renderColor = ray.RenderColor;
 
                 //  need to do this here so that the correct godray fades etc etc,
-                if (fadeNearPlayer && player is not null) {
+                if (fadeNearPlayer && player is not null)
+                {
                     float playerDistance = (renderPos + cameraPos - player.Position).Length();
                     if (playerDistance < 64f)
                         renderColor *= 0.25f + 0.75f * (playerDistance / 64f);
@@ -215,19 +227,22 @@ public class HiResGodrays : HiResBackdrop {
         vertexCount = vertexIndex;
     }
 
-    public override void RenderHiRes(Scene scene, Matrix upscaleMatrix) {
+    public override void RenderHiRes(Scene scene, Matrix upscaleMatrix)
+    {
         if (useTextureParticles)
             DrawTextureParticles(scene);
         else
             DrawGodrays(upscaleMatrix);
     }
 
-    private void DrawGodrays(Matrix matrix) {
+    private void DrawGodrays(Matrix matrix)
+    {
         if (vertexCount > 0)
             GFX.DrawVertices(matrix, vertices, vertexCount);
     }
 
-    private void DrawTextureParticles(Scene scene) {
+    private void DrawTextureParticles(Scene scene)
+    {
         // im realising there mightt be some inconsistency between godrays/texture particles since one is setup in update and the other partly in render   fun
         Level level = (scene as Level)!;
         Vector2 cameraPos = level.Camera.Position.Floor();
@@ -235,15 +250,18 @@ public class HiResGodrays : HiResBackdrop {
         int cameraHeight = level.Camera.Height;
         Player player = level.Tracker.GetEntity<Player>();
 
-        for (int i = 0; i < rays.Length; i++) {
+        for (int i = 0; i < rays.Length; i++)
+        {
             ref Ray ray = ref rays[i];
 
             for (int x = 0; x < cameraWidth + offscreenPadding; x += 320 + offscreenPadding * 2)
-            for (int y = 0; y < cameraHeight + offscreenPadding; y += 180 + offscreenPadding * 2) {
+            for (int y = 0; y < cameraHeight + offscreenPadding; y += 180 + offscreenPadding * 2)
+            {
                 Vector2 renderPos = new Vector2(ray.RenderPosition.X + x, ray.RenderPosition.Y + y);
                 Color renderColor = ray.RenderColor;
 
-                if (fadeNearPlayer && player is not null) {
+                if (fadeNearPlayer && player is not null)
+                {
                     float playerDistance = (renderPos + cameraPos - player.Position).Length();
                     if (playerDistance < 64f)
                         renderColor *= 0.25f + 0.75f * (playerDistance / 64f);

@@ -6,7 +6,8 @@ using Celeste.Mod.SorbetHelper.Utils;
 
 namespace Celeste.Mod.SorbetHelper.Backdrops;
 
-public abstract class HiResBackdrop : Backdrop {
+public abstract class HiResBackdrop : Backdrop
+{
     private const float UpscaleAmount = 6f;
 
     /// <summary>
@@ -29,17 +30,21 @@ public abstract class HiResBackdrop : Backdrop {
 
     #region Hooks
 
-    internal static void Load() {
+    internal static void Load()
+    {
         Everest.Events.LevelLoader.OnLoadingThread += OnLoadingThread;
     }
 
-    internal static void Unload() {
+    internal static void Unload()
+    {
         Everest.Events.LevelLoader.OnLoadingThread -= OnLoadingThread;
     }
 
-    private static void OnLoadingThread(Level level) {
+    private static void OnLoadingThread(Level level)
+    {
         HiResBackdropRenderer renderer = null;
-        foreach (Backdrop backdrop in level.Foreground.Backdrops) {
+        foreach (Backdrop backdrop in level.Foreground.Backdrops)
+        {
             if (backdrop is not HiResBackdrop hiResBackdrop)
                 continue;
 
@@ -53,19 +58,23 @@ public abstract class HiResBackdrop : Backdrop {
 
     #endregion
 
-    private class HiResBackdropRenderer : Entity {
+    private class HiResBackdropRenderer : Entity
+    {
         private readonly List<HiResBackdrop> backdrops = [];
 
-        public HiResBackdropRenderer() : base() {
+        public HiResBackdropRenderer() : base()
+        {
             Tag = global::Celeste.Tags.Global | TagsExt.SubHUD;
             Depth = 2000000;
         }
 
-        public void AddBackdrop(HiResBackdrop backdrop) {
+        public void AddBackdrop(HiResBackdrop backdrop)
+        {
             backdrops.Add(backdrop);
         }
 
-        public override void Render() {
+        public override void Render()
+        {
             // todo: not sure what the threshold for this check should be    if any
             if (backdrops.Count < 10 && backdrops.All(backdrop => !backdrop.Visible))
                 return;
@@ -84,7 +93,8 @@ public abstract class HiResBackdrop : Backdrop {
                 matrix *= Matrix.CreateScale(level.Zoom);
 
             // watchtower/etc edge padding
-            if (level.ScreenPadding != 0f) {
+            if (level.ScreenPadding != 0f)
+            {
                 float paddingScale = (320f - level.ScreenPadding * 2f) / 320f;
                 Vector2 paddingOffset = new Vector2(level.ScreenPadding, level.ScreenPadding * 0.5625f);
                 matrix *= Matrix.CreateTranslation(1920 * -0.5f, 1080 * -0.5f, 0f) * Matrix.CreateScale(paddingScale) * Matrix.CreateTranslation(1920 * 0.5f + paddingOffset.X, 1080 * 0.5f + paddingOffset.Y, 0f);
@@ -96,11 +106,13 @@ public abstract class HiResBackdrop : Backdrop {
             SubHudRenderer.EndRender();
 
             bool spriteBatchActive = false;
-            foreach (HiResBackdrop backdrop in backdrops) {
+            foreach (HiResBackdrop backdrop in backdrops)
+            {
                 if (!backdrop.Visible)
                     continue;
 
-                switch (backdrop.UseHiResSpritebatch) {
+                switch (backdrop.UseHiResSpritebatch)
+                {
                     case true when !spriteBatchActive:
                         Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, matrix);
                         spriteBatchActive = true;

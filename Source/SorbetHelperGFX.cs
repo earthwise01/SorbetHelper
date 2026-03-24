@@ -3,7 +3,8 @@ using Celeste.Mod.SorbetHelper.Utils;
 
 namespace Celeste.Mod.SorbetHelper;
 
-public static class SorbetHelperGFX {
+public static class SorbetHelperGFX
+{
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(SorbetHelperGFX)}";
 
     public static int GameplayBufferWidth => GameplayBuffers.Gameplay?.Width ?? 320;
@@ -17,16 +18,19 @@ public static class SorbetHelperGFX {
 
     public static Effect FxAlphaMask { get; private set; }
 
-    internal static void LoadContent() {
+    internal static void LoadContent()
+    {
         FxAlphaMask = LoadEffect("AlphaMask");
     }
 
-    internal static void UnloadContent() {
+    internal static void UnloadContent()
+    {
         FxAlphaMask?.Dispose();
         FxAlphaMask = null;
     }
 
-    private static Effect LoadEffect(string id) {
+    private static Effect LoadEffect(string id)
+    {
         string path = $"SorbetHelper:/Effects/SorbetHelper/{id}.cso";
         Logger.Info(LogID, $"Loading effect from {path}");
 
@@ -36,7 +40,8 @@ public static class SorbetHelperGFX {
         return new Effect(Engine.Graphics.GraphicsDevice, effect.Data);
     }
 
-    public static void EnsureBufferSize(VirtualRenderTarget target) {
+    public static void EnsureBufferSize(VirtualRenderTarget target)
+    {
         if (target is null || target.IsDisposed || (target.Width == GameplayBufferWidth && target.Height == GameplayBufferHeight))
             return;
 
@@ -48,7 +53,8 @@ public static class SorbetHelperGFX {
 #if DEBUG
 
     [Command("sorbethelper_reloadgfx", "Reloads SorbetHelper GFX")]
-    public static void ReloadContentCommand() {
+    public static void ReloadContentCommand()
+    {
         Logger.Info(LogID, "Reloading GFX...");
 
         UnloadContent();

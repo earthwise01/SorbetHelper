@@ -16,12 +16,14 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [GlobalEntity]
 [CustomEntity("SorbetHelper/MusicSyncControllerFMOD")]
 [Tracked]
-public class MusicSyncControllerFMOD : Entity {
+public class MusicSyncControllerFMOD : Entity
+{
     private const string SessionPrefix = "musicSync_";
 
     private readonly bool showDebugUI;
 
-    public MusicSyncControllerFMOD(EntityData data, Vector2 _) {
+    public MusicSyncControllerFMOD(EntityData data, Vector2 _)
+    {
         // ReSharper disable once AssignmentInConditionalExpression
         if (Visible = showDebugUI = data.Bool("showDebugUI", false))
             Tag |= TagsExt.SubHUD;
@@ -35,7 +37,8 @@ public class MusicSyncControllerFMOD : Entity {
         Depth = 1;
     }
 
-    public override void Update() {
+    public override void Update()
+    {
         // make sure that the music has the callback if necessary
         UpdateMusicSyncEvent();
 
@@ -50,7 +53,8 @@ public class MusicSyncControllerFMOD : Entity {
         session.SetFlag(SessionPrefix + "beatOdd", sessionTimelineInfo.Beat % 2 != 0);
 
         SorbetHelperSession sorbetSession = SorbetHelperModule.Session;
-        if (sessionTimelineInfo.Marker != sorbetSession.CurrentMusicSyncMarker) {
+        if (sessionTimelineInfo.Marker != sorbetSession.CurrentMusicSyncMarker)
+        {
             if (!string.IsNullOrEmpty(sessionTimelineInfo.Marker))
                 session.SetFlag(SessionPrefix + sessionTimelineInfo.Marker, true);
             if (!string.IsNullOrEmpty(sorbetSession.CurrentMusicSyncMarker))
@@ -60,7 +64,8 @@ public class MusicSyncControllerFMOD : Entity {
         }
     }
 
-    private struct TimelineInfo {
+    private struct TimelineInfo
+    {
         public int Bar, Beat;
         public float Tempo;
         public float TimeSigUpper, TimeSigLower;
@@ -74,7 +79,8 @@ public class MusicSyncControllerFMOD : Entity {
     // these next 2 methods are all run on the audio thread
     // this means these are called: during freezeframes, when paused, *during lag*, etc
     // (just prepare the values here and actually update stuff in the entity's update method though)
-    private static void HandleBeat(TIMELINE_BEAT_PROPERTIES parameters) {
+    private static void HandleBeat(TIMELINE_BEAT_PROPERTIES parameters)
+    {
         fmodTimelineInfo.Bar = parameters.bar;
         fmodTimelineInfo.Beat = parameters.beat;
         fmodTimelineInfo.Tempo = parameters.tempo;
@@ -85,12 +91,14 @@ public class MusicSyncControllerFMOD : Entity {
         // (Scene as Level)?.Displacement.AddBurst(Scene.Tracker.GetEntity<Player>()?.Position ?? Vector2.One, 0.2f, 4f, 32f);
     }
 
-    private static void HandleMarker(TIMELINE_MARKER_PROPERTIES parameters) {
+    private static void HandleMarker(TIMELINE_MARKER_PROPERTIES parameters)
+    {
         fmodTimelineInfo.Marker.nativeUtf8Ptr = parameters.name;
         fmodTimelineInfo.MarkerPosition = parameters.position;
     }
 
-    private static void ResetTimelineInfo() {
+    private static void ResetTimelineInfo()
+    {
         fmodTimelineInfo.Bar = 0;
         fmodTimelineInfo.Beat = 0;
         fmodTimelineInfo.Tempo = 0;
@@ -101,13 +109,17 @@ public class MusicSyncControllerFMOD : Entity {
     }
 
     private static EventInstance musicSyncEvent = null;
+
     private static bool CanAffectEvent(HashSet<string> eventNames, string eventName)
         => eventNames.Count == 0 || eventNames.Contains(eventName);
-    private static void UpdateMusicSyncEvent() {
+
+    private static void UpdateMusicSyncEvent()
+    {
         EventInstance eventInstance = Audio.CurrentMusicEventInstance;
         string eventPath = Audio.CurrentMusic;
 
-        if (eventInstance != musicSyncEvent) {
+        if (eventInstance != musicSyncEvent)
+        {
             musicSyncEvent?.setCallback(null, 0u);
 
             HashSet<string> eventNames = null;
@@ -123,17 +135,21 @@ public class MusicSyncControllerFMOD : Entity {
         }
     }
 
-    private static FMOD.RESULT MusicCallback(EVENT_CALLBACK_TYPE callbackType, nint instancePtr, nint parametersPtr) {
-        switch (callbackType) {
-            case EVENT_CALLBACK_TYPE.TIMELINE_BEAT: {
-                    TIMELINE_BEAT_PROPERTIES parameters = Marshal.PtrToStructure<TIMELINE_BEAT_PROPERTIES>(parametersPtr);
-                    HandleBeat(parameters);
-                }
+    private static FMOD.RESULT MusicCallback(EVENT_CALLBACK_TYPE callbackType, nint instancePtr, nint parametersPtr)
+    {
+        switch (callbackType)
+        {
+            case EVENT_CALLBACK_TYPE.TIMELINE_BEAT:
+            {
+                TIMELINE_BEAT_PROPERTIES parameters = Marshal.PtrToStructure<TIMELINE_BEAT_PROPERTIES>(parametersPtr);
+                HandleBeat(parameters);
+            }
                 break;
-            case EVENT_CALLBACK_TYPE.TIMELINE_MARKER: {
-                    TIMELINE_MARKER_PROPERTIES parameters = Marshal.PtrToStructure<TIMELINE_MARKER_PROPERTIES>(parametersPtr);
-                    HandleMarker(parameters);
-                }
+            case EVENT_CALLBACK_TYPE.TIMELINE_MARKER:
+            {
+                TIMELINE_MARKER_PROPERTIES parameters = Marshal.PtrToStructure<TIMELINE_MARKER_PROPERTIES>(parametersPtr);
+                HandleMarker(parameters);
+            }
                 break;
         }
 
@@ -142,11 +158,13 @@ public class MusicSyncControllerFMOD : Entity {
 
     #region Hooks
 
-    internal static void Load() {
+    internal static void Load()
+    {
         On.Celeste.Audio.SetMusic += On_Audio_SetMusic;
     }
 
-    internal static void Unload() {
+    internal static void Unload()
+    {
         On.Celeste.Audio.SetMusic -= On_Audio_SetMusic;
 
         // make sure the callback is gone before unloading (i don't know if this does much but   aa native code & multithreading scary)
@@ -154,7 +172,8 @@ public class MusicSyncControllerFMOD : Entity {
         musicSyncEvent = null;
     }
 
-    private static bool On_Audio_SetMusic(On.Celeste.Audio.orig_SetMusic orig, string path, bool startPlaying, bool allowFadeOut) {
+    private static bool On_Audio_SetMusic(On.Celeste.Audio.orig_SetMusic orig, string path, bool startPlaying, bool allowFadeOut)
+    {
         bool result = orig(path, startPlaying, allowFadeOut);
         UpdateMusicSyncEvent();
         return result;
@@ -162,7 +181,8 @@ public class MusicSyncControllerFMOD : Entity {
 
     #endregion
 
-    public override void Render() {
+    public override void Render()
+    {
         base.Render();
 
         if (!showDebugUI)
@@ -178,13 +198,16 @@ public class MusicSyncControllerFMOD : Entity {
         string debugText = currentEvent + "\n";
 
         // tempo marker & beat/bar
-        if (sessionTimelineInfo.Beat != 0) {
+        if (sessionTimelineInfo.Beat != 0)
+        {
             // time sig
             debugText += $"{sessionTimelineInfo.TimeSigUpper}/{sessionTimelineInfo.TimeSigLower} {sessionTimelineInfo.Tempo}bpm" + '\n';
             // beat & bar
             debugText += $"Bar {sessionTimelineInfo.Bar}" + '\n';
             debugText += $"Beat {sessionTimelineInfo.Beat}" + '\n';
-        } else {
+        }
+        else
+        {
             debugText += "\n\n\n";
         }
 

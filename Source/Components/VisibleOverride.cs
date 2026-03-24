@@ -7,7 +7,8 @@ namespace Celeste.Mod.SorbetHelper.Components;
 /// This is done by setting its Visible field to false for the duration of Level.Render and restoring it afterwards.
 /// </summary>
 [Tracked]
-public class VisibleOverride() : Component(false, false) {
+public class VisibleOverride() : Component(false, false)
+{
     private bool? wasVisible;
 
     /// <summary>
@@ -18,24 +19,29 @@ public class VisibleOverride() : Component(false, false) {
 
     #region Hooks
 
-    internal static void Load() {
+    internal static void Load()
+    {
         On.Celeste.Level.Render += On_Level_Render;
     }
 
-    internal static void Unload() {
+    internal static void Unload()
+    {
         On.Celeste.Level.Render -= On_Level_Render;
     }
 
-    private static void On_Level_Render(On.Celeste.Level.orig_Render orig, Level self) {
+    private static void On_Level_Render(On.Celeste.Level.orig_Render orig, Level self)
+    {
         List<Component> visibleOverrides = self.Tracker.GetComponents<VisibleOverride>();
-        foreach (VisibleOverride component in visibleOverrides) {
+        foreach (VisibleOverride component in visibleOverrides)
+        {
             component.wasVisible = component.Entity.Visible;
             component.Entity.Visible = false;
         }
 
         orig(self);
 
-        foreach (VisibleOverride component in visibleOverrides) {
+        foreach (VisibleOverride component in visibleOverrides)
+        {
             component.Entity.Visible = (bool)component.wasVisible;
             component.wasVisible = null;
         }

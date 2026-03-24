@@ -9,12 +9,14 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/WingedStrawberryDirectionController")]
 [Tracked]
-public class WingedStrawberryDirectionController(EntityData data, Vector2 offset) : Entity(data.Position + offset) {
+public class WingedStrawberryDirectionController(EntityData data, Vector2 offset) : Entity(data.Position + offset)
+{
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(WingedStrawberryDirectionController)}";
 
-    private static readonly Dictionary<string, Vector2> DirectionToVector = new Dictionary<string, Vector2> {
-        {"up", new Vector2(0f, -1f)}, {"down", new Vector2(0f, 1f)}, {"left", new Vector2(-1f, 0f)}, {"right", new Vector2(1f, 0f)},
-        {"upleft", new Vector2(-1f, -1f)}, {"upright", new Vector2(1f, -1f)}, {"downleft", new Vector2(-1f, 1f)}, {"downright", new Vector2(1f, 1f)}
+    private static readonly Dictionary<string, Vector2> DirectionToVector = new Dictionary<string, Vector2>
+    {
+        { "up", new Vector2(0f, -1f) }, { "down", new Vector2(0f, 1f) }, { "left", new Vector2(-1f, 0f) }, { "right", new Vector2(1f, 0f) },
+        { "upleft", new Vector2(-1f, -1f) }, { "upright", new Vector2(1f, -1f) }, { "downleft", new Vector2(-1f, 1f) }, { "downright", new Vector2(1f, 1f) }
     };
 
     private readonly Vector2 direction = DirectionToVector[data.Attr("direction", "up").ToLower()].SafeNormalize();
@@ -23,15 +25,18 @@ public class WingedStrawberryDirectionController(EntityData data, Vector2 offset
 
     private static ILHook ilHook_Strawberry_orig_Update;
 
-    internal static void Load() {
+    internal static void Load()
+    {
         ilHook_Strawberry_orig_Update = new ILHook(typeof(Strawberry).GetMethod("orig_Update", HookHelper.Bind.PublicInstance)!, IL_Strawberry_orig_Update);
     }
 
-    internal static void Unload() {
+    internal static void Unload()
+    {
         HookHelper.DisposeAndSetNull(ref ilHook_Strawberry_orig_Update);
     }
 
-    private static void IL_Strawberry_orig_Update(ILContext il) {
+    private static void IL_Strawberry_orig_Update(ILContext il)
+    {
         ILCursor cursor = new ILCursor(il);
 
         VariableDefinition controllerVariable = new VariableDefinition(il.Import(typeof(WingedStrawberryDirectionController)));
@@ -45,7 +50,8 @@ public class WingedStrawberryDirectionController(EntityData data, Vector2 offset
             || !cursor.TryGotoPrev(MoveType.Before,
                 instr => instr.MatchLdarg0(),
                 instr => instr.MatchLdarg0(),
-                instr => instr.MatchCall<Entity>("get_Y"))) {
+                instr => instr.MatchCall<Entity>("get_Y")))
+        {
             Logger.Warn(LogID, $"Failed to inject custom flight movement in CIL code for {cursor.Method.FullName}!");
             return;
         }
@@ -72,8 +78,9 @@ public class WingedStrawberryDirectionController(EntityData data, Vector2 offset
         ILLabel afterOOBChecksLabel = null;
 
         if (!cursor.TryGotoNext(MoveType.Before,
-                instr => instr.MatchLdarg0(),
-                instr => instr.MatchCall<Entity>("get_Y"))) {
+            instr => instr.MatchLdarg0(),
+            instr => instr.MatchCall<Entity>("get_Y")))
+        {
             Logger.Warn(LogID, $"Failed to inject additional out of room bounds checks in CIL code for {cursor.Method.FullName}!");
             return;
         }
@@ -89,9 +96,10 @@ public class WingedStrawberryDirectionController(EntityData data, Vector2 offset
 
         // inject horizontal idle bounds checks alongside the vanilla vertical checks
         if (!cursor.TryGotoNext(MoveType.After,
-                instr => instr.MatchMul(),
-                instr => instr.MatchCall(typeof(Calc), nameof(Calc.Approach)),
-                instr => instr.MatchStfld<Strawberry>(nameof(Strawberry.flapSpeed)))) {
+            instr => instr.MatchMul(),
+            instr => instr.MatchCall(typeof(Calc), nameof(Calc.Approach)),
+            instr => instr.MatchStfld<Strawberry>(nameof(Strawberry.flapSpeed))))
+        {
             Logger.Warn(LogID, $"Failed to inject horizontal idle bounds checks in CIL code for {cursor.Method.FullName}!");
             return;
         }
@@ -110,7 +118,8 @@ public class WingedStrawberryDirectionController(EntityData data, Vector2 offset
             => self.Scene?.Tracker.GetEntity<WingedStrawberryDirectionController>();
 
         // returns true if vanilla movement should be skipped
-        static bool DirectionalMovement(Entity self, float flapSpeed, WingedStrawberryDirectionController controller) {
+        static bool DirectionalMovement(Entity self, float flapSpeed, WingedStrawberryDirectionController controller)
+        {
             if (controller is null)
                 return false;
 
@@ -120,7 +129,8 @@ public class WingedStrawberryDirectionController(EntityData data, Vector2 offset
         }
 
         // returns true if vanilla oob check should be skipped
-        static bool DirectionalOutOfBoundsCheck(Entity self, WingedStrawberryDirectionController controller) {
+        static bool DirectionalOutOfBoundsCheck(Entity self, WingedStrawberryDirectionController controller)
+        {
             if (controller is null)
                 return false;
 
@@ -134,7 +144,8 @@ public class WingedStrawberryDirectionController(EntityData data, Vector2 offset
             return true;
         }
 
-        static void HorizontalIdleBoundsCheck(Entity self, Vector2 start, WingedStrawberryDirectionController controller) {
+        static void HorizontalIdleBoundsCheck(Entity self, Vector2 start, WingedStrawberryDirectionController controller)
+        {
             // only perform horizontal idle bounds checks if a controller exists
             if (controller is null)
                 return;
@@ -147,5 +158,4 @@ public class WingedStrawberryDirectionController(EntityData data, Vector2 offset
     }
 
     #endregion
-
 }

@@ -10,7 +10,8 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 
 // i   give up on the fmod api .  callbacks?? no thanks sorry im just going to do this myself i cant rly notice any real difference anyway
 // updatee  nvm pt 2. dont like reimplementing markers ill just embrace the api instead
-public class MusicSyncController : Entity {
+public class MusicSyncController : Entity
+{
     private readonly record struct TimelineMarker(string Name, int Position, int EndPosition);
     private readonly record struct TempoMarker(float Tempo, int TimeSigUpper, int TimeSigLower, int Position);
 
@@ -22,17 +23,20 @@ public class MusicSyncController : Entity {
 
     private readonly bool showDebugUI;
 
-    public MusicSyncController(EntityData data, Vector2 _) {
+    public MusicSyncController(EntityData data, Vector2 _)
+    {
         eventName = data.Attr("eventName");
 
         string tempoMarkersRaw = data.Attr("tempoMarkers", "120-4-4-0");
-        foreach (string raw in tempoMarkersRaw.Split(',')) {
+        foreach (string raw in tempoMarkersRaw.Split(','))
+        {
             if (ParseTempoMarker(raw, out TempoMarker marker))
                 tempoMarkers.Add(marker);
         }
 
         string markersRaw = data.Attr("markers");
-        foreach (string raw in markersRaw.Split(',')) {
+        foreach (string raw in markersRaw.Split(','))
+        {
             if (ParseTimelineMarker(raw, out TimelineMarker marker))
                 timelineMarkers.Add(marker);
         }
@@ -48,7 +52,8 @@ public class MusicSyncController : Entity {
     }
 
     // format: tempo-timeSigUpper-timeSigLower-position
-    private static bool ParseTempoMarker(string raw, out TempoMarker marker) {
+    private static bool ParseTempoMarker(string raw, out TempoMarker marker)
+    {
         marker = default;
 
         string[] split = raw.Split('-');
@@ -72,7 +77,8 @@ public class MusicSyncController : Entity {
     }
 
     // format: name-position
-    private static bool ParseTimelineMarker(string raw, out TimelineMarker marker) {
+    private static bool ParseTimelineMarker(string raw, out TimelineMarker marker)
+    {
         marker = default;
 
         string[] split = raw.Split('-');
@@ -98,19 +104,23 @@ public class MusicSyncController : Entity {
     private TempoMarker? currentTempoMarker;
     private TimelineMarker? currentTimelineMarker;
 
-    private void UpdateValues() {
+    private void UpdateValues()
+    {
         if (Scene is not Level level)
             return;
 
         // reset stuff if the event isn't playing
         EventInstance music = Audio.CurrentMusicEventInstance;
-        if (music is null || (!string.IsNullOrEmpty(eventName) && Audio.CurrentMusic != eventName)) {
+        if (music is null || (!string.IsNullOrEmpty(eventName) && Audio.CurrentMusic != eventName))
+        {
             currentTimelinePos = 0;
             currentBar = currentBeat = 0;
             currentTempoMarker = null;
             currentTimelineMarker = null;
-        // otherwise update the markers using the timeline position
-        } else {
+            // otherwise update the markers using the timeline position
+        }
+        else
+        {
             // get timeline position
             music.getTimelinePosition(out currentTimelinePos);
 
@@ -121,17 +131,21 @@ public class MusicSyncController : Entity {
                     currentTempoMarker = marker;
 
             // get beat/bar
-            if (currentTempoMarker is { } tempoMarker) {
+            if (currentTempoMarker is { } tempoMarker)
+            {
                 int beat = (int)MathF.Floor(currentTimelinePos / (60f / (tempoMarker.Tempo * tempoMarker.TimeSigLower / 4f) * 1000f));
                 currentBar = 1 + beat / tempoMarker.TimeSigUpper;
                 currentBeat = 1 + beat % tempoMarker.TimeSigUpper;
-            } else {
+            }
+            else
+            {
                 currentBar = currentBeat = 0;
             }
 
             // get marker (null means no marker)
             currentTimelineMarker = null;
-            foreach (TimelineMarker marker in timelineMarkers) {
+            foreach (TimelineMarker marker in timelineMarkers)
+            {
                 if (currentTimelinePos >= marker.Position
                     // don't replace the current marker with one earlier
                     && currentTimelineMarker.GetValueOrDefault().Position <= marker.Position
@@ -148,7 +162,8 @@ public class MusicSyncController : Entity {
         session.SetCounter(sessionPrefix + "_timeline", currentTimelinePos);
 
         string currentMarkerFlag = currentTimelineMarker.HasValue ? sessionPrefix + "_" + currentTimelineMarker.Value.Name : null;
-        foreach (TimelineMarker marker in timelineMarkers) {
+        foreach (TimelineMarker marker in timelineMarkers)
+        {
             string flagName = sessionPrefix + "_" + marker.Name;
             bool isCurrentFlag = flagName == currentMarkerFlag;
 
@@ -157,24 +172,27 @@ public class MusicSyncController : Entity {
         }
     }
 
-    public override void Added(Scene scene) {
+    public override void Added(Scene scene)
+    {
         base.Added(scene);
         UpdateValues();
     }
 
-    public override void Update() {
+    public override void Update()
+    {
         base.Update();
         UpdateValues();
     }
 
-    public override void Render() {
+    public override void Render()
+    {
         base.Render();
 
         // im so good at coding
         if (!showDebugUI || (!string.IsNullOrEmpty(eventName) && Audio.CurrentMusic != eventName))
             return;
 
-        string debugText =  $"{(string.IsNullOrEmpty(eventName) ? "Music Sync" : eventName)}\n";
+        string debugText = $"{(string.IsNullOrEmpty(eventName) ? "Music Sync" : eventName)}\n";
 
         // tempo
         if (currentTempoMarker is { } tempoMarker)
