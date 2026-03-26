@@ -2,14 +2,15 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/TouchGateBlock")]
 [Tracked]
-public class TouchGateBlock : GateBlock {
-
+public class TouchGateBlock : GateBlock
+{
     private readonly MTexture mainTexture;
 
     private readonly bool moveOnGrab;
     private readonly bool moveOnStaticMover;
 
-    public TouchGateBlock(EntityData data, Vector2 offset) : base(data, offset) {
+    public TouchGateBlock(EntityData data, Vector2 offset) : base(data, offset)
+    {
         moveOnGrab = data.Bool("moveOnGrab", true);
         moveOnStaticMover = data.Bool("moveOnStaticMoverInteract", false);
 
@@ -17,8 +18,10 @@ public class TouchGateBlock : GateBlock {
         mainTexture = GFX.Game[$"objects/{blockSprite}"];
     }
 
-    public override void OnStaticMoverTrigger(StaticMover sm) {
-        if (!Triggered && moveOnStaticMover) {
+    public override void OnStaticMoverTrigger(StaticMover sm)
+    {
+        if (!Triggered && moveOnStaticMover)
+        {
             Activate();
             if (smoke)
                 ActivateParticles();
@@ -27,9 +30,11 @@ public class TouchGateBlock : GateBlock {
         }
     }
 
-    public override void Update() {
+    public override void Update()
+    {
         // maybe kinda messy but i dont rlly care enough to try and fix it rn
-        if (!Triggered && (moveOnGrab ? HasPlayerRider() : HasPlayerOnTop())) {
+        if (!Triggered && (moveOnGrab ? HasPlayerRider() : HasPlayerOnTop()))
+        {
             Activate();
             if (smoke)
                 ActivateParticles();
@@ -40,7 +45,8 @@ public class TouchGateBlock : GateBlock {
         base.Update();
     }
 
-    public override void Render() {
+    public override void Render()
+    {
         if (!VisibleOnCamera)
             return;
 
@@ -52,7 +58,8 @@ public class TouchGateBlock : GateBlock {
         base.Render();
     }
 
-    protected override void RenderOutline() {
+    protected override void RenderOutline()
+    {
         Draw.Rect(Position + Offset - new Vector2(1f, 1f), Collider.Width + 2f, Collider.Height + 2f, Color.Black);
     }
 }

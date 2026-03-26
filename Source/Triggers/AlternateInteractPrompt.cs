@@ -8,8 +8,8 @@ namespace Celeste.Mod.SorbetHelper.Triggers;
 
 [Tracked]
 [CustomEntity("SorbetHelper/AlternateInteractPrompt")]
-public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : Trigger(data, offset) {
-
+public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : Trigger(data, offset)
+{
     private readonly TalkComponentAltUI.Options options = new TalkComponentAltUI.Options(
         Style: data.Enum("style", TalkComponentAltUI.Styles.BottomCorner),
         LabelDialogId: data.Attr("dialogId", "sorbethelper_ui_talk"),
@@ -19,8 +19,10 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
 
     #region Custom TalkComponentUI
 
-    public class TalkComponentAltUI : TalkComponentUI {
-        public enum Styles {
+    public class TalkComponentAltUI : TalkComponentUI
+    {
+        public enum Styles
+        {
             BottomCorner,
             SmallArrow
         }
@@ -38,7 +40,8 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
 
         private readonly Options options;
 
-        private TalkComponentAltUI(TalkComponent handler, Options options) : base(handler) {
+        private TalkComponentAltUI(TalkComponent handler, Options options) : base(handler)
+        {
             Add(selectWiggle = Wiggler.Create(0.4f, 4f));
             this.options = options;
 
@@ -50,10 +53,12 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
             Tag |= TagsExt.SubHUD;
         }
 
-        public override void Update() {
+        public override void Update()
+        {
             highlightedEase = Calc.Approach(highlightedEase, Highlighted ? 1f : 0f, Engine.DeltaTime * 4f);
 
-            if (Input.Talk.Pressed && selectWiggleDelay <= 0f) {
+            if (Input.Talk.Pressed && selectWiggleDelay <= 0f)
+            {
                 selectWiggle.Start();
                 selectWiggleDelay = 0.5f;
             }
@@ -62,15 +67,18 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
             base.Update();
         }
 
-        public override void Render() {
+        public override void Render()
+        {
             // base.Render();
             Level level = SceneAs<Level>();
 
             if (level is null || level.FrozenOrPaused || slide <= 0f || Handler.Entity == null)
                 return;
 
-            switch (options.Style) {
-                case Styles.BottomCorner: {
+            switch (options.Style)
+            {
+                case Styles.BottomCorner:
+                {
                     float slideEase = Math.Min(highlightedEase, slide);
 
                     if (slideEase <= 0f)
@@ -101,7 +109,8 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
 
                     break;
                 }
-                case Styles.SmallArrow: {
+                case Styles.SmallArrow:
+                {
                     Vector2 camPos = level.Camera.Position.Floor();
                     Vector2 drawPos = Handler.Entity.Position + Handler.DrawAt - camPos;
                     if (SaveData.Instance != null && SaveData.Instance.Assists.MirrorMode)
@@ -138,7 +147,8 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
             }
         }
 
-        private static float GetPromptWidth(string label) {
+        private static float GetPromptWidth(string label)
+        {
             MTexture buttonTexture = Input.GuiButton(Input.Talk, Input.PrefixMode.Latest);
 
             if (string.IsNullOrEmpty(label))
@@ -147,7 +157,8 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
                 return ActiveFont.Measure(label).X + 8f + buttonTexture.Width;
         }
 
-        private static void RenderPrompt(Vector2 position, string label, float scale, float justifyX = 0.5f, bool flipX = false, float wiggle = 0f, float alpha = 1f, float backgroundAlpha = 1f) {
+        private static void RenderPrompt(Vector2 position, string label, float scale, float justifyX = 0.5f, bool flipX = false, float wiggle = 0f, float alpha = 1f, float backgroundAlpha = 1f)
+        {
             RenderBackground(position, label, scale, justifyX, backgroundAlpha * alpha);
 
             MTexture buttonTexture = Input.GuiButton(Input.Talk, Input.PrefixMode.Latest);
@@ -172,7 +183,8 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
             ActiveFont.DrawOutline(label, position, textJustify, Vector2.One * (scale + wiggle), Color.White * alpha, 2f, Color.Black * alpha);
         }
 
-        private static void RenderBackground(Vector2 position, string label, float scale = 1f, float justifyX = 0.5f, float alpha = 1f) {
+        private static void RenderBackground(Vector2 position, string label, float scale = 1f, float justifyX = 0.5f, float alpha = 1f)
+        {
             if (alpha <= 0f)
                 return;
 
@@ -190,34 +202,38 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
                 Draw.Rect(rectX, position.Y - height / 2f, rectWidth, height, color);
             edgeTexture.DrawJustified(new Vector2(rectX, (int)position.Y), new Vector2(1f, 0.5f), color, scale, 0f, SpriteEffects.FlipHorizontally);
             edgeTexture.DrawJustified(new Vector2(rectX + rectWidth, (int)position.Y), new Vector2(0f, 0.5f), color, scale);
-
         }
 
         #region Hooks
 
         private static Hook hook_set_Highlighted = null;
 
-        internal static void Load() {
+        internal static void Load()
+        {
             hook_set_Highlighted = new Hook(
                 typeof(TalkComponentUI).GetProperty(nameof(TalkComponentUI.Highlighted), HookHelper.Bind.PublicInstance)!.GetSetMethod()!,
                 On_set_Highlighted
             );
             IL.Celeste.TalkComponent.Update += IL_TalkComponent_Update;
         }
-        internal static void Unload() {
+
+        internal static void Unload()
+        {
             HookHelper.DisposeAndSetNull(ref hook_set_Highlighted);
             IL.Celeste.TalkComponent.Update -= IL_TalkComponent_Update;
         }
 
         private delegate void orig_set_Highlighted(TalkComponentUI self, bool value);
-        private static void On_set_Highlighted(orig_set_Highlighted orig, TalkComponentUI self, bool value) {
+        private static void On_set_Highlighted(orig_set_Highlighted orig, TalkComponentUI self, bool value)
+        {
             if (self is TalkComponentAltUI { options.HighlightEffects: false })
                 self.highlighted = value;
             else
                 orig(self, value);
         }
 
-        private static void IL_TalkComponent_Update(ILContext il) {
+        private static void IL_TalkComponent_Update(ILContext il)
+        {
             ILCursor cursor = new ILCursor(il);
 
             // swap out the vanilla TalkComponentUI for a custom one if colliding with an AlternateInteractPromptWrapper
@@ -243,7 +259,8 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
 
             return;
 
-            static TalkComponentAltUI TryGetCustomUI(TalkComponent self) {
+            static TalkComponentAltUI TryGetCustomUI(TalkComponent self)
+            {
                 if (self.Entity is not { } entity)
                     return null;
 
@@ -257,11 +274,14 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
                 return null;
             }
 
-            static float AdjustHoverTimerForCustomUI(float orig, TalkComponentUI ui) {
-                if (ui is TalkComponentAltUI altUi) {
-                    return altUi.options.Style switch {
+            static float AdjustHoverTimerForCustomUI(float orig, TalkComponentUI ui)
+            {
+                if (ui is TalkComponentAltUI altUi)
+                {
+                    return altUi.options.Style switch
+                    {
                         Styles.BottomCorner => 0f,
-                        _ => 0.1f
+                        _                   => 0.1f
                     };
                 }
 
@@ -270,9 +290,7 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
         }
 
         #endregion
-
     }
 
     #endregion
-
 }

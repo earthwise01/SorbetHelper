@@ -12,13 +12,16 @@ namespace Celeste.Mod.SorbetHelper.Utils;
 // (also licenced under the MIT License https://github.com/aonkeeper4/aonHelper/blob/main/LICENSE)
 // which was implemented by the same person (ty aon) and is the closest public version i'm aware of
 
-public static class HookHelper {
-    public static void DisposeAndSetNull(ref Hook hook) {
+public static class HookHelper
+{
+    public static void DisposeAndSetNull(ref Hook hook)
+    {
         hook?.Dispose();
         hook = null;
     }
 
-    public static void DisposeAndSetNull(ref ILHook ilHook) {
+    public static void DisposeAndSetNull(ref ILHook ilHook)
+    {
         ilHook?.Dispose();
         ilHook = null;
     }
@@ -26,7 +29,8 @@ public static class HookHelper {
     /// <summary>
     /// Contains commonly used <see cref="BindingFlags"/>.
     /// </summary>
-    public static class Bind {
+    public static class Bind
+    {
         /// <summary>
         /// Shorthand for <see cref="BindingFlags.Public"/> and <see cref="BindingFlags.Static"/>.
         /// </summary>
@@ -51,7 +55,8 @@ public static class HookHelper {
     /// <summary>
     /// Custom <see cref="Exception"/> to be thrown when hook application fails.
     /// </summary>
-    public class HookException : Exception {
+    public class HookException : Exception
+    {
         public HookException(string message, Exception inner = null) : base($"Hook application failed: {message}", inner) { }
 
         public HookException(ILContext il, string message, Exception inner = null) : base($"IL hook application on method {il.Method.FullName} failed: {message}", inner) { }

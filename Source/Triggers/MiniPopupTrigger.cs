@@ -3,8 +3,10 @@ using Celeste.Mod.SorbetHelper.Entities;
 namespace Celeste.Mod.SorbetHelper.Triggers;
 
 [CustomEntity("SorbetHelper/MiniPopupTrigger")]
-public class MiniPopupTrigger(EntityData data, Vector2 offset, EntityID entityId) : Trigger(data, offset) {
-    private enum Modes {
+public class MiniPopupTrigger(EntityData data, Vector2 offset, EntityID entityId) : Trigger(data, offset)
+{
+    private enum Modes
+    {
         OnPlayerEnter,
         OnFlagEnabled,
         OnFlagDisabled,
@@ -30,14 +32,16 @@ public class MiniPopupTrigger(EntityData data, Vector2 offset, EntityID entityId
 
     private Action disablePopup;
 
-    public override void Awake(Scene scene) {
+    public override void Awake(Scene scene)
+    {
         base.Awake(scene);
 
         if (!string.IsNullOrEmpty(flag))
             currentFlagState = SceneAs<Level>().Session.GetFlag(flag);
     }
 
-    public override void Update() {
+    public override void Update()
+    {
         base.Update();
 
         if (string.IsNullOrEmpty(flag) || SceneAs<Level>().Session.GetFlag(flag) == currentFlagState)
@@ -45,7 +49,8 @@ public class MiniPopupTrigger(EntityData data, Vector2 offset, EntityID entityId
 
         currentFlagState = !currentFlagState;
 
-        switch (mode) {
+        switch (mode)
+        {
             case Modes.OnPlayerEnter or Modes.WhilePlayerInside:
                 Collidable = currentFlagState;
                 break;
@@ -62,21 +67,24 @@ public class MiniPopupTrigger(EntityData data, Vector2 offset, EntityID entityId
         }
     }
 
-    public override void OnEnter(Player player) {
+    public override void OnEnter(Player player)
+    {
         base.OnEnter(player);
 
         if (mode is Modes.OnPlayerEnter or Modes.WhilePlayerInside)
             Trigger();
     }
 
-    public override void OnLeave(Player player) {
+    public override void OnLeave(Player player)
+    {
         base.OnLeave(player);
 
         if (mode is Modes.WhilePlayerInside && disablePopup is not null)
             disablePopup();
     }
 
-    private void Trigger() {
+    private void Trigger()
+    {
         if (triggered && removeOnLeave)
             return;
 

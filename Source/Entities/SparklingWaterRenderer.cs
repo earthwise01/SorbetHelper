@@ -7,16 +7,17 @@ using Celeste.Mod.SorbetHelper.Utils;
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [Tracked]
-public class SparklingWaterRenderer : Entity {
-
+public class SparklingWaterRenderer : Entity
+{
     #region Settings
 
-    public class Settings(Color outlineColor, Color edgeColor, Color fillColor,
+    public class Settings(
+        Color outlineColor, Color edgeColor, Color fillColor,
         string detailTexture,
         float causticScale, float causticAlpha,
         float bubbleAlpha,
-        float displacementSpeed) {
-
+        float displacementSpeed)
+    {
         private static readonly Color DefaultOutlineColor = Calc.HexToColorWithNonPremultipliedAlpha("87cefaf0");
         private static readonly Color DefaultEdgeColor = Calc.HexToColorWithNonPremultipliedAlpha("87cefa80");
         private static readonly Color DefaultFillColor = Calc.HexToColorWithNonPremultipliedAlpha("4480b890");
@@ -39,12 +40,12 @@ public class SparklingWaterRenderer : Entity {
 
         public Settings(EntityData data)
             : this(data.HexColorWithNonPremultipliedAlpha("outlineColor", DefaultOutlineColor),
-            data.HexColorWithNonPremultipliedAlpha("edgeColor", DefaultEdgeColor),
-            data.HexColorWithNonPremultipliedAlpha("fillColor", DefaultFillColor),
-            data.String("detailTexture", DefaultDetailTexture),
-            data.Float("causticScale", DefaultCausticScale), data.Float("causticAlpha", DefaultCausticAlpha),
-            data.Float("bubbleAlpha", DefaultBubbleAlpha),
-            data.Float("displacementSpeed", DefaultDisplacementSpeed)) { }
+                data.HexColorWithNonPremultipliedAlpha("edgeColor", DefaultEdgeColor),
+                data.HexColorWithNonPremultipliedAlpha("fillColor", DefaultFillColor),
+                data.String("detailTexture", DefaultDetailTexture),
+                data.Float("causticScale", DefaultCausticScale), data.Float("causticAlpha", DefaultCausticAlpha),
+                data.Float("bubbleAlpha", DefaultBubbleAlpha),
+                data.Float("displacementSpeed", DefaultDisplacementSpeed)) { }
     }
 
     public static Settings GetSettings(Scene scene, int depth)
@@ -66,7 +67,8 @@ public class SparklingWaterRenderer : Entity {
 
     private float timer;
 
-    private SparklingWaterRenderer(int depth) : base() {
+    private SparklingWaterRenderer(int depth) : base()
+    {
         Tag = Tags.Global | Tags.TransitionUpdate;
         Depth = depth;
 
@@ -77,12 +79,14 @@ public class SparklingWaterRenderer : Entity {
     public void Track(SparklingWater water) => sparklingWater.Add(water);
     public void Untrack(SparklingWater water) => sparklingWater.Remove(water);
 
-    public override void Update() {
+    public override void Update()
+    {
         base.Update();
         timer += Engine.DeltaTime;
     }
 
-    public void BeforeRender() {
+    public void BeforeRender()
+    {
         List<SparklingWater> visibleWater = sparklingWater.Where(water => water.Visible && water.VisibleOnCamera).ToList();
 
         // don't attempt to render if no water is visible
@@ -131,10 +135,12 @@ public class SparklingWaterRenderer : Entity {
         effect.Parameters["World"].SetValue(matrix);
 
         // draw water meshes
-        foreach (EffectPass pass in effect.CurrentTechnique.Passes) {
+        foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+        {
             pass.Apply();
 
-            foreach (SparklingWater water in sparklingWater) {
+            foreach (SparklingWater water in sparklingWater)
+            {
                 if (water.Visible && water.VisibleOnCamera)
                     water.DrawMesh();
             }
@@ -144,47 +150,53 @@ public class SparklingWaterRenderer : Entity {
         Engine.Graphics.GraphicsDevice.SamplerStates[0] = prevSamplerState0;
     }
 
-    public void RenderDisplacement() {
+    public void RenderDisplacement()
+    {
         if (displacementBuffer is null || displacementBuffer.IsDisposed)
             return;
 
         Draw.SpriteBatch.Draw(displacementBuffer, SceneAs<Level>().Camera.Position, Color.White);
     }
 
-    public override void Render() {
+    public override void Render()
+    {
         if (buffer is null || buffer.IsDisposed)
             return;
 
         Draw.SpriteBatch.Draw(buffer, SceneAs<Level>().Camera.Position, Color.White);
     }
 
-    public override void Removed(Scene scene) {
+    public override void Removed(Scene scene)
+    {
         base.Removed(scene);
         Dispose();
     }
 
-    public override void SceneEnd(Scene scene) {
+    public override void SceneEnd(Scene scene)
+    {
         base.SceneEnd(scene);
         Dispose();
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         RenderTargetHelper.DisposeAndSetNull(ref buffer);
         RenderTargetHelper.DisposeAndSetNull(ref displacementBuffer);
     }
 
-    public static SparklingWaterRenderer GetRenderer(Scene scene, int depth) {
+    public static SparklingWaterRenderer GetRenderer(Scene scene, int depth)
+    {
         if (scene.Tracker.GetEntities<SparklingWaterRenderer>()
                          .Concat(scene.Entities.ToAdd)
                          .FirstOrDefault(r => r is SparklingWaterRenderer && r.Depth == depth)
-            is not SparklingWaterRenderer renderer) {
-            scene.Add(renderer = new SparklingWaterRenderer(depth));
-            Logger.Info($"{nameof(SorbetHelper)}/{nameof(SparklingWaterRenderer)}", $"creating new SparklingWaterRenderer at depth {depth}.");
-        }
+            is SparklingWaterRenderer renderer)
+            return renderer;
+
+        Logger.Info($"{nameof(SorbetHelper)}/{nameof(SparklingWaterRenderer)}", $"creating new SparklingWaterRenderer at depth {depth}.");
+        scene.Add(renderer = new SparklingWaterRenderer(depth));
 
         return renderer;
     }
 
     #endregion
-
 }

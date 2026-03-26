@@ -8,47 +8,8 @@ local iconUtils = require("ui.utils.icons")
 local contextMenu = require("ui.context_menu")
 local form = require("ui.forms.form")
 local languageRegistry = require("language_registry")
-
--- i would be   so not surprised if there was a better way to do this
--- my brain is mush n this works for now though so   thanks "ingemar"
--- https://forums.solar2d.com/t/split-utf-8-string-word-with-foreign-characters-to-letters/320463/2
-local UTF8ToCharArray = function(str)
-    local charArray = {}
-    local iStart = 0
-    local strLen = str:len()
-
-    local function bit(b)
-        return 2 ^ (b - 1)
-    end
-    local function hasbit(w, b)
-        return w % (b + b) >= b
-    end
-
-    local checkMultiByte = function(i)
-        if (iStart ~= 0) then
-            charArray[#charArray + 1] = str:sub(iStart, i - 1)
-            iStart = 0
-        end
-    end
-
-    for i = 1, strLen do
-        local b = str:byte(i)
-        local multiStart = hasbit(b, bit(7)) and hasbit(b, bit(8))
-        local multiTrail = not hasbit(b, bit(7)) and hasbit(b, bit(8))
-        if (multiStart) then
-            checkMultiByte(i)
-            iStart = i
-        elseif (not multiTrail) then
-            checkMultiByte(i)
-            charArray[#charArray + 1] = str:sub(i, i)
-        end
-    end
-
-    -- process if last character is multi-byte
-    checkMultiByte(strLen + 1)
-
-    return charArray
-end
+local mods = require("mods")
+local sorbetUtils = mods.requireFromPlugin("libraries.utils")
 
 -- 99.9% copy paste from the default loenn list field, just made to work when using unicode characters with an empty seperator
 -- hopefully gets fixed upstreamm but this like   is better than letting it crash for now i guess
@@ -62,7 +23,7 @@ local function getValueParts(value, options)
         return {}
     end
 
-    local parts = UTF8ToCharArray(value)
+    local parts = sorbetUtils.UTF8ToCharArray(value)
 
     -- Special case for empty string and empty default
     -- Otherwise we will never be able to add when the field is empty
@@ -322,7 +283,7 @@ function listField.getElement(name, value, options)
         local parts = {}
 
         if type(value) == "string" then
-            parts = UTF8ToCharArray(value)
+            parts = sorbetUtils.UTF8ToCharArray(value)
         end
 
         if #parts < options.minimumElements or #parts > options.maximumElements then

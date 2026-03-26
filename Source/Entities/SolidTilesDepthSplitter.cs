@@ -6,8 +6,10 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 
 [GlobalEntity]
 [CustomEntity("SorbetHelper/SolidTilesDepthSplitter")]
-public class SolidTilesDepthSplitter : Entity {
-    public static Entity Load(Level level, LevelData levelData, Vector2 position, EntityData entityData) {
+public class SolidTilesDepthSplitter : Entity
+{
+    public static Entity Load(Level level, LevelData levelData, Vector2 position, EntityData entityData)
+    {
         SolidTilesDepthSplitter depthSplitter = new SolidTilesDepthSplitter(entityData.Int("depth", Depths.FGDecals - 10),
             entityData.Attr("tiletypes", "3").ToHashSet(), entityData.Bool("tryFillBehind", false));
 
@@ -25,27 +27,31 @@ public class SolidTilesDepthSplitter : Entity {
     private TileGrid tiles;
     private AnimatedTiles animatedTiles;
 
-    private SolidTilesDepthSplitter(int depth, HashSet<char> tiletypes, bool tryFillBehind) : base() {
+    private SolidTilesDepthSplitter(int depth, HashSet<char> tiletypes, bool tryFillBehind) : base()
+    {
         Depth = depth;
         this.tiletypes = tiletypes;
         this.tiletypes.Remove('0');
         this.tryFillBehind = tryFillBehind;
     }
 
-    public override void Added(Scene scene) {
+    public override void Added(Scene scene)
+    {
         base.Added(scene);
 
         tiles.ClipCamera = SceneAs<Level>().Camera;
         animatedTiles?.ClipCamera = tiles.ClipCamera;
     }
 
-    private void SplitTiles(Vector2 position, VirtualMap<char> tileData, TileGrid origTiles, AnimatedTiles origAnimTiles, Autotiler autotiler) {
+    private void SplitTiles(Vector2 position, VirtualMap<char> tileData, TileGrid origTiles, AnimatedTiles origAnimTiles, Autotiler autotiler)
+    {
         if (tiletypes.Count <= 0)
             return;
 
         Position = position;
 
-        tiles = new TileGrid(origTiles.TileWidth, origTiles.TileHeight, origTiles.TilesX, origTiles.TilesY) {
+        tiles = new TileGrid(origTiles.TileWidth, origTiles.TileHeight, origTiles.TilesX, origTiles.TilesY)
+        {
             VisualExtend = origTiles.VisualExtend
         };
 
@@ -54,13 +60,16 @@ public class SolidTilesDepthSplitter : Entity {
             tryGetFillBehind = GenerateFillBehind(tileData, autotiler);
 
         for (int x = 0; x < tileData.Columns; x++)
-        for (int y = 0; y < tileData.Rows; y++) {
-            if (tiletypes.Contains(tileData[x, y])) {
+        for (int y = 0; y < tileData.Rows; y++)
+        {
+            if (tiletypes.Contains(tileData[x, y]))
+            {
                 tiles.Tiles[x, y] = origTiles.Tiles[x, y];
                 origTiles.Tiles[x, y] = tryGetFillBehind?.Invoke(x, y);
 
                 // only create anim tiles if necessary
-                if (origAnimTiles.tiles.AnyInSegmentAtTile(x, y)) {
+                if (origAnimTiles.tiles.AnyInSegmentAtTile(x, y))
+                {
                     if (origAnimTiles.tiles[x, y] is null)
                         continue;
 
@@ -78,7 +87,8 @@ public class SolidTilesDepthSplitter : Entity {
             Add(animatedTiles);
     }
 
-    private Func<int, int, MTexture> GenerateFillBehind(VirtualMap<char> origTiles, Autotiler autotiler) {
+    private Func<int, int, MTexture> GenerateFillBehind(VirtualMap<char> origTiles, Autotiler autotiler)
+    {
         VirtualMap<char> newTiles = new VirtualMap<char>(origTiles.Columns, origTiles.Rows, origTiles.EmptyValue);
         for (int x = 0; x < origTiles.Columns; x++)
         for (int y = 0; y < origTiles.Rows; y++)
@@ -88,7 +98,8 @@ public class SolidTilesDepthSplitter : Entity {
 
         return (int x, int y) => tiletypes.Contains(newTiles[x, y]) ? null : generated.TileGrid.Tiles[x, y];
 
-        char GetTile(int x, int y) {
+        char GetTile(int x, int y)
+        {
             char origTile = origTiles[x, y];
             if (!tiletypes.Contains(origTile))
                 return origTile;
@@ -101,9 +112,11 @@ public class SolidTilesDepthSplitter : Entity {
                    ?? origTile;
 
             // returns whichever neighbour that connects to the original tile ignores the most of the others
-            char? TryGetFillFrom(char[] neighbours) {
+            char? TryGetFillFrom(char[] neighbours)
+            {
                 char? fillTile = null;
-                foreach (char neighbour in neighbours) {
+                foreach (char neighbour in neighbours)
+                {
                     // ignore any neighbours that are also being split
                     if (tiletypes.Contains(neighbour))
                         continue;
@@ -115,6 +128,7 @@ public class SolidTilesDepthSplitter : Entity {
                         && (fillTile is null || fillTile == '0' || neighbourData.Ignore(fillTile.Value)))
                         fillTile = neighbour;
                 }
+
                 return fillTile;
             }
         }

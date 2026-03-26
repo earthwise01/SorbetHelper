@@ -6,15 +6,49 @@ local entities = require("entities")
 
 local sorbetUtils = {}
 
-function sorbetUtils.getGenericNodeSprite(x, y, color)
-    local color = color or colors.selectionCompleteNodeLineColor
+---
 
-    local sprite = drawableSprite.fromTexture("editorSprites/SorbetHelper/nodeMarker", {x = x, y = y, color = color})
-    sprite.rotation = math.pi / 4
-    sprite:setScale(0.9428090415820632)
+-- adapted from https://forums.solar2d.com/t/split-utf-8-string-word-with-foreign-characters-to-letters/320463/2
+function sorbetUtils.UTF8ToCharArray(str)
+    local charArray = {}
+    local iStart = 0
+    local strLen = str:len()
 
-    return sprite
+    local function bit(b)
+        return 2 ^ (b - 1)
+    end
+    local function hasBit(w, b)
+        return w % (b + b) >= b
+    end
+    local function checkMultiByte(i)
+        if iStart ~= 0 then
+            charArray[#charArray + 1] = str:sub(iStart, i - 1)
+            iStart = 0
+        end
+    end
+
+    for i = 1, strLen do
+        local b = str:byte(i)
+        local multiStart = hasBit(b, bit(7)) and hasBit(b, bit(8))
+        local multiTrail = not hasBit(b, bit(7)) and hasBit(b, bit(8))
+
+        if multiStart then
+            checkMultiByte(i)
+            iStart = i
+
+        elseif not multiTrail then
+            checkMultiByte(i)
+            charArray[#charArray + 1] = str:sub(i, i)
+        end
+    end
+
+    -- process if last character is multi-byte
+    checkMultiByte(strLen + 1)
+
+    return charArray
 end
+
+---
 
 function sorbetUtils.getAllSIDs()
     local sids = {}
@@ -45,6 +79,8 @@ function sorbetUtils.getMapSIDs()
     return sids
 end
 
+---
+
 function sorbetUtils.checkForDuplicateInMap(self, isTrigger, duplicateCheck)
     isTrigger = isTrigger or false
     local map = loadedState.map
@@ -65,6 +101,18 @@ function sorbetUtils.checkForDuplicateInMap(self, isTrigger, duplicateCheck)
     end
 
     return false
+end
+
+---
+
+function sorbetUtils.getGenericNodeSprite(x, y, color)
+    local color = color or colors.selectionCompleteNodeLineColor
+
+    local sprite = drawableSprite.fromTexture("editorSprites/SorbetHelper/nodeMarker", {x = x, y = y, color = color})
+    sprite.rotation = math.pi / 4
+    sprite:setScale(0.9428090415820632)
+
+    return sprite
 end
 
 function sorbetUtils.getControllerSprites(x, y, texture, global, warning)
@@ -93,5 +141,7 @@ function sorbetUtils.getControllerSpriteFunction(textureName, globalCheck, noDup
         return sorbetUtils.getControllerSprites(entity.x or 0, entity.y or 0, textureName, global, warning)
     end
 end
+
+---
 
 return sorbetUtils

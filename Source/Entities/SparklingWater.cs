@@ -7,8 +7,10 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [CustomEntity("SorbetHelper/SparklingWater")]
 [Tracked]
 [TrackedAs(typeof(Water))]
-public class SparklingWater : Water {
-    private class SparklingSurface : Surface {
+public class SparklingWater : Water
+{
+    private class SparklingSurface : Surface
+    {
         // size of the "distance from edge" gradient used by the shader
         public const int SurfaceMaxHeight = 16;
         // surfaces have their positions 8px beneath their edge
@@ -18,7 +20,8 @@ public class SparklingWater : Water {
 
         private readonly int edgeStartIndex, borderStartIndex;
 
-        public SparklingSurface(Vector2 position, Vector2 outwards, float width, float bodyHeight, ref VertexPositionColor[] mesh) : base(position, outwards, width, bodyHeight) {
+        public SparklingSurface(Vector2 position, Vector2 outwards, float width, float bodyHeight, ref VertexPositionColor[] mesh) : base(position, outwards, width, bodyHeight)
+        {
             base.mesh = null;
             Rays.Clear();
 
@@ -33,7 +36,8 @@ public class SparklingWater : Water {
             Color fillColor = Color.Lerp(edgeColor, SparklingWaterRenderer.FillMaskColor, (float)surfaceHeight / (float)SurfaceMaxHeight);
 
             // edge colors
-            for (int i = edgeStartIndex; i < edgeStartIndex + segments * 6; i += 6) {
+            for (int i = edgeStartIndex; i < edgeStartIndex + segments * 6; i += 6)
+            {
                 mesh[i + 0].Color = edgeColor;
                 mesh[i + 1].Color = edgeColor;
                 mesh[i + 2].Color = fillColor;
@@ -47,18 +51,24 @@ public class SparklingWater : Water {
                 mesh[i].Color = SparklingWaterRenderer.OutlineMaskColor;
         }
 
-        public void Update(Rectangle cameraRect, VertexPositionColor[] mesh) {
+        public void Update(Rectangle cameraRect, VertexPositionColor[] mesh)
+        {
             timer += Engine.DeltaTime;
 
             // update ripples
-            for (int i = Ripples.Count - 1; i >= 0; i--) {
+            for (int i = Ripples.Count - 1; i >= 0; i--)
+            {
                 Ripple ripple = Ripples[i];
 
-                if (ripple.Percent > 1f) {
+                if (ripple.Percent > 1f)
+                {
                     Ripples.RemoveAt(i);
-                } else {
+                }
+                else
+                {
                     ripple.Position += ripple.Speed * Engine.DeltaTime;
-                    if (ripple.Position < 0f || ripple.Position > Width) {
+                    if (ripple.Position < 0f || ripple.Position > Width)
+                    {
                         ripple.Speed = 0f - ripple.Speed;
                         ripple.Position = Calc.Clamp(ripple.Position, 0f, Width);
                     }
@@ -80,7 +90,8 @@ public class SparklingWater : Water {
             int edgeIndex = edgeStartIndex + 6 * visibleStart / Resolution;
             int borderIndex = borderStartIndex + 6 * visibleStart / Resolution;
 
-            while (surfacePos < visibleEnd) {
+            while (surfacePos < visibleEnd)
+            {
                 int surfacePosNext = Math.Min(surfacePos + Resolution, Width);
                 Vector2 worldPosNext = Position + perpendicular * (-Width / 2 + surfacePosNext);
                 float heightNext = GetSurfaceHeight(surfacePosNext);
@@ -108,7 +119,8 @@ public class SparklingWater : Water {
             }
         }
 
-        private (bool surfaceOnCamera, int visibleStart, int visibleEnd) GetVisibility(Rectangle cameraRect) {
+        private (bool surfaceOnCamera, int visibleStart, int visibleEnd) GetVisibility(Rectangle cameraRect)
+        {
             // todo but in like the far far future probably cus it doesnt sound fun in general: support left and right surfaces
             int left, right, top, bottom;
             int visibleStart, visibleEnd;
@@ -116,7 +128,8 @@ public class SparklingWater : Water {
             left = (int)(Position.X - Width / 2f);
             right = (int)(Position.X + Width / 2f);
 
-            switch (Outwards) {
+            switch (Outwards)
+            {
                 // top surface
                 case { Y: < 0f }:
                     top = (int)(Position.Y - PositionYOffset);
@@ -162,7 +175,8 @@ public class SparklingWater : Water {
 
     public bool VisibleOnCamera = true;
 
-    private static readonly ParticleType P_SparklingSplash = new ParticleType() {
+    private static readonly ParticleType P_SparklingSplash = new ParticleType()
+    {
         Source = GFX.Game["particles/feather"],
         FadeMode = ParticleType.FadeModes.Linear,
         Acceleration = new Vector2(0f, 150f),
@@ -174,7 +188,8 @@ public class SparklingWater : Water {
     };
 
     public SparklingWater(Vector2 position, float width, float height, bool topSurface, bool bottomSurface, int depth = -9999, bool collidable = true, bool canSplash = true)
-        : base(position, false, false, width, height) {
+        : base(position, false, false, width, height)
+    {
         Remove(Get<DisplacementRenderHook>());
         Depth = depth;
 
@@ -183,26 +198,29 @@ public class SparklingWater : Water {
 
         mesh = new VertexPositionColor[6];
 
-        if (topSurface) {
+        if (topSurface)
+        {
             base.TopSurface = new SparklingSurface(Position + new Vector2(width / 2f, SparklingSurface.PositionYOffset), new Vector2(0f, -1f), width, height, ref mesh);
             Surfaces.Add(TopSurface);
             fill.Y += SparklingSurface.SurfaceMaxHeight;
             fill.Height -= SparklingSurface.SurfaceMaxHeight;
         }
 
-        if (bottomSurface) {
+        if (bottomSurface)
+        {
             base.BottomSurface = new SparklingSurface(Position + new Vector2(width / 2f, height - SparklingSurface.PositionYOffset), new Vector2(0f, 1f), width, height, ref mesh);
             Surfaces.Add(BottomSurface);
             fill.Height -= SparklingSurface.SurfaceMaxHeight;
         }
 
-        if (fill.Height > 0) {
+        if (fill.Height > 0)
+        {
             const int fillStartIndex = 0;
             for (int i = fillStartIndex; i < fillStartIndex + 6; i++)
                 mesh[i].Color = SparklingWaterRenderer.FillMaskColor;
 
-            float fillLeft = X + fill.X, fillRight  = X + fill.X + fill.Width;
-            float fillTop  = Y + fill.Y, fillBottom = Y + fill.Y + fill.Height;
+            float fillLeft = X + fill.X, fillRight = X + fill.X + fill.Width;
+            float fillTop = Y + fill.Y, fillBottom = Y + fill.Y + fill.Height;
             mesh[fillStartIndex + 0].Position = new Vector3(fillLeft, fillTop, 0f);
             mesh[fillStartIndex + 1].Position = new Vector3(fillRight, fillTop, 0f);
             mesh[fillStartIndex + 2].Position = new Vector3(fillLeft, fillBottom, 0f);
@@ -214,33 +232,39 @@ public class SparklingWater : Water {
 
     public SparklingWater(EntityData data, Vector2 offset)
         : this(data.Position + offset, data.Width, data.Height,
-               data.Bool("topSurface", true), data.Bool("bottomSurface", false),
-               data.Int("depth", -9999), data.Bool("collidable", true), data.Bool("canSplash", true)) { }
+            data.Bool("topSurface", true), data.Bool("bottomSurface", false),
+            data.Int("depth", -9999), data.Bool("collidable", true), data.Bool("canSplash", true))
+    { }
 
     private void TrackSelf() => SparklingWaterRenderer.GetRenderer(Scene, Depth).Track(this);
     private void UntrackSelf() => SparklingWaterRenderer.GetRenderer(Scene, Depth).Untrack(this);
 
     [MonoModLinkTo("Monocle.Entity", "System.Void Added(Monocle.Scene)")]
     private extern void base_Added(Scene scene);
-    public override void Added(Scene scene) {
+    public override void Added(Scene scene)
+    {
         base_Added(scene);
         TrackSelf();
     }
 
-    public override void Awake(Scene scene) {
+    public override void Awake(Scene scene)
+    {
         base.Awake(scene);
         // todo: change awake priority (once that exists) to always go after waterfalls
         Collidable = collidable;
     }
 
-    public override void Removed(Scene scene) {
+    public override void Removed(Scene scene)
+    {
         UntrackSelf();
         base.Removed(scene);
     }
 
     [MonoModLinkTo("Monocle.Entity", "System.Void Update()")]
     private extern void base_Update();
-    public override void Update() {
+
+    public override void Update()
+    {
         // can't use base.Update() normally since that would call the vanilla surface update methods
         base_Update();
 
@@ -248,7 +272,7 @@ public class SparklingWater : Water {
         Camera camera = SceneAs<Level>().Camera;
         const int visibilityBuffer = 24;
         Rectangle cameraRect = new Rectangle((int)camera.X - visibilityBuffer, (int)camera.Y - visibilityBuffer,
-                                             camera.Width + visibilityBuffer, camera.Height + visibilityBuffer);
+            camera.Width + visibilityBuffer, camera.Height + visibilityBuffer);
 
         VisibleOnCamera = Left < cameraRect.Right && Right > cameraRect.Left
                           && Top < cameraRect.Bottom && Bottom > cameraRect.Top;
@@ -258,8 +282,10 @@ public class SparklingWater : Water {
             surface.Update(cameraRect, mesh);
 
         // ripples & splash sfx for water interaction components
-        if (canSplash) {
-            foreach (WaterInteraction waterInteraction in Scene.Tracker.GetComponents<WaterInteraction>()) {
+        if (canSplash)
+        {
+            foreach (WaterInteraction waterInteraction in Scene.Tracker.GetComponents<WaterInteraction>())
+            {
                 Entity interactionEntity = waterInteraction.Entity;
 
                 bool wasInside = contains.Contains(waterInteraction);
@@ -267,16 +293,20 @@ public class SparklingWater : Water {
 
                 if (!initializedWaterInteractionsInside && isInside)
                     contains.Add(waterInteraction);
-                else if (wasInside != isInside) {
+                else if (wasInside != isInside)
+                {
                     Vector2 interactionPos = waterInteraction.AbsoluteCenter;
                     DoSplash(interactionPos, interactionEntity.Width, 1f);
 
                     bool isDashing = waterInteraction.IsDashing();
                     int deepParam = (interactionPos.Y < Center.Y && !Scene.CollideCheck<Solid>(new Vector2(waterInteraction.Bounds.Left, Top + 8f), new Vector2(waterInteraction.Bounds.Right, Top + 8f))) ? 1 : 0;
-                    if (wasInside) {
+                    if (wasInside)
+                    {
                         Audio.Play(isDashing ? "event:/char/madeline/water_dash_out" : "event:/char/madeline/water_out", interactionPos, "deep", deepParam);
                         waterInteraction.DrippingTimer = 2f;
-                    } else {
+                    }
+                    else
+                    {
                         Audio.Play((isDashing && deepParam == 1) ? "event:/char/madeline/water_dash_in" : "event:/char/madeline/water_in", interactionPos, "deep", deepParam);
                         waterInteraction.DrippingTimer = 0f;
                     }
@@ -287,13 +317,17 @@ public class SparklingWater : Water {
                         contains.Add(waterInteraction);
                 }
 
-                if (BottomSurface is not null && interactionEntity is Player) {
-                    if (isInside && interactionEntity.Y > Bottom - 8f) {
+                if (BottomSurface is not null && interactionEntity is Player)
+                {
+                    if (isInside && interactionEntity.Y > Bottom - 8f)
+                    {
                         playerBottomTension ??= BottomSurface.SetTension(interactionEntity.Position, 0f);
 
                         playerBottomTension.Position = BottomSurface.GetPointAlong(interactionEntity.Position);
                         playerBottomTension.Strength = Calc.ClampedMap(interactionEntity.Y, Bottom - 8f, Bottom + 4f) * 0.25f;
-                    } else if (playerBottomTension is not null) {
+                    }
+                    else if (playerBottomTension is not null)
+                    {
                         BottomSurface.RemoveTension(playerBottomTension);
                         playerBottomTension = null;
                     }
@@ -304,7 +338,8 @@ public class SparklingWater : Water {
         }
     }
 
-    public void DoSplash(Vector2 position, float width, float strength) {
+    public void DoSplash(Vector2 position, float width, float strength)
+    {
         bool onTop = position.Y <= CenterY;
         Surface surface = onTop ? TopSurface : BottomSurface;
         if (surface is null)
@@ -312,7 +347,8 @@ public class SparklingWater : Water {
 
         surface.DoRipple(position, strength);
         const int rippleDistance = 48;
-        for (int x = rippleDistance; x < width / 2f; x += rippleDistance) {
+        for (int x = rippleDistance; x < width / 2f; x += rippleDistance)
+        {
             surface.DoRipple(new Vector2(position.X + x, position.Y), strength);
             surface.DoRipple(new Vector2(position.X - x, position.Y), strength);
         }
@@ -327,7 +363,8 @@ public class SparklingWater : Water {
 
     public override void Render() { }
 
-    public void DrawMesh() {
+    public void DrawMesh()
+    {
         Engine.Instance.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, mesh, 0, mesh.Length / 3);
     }
 }

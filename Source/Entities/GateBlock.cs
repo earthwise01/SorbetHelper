@@ -11,7 +11,8 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 // originally made around early 2022 as an excuse to better understand inheritance/polymorphism/virtual methods/whatever its called and to mess around with celeste modding in general more
 
 [Tracked(true)]
-public abstract class GateBlock : Solid {
+public abstract class GateBlock : Solid
+{
     public bool Triggered { get; private set; }
 
     protected readonly int entityId;
@@ -51,7 +52,8 @@ public abstract class GateBlock : Solid {
     protected readonly ParticleType P_Activate;
     protected readonly ParticleType P_ActivateReturn;
 
-    public GateBlock(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, data.Height, safe: false) {
+    public GateBlock(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, data.Height, safe: false)
+    {
         if (data.Nodes.Length > 0)
             node = data.Nodes[0] + offset;
 
@@ -82,37 +84,40 @@ public abstract class GateBlock : Solid {
         icon.Color = fillColor = inactiveColor;
         icon.Position = iconOffset = new Vector2(data.Width / 2f, data.Height / 2f);
         icon.CenterOrigin();
-        Add(finishIconScaleWiggler = Wiggler.Create(0.5f, 4f, f => {
-            icon.Scale = Vector2.One * (1f + f);
-        }));
+        Add(finishIconScaleWiggler = Wiggler.Create(0.5f, 4f, f => { icon.Scale = Vector2.One * (1f + f); }));
 
         Add(openSfx = new SoundSource());
         Add(new LightOcclude(0.5f));
 
-        P_RecoloredFire = new ParticleType(TouchSwitch.P_Fire) {
+        P_RecoloredFire = new ParticleType(TouchSwitch.P_Fire)
+        {
             Color = finishColor
         };
 
-        P_Activate = new(Seeker.P_HitWall) {
+        P_Activate = new(Seeker.P_HitWall)
+        {
             Color = inactiveColor,
             Color2 = Color.Lerp(inactiveColor, Color.White, 0.75f),
             ColorMode = ParticleType.ColorModes.Blink,
         };
-        P_ActivateReturn = new(P_Activate) {
+        P_ActivateReturn = new(P_Activate)
+        {
             Color = finishColor,
             Color2 = Color.Lerp(finishColor, Color.White, 0.75f),
             ColorMode = ParticleType.ColorModes.Blink,
         };
     }
 
-    public void Activate() {
+    public void Activate()
+    {
         Triggered = true;
 
         if (!string.IsNullOrEmpty(onActivateFlag))
             SceneAs<Level>().Session.SetFlag(onActivateFlag);
     }
 
-    public override void Added(Scene scene) {
+    public override void Added(Scene scene)
+    {
         base.Added(scene);
 
         // no need to try creating an outline renderer if the block doesn't need an outline anyway
@@ -120,11 +125,13 @@ public abstract class GateBlock : Solid {
             GateBlockOutlineRenderer.TryCreateRenderer(scene);
     }
 
-    public override void Awake(Scene scene) {
+    public override void Awake(Scene scene)
+    {
         base.Awake(scene);
         start = Position;
 
-        if (persistent && SceneAs<Level>().Session.GetFlag("flag_sorbetHelper_gateBlock_persistent_" + entityId)) {
+        if (persistent && SceneAs<Level>().Session.GetFlag("flag_sorbetHelper_gateBlock_persistent_" + entityId))
+        {
             atNode = true;
 
             if (allowReturn)
@@ -137,7 +144,9 @@ public abstract class GateBlock : Solid {
             icon.SetAnimationFrame(0);
             icon.Color = finishColor;
             fillColor = allowReturn ? finishColor : new((int)(finishColor.R * 0.7f), (int)(finishColor.G * 0.67f), (int)(finishColor.B * 0.8f), 255);
-        } else {
+        }
+        else
+        {
             atNode = false;
 
             if (allowReturn)
@@ -147,9 +156,11 @@ public abstract class GateBlock : Solid {
         }
     }
 
-     // (somewhat) stolen from maddie helping hand
-    private IEnumerator BackAndForthSequence() {
-        while (true) {
+    // (somewhat) stolen from maddie helping hand
+    private IEnumerator BackAndForthSequence()
+    {
+        while (true)
+        {
             IEnumerator seq = Sequence();
 
             while (seq.MoveNext())
@@ -157,22 +168,27 @@ public abstract class GateBlock : Solid {
         }
     }
 
-    private IEnumerator Sequence() {
+    private IEnumerator Sequence()
+    {
         Vector2 moveFrom = Position;
         Vector2 moveTo;
         Color fromColor, toColor;
 
-        if (!atNode) {
+        if (!atNode)
+        {
             moveTo = node;
 
             fromColor = inactiveColor;
             toColor = finishColor;
-        } else {
+        }
+        else
+        {
             moveTo = start;
 
             fromColor = finishColor;
             toColor = inactiveColor;
         }
+
         // darken finished no return fill color a bit
         Color toFillColorNoReturn = new((int)(toColor.R * 0.7f), (int)(toColor.G * 0.67f), (int)(toColor.B * 0.8f), 255);
 
@@ -187,14 +203,18 @@ public abstract class GateBlock : Solid {
 
         // animate the icon
         openSfx.Play(moveSound);
-        if (shakeTime > 0f) {
+        if (shakeTime > 0f)
+        {
             StartShaking(shakeTime);
-            while (icon.Rate < 1f) {
+            while (icon.Rate < 1f)
+            {
                 icon.Color = fillColor = Color.Lerp(fromColor, activeColor, icon.Rate);
                 icon.Rate += Engine.DeltaTime / shakeTime;
                 yield return null;
             }
-        } else {
+        }
+        else
+        {
             icon.Color = fillColor = activeColor;
             icon.Rate = 1f;
         }
@@ -204,14 +224,19 @@ public abstract class GateBlock : Solid {
         // move the gate block, emitting particles along the way
         int particleAt = 0;
         Tween moveTween = Tween.Create(Tween.TweenMode.Oneshot, moveEased ? Ease.CubeOut : null, moveTime + (moveEased ? 0.2f : 0f), start: true);
-        moveTween.OnUpdate = tweenArg => {
+        moveTween.OnUpdate = tweenArg =>
+        {
             MoveTo(Vector2.Lerp(moveFrom, moveTo, tweenArg.Eased));
-            if (Scene.OnInterval(0.1f)) {
+            if (Scene.OnInterval(0.1f))
+            {
                 particleAt++;
                 particleAt %= 2;
-                for (int tileX = 0; tileX < Width / 8f; tileX++) {
-                    for (int tileY = 0; tileY < Height / 8f; tileY++) {
-                        if ((tileX + tileY) % 2 == particleAt) {
+                for (int tileX = 0; tileX < Width / 8f; tileX++)
+                {
+                    for (int tileY = 0; tileY < Height / 8f; tileY++)
+                    {
+                        if ((tileX + tileY) % 2 == particleAt)
+                        {
                             SceneAs<Level>().ParticlesBG.Emit(SwitchGate.P_Behind,
                                 Position + new Vector2(tileX * 8, tileY * 8) + Calc.Random.Range(Vector2.One * 2f, Vector2.One * 6f));
                         }
@@ -222,7 +247,8 @@ public abstract class GateBlock : Solid {
         Add(moveTween);
 
         float moveTimeLeft = moveTime;
-        while (moveTimeLeft > 0f) {
+        while (moveTimeLeft > 0f)
+        {
             yield return null;
             moveTimeLeft -= Engine.DeltaTime;
         }
@@ -231,12 +257,15 @@ public abstract class GateBlock : Solid {
         Collidable = false;
 
         // collide dust particles on the left
-        if (moveTo.X <= moveFrom.X) {
+        if (moveTo.X <= moveFrom.X)
+        {
             Vector2 add = new Vector2(0f, 2f);
-            for (int tileY = 0; tileY < Height / 8f; tileY++) {
+            for (int tileY = 0; tileY < Height / 8f; tileY++)
+            {
                 Vector2 collideAt = new Vector2(Left - 1f, Top + 4f + (tileY * 8));
                 Vector2 noCollideAt = collideAt + Vector2.UnitX;
-                if (Scene.CollideCheck<Solid>(collideAt) && !Scene.CollideCheck<Solid>(noCollideAt)) {
+                if (Scene.CollideCheck<Solid>(collideAt) && !Scene.CollideCheck<Solid>(noCollideAt))
+                {
                     SceneAs<Level>().ParticlesFG.Emit(SwitchGate.P_Dust, collideAt + add, (float)Math.PI);
                     SceneAs<Level>().ParticlesFG.Emit(SwitchGate.P_Dust, collideAt - add, (float)Math.PI);
                 }
@@ -244,12 +273,15 @@ public abstract class GateBlock : Solid {
         }
 
         // collide dust particles on the right
-        if (moveTo.X >= moveFrom.X) {
+        if (moveTo.X >= moveFrom.X)
+        {
             Vector2 add = new Vector2(0f, 2f);
-            for (int tileY = 0; tileY < Height / 8f; tileY++) {
+            for (int tileY = 0; tileY < Height / 8f; tileY++)
+            {
                 Vector2 collideAt = new Vector2(Right + 1f, Top + 4f + (tileY * 8));
                 Vector2 noCollideAt = collideAt - Vector2.UnitX * 2f;
-                if (Scene.CollideCheck<Solid>(collideAt) && !Scene.CollideCheck<Solid>(noCollideAt)) {
+                if (Scene.CollideCheck<Solid>(collideAt) && !Scene.CollideCheck<Solid>(noCollideAt))
+                {
                     SceneAs<Level>().ParticlesFG.Emit(SwitchGate.P_Dust, collideAt + add, 0f);
                     SceneAs<Level>().ParticlesFG.Emit(SwitchGate.P_Dust, collideAt - add, 0f);
                 }
@@ -257,12 +289,15 @@ public abstract class GateBlock : Solid {
         }
 
         // collide dust particles on the top
-        if (moveTo.Y <= moveFrom.Y) {
+        if (moveTo.Y <= moveFrom.Y)
+        {
             Vector2 add = new Vector2(2f, 0f);
-            for (int tileX = 0; tileX < Width / 8f; tileX++) {
+            for (int tileX = 0; tileX < Width / 8f; tileX++)
+            {
                 Vector2 collideAt = new Vector2(Left + 4f + (tileX * 8), Top - 1f);
                 Vector2 noCollideAt = collideAt + Vector2.UnitY;
-                if (Scene.CollideCheck<Solid>(collideAt) && !Scene.CollideCheck<Solid>(noCollideAt)) {
+                if (Scene.CollideCheck<Solid>(collideAt) && !Scene.CollideCheck<Solid>(noCollideAt))
+                {
                     SceneAs<Level>().ParticlesFG.Emit(SwitchGate.P_Dust, collideAt + add, -(float)Math.PI / 2f);
                     SceneAs<Level>().ParticlesFG.Emit(SwitchGate.P_Dust, collideAt - add, -(float)Math.PI / 2f);
                 }
@@ -270,23 +305,28 @@ public abstract class GateBlock : Solid {
         }
 
         // collide dust particles on the bottom
-        if (moveTo.Y >= moveFrom.Y) {
+        if (moveTo.Y >= moveFrom.Y)
+        {
             Vector2 add = new Vector2(2f, 0f);
-            for (int tileX = 0; tileX < Width / 8f; tileX++) {
+            for (int tileX = 0; tileX < Width / 8f; tileX++)
+            {
                 Vector2 collideAt = new Vector2(Left + 4f + (tileX * 8), Bottom + 1f);
                 Vector2 noCollideAt = collideAt - Vector2.UnitY * 2f;
-                if (Scene.CollideCheck<Solid>(collideAt) && !Scene.CollideCheck<Solid>(noCollideAt)) {
+                if (Scene.CollideCheck<Solid>(collideAt) && !Scene.CollideCheck<Solid>(noCollideAt))
+                {
                     SceneAs<Level>().ParticlesFG.Emit(SwitchGate.P_Dust, collideAt + add, (float)Math.PI / 2f);
                     SceneAs<Level>().ParticlesFG.Emit(SwitchGate.P_Dust, collideAt - add, (float)Math.PI / 2f);
                 }
             }
         }
+
         Collidable = collidableBackup;
 
         // moving is over
         Audio.Play(finishedSound, Position);
         StartShaking(0.2f);
-        while (icon.Rate > 0f) {
+        while (icon.Rate > 0f)
+        {
             icon.Color = Color.Lerp(activeColor, toColor, 1f - icon.Rate);
             fillColor = Color.Lerp(activeColor, allowReturn ? toColor : toFillColorNoReturn, 1f - icon.Rate);
 
@@ -300,8 +340,10 @@ public abstract class GateBlock : Solid {
         // emit fire particles if the block is not behind a solid
         collidableBackup = Collidable;
         Collidable = false;
-        if (!Scene.CollideCheck<Solid>(Center) && smoke) {
-            for (int i = 0; i < 32; i++) {
+        if (!Scene.CollideCheck<Solid>(Center) && smoke)
+        {
+            for (int i = 0; i < 32; i++)
+            {
                 float angle = Calc.Random.NextFloat((float)Math.PI * 2f);
                 SceneAs<Level>().ParticlesFG.Emit(P_RecoloredFire, Position + iconOffset + Calc.AngleToVector(angle, 4f), toColor, angle);
             }
@@ -313,7 +355,8 @@ public abstract class GateBlock : Solid {
             Triggered = false;
     }
 
-    public override void Update() {
+    public override void Update()
+    {
         VisibleOnCamera = InView(SceneAs<Level>().Camera);
 
         // ease scale and hitOffset towards their default values
@@ -325,7 +368,8 @@ public abstract class GateBlock : Solid {
         base.Update();
     }
 
-    public override void Render() {
+    public override void Render()
+    {
         if (!VisibleOnCamera)
             return;
 
@@ -346,7 +390,8 @@ public abstract class GateBlock : Solid {
     protected virtual void RenderOutline() { }
 
     // i love stealing vanilla code peaceline
-    protected void ActivateParticles() {
+    protected void ActivateParticles()
+    {
         Vector2 dir = node - start;
         if (atNode)
             dir = -dir;
@@ -357,29 +402,38 @@ public abstract class GateBlock : Solid {
         int num;
 
         dir = dir.FourWayNormal();
-        if (dir == Vector2.UnitX) {
+        if (dir == Vector2.UnitX)
+        {
             position = CenterRight - Vector2.UnitX;
             positionRange = Vector2.UnitY * (Height - 2f) * 0.5f;
             num = (int)(Height / 8f) * 4;
-        } else if (dir == -Vector2.UnitX) {
+        }
+        else if (dir == -Vector2.UnitX)
+        {
             position = CenterLeft + Vector2.UnitX;
             positionRange = Vector2.UnitY * (Height - 2f) * 0.5f;
             num = (int)(Height / 8f) * 4;
-        } else if (dir == Vector2.UnitY) {
+        }
+        else if (dir == Vector2.UnitY)
+        {
             position = BottomCenter - Vector2.UnitY;
             positionRange = Vector2.UnitX * (Width - 2f) * 0.5f;
             num = (int)(Width / 8f) * 4;
-        } else {
+        }
+        else
+        {
             position = TopCenter + Vector2.UnitY;
             positionRange = Vector2.UnitX * (Width - 2f) * 0.5f;
             num = (int)(Width / 8f) * 4;
         }
+
         num += 2;
 
         SceneAs<Level>().Particles.Emit(atNode ? P_ActivateReturn : P_Activate, num, position, positionRange, direction);
     }
 
-    protected void DrawNineSlice(MTexture texture, Color color) {
+    protected void DrawNineSlice(MTexture texture, Color color)
+    {
         // completely stolen from maddie's helping hand
         // probably much more performant than anything i could make so its mostly unchanged apart from adding scaling
         int widthInTiles = (int)Collider.Width / 8 - 1;
@@ -393,9 +447,11 @@ public abstract class GateBlock : Solid {
 
         Rectangle clipRect = new Rectangle(clipBaseX, clipBaseY, 8, 8);
 
-        for (int i = 0; i <= widthInTiles; i++) {
+        for (int i = 0; i <= widthInTiles; i++)
+        {
             clipRect.X = clipBaseX + ((i < widthInTiles) ? i == 0 ? 0 : 8 : 16);
-            for (int j = 0; j <= heightInTiles; j++) {
+            for (int j = 0; j <= heightInTiles; j++)
+            {
                 int tilePartY = (j < heightInTiles) ? j == 0 ? 0 : 8 : 16;
                 clipRect.Y = tilePartY + clipBaseY;
                 Draw.SpriteBatch.Draw(baseTexture, blockCenter + ((renderPos + new Vector2(4, 4) - blockCenter) * Scale), clipRect, color, 0f, new Vector2(4, 4), Scale, SpriteEffects.None, 0f);
@@ -411,28 +467,34 @@ public abstract class GateBlock : Solid {
                                           && Y < camera.Bottom + 16f && Y + Height > camera.Top - 16f;
 
     [Tracked]
-    private class GateBlockOutlineRenderer : Entity {
+    private class GateBlockOutlineRenderer : Entity
+    {
         private static bool _rendererJustCreated = false;
 
-        private GateBlockOutlineRenderer() : base() {
+        private GateBlockOutlineRenderer() : base()
+        {
             Depth = 1;
             Tag = Tags.Persistent;
         }
 
-        public override void Render() {
-            foreach (GateBlock block in Scene.Tracker.GetEntities<GateBlock>()) {
+        public override void Render()
+        {
+            foreach (GateBlock block in Scene.Tracker.GetEntities<GateBlock>())
+            {
                 if (block.Visible && block.VisibleOnCamera && block.drawOutline)
                     block.RenderOutline();
             }
         }
 
-        public override void Awake(Scene scene) {
+        public override void Awake(Scene scene)
+        {
             base.Awake(scene);
 
             _rendererJustCreated = false;
         }
 
-        public static void TryCreateRenderer(Scene scene) {
+        public static void TryCreateRenderer(Scene scene)
+        {
             if (_rendererJustCreated || scene.Tracker.GetEntities<GateBlockOutlineRenderer>().Count > 0)
                 return;
 

@@ -6,7 +6,8 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 
 [TrackedAs(typeof(FallingBlock))]
 [CustomEntity("SorbetHelper/CustomFallingBlock", "SorbetHelper/CustomGravityFallingBlock = LoadGravity")]
-public class CustomFallingBlock : FallingBlock {
+public class CustomFallingBlock : FallingBlock
+{
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(CustomFallingBlock)}";
 
     protected readonly string flagOnFall, flagOnLand, triggerFlag;
@@ -19,9 +20,11 @@ public class CustomFallingBlock : FallingBlock {
     protected readonly float maxSpeed, acceleration;
     protected readonly string shakeSfx, impactSfx;
 
-    private static readonly Dictionary<string, Vector2> DirectionToVector = new Dictionary<string, Vector2> {
-        {"down", new Vector2(0f, 1f)}, {"up", new Vector2(0f, -1f)}, {"left", new Vector2(-1f, 0f)}, {"right", new Vector2(1f, 0f)}
+    private static readonly Dictionary<string, Vector2> DirectionToVector = new Dictionary<string, Vector2>
+    {
+        { "down", new Vector2(0f, 1f) }, { "up", new Vector2(0f, -1f) }, { "left", new Vector2(-1f, 0f) }, { "right", new Vector2(1f, 0f) }
     };
+
     public Vector2 Direction;
 
     // chrono helper gravity falling block switch support
@@ -36,7 +39,8 @@ public class CustomFallingBlock : FallingBlock {
     public static Entity LoadGravity(Level level, LevelData levelData, Vector2 offset, EntityData entityData)
         => new CustomFallingBlock(entityData, offset, chronoHelperGravity: true);
 
-    public CustomFallingBlock(EntityData data, Vector2 offset, bool chronoHelperGravity) : base(data, offset) {
+    public CustomFallingBlock(EntityData data, Vector2 offset, bool chronoHelperGravity) : base(data, offset)
+    {
         // remove the Coroutine added by the vanilla falling block
         Remove(Get<Coroutine>());
 
@@ -67,12 +71,14 @@ public class CustomFallingBlock : FallingBlock {
         // Add(new MovingBlockHittable(OnMovingBlockHit));
     }
 
-    public override void OnStaticMoverTrigger(StaticMover sm) {
+    public override void OnStaticMoverTrigger(StaticMover sm)
+    {
         if (fallOnStaticMover)
             Triggered = true;
     }
 
-    public override void Awake(Scene scene) {
+    public override void Awake(Scene scene)
+    {
         base.Awake(scene);
 
         if (!resetFlags)
@@ -87,9 +93,11 @@ public class CustomFallingBlock : FallingBlock {
             session.SetFlag(triggerFlag, false);
     }
 
-    public override void Update() {
+    public override void Update()
+    {
         // chronohelper gravity
-        if (chronoHelperGravityFallingBlock) {
+        if (chronoHelperGravityFallingBlock)
+        {
             chronoHelperGravityWasUp = chronoHelperGravityUp;
             chronoHelperGravityUp = ChronoHelperCompat.SessionGravityModeUp;
 
@@ -104,7 +112,8 @@ public class CustomFallingBlock : FallingBlock {
         base.Update();
     }
 
-    private new IEnumerator Sequence() {
+    private new IEnumerator Sequence()
+    {
         while (!Triggered && (!fallOnTouch || !PlayerFallCheck()))
             yield return null;
 
@@ -112,7 +121,8 @@ public class CustomFallingBlock : FallingBlock {
         if (!string.IsNullOrEmpty(flagOnFall))
             SceneAs<Level>().Session.SetFlag(flagOnFall);
 
-        while (true) {
+        while (true)
+        {
             Audio.Play(shakeSfx, Center);
             StartShaking();
             Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
@@ -124,7 +134,8 @@ public class CustomFallingBlock : FallingBlock {
                 yield return chronoHelperGravityChangeShakeTime;
 
             float shakeTimer = variableShakeTime;
-            while (shakeTimer > 0f && PlayerWaitCheck() && (!chronoHelperGravityFallingBlock || !chronoHelperHasShaken)) {
+            while (shakeTimer > 0f && PlayerWaitCheck() && (!chronoHelperGravityFallingBlock || !chronoHelperHasShaken))
+            {
                 yield return null;
                 shakeTimer -= Engine.DeltaTime;
             }
@@ -134,15 +145,19 @@ public class CustomFallingBlock : FallingBlock {
             DirectionalShakeParticles();
 
             Vector2 speed = Vector2.Zero;
-            while (true) {
+            while (true)
+            {
                 Level level = SceneAs<Level>();
                 speed.X = Calc.Approach(speed.X, Direction.X * maxSpeed, acceleration * Engine.DeltaTime);
                 speed.Y = Calc.Approach(speed.Y, Direction.Y * maxSpeed, acceleration * Engine.DeltaTime);
 
-                if (ignoreSolids) {
+                if (ignoreSolids)
+                {
                     MoveV(speed.Y * Engine.DeltaTime);
                     MoveH(speed.X * Engine.DeltaTime);
-                } else {
+                }
+                else
+                {
                     if (MoveVCollideSolids(speed.Y * Engine.DeltaTime, thruDashBlocks: breakDashBlocks))
                         break;
 
@@ -155,7 +170,8 @@ public class CustomFallingBlock : FallingBlock {
                 // todo: maybe allow disabling this for gravity falling blocks?
                 if (Top > level.Bounds.Bottom + 16 || Bottom < level.Bounds.Top - 16 || Right < level.Bounds.Left - 16 || Left > level.Bounds.Right + 16
                     || ((Top > level.Bounds.Bottom - 1 || Bottom < level.Bounds.Top + 1 || Right < level.Bounds.Left + 1 || Left > level.Bounds.Right - 1)
-                        && CollideCheck<Solid>(Position + Direction))) {
+                        && CollideCheck<Solid>(Position + Direction)))
+                {
                     Collidable = Visible = false;
                     yield return 0.2f;
 
@@ -163,7 +179,8 @@ public class CustomFallingBlock : FallingBlock {
                     if (level.Session.MapData.CanTransitionTo(level, new Vector2(Center.X, Bottom + 12f))
                         || level.Session.MapData.CanTransitionTo(level, new Vector2(Center.X, Top - 12f))
                         || level.Session.MapData.CanTransitionTo(level, new Vector2(Left - 12f, Center.Y))
-                        || level.Session.MapData.CanTransitionTo(level, new Vector2(Right + 12f, Center.Y))) {
+                        || level.Session.MapData.CanTransitionTo(level, new Vector2(Right + 12f, Center.Y)))
+                    {
                         yield return 0.2f;
                         level.Shake();
                         Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
@@ -207,57 +224,71 @@ public class CustomFallingBlock : FallingBlock {
         Safe = true;
     }
 
-    private void DirectionalShakeParticles() {
+    private void DirectionalShakeParticles()
+    {
         Vector2 dir = Direction.FourWayNormal();
 
         Level level = SceneAs<Level>();
-        switch (dir) {
+        switch (dir)
+        {
             case { X: 1f }:
-                for (int i = 2; i < Height; i += 4) {
+                for (int i = 2; i < Height; i += 4)
+                {
                     if (Scene.CollideCheck<Solid>(TopLeft + new Vector2(-2f, i)))
                         level.Particles.Emit(P_FallDustA, 2, new Vector2(X + 2f, Y + i), Vector2.One * 4f, 0f);
 
                     level.Particles.Emit(P_FallDustB, 2, new Vector2(X + 2f, Y + i), Vector2.One * 4f, 0.1f);
                 }
+
                 break;
             case { X: -1f }:
-                for (int i = 2; i < Height; i += 4) {
+                for (int i = 2; i < Height; i += 4)
+                {
                     if (Scene.CollideCheck<Solid>(TopRight + new Vector2(2f, i)))
                         level.Particles.Emit(P_FallDustA, 2, new Vector2(Right - 2f, Y + i), Vector2.One * 4f, MathF.PI);
 
                     level.Particles.Emit(P_FallDustB, 2, new Vector2(Right - 2f, Y + i), Vector2.One * 4f, MathF.PI - 0.1f);
                 }
+
                 break;
             case { Y: -1f }:
-                for (int i = 2; i < Width; i += 4) {
+                for (int i = 2; i < Width; i += 4)
+                {
                     if (Scene.CollideCheck<Solid>(BottomLeft + new Vector2(i, 2f)))
                         level.Particles.Emit(P_FallDustA, 2, new Vector2(X + i, Bottom - 4f), Vector2.One * 4f, -MathF.PI / 2f);
 
                     level.Particles.Emit(P_FallDustB, 2, new Vector2(X + i, Bottom - 2f), Vector2.One * 4f);
                 }
+
                 break;
             default:
-                for (int i = 2; i < Width; i += 4) {
+                for (int i = 2; i < Width; i += 4)
+                {
                     if (Scene.CollideCheck<Solid>(TopLeft + new Vector2(i, -2f)))
                         level.Particles.Emit(P_FallDustA, 2, new Vector2(X + i, Y), Vector2.One * 4f, MathF.PI / 2f);
 
                     level.Particles.Emit(P_FallDustB, 2, new Vector2(X + i, Y), Vector2.One * 4f);
                 }
+
                 break;
         }
     }
 
-    private void DirectionalLandParticles() {
+    private void DirectionalLandParticles()
+    {
         Vector2 dir = Direction.FourWayNormal();
 
-        ParticleType P_DirectionalLandDust = new ParticleType(P_LandDust) {
+        ParticleType P_DirectionalLandDust = new ParticleType(P_LandDust)
+        {
             Acceleration = dir * -30f
         };
 
         Level level = SceneAs<Level>();
-        switch (dir) {
+        switch (dir)
+        {
             case { X: 1f }:
-                for (int i = 2; i <= Height; i += 4) {
+                for (int i = 2; i <= Height; i += 4)
+                {
                     if (!Scene.CollideCheck<Solid>(TopRight + new Vector2(3f, i)))
                         continue;
 
@@ -265,9 +296,11 @@ public class CustomFallingBlock : FallingBlock {
                     float direction = i >= Height / 2f ? MathF.PI / 2f : -MathF.PI / 2f;
                     level.ParticlesFG.Emit(P_DirectionalLandDust, 1, new Vector2(Right, Y + i), Vector2.One * 4f, direction);
                 }
+
                 break;
             case { X: -1f }:
-                for (int i = 2; i <= Height; i += 4) {
+                for (int i = 2; i <= Height; i += 4)
+                {
                     if (!Scene.CollideCheck<Solid>(TopLeft + new Vector2(-3f, i)))
                         continue;
 
@@ -275,9 +308,11 @@ public class CustomFallingBlock : FallingBlock {
                     float direction = i >= Height / 2f ? MathF.PI / 2f : -MathF.PI / 2f;
                     level.ParticlesFG.Emit(P_DirectionalLandDust, 1, new Vector2(X, Y + i), Vector2.One * 4f, direction);
                 }
+
                 break;
             case { Y: -1f }:
-                for (int i = 2; i <= Width; i += 4) {
+                for (int i = 2; i <= Width; i += 4)
+                {
                     if (!Scene.CollideCheck<Solid>(TopLeft + new Vector2(i, -3f)))
                         continue;
 
@@ -285,6 +320,7 @@ public class CustomFallingBlock : FallingBlock {
                     float direction = i >= Width / 2f ? 0f : MathF.PI;
                     level.ParticlesFG.Emit(P_DirectionalLandDust, 1, new Vector2(X + i, Y), Vector2.One * 4f, direction);
                 }
+
                 break;
             default:
                 LandParticles();

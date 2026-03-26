@@ -7,7 +7,8 @@ using MonoMod.RuntimeDetour;
 namespace Celeste.Mod.SorbetHelper.Components;
 
 [Tracked]
-public class DepthAdheringDisplacementRenderHook : Component {
+public class DepthAdheringDisplacementRenderHook : Component
+{
     public readonly Action RenderEntity;
     public readonly Action RenderDisplacement;
 
@@ -16,7 +17,8 @@ public class DepthAdheringDisplacementRenderHook : Component {
     private readonly VisibleOverride visibleOverride;
     public bool EntityVisible => visibleOverride?.EntityVisible != false;
 
-    public DepthAdheringDisplacementRenderHook(Action renderEntity, Action renderDisplacement, bool distortBehind, bool respectVisible) : base(false, true) {
+    public DepthAdheringDisplacementRenderHook(Action renderEntity, Action renderDisplacement, bool distortBehind, bool respectVisible) : base(false, true)
+    {
         RenderEntity = renderEntity;
         RenderDisplacement = renderDisplacement;
         this.distortBehind = distortBehind;
@@ -30,7 +32,8 @@ public class DepthAdheringDisplacementRenderHook : Component {
     private void TrackSelf() => DepthAdheringDisplacementRenderer.GetRenderer(Scene, Entity.Depth, distortBehind).Track(this);
     private void UntrackSelf() => DepthAdheringDisplacementRenderer.GetRenderer(Scene, Entity.Depth, distortBehind).Untrack(this);
 
-    public override void Added(Entity entity) {
+    public override void Added(Entity entity)
+    {
         base.Added(entity);
 
         if (Scene is not null)
@@ -42,12 +45,14 @@ public class DepthAdheringDisplacementRenderHook : Component {
             entity.Visible = false;
     }
 
-    public override void EntityAdded(Scene scene) {
+    public override void EntityAdded(Scene scene)
+    {
         base.EntityAdded(scene);
         TrackSelf();
     }
 
-    public override void Removed(Entity entity) {
+    public override void Removed(Entity entity)
+    {
         UntrackSelf();
 
         if (visibleOverride is not null)
@@ -56,7 +61,8 @@ public class DepthAdheringDisplacementRenderHook : Component {
         base.Removed(entity);
     }
 
-    public override void EntityRemoved(Scene scene) {
+    public override void EntityRemoved(Scene scene)
+    {
         UntrackSelf();
         base.EntityRemoved(scene);
     }
@@ -65,20 +71,24 @@ public class DepthAdheringDisplacementRenderHook : Component {
 
     private static Hook hook_Entity_set_Depth;
 
-    internal static void Load() {
+    internal static void Load()
+    {
         hook_Entity_set_Depth = new Hook(
             typeof(Entity).GetProperty(nameof(Entity.Depth), HookHelper.Bind.PublicInstance)!.GetSetMethod()!,
             On_Entity_set_Depth
         );
     }
 
-    internal static void Unload() {
+    internal static void Unload()
+    {
         HookHelper.DisposeAndSetNull(ref hook_Entity_set_Depth);
     }
 
-    // i'm kinda bleh on hooking this but any other approaches seem slightly too unreliable + i guess depth doesn't change that oftenn and communal helper dream sprites take this approach too
-    private static void On_Entity_set_Depth(Action<Entity, int> orig, Entity self, int value) {
-        if (self.Depth == value || self.Scene is null || self.Scene.Tracker.CountComponents<DepthAdheringDisplacementRenderHook>() == 0) {
+    // i'm kinda bleh on hooking this but any other approaches seem slightly too unreliable and i guess depth doesn't change that often andddd communal helper dream sprites take this approach too
+    private static void On_Entity_set_Depth(Action<Entity, int> orig, Entity self, int value)
+    {
+        if (self.Depth == value || self.Scene is null || self.Scene.Tracker.CountComponents<DepthAdheringDisplacementRenderHook>() == 0)
+        {
             orig(self, value);
             return;
         }
@@ -94,5 +104,4 @@ public class DepthAdheringDisplacementRenderHook : Component {
     }
 
     #endregion
-
 }

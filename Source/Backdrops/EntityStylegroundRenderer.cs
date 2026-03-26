@@ -8,12 +8,15 @@ namespace Celeste.Mod.SorbetHelper.Backdrops;
 /// Renders entities with an <see cref="EntityStylegroundMarker"/> component as if they were part of a styleground.<br/>
 /// </summary>
 [CustomBackdrop("SorbetHelper/EntityStylegroundRenderer")]
-public class EntityStylegroundRenderer : Backdrop {
-    public EntityStylegroundRenderer(BinaryPacker.Element data) {
+public class EntityStylegroundRenderer : Backdrop
+{
+    public EntityStylegroundRenderer(BinaryPacker.Element data)
+    {
         UseSpritebatch = false;
     }
 
-    public override void Render(Scene scene) {
+    public override void Render(Scene scene)
+    {
         base.Render(scene);
 
         List<Component> components = scene.Tracker.GetComponents<EntityStylegroundMarker>();
@@ -32,11 +35,13 @@ public class EntityStylegroundRenderer : Backdrop {
 
     private static readonly Comparison<EntityStylegroundMarker> CompareDepth = (a, b) => Math.Sign(b.Entity.actualDepth - a.Entity.actualDepth);
 
-    private List<EntityStylegroundMarker> GetEntitiesToRender(List<Component> components) {
+    private List<EntityStylegroundMarker> GetEntitiesToRender(List<Component> components)
+    {
         List<EntityStylegroundMarker> markers = new List<EntityStylegroundMarker>(components.Count);
 
-        foreach (Component t in components) {
-            EntityStylegroundMarker marker = (EntityStylegroundMarker)t;
+        foreach (Component component in components)
+        {
+            EntityStylegroundMarker marker = (EntityStylegroundMarker)component;
 
             if (marker.EntityVisible && Tags.Contains(marker.Tag))
                 markers.Add(marker);

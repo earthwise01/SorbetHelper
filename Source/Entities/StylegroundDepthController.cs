@@ -9,13 +9,15 @@ using MonoMod.Cil;
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [Tracked]
-public class StylegroundDepthController : Entity {
+public class StylegroundDepthController : Entity
+{
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(StylegroundDepthController)}";
 
     public enum Modes { Normal, AboveColorgrade, AboveHud, AbovePauseHud }
 
     // modified additive blendstate that still works after being rendered to a transparent render target
-    private static readonly BlendState AdditiveFix = new BlendState() {
+    private static readonly BlendState AdditiveFix = new BlendState()
+    {
         ColorSourceBlend = Blend.SourceAlpha,
         AlphaSourceBlend = Blend.Zero,
         ColorDestinationBlend = Blend.One,
@@ -41,21 +43,26 @@ public class StylegroundDepthController : Entity {
 
     // also see map data processor
     public readonly record struct StylegroundDepthControllerData(string StylegroundTag, int Depth, Modes Mode);
-    private static void Event_OnLoadingThread(Level level) {
+
+    private static void Event_OnLoadingThread(Level level)
+    {
         if (!SorbetHelperMapDataProcessor.StylegroundDepthControllers.TryGetValue((level.Session.Area.ID, level.Session.Area.Mode), out List<StylegroundDepthControllerData> depthControllers))
             return;
 
         StylegroundDepthController trackedController = null;
         List<StylegroundDepthController> currentDepthControllers = [];
-        foreach ((string tag, int depth, Modes mode) in depthControllers) {
-            if (currentDepthControllers.FirstOrDefault(c => mode == c.Mode && (mode != Modes.Normal || c.Depth == depth)) is not { } depthController) {
+        foreach ((string tag, int depth, Modes mode) in depthControllers)
+        {
+            if (currentDepthControllers.FirstOrDefault(c => mode == c.Mode && (mode != Modes.Normal || c.Depth == depth)) is not { } depthController)
+            {
                 depthController = new StylegroundDepthController(depth, mode);
                 level.Add(depthController);
                 currentDepthControllers.Add(depthController);
                 trackedController ??= depthController;
 
                 // store the instances of any controllers with a non-default mode for easier access when using them in hooks
-                switch (mode) {
+                switch (mode)
+                {
                     case Modes.AboveColorgrade:
                         trackedController._aboveColorgrade = depthController;
                         break;
@@ -74,7 +81,8 @@ public class StylegroundDepthController : Entity {
         }
     }
 
-    private StylegroundDepthController(int depth, Modes mode) {
+    private StylegroundDepthController(int depth, Modes mode)
+    {
         Depth = depth;
         Mode = mode;
 
@@ -86,7 +94,8 @@ public class StylegroundDepthController : Entity {
             Tag |= Tags.PauseUpdate;
     }
 
-    private void DrawStylegrounds() {
+    private void DrawStylegrounds()
+    {
         renderingDepthBackdrops = true;
 
         BackdropRenderer rendererBg = SceneAs<Level>().Background;
@@ -105,16 +114,20 @@ public class StylegroundDepthController : Entity {
         renderingDepthBackdrops = false;
     }
 
-    private void RegisterStylegrounds(Level level) {
+    private void RegisterStylegrounds(Level level)
+    {
         RegisterStylegrounds(level.Background.Backdrops, backdropsBg);
         RegisterStylegrounds(level.Foreground.Backdrops, backdropsFg);
     }
 
-    private void RegisterStylegrounds(List<Backdrop> origBackdrops, List<Backdrop> into) {
+    private void RegisterStylegrounds(List<Backdrop> origBackdrops, List<Backdrop> into)
+    {
         HashSet<Backdrop> current = Scene.Tracker.GetEntity<StylegroundDepthController>()._current;
 
-        foreach (Backdrop backdrop in origBackdrops) {
-            if (backdrop.Tags.Overlaps(StylegroundTags) && current.Add(backdrop)) {
+        foreach (Backdrop backdrop in origBackdrops)
+        {
+            if (backdrop.Tags.Overlaps(StylegroundTags) && current.Add(backdrop))
+            {
                 into.Add(backdrop);
 
                 if (Mode != Modes.Normal && backdrop is Parallax parallax && parallax.BlendState == BlendState.Additive)
@@ -123,26 +136,30 @@ public class StylegroundDepthController : Entity {
         }
     }
 
-    public override void Added(Scene scene) {
+    public override void Added(Scene scene)
+    {
         base.Added(scene);
 
         RegisterStylegrounds(SceneAs<Level>());
     }
 
-    public override void Removed(Scene scene) {
+    public override void Removed(Scene scene)
+    {
         base.Removed(scene);
 
         RenderTargetHelper.DisposeAndSetNull(ref buffer);
     }
 
-    public override void SceneEnd(Scene scene) {
+    public override void SceneEnd(Scene scene)
+    {
         base.SceneEnd(scene);
 
         RenderTargetHelper.DisposeAndSetNull(ref buffer);
     }
 
     // for the AbovePauseHud mode, we need to manually update the stylegrounds
-    public override void Update() {
+    public override void Update()
+    {
         base.Update();
 
         if (Mode != Modes.AbovePauseHud || SceneAs<Level>().Paused)
@@ -153,7 +170,8 @@ public class StylegroundDepthController : Entity {
     }
 
     // for "above hud"-type modes, in order to draw the stylegrounds *after* everything else (and at the correct resolution), they need to be drawn to a render target first
-    public void BeforeRender() {
+    public void BeforeRender()
+    {
         if (Mode == Modes.Normal)
             return;
 
@@ -166,7 +184,8 @@ public class StylegroundDepthController : Entity {
     }
 
     // otherwise, just draw them directly to the gameplay buffer at the specified depth
-    public override void Render() {
+    public override void Render()
+    {
         if (Mode != Modes.Normal)
             return;
 
@@ -175,7 +194,8 @@ public class StylegroundDepthController : Entity {
         GameplayRenderer.Begin();
     }
 
-    public void RenderToHiRes() {
+    public void RenderToHiRes()
+    {
         if (Mode == Modes.Normal)
             return;
 
@@ -193,13 +213,16 @@ public class StylegroundDepthController : Entity {
 
     #region Hooks
 
-    internal static void Load() {
+    internal static void Load()
+    {
         Everest.Events.LevelLoader.OnLoadingThread += Event_OnLoadingThread;
 
         IL.Celeste.BackdropRenderer.Render += IL_BackdropRenderer_Render;
         IL.Celeste.Level.Render += IL_Level_Render;
     }
-    internal static void Unload() {
+
+    internal static void Unload()
+    {
         Everest.Events.LevelLoader.OnLoadingThread -= Event_OnLoadingThread;
 
         IL.Celeste.BackdropRenderer.Render -= IL_BackdropRenderer_Render;
@@ -207,7 +230,8 @@ public class StylegroundDepthController : Entity {
     }
 
     // prevent depth backdrops from being rendered normally
-    private static void IL_BackdropRenderer_Render(ILContext il) {
+    private static void IL_BackdropRenderer_Render(ILContext il)
+    {
         ILCursor cursor = new ILCursor(il);
 
         VariableDefinition depthRenderedBackdropsVar = new VariableDefinition(il.Import(typeof(HashSet<Backdrop>)));
@@ -219,7 +243,8 @@ public class StylegroundDepthController : Entity {
         cursor.EmitStloc(depthRenderedBackdropsVar);
 
         if (!cursor.TryGotoNext(MoveType.After,
-                instr => instr.MatchLdfld<Backdrop>(nameof(Backdrop.Visible)))) {
+            instr => instr.MatchLdfld<Backdrop>(nameof(Backdrop.Visible))))
+        {
             Logger.Warn(LogID, $"ilhook error! failed to find backdrop visible check in CIL code for {cursor.Method.Name}!");
             return;
         }
@@ -233,7 +258,8 @@ public class StylegroundDepthController : Entity {
 
         return;
 
-        static HashSet<Backdrop> GetDepthRenderedBackdrops(Scene scene) {
+        static HashSet<Backdrop> GetDepthRenderedBackdrops(Scene scene)
+        {
             if (renderingDepthBackdrops)
                 return EmptyBackdropHashSet;
 
@@ -248,12 +274,14 @@ public class StylegroundDepthController : Entity {
             => orig && !depthRendered.Contains(backdrop);
     }
 
-    private static void IL_Level_Render(ILContext il) {
+    private static void IL_Level_Render(ILContext il)
+    {
         ILCursor cursor = new ILCursor(il);
 
         if (!cursor.TryGotoNextBestFit(MoveType.Before,
-                instr => instr.MatchLdarg0(),
-                instr => instr.MatchLdfld<Level>(nameof(Level.Pathfinder)))) {
+            instr => instr.MatchLdarg0(),
+            instr => instr.MatchLdfld<Level>(nameof(Level.Pathfinder))))
+        {
             Logger.Warn(LogID, $"ilhook error! failed to inject above colorgrade rendering in CIL code for {cursor.Method.Name}!");
             return;
         }
@@ -286,8 +314,9 @@ public class StylegroundDepthController : Entity {
         cursor.EmitDelegate(RenderAboveColorgrade);
 
         if (!cursor.TryGotoNextBestFit(MoveType.AfterLabel,
-                instr => instr.MatchLdarg0(),
-                instr => instr.MatchLdfld<Level>(nameof(Level.SubHudRenderer)))) {
+            instr => instr.MatchLdarg0(),
+            instr => instr.MatchLdfld<Level>(nameof(Level.SubHudRenderer))))
+        {
             Logger.Warn(LogID, $"ilhook error! failed to inject below hud rendering in CIL code for {cursor.Method.Name}!");
             return;
         }
@@ -300,9 +329,10 @@ public class StylegroundDepthController : Entity {
         cursor.EmitDelegate(RenderBelowHud);
 
         if (!cursor.TryGotoNextBestFit(MoveType.After,
-                instr => instr.MatchLdfld<Level>(nameof(Level.HudRenderer)),
-                instr => instr.MatchLdarg0(),
-                instr => instr.MatchCallOrCallvirt<Renderer>(nameof(Renderer.Render)))) {
+            instr => instr.MatchLdfld<Level>(nameof(Level.HudRenderer)),
+            instr => instr.MatchLdarg0(),
+            instr => instr.MatchCallOrCallvirt<Renderer>(nameof(Renderer.Render))))
+        {
             Logger.Warn(LogID, $"ilhook error! failed to inject above hud rendering in CIL code for {cursor.Method.Name}!");
             return;
         }
@@ -317,7 +347,8 @@ public class StylegroundDepthController : Entity {
 
         return;
 
-        static void UpdateUpscaleData(Matrix scaleMatrix, Vector2 paddingOffset, Vector2 zoomFocusOffset, float scale) {
+        static void UpdateUpscaleData(Matrix scaleMatrix, Vector2 paddingOffset, Vector2 zoomFocusOffset, float scale)
+        {
             StylegroundDepthController.scaleMatrix = scaleMatrix;
             StylegroundDepthController.paddingOffset = paddingOffset;
             StylegroundDepthController.zoomFocusOffset = zoomFocusOffset;
@@ -325,18 +356,23 @@ public class StylegroundDepthController : Entity {
         }
 
         static StylegroundDepthController GetDepthController(Level self)
-            => self.Tracker.GetEntity<StylegroundDepthController>();
+        {
+            return self.Tracker.GetEntity<StylegroundDepthController>();
+        }
 
-        static void RenderAboveColorgrade(StylegroundDepthController depthController) {
+        static void RenderAboveColorgrade(StylegroundDepthController depthController)
+        {
             depthController?._aboveColorgrade?.RenderToHiRes();
         }
 
-        static void RenderBelowHud(StylegroundDepthController depthController, bool paused) {
+        static void RenderBelowHud(StylegroundDepthController depthController, bool paused)
+        {
             if (paused)
                 depthController?._aboveHud?.RenderToHiRes();
         }
 
-        static void RenderAboveHud(StylegroundDepthController depthController, bool paused) {
+        static void RenderAboveHud(StylegroundDepthController depthController, bool paused)
+        {
             if (!paused)
                 depthController?._aboveHud?.RenderToHiRes();
 
@@ -345,5 +381,4 @@ public class StylegroundDepthController : Entity {
     }
 
     #endregion
-
 }

@@ -7,7 +7,8 @@ using MonoMod.Cil;
 namespace Celeste.Mod.SorbetHelper.Components;
 
 [Tracked]
-public class LightCover(float alpha) : Component(false, true) {
+public class LightCover(float alpha) : Component(false, true)
+{
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(LightCover)}";
 
     // storing this as a byte because otherwise im worried about using floats when grouping the alpha batches
@@ -15,21 +16,26 @@ public class LightCover(float alpha) : Component(false, true) {
 
     #region Hooks
 
-    internal static void Load() {
+    internal static void Load()
+    {
         IL.Celeste.LightingRenderer.BeforeRender += IL_LightingRenderer_BeforeRender;
     }
 
-    internal static void Unload() {
+    internal static void Unload()
+    {
         IL.Celeste.LightingRenderer.BeforeRender -= IL_LightingRenderer_BeforeRender;
     }
 
-    private static void IL_LightingRenderer_BeforeRender(ILContext il) {
-        ILCursor cursor = new ILCursor(il) {
+    private static void IL_LightingRenderer_BeforeRender(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il)
+        {
             Index = -1
         };
 
         if (!cursor.TryGotoPrev(MoveType.After,
-                instr => instr.MatchCallOrCallvirt(typeof(GFX), nameof(GFX.DrawIndexedVertices)))) {
+            instr => instr.MatchCallOrCallvirt(typeof(GFX), nameof(GFX.DrawIndexedVertices))))
+        {
             Logger.Warn(LogID, $"Failed to inject check to render LightCover components in CIL code for {cursor.Method.Name}!");
             return;
         }
@@ -41,7 +47,8 @@ public class LightCover(float alpha) : Component(false, true) {
 
         return;
 
-        static void DrawLightCovers(Level level) {
+        static void DrawLightCovers(Level level)
+        {
             // todo: this sucksssss
 
             List<Component> components = level?.Tracker.GetComponents<LightCover>();
@@ -52,13 +59,14 @@ public class LightCover(float alpha) : Component(false, true) {
             // split the components up based on alpha (is there a better way to do this?)
             List<IGrouping<byte, LightCover>> alphaBatches =
                 components.Cast<LightCover>().GroupBy(lightCover => lightCover.alpha)
-                                             .ToList();
+                          .ToList();
             int batchCount = alphaBatches.Count;
 
             RenderTargetBinding[] initalBuffer = Engine.Instance.GraphicsDevice.GetRenderTargets();
             VirtualRenderTarget[] tempBuffers = RenderTargetHelper.GetGameplayBuffers(batchCount);
 
-            for (int i = 0; i < batchCount; i++) {
+            for (int i = 0; i < batchCount; i++)
+            {
                 IGrouping<byte, LightCover> batch = alphaBatches[i];
                 VirtualRenderTarget tempBuffer = tempBuffers[i];
                 Engine.Instance.GraphicsDevice.SetRenderTarget(tempBuffer);
@@ -67,7 +75,8 @@ public class LightCover(float alpha) : Component(false, true) {
                 GameplayRenderer.Begin();
 
                 // performance is in shambles but i don't see how else im supposed to do this bweh
-                foreach (LightCover component in batch) {
+                foreach (LightCover component in batch)
+                {
                     Entity entity = component.Entity;
 
                     if (component.Visible && entity.Visible)
@@ -83,7 +92,8 @@ public class LightCover(float alpha) : Component(false, true) {
             Engine.Instance.GraphicsDevice.SetRenderTargets(initalBuffer);
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, SorbetHelperGFX.FxAlphaMask);
 
-            for (int i = 0; i < batchCount; i++) {
+            for (int i = 0; i < batchCount; i++)
+            {
                 VirtualRenderTarget tempBuffer = tempBuffers[i];
                 float alpha = alphaBatches[i].Key / 255f;
 
@@ -97,5 +107,4 @@ public class LightCover(float alpha) : Component(false, true) {
     }
 
     #endregion
-
 }

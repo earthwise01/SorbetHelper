@@ -4,13 +4,15 @@ using Celeste.Mod.SorbetHelper.Utils;
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/DisplacementEffectArea")]
-public class DisplacementEffectArea : Entity {
+public class DisplacementEffectArea : Entity
+{
     private readonly Color color;
 
     private readonly string flag;
     private readonly bool invertFlag;
 
-    public DisplacementEffectArea(EntityData data, Vector2 offset) : base(data.Position + offset) {
+    public DisplacementEffectArea(EntityData data, Vector2 offset) : base(data.Position + offset)
+    {
         Collider = new Hitbox(data.Width, data.Height);
 
         // remap the values from the "more friendly" -1 to 1 range to the actual expected 0 to 1 range (where 0.5 is no displacement)
@@ -21,20 +23,25 @@ public class DisplacementEffectArea : Entity {
         color = new Color(horizontalDisplacement, verticalDisplacement, waterDisplacement) * alpha;
 
         flag = data.Attr("flag", "");
-        if (flag.StartsWith('!')) {
+        if (flag.StartsWith('!'))
+        {
             invertFlag = true;
             flag = flag.Substring(1);
         }
 
-        if (data.Bool("depthAdhering", false)) {
+        if (data.Bool("depthAdhering", false))
+        {
             Depth = data.Int("depth", 0);
             Add(new DepthAdheringDisplacementRenderHook(() => { }, RenderDisplacement, true, false));
-        } else {
+        }
+        else
+        {
             Add(new DisplacementRenderHook(RenderDisplacement));
         }
     }
 
-    private void RenderDisplacement() {
+    private void RenderDisplacement()
+    {
         if (!string.IsNullOrEmpty(flag) && !SceneAs<Level>().Session.GetFlag(flag, invertFlag))
             return;
 

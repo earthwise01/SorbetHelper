@@ -6,8 +6,10 @@ using Celeste.Mod.SorbetHelper.Utils;
 namespace Celeste.Mod.SorbetHelper.Backdrops;
 
 [CustomBackdrop("SorbetHelper/SpiralStars")]
-public class SpiralStars : Backdrop {
-    private class Star {
+public class SpiralStars : Backdrop
+{
+    private class Star
+    {
         public int TextureSet;
         public float AnimationTimer;
         public int FrameIndex;
@@ -37,7 +39,8 @@ public class SpiralStars : Backdrop {
     private readonly int trailLength;
     private readonly float trailDelay;
 
-    public SpiralStars(BinaryPacker.Element data) : base() {
+    public SpiralStars(BinaryPacker.Element data) : base()
+    {
         center.X = data.AttrFloat("centerX", 160f);
         center.Y = data.AttrFloat("centerY", 90f);
 
@@ -66,8 +69,10 @@ public class SpiralStars : Backdrop {
 
         int starCount = data.AttrInt("starCount", 100);
         stars = new Star[starCount];
-        for (int i = 0; i < stars.Length; i++) {
-            Star star = new Star {
+        for (int i = 0; i < stars.Length; i++)
+        {
+            Star star = new Star
+            {
                 AnimationTimer = Calc.Random.NextFloat(MathF.PI * 2f),
                 TextureSet = Calc.Random.Next(textures.Count),
                 Color = colors[Calc.Random.Next(colors.Length)],
@@ -81,10 +86,12 @@ public class SpiralStars : Backdrop {
         }
     }
 
-    public override void Update(Scene scene) {
+    public override void Update(Scene scene)
+    {
         base.Update(scene);
 
-        foreach (Star star in stars) {
+        foreach (Star star in stars)
+        {
             star.Distance = Mod(star.Distance - Engine.DeltaTime * speed, spawningDistance + 1);
             star.Angle += Engine.DeltaTime * rotationSpeed;
             star.AnimationTimer += Engine.DeltaTime;
@@ -93,16 +100,19 @@ public class SpiralStars : Backdrop {
         }
     }
 
-    public override void Render(Scene scene) {
+    public override void Render(Scene scene)
+    {
         if (backgroundColor.A > 0)
             Draw.Rect(-1f, -1f, SorbetHelperGFX.GameplayBufferWidth + 2f, SorbetHelperGFX.GameplayBufferHeight + 2f, backgroundColor);
 
         Vector2 zoomCenterOffset = SorbetHelperGFX.GetZoomOutCameraCenterOffset((scene as Level)!.Camera);
 
-        foreach (Star star in stars) {
+        foreach (Star star in stars)
+        {
             List<MTexture> textureSet = textures[star.TextureSet];
 
-            for (int j = 0; j < star.Trails.Count; j++) {
+            for (int j = 0; j < star.Trails.Count; j++)
+            {
                 Star.Trail trail = star.Trails[j];
                 float trailScale = trail.Scale;
 
@@ -113,7 +123,8 @@ public class SpiralStars : Backdrop {
         }
     }
 
-    private void UpdateStar(Star star) {
+    private void UpdateStar(Star star)
+    {
         Vector2 position = center + Calc.AngleToVector(star.Angle, star.Distance);
         float scale = Math.Clamp(star.Distance / eventHorizonDistance, 0f, 1f);
 
@@ -121,7 +132,8 @@ public class SpiralStars : Backdrop {
         int frameIndex = (int)((Math.Sin(star.AnimationTimer) + 1.0) / 2.0 * list.Count);
         frameIndex %= list.Count;
 
-        if (trailLength > 0) {
+        if (trailLength > 0)
+        {
             star.Trails.Clear();
 
             for (int i = 1; i <= trailLength; i++)
@@ -133,7 +145,8 @@ public class SpiralStars : Backdrop {
         star.FrameIndex = frameIndex;
     }
 
-    private Star.Trail GetTrailWithTimeOffset(Star star, float timeOffset) {
+    private Star.Trail GetTrailWithTimeOffset(Star star, float timeOffset)
+    {
         float distance = Mod(star.Distance - timeOffset * speed, spawningDistance + 1);
         float angle = star.Angle + timeOffset * rotationSpeed;
 

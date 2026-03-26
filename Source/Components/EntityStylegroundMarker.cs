@@ -6,13 +6,15 @@ namespace Celeste.Mod.SorbetHelper.Components;
 /// Marks an entity to be rendered by an <see cref="EntityStylegroundRenderer"/> backdrop.<br/>
 /// </summary>
 [Tracked]
-public class EntityStylegroundMarker : Component {
+public class EntityStylegroundMarker : Component
+{
     public readonly string Tag;
 
     private readonly VisibleOverride visibleOverride;
     public bool EntityVisible => visibleOverride?.EntityVisible != false;
 
-    public EntityStylegroundMarker(string tag, bool respectVisible) : base(false, false) {
+    public EntityStylegroundMarker(string tag, bool respectVisible) : base(false, false)
+    {
         Tag = tag;
 
         if (respectVisible)
@@ -21,10 +23,12 @@ public class EntityStylegroundMarker : Component {
 
     public EntityStylegroundMarker(string tag) : this(tag, true) { }
 
-    public override void Added(Entity entity) {
+    public override void Added(Entity entity)
+    {
         base.Added(entity);
 
-        if (string.IsNullOrEmpty(Tag)) {
+        if (string.IsNullOrEmpty(Tag))
+        {
             RemoveSelf();
             return;
         }
@@ -34,26 +38,11 @@ public class EntityStylegroundMarker : Component {
         else
             entity.Visible = false;
 
-        // hmm i feel kind of bad removing support for this but it did rely pretty heavily on depth displacement not being depth batched
-        // hopefully no one was using this yet
-
-        // extremelyy niche; mostly for fg waterfalls
-        // var depthDisplacement = entity.Get<DepthAdheringDisplacementRenderHook>();
-        // if (depthDisplacement is null && entity.Get<DisplacementRenderHook>() is { } displacement) {
-        //     depthDisplacement = new DepthAdheringDisplacementRenderHook(entity.Render, displacement.RenderDisplacement, true) {
-        //         Visible = false
-        //     };
-        //     entity.Remove(displacement);
-        //     entity.Add(depthDisplacement);
-        // }
-
-        // if (depthDisplacement is null)
-        //     EntityRender = entity.Render;
-        // else
-        //     EntityRender = depthDisplacement.EntityRenderOverride;
+        // todo: this used to support entities with displacement render hooks
     }
 
-    public override void Removed(Entity entity) {
+    public override void Removed(Entity entity)
+    {
         if (visibleOverride is not null)
             entity.Remove(visibleOverride);
 

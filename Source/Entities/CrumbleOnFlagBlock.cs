@@ -3,7 +3,8 @@ using Celeste.Mod.SorbetHelper.Utils;
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/CrumbleOnFlagBlock")]
-public class CrumbleOnFlagBlock : Solid {
+public class CrumbleOnFlagBlock : Solid
+{
     private readonly char tileType;
     private readonly bool blendIn;
     private readonly string flag;
@@ -17,7 +18,8 @@ public class CrumbleOnFlagBlock : Solid {
     private TileGrid tiles;
     private LightOcclude lightOcclude;
 
-    public CrumbleOnFlagBlock(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, data.Height, false) {
+    public CrumbleOnFlagBlock(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, data.Height, false)
+    {
         Depth = data.Int("depth", -10010);
         tileType = data.Char("tiletype", '3');
         flag = data.Attr("flag", "");
@@ -31,27 +33,33 @@ public class CrumbleOnFlagBlock : Solid {
         SurfaceSoundIndex = SurfaceIndex.TileToIndex[tileType];
     }
 
-    public override void Awake(Scene scene) {
+    public override void Awake(Scene scene)
+    {
         base.Awake(scene);
+
         Level level = SceneAs<Level>();
 
-        if (!blendIn) {
-            tiles = GFX.FGAutotiler.GenerateBox(tileType, (int)Width / 8, (int)Height / 8).TileGrid;
-        } else {
+        int widthInTiles = (int)Width / 8;
+        int heightInTiles = (int)Height / 8;
+        if (!blendIn)
+        {
+            tiles = GFX.FGAutotiler.GenerateBox(tileType, widthInTiles, heightInTiles).TileGrid;
+        }
+        else
+        {
             Rectangle tileBounds = level.Session.MapData.TileBounds;
             VirtualMap<char> solidsData = level.SolidsData;
-            int x = (int)(X / 8f) - tileBounds.Left;
-            int y = (int)(Y / 8f) - tileBounds.Top;
-            int tilesX = (int)Width / 8;
-            int tilesY = (int)Height / 8;
-            tiles = GFX.FGAutotiler.GenerateOverlay(tileType, x, y, tilesX, tilesY, solidsData).TileGrid;
+            int solidsDataX = (int)(X / 8f) - tileBounds.Left;
+            int solidsDataY = (int)(Y / 8f) - tileBounds.Top;
+            tiles = GFX.FGAutotiler.GenerateOverlay(tileType, solidsDataX, solidsDataY, widthInTiles, heightInTiles, solidsData).TileGrid;
         }
 
         Add(tiles);
         Add(new TileInterceptor(tiles, highPriority: true));
         Add(lightOcclude = new LightOcclude());
 
-        if (CollideCheck<Player>() || level.Session.GetFlag(flag, inverted)) {
+        if (CollideCheck<Player>() || level.Session.GetFlag(flag, inverted))
+        {
             lightOcclude.Alpha = tiles.Alpha = 0f;
             Collidable = false;
 
@@ -60,26 +68,20 @@ public class CrumbleOnFlagBlock : Solid {
         }
     }
 
-    public override void Update() {
+    public override void Update()
+    {
         base.Update();
 
-        if (!string.IsNullOrEmpty(flag)) {
-            if (!SceneAs<Level>().Session.GetFlag(flag, inverted)) {
-                if (!Collidable && !CollideCheck<Player>()) {
-                    Collidable = true;
-
-                    if (destroyAttached)
-                        EnableStaticMovers();
-
-                    if (playAudio)
-                        Audio.Play(SFX.game_gen_passageclosedbehind, base.Center);
-                }
-            } else {
+        if (!string.IsNullOrEmpty(flag) && SceneAs<Level>().Session.GetFlag(flag, inverted) == Collidable)
+        {
+            if (Collidable)
                 Break();
-            }
+            else if (!CollideCheck<Player>())
+                Reform();
         }
 
-        if (Collidable) {
+        if (Collidable)
+        {
             if (fadeInTime <= 0f)
                 lightOcclude.Alpha = tiles.Alpha = 1f;
             else
@@ -87,10 +89,8 @@ public class CrumbleOnFlagBlock : Solid {
         }
     }
 
-    private void Break() {
-        if (!Collidable || Scene is null)
-            return;
-
+    private void Break()
+    {
         Collidable = false;
 
         if (destroyAttached)
@@ -99,16 +99,31 @@ public class CrumbleOnFlagBlock : Solid {
         if (playAudio)
             Audio.Play(SFX.game_10_quake_rockbreak, Position);
 
-        if (showDebris) {
-            for (int x = 0; x < Width / 8f; x++) {
-                for (int y = 0; y < Height / 8f; y++) {
-                    if (!Scene.CollideCheck<Solid>(new Rectangle((int)X + x * 8, (int)Y + y * 8, 8, 8)))
-                        Scene.Add(Engine.Pooler.Create<Debris>().Init(Position + new Vector2(4 + x * 8, 4 + y * 8), tileType, playSound: true)
-                                                                .BlastFrom(TopCenter));
+        if (showDebris)
+        {
+            for (int x = 0; x < Width; x += 8)
+            for (int y = 0; y < Height; y += 8)
+            {
+                if (!Scene.CollideCheck<Solid>(new Rectangle((int)X + x, (int)Y + y, 8, 8)))
+                {
+                    Scene.Add(Engine.Pooler.Create<Debris>()
+                                           .Init(Position + new Vector2(x + 4, y + 4), tileType, playSound: true)
+                                           .BlastFrom(TopCenter));
                 }
             }
         }
 
         lightOcclude.Alpha = tiles.Alpha = 0f;
+    }
+
+    private void Reform()
+    {
+        Collidable = true;
+
+        if (destroyAttached)
+            EnableStaticMovers();
+
+        if (playAudio)
+            Audio.Play(SFX.game_gen_passageclosedbehind, Center);
     }
 }

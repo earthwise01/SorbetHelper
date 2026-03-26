@@ -5,14 +5,17 @@ using Celeste.Mod.SorbetHelper.Entities;
 
 namespace Celeste.Mod.SorbetHelper;
 
-public class SorbetHelperMapDataProcessor : EverestMapDataProcessor {
+public class SorbetHelperMapDataProcessor : EverestMapDataProcessor
+{
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(SorbetHelperMapDataProcessor)}";
 
     public static Dictionary<(int, AreaMode), List<StylegroundDepthController.StylegroundDepthControllerData>> StylegroundDepthControllers { get; private set; } = [];
     public static Dictionary<(int, AreaMode), HashSet<string>> MusicSyncEvents { get; private set; } = [];
 
-    public override Dictionary<string, Action<BinaryPacker.Element>> Init() {
-        void ProcessStylegroundDepthController(BinaryPacker.Element data) {
+    public override Dictionary<string, Action<BinaryPacker.Element>> Init()
+    {
+        void ProcessStylegroundDepthController(BinaryPacker.Element data)
+        {
             if (!StylegroundDepthControllers.TryGetValue((AreaKey.ID, AreaKey.Mode), out List<StylegroundDepthController.StylegroundDepthControllerData> depthControllers))
                 StylegroundDepthControllers[(AreaKey.ID, AreaKey.Mode)] = depthControllers = [];
 
@@ -36,13 +39,15 @@ public class SorbetHelperMapDataProcessor : EverestMapDataProcessor {
         }
 
         // convert to a styleground depth controller
-        void ProcessStylegroundOverHudController(BinaryPacker.Element entityData) {
+        void ProcessStylegroundOverHudController(BinaryPacker.Element entityData)
+        {
             entityData.Attributes["depth"] = entityData.AttrInt("pauseBehavior", 0) < 2 ? "AbovePauseHud" : "AboveHud";
             entityData.Attributes["tag"] = "sorbetHelper_drawAboveHud";
             ProcessStylegroundDepthController(entityData);
         }
 
-        void ProcessMusicSyncController(BinaryPacker.Element entityData) {
+        void ProcessMusicSyncController(BinaryPacker.Element entityData)
+        {
             HashSet<string> eventNames = entityData.AttrList("eventNames", str => str).ToHashSet();
             MusicSyncEvents[(AreaKey.ID, AreaKey.Mode)] = eventNames;
 
@@ -50,12 +55,14 @@ public class SorbetHelperMapDataProcessor : EverestMapDataProcessor {
         }
 
         // swap to the global versions based on a "global" attribute
-        static void ProcessGlobalOptionController(BinaryPacker.Element entityData) {
+        static void ProcessGlobalOptionController(BinaryPacker.Element entityData)
+        {
             if (entityData.AttrBool("global", false))
                 entityData.Name += "Global";
         }
 
-        return new Dictionary<string, Action<BinaryPacker.Element>> {
+        return new Dictionary<string, Action<BinaryPacker.Element>>
+        {
             // styleground depth controller
             { "entity:SorbetHelper/StylegroundDepthController", ProcessStylegroundDepthController },
             // styleground over hud
@@ -75,12 +82,14 @@ public class SorbetHelperMapDataProcessor : EverestMapDataProcessor {
         };
     }
 
-    public override void Reset() {
+    public override void Reset()
+    {
         StylegroundDepthControllers.Remove((AreaKey.ID, AreaKey.Mode));
         MusicSyncEvents.Remove((AreaKey.ID, AreaKey.Mode));
     }
 
-    public override void End() {
+    public override void End()
+    {
 
     }
 }

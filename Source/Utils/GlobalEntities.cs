@@ -3,7 +3,8 @@ using System.Reflection;
 
 namespace Celeste.Mod.SorbetHelper.Utils;
 
-internal static class GlobalEntities {
+internal static class GlobalEntities
+{
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(GlobalEntities)}";
 
     public const string ForceGlobalAttribute = "sorbetHelper_makeGlobal"; // could be useful idk
@@ -17,10 +18,12 @@ internal static class GlobalEntities {
         => GlobalEntityIDs.Contains(entityData.Name) || entityData.Bool(ForceGlobalAttribute);
 
 
-    public static void ProcessAttributes(Assembly assembly) {
+    public static void ProcessAttributes(Assembly assembly)
+    {
         Type[] types = assembly.GetTypesSafe();
 
-        foreach (Type type in types) {
+        foreach (Type type in types)
+        {
             GlobalEntityAttribute globalAttr = type.GetCustomAttribute<GlobalEntityAttribute>();
             if (globalAttr is null)
                 continue;
@@ -29,7 +32,8 @@ internal static class GlobalEntities {
             bool onlyOne = globalAttr.OnlyOne;
 
             // if no ids specified try grabbing them from a custom entity attribute
-            if (ids.Length == 0 && type.GetCustomAttribute<CustomEntityAttribute>() is { } customEntity) {
+            if (ids.Length == 0 && type.GetCustomAttribute<CustomEntityAttribute>() is { } customEntity)
+            {
                 ids = new string[customEntity.IDs.Length];
                 for (int i = 0; i < ids.Length; i++)
                     ids[i] = customEntity.IDs[i].Split('=')[0].Trim();
@@ -40,7 +44,8 @@ internal static class GlobalEntities {
         }
     }
 
-    public static void RegisterGlobalEntity(string id, bool onlyOne) {
+    public static void RegisterGlobalEntity(string id, bool onlyOne)
+    {
         GlobalEntityIDs.Add(id);
 
         if (onlyOne)
@@ -49,32 +54,39 @@ internal static class GlobalEntities {
 
     #region Hooks
 
-    internal static void Load() {
+    internal static void Load()
+    {
         Everest.Events.LevelLoader.OnLoadingThread += Event_OnLoadingThread;
         Everest.Events.Level.OnLoadEntity += Event_OnLoadEntity;
     }
-    internal static void Unload() {
+
+    internal static void Unload()
+    {
         Everest.Events.LevelLoader.OnLoadingThread -= Event_OnLoadingThread;
         Everest.Events.Level.OnLoadEntity -= Event_OnLoadEntity;
     }
 
-    private static void Event_OnLoadingThread(Level level) {
+    private static void Event_OnLoadingThread(Level level)
+    {
         HashSet<string> onlyOneLoaded = [];
 
         string origLevel = level.Session.Level;
         MapData mapData = level.Session.MapData;
 
-        foreach (LevelData levelData in mapData.Levels) {
+        foreach (LevelData levelData in mapData.Levels)
+        {
             loadingGlobalEntities = true;
             // LoadCustomEntity doesn't take a LevelData argument and instead gets it through level.Session.LevelData,
             // so to make sure global entities are loading with the correct offsets/EntityIDs/etc, Session.Level needs to be modified temporarily
             level.Session.Level = levelData.Name;
             Calc.PushRandom(levelData.LoadSeed);
 
-            try {
+            try
+            {
                 List<Entity> loaded = [];
 
-                foreach (EntityData entityData in levelData.Entities) {
+                foreach (EntityData entityData in levelData.Entities)
+                {
                     string name = entityData.Name;
                     if (!IsGlobalEntity(entityData) || onlyOneLoaded.Contains(name))
                         continue;
@@ -90,7 +102,9 @@ internal static class GlobalEntities {
                 // apply the global tag
                 foreach (Entity entity in loaded)
                     entity.Tag |= Tags.Global;
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 Logger.Error(LogID, $"error while loading global entities for room {levelData.Name} in map {mapData.Area.SID}!\n{e}");
             }
 
@@ -101,7 +115,8 @@ internal static class GlobalEntities {
         level.Session.Level = origLevel;
     }
 
-    private static bool Event_OnLoadEntity(Level level, LevelData levelData, Vector2 offset, EntityData entityData) {
+    private static bool Event_OnLoadEntity(Level level, LevelData levelData, Vector2 offset, EntityData entityData)
+    {
         // don't give any failed to load warnings for map data processed entities
         if (entityData.Name == "SorbetHelper/MapDataProcessed")
             return true;
@@ -114,7 +129,6 @@ internal static class GlobalEntities {
     }
 
     #endregion
-
 }
 
 /// <summary>
@@ -122,7 +136,8 @@ internal static class GlobalEntities {
 /// Automatically adds the Tags.Global BitTag.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-public class GlobalEntityAttribute(params string[] ids) : Attribute {
+public class GlobalEntityAttribute(params string[] ids) : Attribute
+{
     public string[] IDs = ids;
     public bool OnlyOne;
 }

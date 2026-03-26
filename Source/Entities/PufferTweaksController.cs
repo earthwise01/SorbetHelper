@@ -4,7 +4,8 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/PufferTweaksController")]
 [Tracked]
-public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(data.Position + offset) {
+public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(data.Position + offset)
+{
     private readonly bool fixSquishExplode = data.Bool("fixSquishExplode", false);
     private readonly bool snapToSpring = data.Bool("snapToSpring", false);
     private readonly float springXSpeedThreshold = data.Float("springXSpeedThreshold", 60f);
@@ -16,7 +17,8 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
     #region Hooks
 
     // this is so many hooks help
-    internal static void Load() {
+    internal static void Load()
+    {
         On.Celeste.Puffer.Update += On_Update;
         IL.Celeste.Puffer.Update += IL_Update;
         On.Celeste.Puffer.OnSquish += On_OnSquish;
@@ -25,7 +27,8 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
         On.Celeste.Puffer.Explode += On_Explode;
     }
 
-    internal static void Unload() {
+    internal static void Unload()
+    {
         On.Celeste.Puffer.Update -= On_Update;
         IL.Celeste.Puffer.Update -= IL_Update;
         On.Celeste.Puffer.OnSquish -= On_OnSquish;
@@ -34,15 +37,18 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
         On.Celeste.Puffer.Explode -= On_Explode;
     }
 
-    private static void On_Update(On.Celeste.Puffer.orig_Update orig, Puffer self) {
+    private static void On_Update(On.Celeste.Puffer.orig_Update orig, Puffer self)
+    {
         orig(self);
 
         if (self.Scene.Tracker.GetEntity<PufferTweaksController>() is { canBePushedWhileExploded: false })
             self.TreatNaive = self.state == Puffer.States.Gone;
     }
 
-    private static void IL_Update(ILContext il) {
-        ILCursor cursor = new ILCursor(il) {
+    private static void IL_Update(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il)
+        {
             Index = -1
         };
 
@@ -54,7 +60,8 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
 
         return;
 
-        static bool CheckForSolid(Puffer self) {
+        static bool CheckForSolid(Puffer self)
+        {
             if (self.Scene.Tracker.GetEntity<PufferTweaksController>() is not { canRespawnWhenHomeBlocked: false })
                 return false;
 
@@ -62,17 +69,20 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
         }
     }
 
-    private static void On_OnSquish(On.Celeste.Puffer.orig_OnSquish orig, Puffer self, CollisionData data) {
+    private static void On_OnSquish(On.Celeste.Puffer.orig_OnSquish orig, Puffer self, CollisionData data)
+    {
         if (self.Scene.Tracker.GetEntity<PufferTweaksController>() is { fixSquishExplode: true } && (self.state == Puffer.States.Gone || self.cantExplodeTimer > 0f))
             return;
 
         orig(self, data);
     }
 
-    private static bool On_HitSpring(On.Celeste.Puffer.orig_HitSpring orig, Puffer self, Spring spring) {
+    private static bool On_HitSpring(On.Celeste.Puffer.orig_HitSpring orig, Puffer self, Spring spring)
+    {
         bool result = orig(self, spring);
 
-        if (result && self.Scene.Tracker.GetEntity<PufferTweaksController>() is { snapToSpring: true }) {
+        if (result && self.Scene.Tracker.GetEntity<PufferTweaksController>() is { snapToSpring: true })
+        {
             self.MoveToX(spring.CenterX);
             self.MoveToY(spring.CenterY);
         }
@@ -80,7 +90,8 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
         return result;
     }
 
-    private static void IL_HitSpring(ILContext il) {
+    private static void IL_HitSpring(ILContext il)
+    {
         ILCursor cursor = new ILCursor(il);
 
         // upwards springs
@@ -100,21 +111,24 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
 
         return;
 
-        static float ModifyUpwardsThreshold(float orig, Puffer self) {
+        static float ModifyUpwardsThreshold(float orig, Puffer self)
+        {
             if (self.Scene.Tracker.GetEntity<PufferTweaksController>() is { } controller)
                 return -controller.springYSpeedThreshold;
 
             return orig;
         }
 
-        static float ModifyRightThreshold(float orig, Puffer self) {
+        static float ModifyRightThreshold(float orig, Puffer self)
+        {
             if (self.Scene.Tracker.GetEntity<PufferTweaksController>() is { } controller)
                 return controller.springXSpeedThreshold;
 
             return orig;
         }
 
-        static float ModifyLeftThreshold(float orig, Puffer self) {
+        static float ModifyLeftThreshold(float orig, Puffer self)
+        {
             if (self.Scene.Tracker.GetEntity<PufferTweaksController>() is { } controller)
                 return -controller.springXSpeedThreshold;
 
@@ -122,7 +136,8 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
         }
     }
 
-    private static void On_Explode(On.Celeste.Puffer.orig_Explode orig, Puffer self) {
+    private static void On_Explode(On.Celeste.Puffer.orig_Explode orig, Puffer self)
+    {
         orig(self);
 
         if (self.Scene.Tracker.GetEntity<PufferTweaksController>() is not { moreExplodeParticles: true })
@@ -131,14 +146,17 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
         // might feel like tweaking these later but works alright i guess for now
 
         Level level = self.SceneAs<Level>();
-        for (float angle = 0f; angle < MathF.PI * 2f; angle += MathF.PI / 18f) {
+        for (float angle = 0f; angle < MathF.PI * 2f; angle += MathF.PI / 18f)
+        {
             Vector2 position = self.Center + Calc.AngleToVector(angle + Calc.Random.Range(-MathF.PI / 90f, MathF.PI / 90f), Calc.Random.Range(12, 18));
             level.ParticlesFG.Emit(Seeker.P_Regen, position, angle);
         }
 
-        for (float angle = 0f; angle < MathF.PI * 2f; angle += MathF.PI / 6f) {
+        for (float angle = 0f; angle < MathF.PI * 2f; angle += MathF.PI / 6f)
+        {
             Vector2 position = self.Center + Calc.AngleToVector(angle + Calc.Random.Range(-MathF.PI / 90f, MathF.PI / 90f), Calc.Random.Range(12, 18));
-            level.ParticlesFG.Emit(new ParticleType(Player.P_SummitLandB) {
+            level.ParticlesFG.Emit(new ParticleType(Player.P_SummitLandB)
+            {
                 SpeedMin = 60,
                 SpeedMax = 90,
                 SpeedMultiplier = 0.25f,
@@ -148,5 +166,4 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
     }
 
     #endregion
-
 }

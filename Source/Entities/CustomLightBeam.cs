@@ -4,7 +4,8 @@ using Celeste.Mod.SorbetHelper.Utils;
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/CustomLightbeam")]
-public class CustomLightBeam : Entity {
+public class CustomLightBeam : Entity
+{
     private readonly string flag;
     private readonly bool invertFlag;
     private readonly float flagFadeTime;
@@ -31,8 +32,11 @@ public class CustomLightBeam : Entity {
 
     private readonly float scroll;
     private readonly Vector2 scrollAnchor;
-    private Vector2 RenderPosition {
-        get {
+
+    private Vector2 RenderPosition
+    {
+        get
+        {
             // don't need to do anything special for non-parallax lightbeams
             if (scroll == 1f)
                 return Position;
@@ -59,7 +63,8 @@ public class CustomLightBeam : Entity {
     private readonly float cullRectTop, cullRectBottom, cullRectLeft, cullRectRight;
     private const int VisibilityPadding = 16;
 
-    public CustomLightBeam(EntityData data, Vector2 offset) : base(data.Position + offset) {
+    public CustomLightBeam(EntityData data, Vector2 offset) : base(data.Position + offset)
+    {
         Tag = Tags.TransitionUpdate;
         this.offset = Calc.Random.NextFloat();
 
@@ -89,7 +94,8 @@ public class CustomLightBeam : Entity {
         rainbow = data.Bool("rainbow", false);
         useCustomRainbowColors = data.Bool("useCustomRainbowColors", false);
 
-        if (rainbow) {
+        if (rainbow)
+        {
             rainbowGradientSize = data.Float("gradientSize", 280f);
             rainbowGradientSpeed = data.Float("gradientSpeed", 50f);
             rainbowLoopColors = data.Bool("loopColors", false);
@@ -116,7 +122,8 @@ public class CustomLightBeam : Entity {
         cullRectRight = Math.Max(Math.Max(baseCornerA.X, baseCornerB.X), Math.Max(edgeCornerA.X, edgeCornerB.X));
     }
 
-    public override void Awake(Scene scene) {
+    public override void Awake(Scene scene)
+    {
         base.Awake(scene);
         Level level = SceneAs<Level>();
 
@@ -131,19 +138,22 @@ public class CustomLightBeam : Entity {
         alpha = baseAlpha * distanceAlpha * flagAlpha;
     }
 
-    public override void Removed(Scene scene) {
+    public override void Removed(Scene scene)
+    {
         base.Removed(scene);
         if (rainbow)
             RainbowHelper.SetGetHueScene(null);
     }
 
-    public override void SceneEnd(Scene scene) {
+    public override void SceneEnd(Scene scene)
+    {
         base.SceneEnd(scene);
         if (rainbow)
             RainbowHelper.SetGetHueScene(null);
     }
 
-    public override void Update() {
+    public override void Update()
+    {
         base.Update();
 
         timer += Engine.DeltaTime;
@@ -156,10 +166,12 @@ public class CustomLightBeam : Entity {
         Visible = InView(level.Camera);
 
         // vanilla proximity/transition fading
-        if (player is not null) {
+        if (player is not null)
+        {
             float targetAlpha = 1f;
 
-            if (fadeWhenNear) {
+            if (fadeWhenNear)
+            {
                 Vector2 direction = Calc.AngleToVector(rotation + MathF.PI / 2f, 1f);
                 Vector2 playerDistancePoint = Calc.ClosestPointOnLine(Position, Position + direction * 10000f, player.Center);
 
@@ -174,7 +186,8 @@ public class CustomLightBeam : Entity {
         }
 
         // flag fading
-        if (!string.IsNullOrEmpty(flag)) {
+        if (!string.IsNullOrEmpty(flag))
+        {
             float targetAlpha = level.Session.GetFlag(flag, invertFlag) ? 1f : 0f;
             flagAlpha = Calc.Approach(flagAlpha, targetAlpha, Engine.DeltaTime / flagFadeTime);
         }
@@ -183,7 +196,8 @@ public class CustomLightBeam : Entity {
         alpha = baseAlpha * distanceAlpha * flagAlpha;
 
         // emit particles
-        if (Visible && !noParticles && alpha >= 0.5f && level.OnInterval(0.8f, offset)) {
+        if (Visible && !noParticles && alpha >= 0.5f && level.OnInterval(0.8f, offset))
+        {
             Vector2 direction = Calc.AngleToVector(rotation + MathF.PI / 2f, 1f);
             Vector2 particlePos = Position - direction * 4f;
             float emitX = Calc.Random.Next(lightWidth - 4) + 2 - lightWidth / 2f;
@@ -191,10 +205,13 @@ public class CustomLightBeam : Entity {
 
             // if rainbow is enabled and rainbowSingleColor is disabled, call GetHue for the particle's color, otherwise use the color variable.
             Color particleColor;
-            if (rainbow && !rainbowSingleColor) {
+            if (rainbow && !rainbowSingleColor)
+            {
                 RainbowHelper.SetGetHueScene(Scene);
                 particleColor = GetHue(particlePos);
-            } else {
+            }
+            else
+            {
                 particleColor = color;
             }
 
@@ -205,24 +222,24 @@ public class CustomLightBeam : Entity {
         Position = actualPosition;
     }
 
-    /*
-     public override void DebugRender(Camera camera) {
-        base.DebugRender(camera);
+    //  public override void DebugRender(Camera camera)
+    //  {
+    //     base.DebugRender(camera);
+    //
+    //     Vector2 baseCornerA = Position - Calc.AngleToVector(rotation, 1f) * (lightWidth / 2f); // would be top left with a rotation of 0f
+    //     Vector2 baseCornerB = Position + Calc.AngleToVector(rotation, 1f) * (lightWidth / 2); // would be top right with a rotation of 0f
+    //     Vector2 edgeCornerA = baseCornerA + Calc.AngleToVector(rotation + (float)Math.PI / 2f, 1f) * lightLength; // would be bottom left with a rotation of 0f
+    //     Vector2 edgeCornerB = baseCornerB + Calc.AngleToVector(rotation + (float)Math.PI / 2f, 1f) * lightLength; // would be bottom right with a rotation of 0f
+    //     Draw.Line(baseCornerA, baseCornerB, Color.GreenYellow * 0.5f);
+    //     Draw.Line(baseCornerA, edgeCornerA, Color.GreenYellow * 0.5f);
+    //     Draw.Line(baseCornerB, edgeCornerB, Color.GreenYellow * 0.5f);
+    //     Draw.Line(edgeCornerA, edgeCornerB, Color.GreenYellow * 0.5f);
+    //
+    //     Draw.HollowRect(rectangleLeft - visibilityPadding / 2, rectangleTop - visibilityPadding / 2, rectangleRight - rectangleLeft + visibilityPadding, rectangleBottom - rectangleTop + visibilityPadding, Color.Yellow * 0.5f);
+    // }
 
-        Vector2 baseCornerA = Position - Calc.AngleToVector(rotation, 1f) * (lightWidth / 2f); // would be top left with a rotation of 0f
-        Vector2 baseCornerB = Position + Calc.AngleToVector(rotation, 1f) * (lightWidth / 2); // would be top right with a rotation of 0f
-        Vector2 edgeCornerA = baseCornerA + Calc.AngleToVector(rotation + (float)Math.PI / 2f, 1f) * lightLength; // would be bottom left with a rotation of 0f
-        Vector2 edgeCornerB = baseCornerB + Calc.AngleToVector(rotation + (float)Math.PI / 2f, 1f) * lightLength; // would be bottom right with a rotation of 0f
-        Draw.Line(baseCornerA, baseCornerB, Color.GreenYellow * 0.5f);
-        Draw.Line(baseCornerA, edgeCornerA, Color.GreenYellow * 0.5f);
-        Draw.Line(baseCornerB, edgeCornerB, Color.GreenYellow * 0.5f);
-        Draw.Line(edgeCornerA, edgeCornerB, Color.GreenYellow * 0.5f);
-
-        Draw.HollowRect(rectangleLeft - visibilityPadding / 2, rectangleTop - visibilityPadding / 2, rectangleRight - rectangleLeft + visibilityPadding, rectangleBottom - rectangleTop + visibilityPadding, Color.Yellow * 0.5f);
-    }
-    */
-
-    public override void Render() {
+    public override void Render()
+    {
         base.Render();
 
         if (alpha <= 0f)
@@ -238,16 +255,20 @@ public class CustomLightBeam : Entity {
             color = GetHue(Position);
 
         // render the base
-        if (rainbow && !rainbowSingleColor) {
+        if (rainbow && !rainbowSingleColor)
+        {
             // draw the base in 4px segments to make a gradient effect
             for (int i = 0; i < lightWidth; i += RainbowSegmentSize)
                 DrawBeam(i - lightWidth / 2f, RainbowSegmentSize, lightLength - 4 + (float)Math.Sin(timer * 2f) * 4f, 0.4f);
-        } else {
+        }
+        else
+        {
             DrawBeam(0f, lightWidth, lightLength - 4 + (float)Math.Sin(timer * 2f) * 4f, 0.4f);
         }
 
         // render the beams
-        for (int i = 0; i < lightWidth; i += 4) {
+        for (int i = 0; i < lightWidth; i += 4)
+        {
             float num = timer + i * 0.6f;
             float beamWidth = 4f + (float)Math.Sin(num * 0.5f + 1.2f) * 4f;
             float beamPosition = (float)Math.Sin((num + i * 32) * 0.1f + Math.Sin(num * 0.05f + i * 0.1f) * 0.25) * (lightWidth / 2f - beamWidth / 2f);
@@ -259,7 +280,8 @@ public class CustomLightBeam : Entity {
         Position = actualPosition;
     }
 
-    private void DrawBeam(float position, float width, float length, float beamAlpha) {
+    private void DrawBeam(float position, float width, float length, float beamAlpha)
+    {
         if (width < 1f)
             return;
 
@@ -269,7 +291,8 @@ public class CustomLightBeam : Entity {
         beamTexture.Draw(beamPosition, new Vector2(0f, 0.5f), beamColor, new Vector2(1f / beamTexture.Width * length, width), beamRotation);
     }
 
-    private Color GetHue(Vector2 position) {
+    private Color GetHue(Vector2 position)
+    {
         // use vanilla/rainbow spinner color controller colors by default
         if (!useCustomRainbowColors)
             return RainbowHelper.GetHue(position);

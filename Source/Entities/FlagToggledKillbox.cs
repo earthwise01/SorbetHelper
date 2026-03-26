@@ -4,7 +4,8 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/FlagToggledKillbox")]
 [TrackedAs(typeof(Killbox))]
-public class FlagToggledKillbox : Killbox {
+public class FlagToggledKillbox : Killbox
+{
     private readonly string flag;
     private readonly bool inverted;
     private readonly bool flagOnly;
@@ -13,7 +14,8 @@ public class FlagToggledKillbox : Killbox {
 
     private readonly bool updateOnLoad;
 
-    public FlagToggledKillbox(EntityData data, Vector2 offset) : base(data, offset) {
+    public FlagToggledKillbox(EntityData data, Vector2 offset) : base(data, offset)
+    {
         flag = data.Attr("flag", "");
         inverted = data.Bool("inverted", false);
         flagOnly = data.Bool("flagOnly", false);
@@ -26,16 +28,19 @@ public class FlagToggledKillbox : Killbox {
             Get<PlayerCollider>().OnCollide = LenientOnPlayer;
     }
 
-    public override void Awake(Scene scene) {
+    public override void Awake(Scene scene)
+    {
         base.Awake(scene);
 
         if (updateOnLoad)
             Update();
     }
 
-    public override void Update() {
+    public override void Update()
+    {
         // flag only mode checks
-        if (flagOnly) {
+        if (flagOnly)
+        {
             if (string.IsNullOrEmpty(flag))
                 Collidable = inverted;
             else
@@ -58,11 +63,15 @@ public class FlagToggledKillbox : Killbox {
     }
 
     // based on Level.EnforceBounds
-    private void LenientOnPlayer(Player player) {
-        if (player.Top > Top && SaveData.Instance.Assists.Invincible) {
+    private void LenientOnPlayer(Player player)
+    {
+        if (player.Top > Top && SaveData.Instance.Assists.Invincible)
+        {
             player.Play("event:/game/general/assist_screenbottom");
             player.Bounce(Top);
-        } else if (player.Top > Top + 4f) {
+        }
+        else if (player.Top > Top + 4f)
+        {
             player.Die(Vector2.Zero);
         }
     }

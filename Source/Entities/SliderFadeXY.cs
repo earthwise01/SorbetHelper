@@ -5,7 +5,8 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 
 [GlobalEntity(              EntityDataID + "Global")] // global version is swapped to in mapdataprocessor based on data.Bool("global")
 [CustomEntity(EntityDataID, EntityDataID + "Global")]
-public class SliderFadeXY : Entity {
+public class SliderFadeXY : Entity
+{
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(SliderFadeXY)}";
 
     public const string EntityDataID = "SorbetHelper/SliderFadeXY";
@@ -13,7 +14,8 @@ public class SliderFadeXY : Entity {
     private readonly string sliderName;
     private readonly Backdrop.Fader fadeX, fadeY;
 
-    public SliderFadeXY(EntityData data, Vector2 offset) : base(data.Position + offset) {
+    public SliderFadeXY(EntityData data, Vector2 offset) : base(data.Position + offset)
+    {
         sliderName = data.Attr("slider", "");
         fadeX = CreateFader(data.Attr("fadeX", ""));
         fadeY = CreateFader(data.Attr("fadeY", ""));
@@ -21,7 +23,8 @@ public class SliderFadeXY : Entity {
         Tag |= Tags.TransitionUpdate;
     }
 
-    public override void Added(Scene scene) {
+    public override void Added(Scene scene)
+    {
         base.Added(scene);
 
         // no empty slider attribute
@@ -29,7 +32,8 @@ public class SliderFadeXY : Entity {
             RemoveSelf();
     }
 
-    public override void Update() {
+    public override void Update()
+    {
         base.Update();
 
         Level level = SceneAs<Level>();
@@ -37,17 +41,21 @@ public class SliderFadeXY : Entity {
         level.Session.SetSlider(sliderName, fadeX.Value(camera.X) * fadeY.Value(camera.Y));
     }
 
-    private static Backdrop.Fader CreateFader(string raw) {
+    private static Backdrop.Fader CreateFader(string raw)
+    {
         Backdrop.Fader fader = new Backdrop.Fader();
 
         string[] zones = raw.Split(':');
-        for (int i = 0; i < zones.Length; i++) {
+        for (int i = 0; i < zones.Length; i++)
+        {
             string[] zone = zones[i].Split(',');
 
-            if (zone.Length == 2) {
+            if (zone.Length == 2)
+            {
                 // values
                 string[] values = zone[1].Split('-');
-                if (values.Length != 2) {
+                if (values.Length != 2)
+                {
                     if (values.Length < 2)
                         Logger.Warn(LogID, $"Fader formatting error! Less than 2 values specified for zone {i + 1}.");
                     if (values.Length > 2)
@@ -61,7 +69,8 @@ public class SliderFadeXY : Entity {
 
                 // positions
                 string[] positions = zone[0].Split('-');
-                if (positions.Length != 2) {
+                if (positions.Length != 2)
+                {
                     if (positions.Length < 2)
                         Logger.Warn(LogID, $"Fader formatting error! Less than 2 positions specified for zone {i + 1}.");
                     if (positions.Length > 2)
@@ -72,18 +81,22 @@ public class SliderFadeXY : Entity {
 
                 int posFrom = 1;
                 int posTo = 1;
-                if (positions[0][0] == 'n') {
+                if (positions[0][0] == 'n')
+                {
                     posFrom = -1;
                     positions[0] = positions[0].Substring(1);
                 }
 
-                if (positions[1][0] == 'n') {
+                if (positions[1][0] == 'n')
+                {
                     posTo = -1;
                     positions[1] = positions[1].Substring(1);
                 }
 
                 fader.Add(posFrom * int.Parse(positions[0]), posTo * int.Parse(positions[1]), fromValue, toValue);
-            } else if (zone.Length != 0) {
+            }
+            else if (zone.Length != 0)
+            {
                 Logger.Warn(LogID, $"Fader formatting error! Zone {i + 1} has wrong number of arguments. (Remember that each zone needs 1 pair of positions followed by 1 pair of values!)");
             }
         }
