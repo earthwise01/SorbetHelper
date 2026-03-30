@@ -31,8 +31,6 @@ public class SorbetHelperModule : EverestModule
 
         ExtendedVariantsCompat.Load();
         ChronoHelperCompat.Load();
-
-        DashFallingBlock.LoadParticles();
     }
 
     public override void Load()

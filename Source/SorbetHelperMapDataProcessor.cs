@@ -74,10 +74,10 @@ public class SorbetHelperMapDataProcessor : EverestMapDataProcessor
             { "entity:SorbetHelper/MusicSyncControllerFMOD", ProcessMusicSyncController },
 
             // global controllers
-            { $"entity:{EntityStylegroundController.EntityDataID}", ProcessGlobalOptionController },
-            { $"entity:{LightCoverController.EntityDataID}", ProcessGlobalOptionController },
-            { $"entity:{SliderFadeXY.EntityDataID}", ProcessGlobalOptionController },
-            { $"entity:{DarknessTransparencyFixController.EntityDataID}", ProcessGlobalOptionController }
+            { $"entity:{EntityStylegroundController.EntitySID}", ProcessGlobalOptionController },
+            { $"entity:{LightCoverController.EntitySID}", ProcessGlobalOptionController },
+            { $"entity:{SliderFadeXY.EntitySID}", ProcessGlobalOptionController },
+            { $"entity:{DarknessTransparencyFixController.EntitySID}", ProcessGlobalOptionController }
         };
     }
 

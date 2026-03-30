@@ -1,3 +1,4 @@
+using Celeste.Mod.SorbetHelper.Utils;
 using MonoMod.Cil;
 
 namespace Celeste.Mod.SorbetHelper.Entities;
@@ -13,6 +14,19 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
     private readonly bool canBePushedWhileExploded = data.Bool("canBePushedWhileExploded", true);
     private readonly bool canRespawnWhenHomeBlocked = data.Bool("canRespawnWhenHomeBlocked", true);
     private readonly bool moreExplodeParticles = data.Bool("moreExplodeParticles", false);
+
+    private static ParticleType P_ExplodeSmoke;
+
+    internal static void LoadParticles()
+    {
+        P_ExplodeSmoke = new ParticleType(Player.P_SummitLandB)
+        {
+            SpeedMin = 60,
+            SpeedMax = 90,
+            SpeedMultiplier = 0.25f,
+            Acceleration = Vector2.UnitY * -30f,
+        };
+    }
 
     #region Hooks
 
@@ -53,7 +67,9 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
         };
 
         ILLabel stayInStGoneLabel = null;
-        cursor.GotoPrev(MoveType.After, i => i.MatchBgtUn(out stayInStGoneLabel));
+        if (!cursor.TryGotoPrev(MoveType.After, instr => instr.MatchBgtUn(out stayInStGoneLabel)))
+            throw new HookHelper.HookException(il, "Failed to find check for whether to stay in `States.Gone` to modify.");
+
         cursor.EmitLdarg0();
         cursor.EmitDelegate(CheckForSolid);
         cursor.EmitBrtrue(stayInStGoneLabel);
@@ -94,18 +110,21 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
     {
         ILCursor cursor = new ILCursor(il);
 
-        // upwards springs
-        cursor.GotoNext(MoveType.After, i => i.MatchLdcR4(0f));
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(0f)))
+            throw new HookHelper.HookException(il, "Unable to find upwards speed threshold `0f` to modify.");
+
         cursor.EmitLdarg0();
         cursor.EmitDelegate(ModifyUpwardsThreshold);
 
-        // right facing springs
-        cursor.GotoNext(MoveType.After, i => i.MatchLdcR4(60f));
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(60f)))
+            throw new HookHelper.HookException(il, "Unable to find rightwards speed threshold `60f` to modify.");
+
         cursor.EmitLdarg0();
         cursor.EmitDelegate(ModifyRightThreshold);
 
-        // left facing spring
-        cursor.GotoNext(MoveType.After, i => i.MatchLdcR4(-60f));
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(-60f)))
+            throw new HookHelper.HookException(il, "Unable to find leftwards speed threshold `-60f` to modify.");
+
         cursor.EmitLdarg0();
         cursor.EmitDelegate(ModifyLeftThreshold);
 
@@ -155,13 +174,7 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
         for (float angle = 0f; angle < MathF.PI * 2f; angle += MathF.PI / 6f)
         {
             Vector2 position = self.Center + Calc.AngleToVector(angle + Calc.Random.Range(-MathF.PI / 90f, MathF.PI / 90f), Calc.Random.Range(12, 18));
-            level.ParticlesFG.Emit(new ParticleType(Player.P_SummitLandB)
-            {
-                SpeedMin = 60,
-                SpeedMax = 90,
-                SpeedMultiplier = 0.25f,
-                Acceleration = Vector2.UnitY * -30f,
-            }, position, angle);
+            level.ParticlesFG.Emit(P_ExplodeSmoke, position, angle);
         }
     }
 

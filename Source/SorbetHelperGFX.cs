@@ -1,3 +1,4 @@
+using Celeste.Mod.SorbetHelper.Entities;
 using Microsoft.Xna.Framework.Graphics;
 using Celeste.Mod.SorbetHelper.Utils;
 
@@ -20,7 +21,10 @@ public static class SorbetHelperGFX
 
     internal static void LoadContent()
     {
-        FxAlphaMask = LoadEffect("AlphaMask");
+        FxAlphaMask = LoadEffect("alpha_mask");
+
+        DashFallingBlock.LoadParticles();
+        PufferTweaksController.LoadParticles();
     }
 
     internal static void UnloadContent()

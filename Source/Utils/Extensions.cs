@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using Celeste.Mod.Registry;
 
@@ -131,6 +132,10 @@ internal static class Extensions
 
     extension(Entity self)
     {
+        /// <summary>
+        /// Shortcut function for getting a Component from the Entity's Components list.<br/>
+        /// Searches from end to start, which may be more efficient if you know the Component was added later.
+        /// </summary>
         public T GetComponentFromEnd<T>() where T : Component
         {
             List<Component> components = self.Components.components;
@@ -142,6 +147,19 @@ internal static class Extensions
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Shortcut function for getting a Component from the Entity's Components list.<br/>
+        /// Searches using the Tracker, instead of iterating through the Entity's Components list.<br/>
+        /// This may be more efficient if the target Component could be anywhere in the list, and/or the number of possible target Components in the scene is less than the entity's number of Components.
+        /// </summary>
+        public T GetComponentFromTracker<T>() where T : Component
+        {
+            if (self.Scene?.Tracker.GetComponents<T>() is not { } trackedComponents || trackedComponents.Count > self.Components.Count)
+                return self.Get<T>();
+
+            return trackedComponents.FirstOrDefault(c => c.Entity == self) as T;
         }
 
         public bool CheckTypeName(params HashSet<string> typeNames)
@@ -180,7 +198,7 @@ internal static class Extensions
     {
         public Color HexColorWithAlpha(string key, Color defaultValue = default)
         {
-            if (!self.Values.TryGetValue(key, out object value))
+            if (self.Values is null || !self.Values.TryGetValue(key, out object value))
                 return defaultValue;
 
             string hexColor = value.ToString();
@@ -192,7 +210,7 @@ internal static class Extensions
 
         public Color HexColorWithNonPremultipliedAlpha(string key, Color defaultValue = default)
         {
-            if (!self.Values.TryGetValue(key, out object value))
+            if (self.Values is null || !self.Values.TryGetValue(key, out object value))
                 return defaultValue;
 
             string hexColor = value.ToString();
@@ -200,6 +218,20 @@ internal static class Extensions
                 return Calc.HexToColorWithNonPremultipliedAlpha(hexColor);
 
             return defaultValue;
+        }
+
+        public T? Nullable<T>(string key) where T : struct, IParsable<T>
+        {
+            if (self.Values is null || !self.Values.TryGetValue(key, out object value))
+                return null;
+
+            if (value is T tResult)
+                return tResult;
+
+            if (T.TryParse(value.ToString(), CultureInfo.InvariantCulture, out T parsedResult))
+                return parsedResult;
+
+            return null;
         }
 
         public Ease.Easer Easer(string key, Ease.Easer defaultValue)

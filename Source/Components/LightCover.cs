@@ -9,8 +9,6 @@ namespace Celeste.Mod.SorbetHelper.Components;
 [Tracked]
 public class LightCover(float alpha) : Component(false, true)
 {
-    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(LightCover)}";
-
     // storing this as a byte because otherwise im worried about using floats when grouping the alpha batches
     private readonly byte alpha = (byte)MathHelper.Clamp(alpha * 255f, 0f, 255f);
 
@@ -33,14 +31,8 @@ public class LightCover(float alpha) : Component(false, true)
             Index = -1
         };
 
-        if (!cursor.TryGotoPrev(MoveType.After,
-            instr => instr.MatchCallOrCallvirt(typeof(GFX), nameof(GFX.DrawIndexedVertices))))
-        {
-            Logger.Warn(LogID, $"Failed to inject check to render LightCover components in CIL code for {cursor.Method.Name}!");
-            return;
-        }
-
-        Logger.Verbose(LogID, $"Injecting check to render LightCover components at {cursor.Index} in CIL code for {cursor.Method.Name}");
+        if (!cursor.TryGotoPrev(MoveType.After, instr => instr.MatchCallOrCallvirt(typeof(GFX), nameof(GFX.DrawIndexedVertices))))
+            throw new HookHelper.HookException(il, "Unable to find light occluder rendering to insert light cover rendering after.");
 
         cursor.EmitLdloc0();
         cursor.EmitDelegate(DrawLightCovers);
@@ -58,8 +50,7 @@ public class LightCover(float alpha) : Component(false, true)
 
             // split the components up based on alpha (is there a better way to do this?)
             List<IGrouping<byte, LightCover>> alphaBatches =
-                components.Cast<LightCover>().GroupBy(lightCover => lightCover.alpha)
-                          .ToList();
+                components.Cast<LightCover>().GroupBy(lightCover => lightCover.alpha).ToList();
             int batchCount = alphaBatches.Count;
 
             RenderTargetBinding[] initalBuffer = Engine.Instance.GraphicsDevice.GetRenderTargets();

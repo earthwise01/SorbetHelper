@@ -1,43 +1,49 @@
 using Microsoft.Xna.Framework.Graphics;
 using Celeste.Mod.SorbetHelper.Utils;
-using MonoMod.RuntimeDetour;
 
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [Tracked]
-[GlobalEntity(              EntityDataID + "Global")] // global version is swapped to in mapdataprocessor based on data.Bool("global")
-[CustomEntity(EntityDataID, EntityDataID + "Global")]
+[GlobalEntity(           EntitySID + "Global")] // global version is swapped to in mapdataprocessor based on data.Bool("global")
+[CustomEntity(EntitySID, EntitySID + "Global")]
 public class DarknessTransparencyFixController : Entity
 {
-    public const string EntityDataID = "SorbetHelper/DarknessTransparencyFixController";
+    public const string EntitySID = "SorbetHelper/DarknessTransparencyFixController";
+
+    private static readonly BlendState DestinationTransparencySubtractAlphaFixed = new BlendState()
+    {
+        // use ColorSourceBlend = Blend.DestinationAlpha instead so that darkness behaves correctly with premultiplied alpha
+        ColorSourceBlend = Blend.DestinationAlpha, // Blend.One,
+        ColorDestinationBlend = Blend.One,
+        ColorBlendFunction = BlendFunction.ReverseSubtract,
+        AlphaSourceBlend = Blend.Zero,
+        AlphaDestinationBlend = Blend.One,
+        AlphaBlendFunction = BlendFunction.Add
+    };
 
     #region Hooks
 
     internal static void Load()
     {
-        // guarantee hook order with style mask helper
-        using (new DetourConfigContext(new DetourConfig("SorbetHelper", before: ["StyleMaskHelper"])).Use())
-            On.Celeste.LightingRenderer.Render += On_LightingRenderer_Render;
+        On.Celeste.Level.Render += On_Level_Render;
     }
 
     internal static void Unload()
     {
-        On.Celeste.LightingRenderer.Render -= On_LightingRenderer_Render;
+        On.Celeste.Level.Render -= On_Level_Render;
     }
 
-    // kinda bleh on modifying a static field in a hook like this but  oh well (i love style mask helper compat :tada:)
-    private static void On_LightingRenderer_Render(On.Celeste.LightingRenderer.orig_Render orig, LightingRenderer self, Scene scene)
+    // we hook Level.Render instead of LightingRenderer.Render since we can't guarantee hook order with StyleMaskHelper for the latter (i love mod compat :tada:)
+    private static void On_Level_Render(On.Celeste.Level.orig_Render orig, Level self)
     {
-        if (scene.Tracker.GetEntity<DarknessTransparencyFixController>() is not null)
+        if (self.Tracker.GetEntity<DarknessTransparencyFixController>() is not null)
         {
-            // use ColorSourceBlend = Blend.DestinationAlpha instead so that darkness behaves correctly with premultiplied alpha
-            GFX.DestinationTransparencySubtract.ColorSourceBlend = Blend.DestinationAlpha;
-            orig(self, scene);
-            GFX.DestinationTransparencySubtract.ColorSourceBlend = Blend.One;
+            using (new SetTemporaryValue<BlendState>(ref GFX.DestinationTransparencySubtract, DestinationTransparencySubtractAlphaFixed))
+                orig(self);
         }
         else
         {
-            orig(self, scene);
+            orig(self);
         }
     }
 

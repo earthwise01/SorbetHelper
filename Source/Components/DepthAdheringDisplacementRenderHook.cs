@@ -1,5 +1,4 @@
 using System.Linq;
-using System.Reflection;
 using Celeste.Mod.SorbetHelper.Entities;
 using Celeste.Mod.SorbetHelper.Utils;
 using MonoMod.RuntimeDetour;

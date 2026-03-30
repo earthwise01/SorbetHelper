@@ -51,12 +51,7 @@ public class WingedStrawberryDirectionController(EntityData data, Vector2 offset
                 instr => instr.MatchLdarg0(),
                 instr => instr.MatchLdarg0(),
                 instr => instr.MatchCall<Entity>("get_Y")))
-        {
-            Logger.Warn(LogID, $"Failed to inject custom flight movement in CIL code for {cursor.Method.FullName}!");
-            return;
-        }
-
-        Logger.Verbose(LogID, $"Injecting custom flight movement at {cursor.Index} in CIL code for {cursor.Method.FullName}");
+            throw new HookHelper.HookException(il, "Unable to find flight movement to modify.");
 
         // initialize controller variable
         cursor.EmitLdarg0();
@@ -80,12 +75,7 @@ public class WingedStrawberryDirectionController(EntityData data, Vector2 offset
         if (!cursor.TryGotoNext(MoveType.Before,
             instr => instr.MatchLdarg0(),
             instr => instr.MatchCall<Entity>("get_Y")))
-        {
-            Logger.Warn(LogID, $"Failed to inject additional out of room bounds checks in CIL code for {cursor.Method.FullName}!");
-            return;
-        }
-
-        Logger.Verbose(LogID, $"Injecting additional out of room bounds checks at {cursor.Index} in CIL code for {cursor.Method.FullName}");
+            throw new HookHelper.HookException(il, "Unable to find out of bounds checks to modify.");
 
         // use custom oob checks if a controller exists and skip past the vanilla ones if necessary
         cursor.EmitLdarg0();
@@ -99,12 +89,7 @@ public class WingedStrawberryDirectionController(EntityData data, Vector2 offset
             instr => instr.MatchMul(),
             instr => instr.MatchCall(typeof(Calc), nameof(Calc.Approach)),
             instr => instr.MatchStfld<Strawberry>(nameof(Strawberry.flapSpeed))))
-        {
-            Logger.Warn(LogID, $"Failed to inject horizontal idle bounds checks in CIL code for {cursor.Method.FullName}!");
-            return;
-        }
-
-        Logger.Verbose(LogID, $"Injecting horizontal idle bounds checks at {cursor.Index} in CIL code for {cursor.Method.FullName}");
+            throw new HookHelper.HookException(il, "Unable to find idle bounds checks to modify.");
 
         cursor.EmitLdarg0();
         cursor.EmitLdarg0();
