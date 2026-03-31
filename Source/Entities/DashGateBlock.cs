@@ -6,50 +6,37 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [Tracked]
 public class DashGateBlock : GateBlock
 {
-    private enum Axes
+    [Flags]
+    private enum HitAxes
     {
-        Both,
-        Horizontal,
-        Vertical
+        Horizontal = 0b01,
+        Vertical = 0b10,
+        Both = Horizontal | Vertical
     }
 
     private readonly MTexture mainTexture, lightsTexture;
 
-    private readonly bool canMoveVertically;
-    private readonly bool canMoveHorizontally;
+    private readonly HitAxes hitAxes;
     private readonly bool allowWavedash;
     private readonly bool dashCornerCorrection;
     private readonly bool refillDash;
 
-    private float activationFlash;
-
     private readonly ParticleType P_RefillDash;
     private readonly ParticleType P_RefillDashReturn;
 
-    public DashGateBlock(EntityData data, Vector2 offset) : base(data, offset)
+    public DashGateBlock(EntityData data, Vector2 offset, EntityID id) : base(data, offset, id)
     {
         allowWavedash = data.Bool("allowWavedash", false);
         dashCornerCorrection = data.Bool("dashCornerCorrection", false);
         refillDash = data.Bool("refillDash", false);
 
-        Axes axes = data.Enum("axes", Axes.Both);
+        hitAxes = data.Enum("axes", HitAxes.Both);
+
         string blockSprite = data.Attr("blockSprite", "SorbetHelper/gateblock/dash/block");
-        switch (axes)
-        {
-            default:
-                canMoveHorizontally = canMoveVertically = true;
-                break;
-            case Axes.Horizontal:
-                blockSprite += "_h";
-                canMoveHorizontally = true;
-                canMoveVertically = false;
-                break;
-            case Axes.Vertical:
-                blockSprite += "_v";
-                canMoveHorizontally = false;
-                canMoveVertically = true;
-                break;
-        }
+        if (hitAxes == HitAxes.Horizontal)
+            blockSprite += "_h";
+        else if (hitAxes == HitAxes.Vertical)
+            blockSprite += "_v";
         mainTexture = GFX.Game[$"objects/{blockSprite}"];
         lightsTexture = GFX.Game[$"objects/{blockSprite}_lights"];
 
@@ -57,15 +44,15 @@ public class DashGateBlock : GateBlock
 
         P_RefillDash = new ParticleType(Refill.P_Shatter)
         {
-            Color = P_Activate.Color2,
-            Color2 = P_Activate.Color,
+            Color = Color.Lerp(startColor, Color.White, 0.75f),
+            Color2 = startColor,
             SpeedMin = 120f,
             SpeedMax = 190f
         };
         P_RefillDashReturn = new ParticleType(P_RefillDash)
         {
-            Color = P_ActivateReturn.Color2,
-            Color2 = P_ActivateReturn.Color
+            Color = Color.Lerp(nodeColor, Color.White, 0.75f),
+            Color2 = nodeColor,
         };
     }
 
@@ -83,30 +70,20 @@ public class DashGateBlock : GateBlock
         Level level = SceneAs<Level>();
 
         // trigger the gate
-        Activate();
+        Activate(dir);
 
-        if (refillDash && player.Dashes < player.MaxDashes)
+        if (refillDash && player.RefillDash())
         {
-            player.RefillDash();
             Audio.Play(SFX.game_gen_diamond_return, player.Center);
 
-            ParticleType particle = atNode ? P_RefillDashReturn : P_RefillDash;
+            ParticleType particle = AtNode ? P_RefillDashReturn : P_RefillDash;
 
             float angle = dir.Angle();
             level.ParticlesFG.Emit(particle, 4, player.Center, Vector2.One * 4f, angle - MathF.PI / 2f);
             level.ParticlesFG.Emit(particle, 4, player.Center, Vector2.One * 4f, angle + MathF.PI / 2f);
         }
 
-        // hit effects
-        if (smoke)
-            ActivateParticles();
-        activationFlash = 1f;
         level.DirectionalShake(dir);
-        scale = new Vector2(
-            1f + Math.Abs(dir.Y) * 0.28f - Math.Abs(dir.X) * 0.28f,
-            1f + Math.Abs(dir.X) * 0.28f - Math.Abs(dir.Y) * 0.28f
-        );
-        offset = dir * 4.15f;
         Audio.Play("event:/game/04_cliffside/arrowblock_activate", Center);
         Audio.Play("event:/sorbethelper/sfx/gateblock_dash_hit", Center);
         Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
@@ -118,36 +95,19 @@ public class DashGateBlock : GateBlock
     }
 
     private bool CanActivate(Vector2 direction)
-        => (direction.X != 0f && canMoveHorizontally) || (direction.Y != 0f && canMoveVertically);
+        => (direction.X != 0f && (hitAxes & HitAxes.Horizontal) != 0)
+           || (direction.Y != 0f && (hitAxes & HitAxes.Vertical) != 0);
 
-    public override void Update()
+    protected override void RenderBlock()
     {
-        base.Update();
-
-        if (activationFlash > 0f)
-            activationFlash -= Engine.DeltaTime * 5f;
-    }
-
-    public override void Render()
-    {
-        if (!VisibleOnCamera)
-            return;
-
-        // main block
-        DrawNineSlice(mainTexture, Color.White);
-        DrawNineSlice(lightsTexture, Color.Lerp(fillColor, Color.White, activationFlash * 0.4f));
-
-        // render icon
-        base.Render();
+        DrawBlockNiceSlice(mainTexture, Color.White);
+        DrawBlockNiceSlice(lightsTexture, FillColor);
     }
 
     protected override void RenderOutline()
     {
-        Vector2 scaledTopLeft = Center + Offset - (new Vector2(Collider.Width / 2f, Collider.Height / 2f) * Scale);
-        float scaledWidth = Collider.Width * Scale.X;
-        float scaledHeight = Collider.Height * Scale.Y;
-
-        Draw.Rect(scaledTopLeft - Vector2.UnitY, scaledWidth, scaledHeight + 2, Color.Black);
-        Draw.Rect(scaledTopLeft - Vector2.UnitX, scaledWidth + 2, scaledHeight, Color.Black);
+        Rectangle blockRect = GetBlockRectangle();
+        Draw.Rect(blockRect.X - 1, blockRect.Y, blockRect.Width + 2, blockRect.Height, Color.Black);
+        Draw.Rect(blockRect.X, blockRect.Y - 1, blockRect.Width, blockRect.Height + 2, Color.Black);
     }
 }

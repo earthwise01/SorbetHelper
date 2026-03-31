@@ -29,18 +29,17 @@ public class SorbetHelperModule : EverestModule
     {
         base.Initialize();
 
+        // mod compat
+        GravityHelperInterop.Load();
+        ExtendedCameraDynamicsInterop.Load();
+        CommunalHelperDashStatesInterop.Load();
         ExtendedVariantsCompat.Load();
         ChronoHelperCompat.Load();
     }
 
     public override void Load()
     {
-        // mod interop
-        // imports
-        GravityHelperInterop.Load();
-        ExtendedCameraDynamicsInterop.Load();
-        CommunalHelperDashStatesInterop.Load();
-        // exports
+        // mod interop exports
         typeof(SorbetHelperExports).ModInterop();
 
         // sorbet helper misc stuff

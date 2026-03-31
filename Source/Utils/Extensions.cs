@@ -3,6 +3,8 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using Celeste.Mod.Registry;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
 
 namespace Celeste.Mod.SorbetHelper.Utils;
 
@@ -314,6 +316,23 @@ internal static class Extensions
         /// maps all Monocle <see cref="Ease.Easer"/>s to their names (i.e. <c>"SineInOut"</c> => <see cref="Ease.SineInOut"/>)
         /// </summary>
         public static ReadOnlyDictionary<string, Ease.Easer> StringToEaser => EaseExtensions_StringToEaser;
+    }
+
+    #endregion
+
+    #region ILCursor Extensions
+
+    extension(ILCursor self)
+    {
+        public VariableDefinition AddVariable(Type type)
+        {
+            VariableDefinition variableDefinition = new VariableDefinition(self.Context.Import(type));
+            self.Body.Variables.Add(variableDefinition);
+            return variableDefinition;
+        }
+
+        public VariableDefinition AddVariable<T>()
+            => AddVariable(self, typeof(T));
     }
 
     #endregion

@@ -39,8 +39,7 @@ public class WingedStrawberryDirectionController(EntityData data, Vector2 offset
     {
         ILCursor cursor = new ILCursor(il);
 
-        VariableDefinition controllerVariable = new VariableDefinition(il.Import(typeof(WingedStrawberryDirectionController)));
-        il.Body.Variables.Add(controllerVariable);
+        VariableDefinition controllerVariable = cursor.AddVariable<WingedStrawberryDirectionController>();
 
         // inject direction non-specific movement code
         ILLabel afterVanillaMovementLabel = cursor.DefineLabel();

@@ -44,87 +44,44 @@ public class KillZone : Entity
 
     private void OnPlayer(Player player)
     {
-        if (fastKill)
-            player.Die(Vector2.Zero);
-        else
-            player.Die((player.Position - Center).SafeNormalize());
+        player.Die(fastKill ? Vector2.Zero : (player.Position - Center).SafeNormalize());
     }
 
     private void OnHoldable(Holdable holdable)
     {
-        // special casing !!!!!
         switch (holdable.Entity)
         {
             case TheoCrystal theo:
                 theo.Die();
                 break;
             case Glider glider:
-                // (see lower il hook) do nothing here weh
-                // or never mind im giving up
-                FakeGliderDieIGiveUp(glider);
+                DestroyGlider(glider);
                 break;
             default:
                 holdable.OnHitSpinner(this);
                 break;
-        } // why did i get a crash here and why was it only once and never again what
-    }
-
-    // i dont think this works with mhh respawning jellies but   oh my godwhatever ill do this better later if i feel like it
-    private static void FakeGliderDieIGiveUp(Glider glider)
-    {
-        if (glider.destroyed)
-            return;
-
-        glider.destroyed = true;
-        glider.Collidable = false;
-        if (glider.Hold.IsHeld)
-        {
-            Vector2 holderSpeed = glider.Hold.Holder.Speed;
-            glider.Hold.Holder.Drop();
-            glider.Speed = holderSpeed * 0.333f;
-            Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
         }
 
-        glider.Add(new Coroutine(glider.DestroyAnimationRoutine()));
+        return;
+
+        // we need to do this manually since the code that usually destroys the jelly is buried deep in its update method in a foreach loop over seeker barriers ..
+        // not compatible with mhh respawning jellies but  oh well
+        static void DestroyGlider(Glider glider)
+        {
+            if (glider.destroyed)
+                return;
+
+            glider.destroyed = true;
+            glider.Collidable = false;
+            if (glider.Hold.IsHeld)
+            {
+                Vector2 holderSpeed = glider.Hold.Holder.Speed;
+                glider.Hold.Holder.Drop();
+                glider.Speed = holderSpeed * 0.333f;
+                Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
+            }
+
+            glider.Add(new Coroutine(glider.DestroyAnimationRoutine()));
+        }
     }
-    // whyyy do jellies not have a normal Die method </3 this sucks
-    //     internal static void Load() {
-    //         IL.Celeste.Glider.Update += IL_Glider_Update;
-    //     }
-    //     internal static void Unload() {
-    //         IL.Celeste.Glider.Update -= IL_Glider_Update;
-    //     }
-
-    // oka y nevermind this crashes yayyy
-    //     private static void IL_Glider_Update(ILContext il) {
-    // /*         var cursor = new ILCursor(il);
-
-    //         var shouldDestroyVariable = new VariableDefinition(il.Import(typeof(bool)));
-    //         il.Body.Variables.Add(shouldDestroyVariable);
-
-    //         var destroyLabel = cursor.DefineLabel();
-
-    //         cursor.GotoNext(MoveType.After, i => i.MatchLdfld<Glider>(nameof(Glider.destroyed)), i => i.MatchBrtrue(out _));
-    //         cursor.EmitLdarg0();
-    //         cursor.EmitDelegate(checkHoldableKillZones);
-    //         cursor.EmitBrtrue(destroyLabel);
-
-    //         // make the brtrue jump to where the glider is destroyed
-    //         cursor.GotoNext(MoveType.Before, i => i.MatchStfld<Glider>(nameof(Glider.destroyed)));
-    //         cursor.GotoPrev(MoveType.After, i => i.MatchBrfalse(out _));
-    //         cursor.MarkLabel(destroyLabel);
-
-    //         Console.WriteLine(il);
-
-    //         static bool checkHoldableKillZones(Glider self) {
-    //             var killZones = self.Scene.Tracker.GetEntities<KillZone>();
-
-    //             foreach (var killZone in killZones) {
-    //                 if (((KillZone)killZone).collideHoldables && self.CollideCheck(killZone))
-    //                     return true;
-    //             }
-
-    //             return false;
-    //         } */
-    //     }
 }

@@ -131,7 +131,7 @@ public class ColorDashBlock : Solid
 
             groupOrigin = new Vector2((int)(groupLeft + (groupRight - groupLeft) / 2f), (int)groupBottom);
             wigglerScaler = new Vector2(Calc.ClampedMap(groupRight - groupLeft, 32f, 96f, 1f, 0.2f), Calc.ClampedMap(groupBottom - groupTop, 32f, 96f, 1f, 0.2f));
-            Add(wiggler = Wiggler.Create(3f, 0.3f));
+            Add(wiggler = Wiggler.Create(0.3f, 3f));
 
             foreach (ColorDashBlock colorDashBlock in group)
             {

@@ -6,16 +6,16 @@ namespace Celeste.Mod.SorbetHelper.Utils;
 public readonly ref struct SetTemporaryValue<T>
 {
     private readonly ref T value;
-    private readonly T origValue;
+    private readonly T originalValue;
 
-    public SetTemporaryValue(ref T value, T newValue)
+    public SetTemporaryValue(ref T value, T temporaryValue)
     {
-        origValue = value;
-        (this.value = ref value) = newValue;
+        originalValue = value;
+        (this.value = ref value) = temporaryValue;
     }
 
     public void Dispose()
     {
-        value = origValue;
+        value = originalValue;
     }
 }

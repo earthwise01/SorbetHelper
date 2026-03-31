@@ -10,6 +10,11 @@ public class CustomFallingBlock : FallingBlock
 {
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(CustomFallingBlock)}";
 
+    private static readonly Dictionary<string, Vector2> DirectionToVector = new Dictionary<string, Vector2>
+    {
+        { "down", new Vector2(0f, 1f) }, { "up", new Vector2(0f, -1f) }, { "left", new Vector2(-1f, 0f) }, { "right", new Vector2(1f, 0f) }
+    };
+
     protected readonly string flagOnFall, flagOnLand, triggerFlag;
     protected readonly bool resetFlags;
     protected bool fallOnTouch;
@@ -19,11 +24,6 @@ public class CustomFallingBlock : FallingBlock
     protected readonly float initialShakeTime, variableShakeTime;
     protected readonly float maxSpeed, acceleration;
     protected readonly string shakeSfx, impactSfx;
-
-    private static readonly Dictionary<string, Vector2> DirectionToVector = new Dictionary<string, Vector2>
-    {
-        { "down", new Vector2(0f, 1f) }, { "up", new Vector2(0f, -1f) }, { "left", new Vector2(-1f, 0f) }, { "right", new Vector2(1f, 0f) }
-    };
 
     public Vector2 Direction;
 
@@ -41,7 +41,6 @@ public class CustomFallingBlock : FallingBlock
 
     public CustomFallingBlock(EntityData data, Vector2 offset, bool chronoHelperGravity) : base(data, offset)
     {
-        // remove the Coroutine added by the vanilla falling block
         Remove(Get<Coroutine>());
 
         Direction = DirectionToVector[data.Attr("direction", "down").ToLower()];
@@ -67,8 +66,6 @@ public class CustomFallingBlock : FallingBlock
         chronoHelperGravityChangeShakeTime = data.Float("chronoHelperGravityChangeShakeTime", 0.1f);
 
         Add(new Coroutine(Sequence()));
-
-        // Add(new MovingBlockHittable(OnMovingBlockHit));
     }
 
     public override void OnStaticMoverTrigger(StaticMover sm)
@@ -96,10 +93,10 @@ public class CustomFallingBlock : FallingBlock
     public override void Update()
     {
         // chronohelper gravity
-        if (chronoHelperGravityFallingBlock)
+        if (chronoHelperGravityFallingBlock && ChronoHelperCompat.IsLoaded)
         {
             chronoHelperGravityWasUp = chronoHelperGravityUp;
-            chronoHelperGravityUp = ChronoHelperCompat.SessionGravityModeUp;
+            chronoHelperGravityUp = ChronoHelperCompat.GetSessionGravityModeUp();
 
             if (chronoHelperGravityUp != chronoHelperGravityWasUp)
                 Direction = -Direction;
@@ -205,10 +202,14 @@ public class CustomFallingBlock : FallingBlock
             StopShaking();
 
             if (chronoHelperGravityFallingBlock)
+            {
                 while (CollideCheck<SolidTiles>(Position + Direction))
                     yield return null;
+            }
             else if (CollideCheck<SolidTiles>(Position + Direction))
+            {
                 break;
+            }
 
             // disable falling block cycles on (new) gravity falling blocks
             bool fallingBlockCycles = !chronoHelperGravityFallingBlock || chronoHelperGravityChangeShakeTime != 0f;

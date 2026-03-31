@@ -8,10 +8,8 @@ namespace Celeste.Mod.SorbetHelper.Backdrops;
 
 public abstract class HiResBackdrop : Backdrop
 {
-    private const float UpscaleAmount = 6f;
-
     /// <summary>
-    /// Whether to automatically start a <see cref="SpriteBatch"/> when calling <see cref="RenderHiRes"/>, or let the backdrop handle everything itself.
+    /// Whether to automatically start a <see cref="SpriteBatch"/> when calling <see cref="RenderHiRes"/>.
     /// </summary>
     public virtual bool UseHiResSpritebatch => true;
 
@@ -25,8 +23,8 @@ public abstract class HiResBackdrop : Backdrop
     /// Renders the backdrop.
     /// </summary>
     /// <param name="scene">The scene the backdrop is being rendered in.</param>
-    /// <param name="upscaleMatrix">The matrix used to upscale and position the backdrop into screen space (1920x1080) from camera space (320x180).</param>
-    public virtual void RenderHiRes(Scene scene, Matrix upscaleMatrix) { }
+    /// <param name="cameraToScreenMatrix">The matrix used to scale and position the backdrop into screen space (1920x1080) from camera space (320x180).</param>
+    public virtual void RenderHiRes(Scene scene, Matrix cameraToScreenMatrix) { }
 
     #region Hooks
 
@@ -75,31 +73,42 @@ public abstract class HiResBackdrop : Backdrop
 
         public override void Render()
         {
-            // todo: not sure what the threshold for this check should be    if any
-            if (backdrops.Count < 10 && backdrops.All(backdrop => !backdrop.Visible))
+            if (backdrops.All(backdrop => !backdrop.Visible))
                 return;
 
             Level level = SceneAs<Level>();
-            Matrix matrix = Matrix.CreateScale(UpscaleAmount);
+            
+            Matrix matrix = Matrix.Identity;
 
-            // mirror mode
+            // zoom & padding
+            float zoom = level.Zoom;
+            if (ExtendedVariantsCompat.IsLoaded)
+                zoom *= ExtendedVariantsCompat.GetZoomLevel();
+            float zoomTarget = ExtendedCameraDynamicsInterop.IsImported && ExtendedCameraDynamicsInterop.ExtendedCameraHooksEnabled()
+                ? level.Zoom
+                : level.ZoomTarget;
+            Vector2 dimensions = new Vector2(320f, 180f);
+            Vector2 scaledDimensions = dimensions / zoomTarget;
+            Vector2 zoomOrigin = zoomTarget != 1f ? (level.ZoomFocusPoint - scaledDimensions / 2f) / (dimensions - scaledDimensions) * dimensions : Vector2.Zero;
+
+            Vector2 paddingOffset = new Vector2(level.ScreenPadding, level.ScreenPadding * (9f / 16f));
+            if (ExtendedVariantsCompat.IsLoaded)
+                paddingOffset = ExtendedVariantsCompat.AddZoomPaddingOffset(paddingOffset);
+
+            float scale = zoom * (320f - level.ScreenPadding * 2f) / 320f;
+
+            matrix *= Matrix.CreateTranslation(-zoomOrigin.X, -zoomOrigin.Y, 0f)
+                      * Matrix.CreateScale(scale)
+                      * Matrix.CreateTranslation(zoomOrigin.X + paddingOffset.X, zoomOrigin.Y + paddingOffset.Y, 0f);
+
+            // mirror mode & upside down
             if (SaveData.Instance.Assists.MirrorMode)
-                matrix *= Matrix.CreateScale(-1f, 1f, 1f) * Matrix.CreateTranslation(1920, 0f, 0f);
-            if (ExtendedVariantsCompat.UpsideDown)
-                matrix *= Matrix.CreateScale(1f, -1f, 1f) * Matrix.CreateTranslation(0f, 1080, 0f);
+                matrix *= Matrix.CreateScale(-1f, 1f, 1f) * Matrix.CreateTranslation(320f, 0f, 0f);
+            if (ExtendedVariantsCompat.IsLoaded && ExtendedVariantsCompat.GetUpsideDown())
+                matrix *= Matrix.CreateScale(1f, -1f, 1f) * Matrix.CreateTranslation(0f, 180f, 0f);
 
-            // zoom out support
-            if (SorbetHelperGFX.ZoomOutActive)
-                matrix *= Matrix.CreateScale(level.Zoom);
-
-            // watchtower/etc edge padding
-            if (level.ScreenPadding != 0f)
-            {
-                float paddingScale = (320f - level.ScreenPadding * 2f) / 320f;
-                Vector2 paddingOffset = new Vector2(level.ScreenPadding, level.ScreenPadding * 0.5625f);
-                matrix *= Matrix.CreateTranslation(1920 * -0.5f, 1080 * -0.5f, 0f) * Matrix.CreateScale(paddingScale) * Matrix.CreateTranslation(1920 * 0.5f + paddingOffset.X, 1080 * 0.5f + paddingOffset.Y, 0f);
-            }
-
+            // scale to screen size
+            matrix *= Matrix.CreateScale(6f);
             if (!SubHudRenderer.DrawToBuffer)
                 matrix *= Engine.ScreenMatrix;
 
