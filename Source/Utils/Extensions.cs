@@ -126,6 +126,47 @@ internal static class Extensions
 
             return entity;
         }
+
+        /// <summary>
+        /// Get a matrix that can be used to transform a vector from camera space to screen space. Accounts for compatibility with ExtendedVariants and ExtendedCameraDynamics.
+        /// </summary>
+        /// <returns>A <see cref="Matrix"/> that can be used to transform a vector from camera space to screen space.</returns>
+        public Matrix GetCameraToScreenMatrix()
+        {
+            Matrix matrix = Matrix.Identity;
+
+            // zoom & padding
+            float zoom = self.Zoom;
+            if (ExtendedVariantsCompat.IsLoaded)
+                zoom *= ExtendedVariantsCompat.GetZoomLevel();
+            float zoomTarget = ExtendedCameraDynamicsInterop.IsImported && ExtendedCameraDynamicsInterop.ExtendedCameraHooksEnabled()
+                ? self.Zoom
+                : self.ZoomTarget;
+            Vector2 dimensions = new Vector2(320f, 180f);
+            Vector2 scaledDimensions = dimensions / zoomTarget;
+            Vector2 zoomOrigin = zoomTarget != 1f ? (self.ZoomFocusPoint - scaledDimensions / 2f) / (dimensions - scaledDimensions) * dimensions : Vector2.Zero;
+
+            Vector2 paddingOffset = new Vector2(self.ScreenPadding, self.ScreenPadding * (9f / 16f));
+            if (ExtendedVariantsCompat.IsLoaded)
+                paddingOffset = ExtendedVariantsCompat.AddZoomPaddingOffset(paddingOffset);
+
+            float scale = zoom * (320f - self.ScreenPadding * 2f) / 320f;
+
+            matrix *= Matrix.CreateTranslation(-zoomOrigin.X, -zoomOrigin.Y, 0f)
+                      * Matrix.CreateScale(scale)
+                      * Matrix.CreateTranslation(zoomOrigin.X + paddingOffset.X, zoomOrigin.Y + paddingOffset.Y, 0f);
+
+            // mirror mode & upside down
+            if (SaveData.Instance.Assists.MirrorMode)
+                matrix *= Matrix.CreateScale(-1f, 1f, 1f) * Matrix.CreateTranslation(320f, 0f, 0f);
+            if (ExtendedVariantsCompat.IsLoaded && ExtendedVariantsCompat.GetUpsideDown())
+                matrix *= Matrix.CreateScale(1f, -1f, 1f) * Matrix.CreateTranslation(0f, 180f, 0f);
+
+            // scale to screen size
+            matrix *= Matrix.CreateScale(6f);
+
+            return matrix;
+        }
     }
 
     #endregion

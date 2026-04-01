@@ -3,23 +3,36 @@ local trigger = {}
 trigger.name = "SorbetHelper/AlternateInteractPrompt"
 trigger.placements = {
     {
-        name = "altTalkUIBottomCorner",
-        alternativeName = "altNameAltTalkUI",
+        name = "bottomCorner",
+        alternativeName = "altName",
         data = {
             dialogId = "",
             style = "BottomCorner",
             playHighlightSfx = true,
             onLeft = false,
+            useUpInput = false
         }
     },
     {
-        name = "altTalkUISmallArrow",
-        alternativeName = "altNameAltTalkUI",
+        name = "smallArrow",
+        alternativeName = "altName",
         data = {
             dialogId = "",
             style = "SmallArrow",
             playHighlightSfx = true,
             onLeft = false,
+            useUpInput = false
+        }
+    },
+    {
+        name = "vanilla_useUpInput",
+        alternativeName = "altName",
+        data = {
+            dialogId = "",
+            style = "Vanilla",
+            playHighlightSfx = true,
+            onLeft = false,
+            useUpInput = true
         }
     }
 }
@@ -34,26 +47,17 @@ trigger.fieldInformation = {
             { "Pet", "sorbethelper_ui_pet" },
             { "Check", "sorbethelper_ui_check" },
             { "Inspect", "sorbethelper_ui_inspect" },
-            { "Toggle", "sorbethelper_ui_toggle" },
+            { "Toggle", "sorbethelper_ui_toggle" }
         }
     },
     style = {
         options = {
             { "Bottom Corner", "BottomCorner" },
             { "Small Arrow", "SmallArrow" },
+            { "Vanilla", "Vanilla" }
         },
         editable = false
     }
 }
-
-function trigger.ignoredFields(entity)
-    local ignored = { "_id", "_name" }
-
-    if entity.style ~= "BottomCorner" then
-        table.insert(ignored, "onLeft")
-    end
-
-    return ignored
-end
 
 return trigger

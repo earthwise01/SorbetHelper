@@ -843,14 +843,17 @@ Entities:
 Triggers:
   SorbetHelper/AlternateInteractPrompt:
     Placements:
-      altTalkUIBottomCorner:
-        Name: Alt Style Interact Prompt (Bottom Corner)
+      bottomCorner:
+        Name: Alternate Interact Prompt (Bottom Corner)
         Description: Replaces the normal interaction/talk prompt with one that slides in from the bottom corner.
-      altTalkUISmallArrow:
-        Name: Alt Style Interact Prompt (Small Arrow)
+      smallArrow:
+        Name: Alternate Interact Prompt (Small Arrow)
         Description: Replaces the normal interaction/talk prompt with a smaller floaty arrow that expands to reveal the prompt when approached.
-      altNameAltTalkUI:
-        Name: Alternate Interact Prompt
+      vanilla_useUpInput:
+        Name: Alternate Interact Prompt (Vanilla, Use Up Input)
+        Description: Replaces the normal interaction/talk prompt with a visually identical version that responds to `Up` inputs instead of `Talk` inputs.
+      altName:
+        Name: Alt Style Interact Prompt
     Attributes:
       dialogId:
         Name: Label Dialog ID
@@ -858,17 +861,29 @@ Triggers:
       style:
         Description: |-
           The alternate style to use.
+          
           Bottom Corner:
-            The prompt will slide in from the bottom right corner when approached. Only appears when highlighted / does not have an indicator.
+            A simple prompt that slides in from the bottom right corner of the screen when highlighted. Does not have an indicator when not highlighted.
+          
           Small Arrow:
-            The normal UI is replaced with a smaller floaty arrow, which the button prompt appears on top of when approached.
+            A smaller floaty arrow, which the button prompt appears above when highlighted.
+          
+          Vanilla:
+            Identical to the vanilla interact prompt. Does not support the `Label Dialog ID` field.
       playHighlightSfx:
         Name: Has Highlight Effects
         Description: Whether to still play the vanilla sfx (and bounce effects) when the prompt is highlighted.
       onLeft:
+        Name: Flip Prompt
         Description: |-
-          Whether the prompt (in the BottomCorner style) should come from the left side of the screen, instead of the right.
-          For the sake of consistency this is recommended to be left off unless necessary.
+          Bottom Corner:
+            Whether to render the prompt on the left side of the screen, instead of the right.
+            For the sake of consistency this is recommended to be kept disabled unless necessary.
+          
+          Small Arrow/Vanilla:
+            Whether to render the prompt upside down.
+      useUpInput:
+        Description: Whether the interact prompt should respond to `Up` inputs instead of `Talk` inputs.
 
   SorbetHelper/MiniPopupTrigger:
     Placements:
