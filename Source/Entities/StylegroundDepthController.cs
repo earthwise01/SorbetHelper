@@ -114,7 +114,7 @@ public class StylegroundDepthController : Entity
         base.Update();
 
         // for the AbovePauseHud mode we need to manually update the stylegrounds when paused
-        if (mode != Modes.AbovePauseHud || SceneAs<Level>().Paused)
+        if (mode != Modes.AbovePauseHud || !SceneAs<Level>().Paused)
             return;
 
         foreach (Backdrop backdrop in backdropsBg.Concat(backdropsFg))
