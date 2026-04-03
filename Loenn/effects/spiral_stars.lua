@@ -1,8 +1,8 @@
-local effect = {}
+local spiralStars = {}
 
-effect.name = "SorbetHelper/SpiralStars"
+spiralStars.name = "SorbetHelper/SpiralStars"
 
-effect.defaultData = {
+spiralStars.defaultData = {
     colors = "ffffff",
     backgroundColor = "000000ff",
     speed = 70,
@@ -14,10 +14,10 @@ effect.defaultData = {
     centerX = 160,
     centerY = 90,
     centerRadius = 70,
-    spawnRadius = 190,
+    spawnRadius = 190
 }
 
-effect.fieldOrder = {
+spiralStars.fieldOrder = {
     "only", "exclude", "tag", "flag",
     "spritePath", "colors", "backgroundColor", "notflag",
     "starCount", "centerX", "spawnRadius", "speed",
@@ -25,18 +25,16 @@ effect.fieldOrder = {
     "trailDelay"
 }
 
-effect.fieldInformation = {
+spiralStars.fieldInformation = {
     colors = {
         fieldType = "list",
         elementOptions = {
             fieldType = "color",
-            allowXNAColors = false,
             showAlpha = true
         }
     },
     backgroundColor = {
         fieldType = "color",
-        allowXNAColors = false,
         showAlpha = true
     },
     trailLength = {
@@ -52,7 +50,7 @@ effect.fieldInformation = {
     },
     spawnRadius = {
         minimumValue = 0
-    },
+    }
 }
 
-return effect
+return spiralStars

@@ -9,7 +9,7 @@ local contextMenu = require("ui.context_menu")
 local form = require("ui.forms.form")
 local languageRegistry = require("language_registry")
 local mods = require("mods")
-local sorbetUtils = mods.requireFromPlugin("libraries.utils")
+local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
 
 -- 99.9% copy paste from the default loenn list field, just made to work when using unicode characters with an empty seperator
 -- hopefully gets fixed upstreamm but this like   is better than letting it crash for now i guess

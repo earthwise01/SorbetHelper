@@ -1,15 +1,16 @@
-local sorbetUtils = require("mods").requireFromPlugin("libraries.utils")
+local mods = require("mods")
+local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
 
-local controller = {}
+local darknessTransparencyFixController = {}
 
-controller.name = "SorbetHelper/DarknessTransparencyFixController"
-controller.sprite = sorbetUtils.getControllerSpriteFunction("darknessTransparencyFixController")
-controller.depth = -1000010
-controller.placements = {
-    name = "controller",
+darknessTransparencyFixController.name = "SorbetHelper/DarknessTransparencyFixController"
+darknessTransparencyFixController.sprite = sorbetUtils.getControllerSpriteFunction("darknessTransparencyFixController")
+darknessTransparencyFixController.depth = sorbetUtils.controllerDepth
+darknessTransparencyFixController.placements = {
+    name = "darkness_transparency_fix_controller",
     data = {
         global = false,
     }
 }
 
-return controller
+return darknessTransparencyFixController

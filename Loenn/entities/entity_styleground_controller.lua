@@ -1,48 +1,22 @@
-local sorbetUtils = require("mods").requireFromPlugin("libraries.utils")
+local mods = require("mods")
+local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
 
 local entityStylegroundController = {}
 
 entityStylegroundController.name = "SorbetHelper/EntityStylegroundController"
 entityStylegroundController.sprite = sorbetUtils.getControllerSpriteFunction("entityStylegroundController")
-entityStylegroundController.depth = -1000010
+entityStylegroundController.depth = sorbetUtils.controllerDepth
 entityStylegroundController.placements = {
-    name = "controller",
+    name = "entity_as_styleground_controller",
     data = {
         classNames = "",
         minDepth = "",
         maxDepth = "",
         global = false,
-
         tag = "",
-
         _instructionsButton = true
     }
 }
-
-entityStylegroundController.fieldInformation = function()
-    return {
-        classNames = {
-            fieldType = "list",
-            elementSeparator = ",",
-            elementDefault = "",
-            elementOptions = {
-                 options = sorbetUtils.getMapSIDs(),
-                 searchable = true,
-            }
-        },
-        minDepth = {
-            fieldType = "integer",
-            allowEmpty = true
-        },
-        maxDepth = {
-            fieldType = "integer",
-            allowEmpty = true
-        },
-        _instructionsButton = {
-            fieldType = "sorbetHelper.infoButton"
-        }
-    }
-end
 
 entityStylegroundController.ignoredFields = {
     "_id", "_name",
@@ -55,6 +29,29 @@ entityStylegroundController.fieldOrder = {
     "classNames", "minDepth",
     "global",
     "_instructionsButton"
+}
+
+entityStylegroundController.fieldInformation = {
+    classNames = {
+        fieldType = "list",
+        elementSeparator = ",",
+        elementDefault = "",
+        elementOptions = {
+             options = function() return sorbetUtils.getMapSIDs() end,
+             searchable = true
+        }
+    },
+    minDepth = {
+        fieldType = "integer",
+        allowEmpty = true
+    },
+    maxDepth = {
+        fieldType = "integer",
+        allowEmpty = true
+    },
+    _instructionsButton = {
+        fieldType = "sorbetHelper.infoButton"
+    }
 }
 
 return entityStylegroundController

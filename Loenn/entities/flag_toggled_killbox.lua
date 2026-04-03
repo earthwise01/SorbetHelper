@@ -2,12 +2,12 @@ local utils = require("utils")
 local drawableRectangle = require("structs.drawable_rectangle")
 local drawableText = require("structs.drawable_text")
 
-local killbox = {}
+local flagToggledKillbox = {}
 
-killbox.name = "SorbetHelper/FlagToggledKillbox"
-killbox.canResize = {true, false}
-killbox.depth = -1000005
-killbox.placements = {
+flagToggledKillbox.name = "SorbetHelper/FlagToggledKillbox"
+flagToggledKillbox.depth = -1000005
+flagToggledKillbox.canResize = {true, false}
+flagToggledKillbox.placements = {
     {
         name = "flag_toggled_killbox",
         data = {
@@ -17,7 +17,7 @@ killbox.placements = {
             flagOnly = false,
             playerAboveThreshold = 32,
             lenientHitbox = false,
-            updateOnLoad = false,
+            updateOnLoad = false
         }
     },
     {
@@ -29,37 +29,38 @@ killbox.placements = {
             flagOnly = false,
             playerAboveThreshold = 32,
             lenientHitbox = true,
-            updateOnLoad = true,
+            updateOnLoad = true
         }
     }
 }
 
-killbox.fieldOrder = {
+flagToggledKillbox.fieldOrder = {
     "x", "y",
     "width", "flag",
     "playerAboveThreshold", "inverted", "flagOnly",
-    "lenientHitbox", "updateOnLoad",
+    "lenientHitbox", "updateOnLoad"
 }
 
-function killbox.rectangle(room, entity)
+function flagToggledKillbox.rectangle(room, entity)
     return utils.rectangle(entity.x, entity.y, entity.width or 8, 8)
 end
 
-function killbox.sprite(room, entity)
+function flagToggledKillbox.sprite(room, entity)
     local x, y = entity.x or 0, entity.y or 0
     local width, height = entity.width or 8, 32
     local flag = entity.flag or ""
     local inverted = entity.inverted or false
 
-    local topRect = drawableRectangle.fromRectangle("fill", x, y, width, 8, {0.8, 0.4, 0.4, 0.8})
-    local mainRect = drawableRectangle.fromRectangle("fill", x, y, width, height, {0.8, 0.4, 0.4, 0.25})
+    local sprites = {}
 
-    if flag == "" then
-        return {mainRect, topRect}
+    table.insert(sprites, drawableRectangle.fromRectangle("fill", x, y, width, 8, {0.8, 0.4, 0.4, 0.8}))
+    table.insert(sprites, drawableRectangle.fromRectangle("fill", x, y, width, height, {0.8, 0.4, 0.4, 0.25}))
+
+    if flag ~= "" then
+        table.insert(sprites, drawableText.fromText("(" .. (inverted and "!" .. flag or flag) .. ")", x, y, width, height, nil, 1))
     end
 
-    local flagText = drawableText.fromText("(" .. (inverted and "!" .. flag or flag) .. ")", x, y, width, height, nil, 1)
-    return {mainRect, topRect, flagText}
+    return sprites
 end
 
-return killbox
+return flagToggledKillbox

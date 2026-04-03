@@ -4,46 +4,20 @@ local utils = require("utils")
 local drawing = require("utils.drawing")
 local colors = require("consts.colors")
 local entities = require("entities")
-local sorbetUtils = require("mods").requireFromPlugin("libraries.utils")
+local mods = require("mods")
+local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
 
-local return_berry = {}
+local returnBerry = {}
 
-return_berry.name = "SorbetHelper/ReturnBerry"
-return_berry.depth = -100
-return_berry.nodeLineRenderType = false -- done manually to seperate seeds and return position
-return_berry.nodeLimits = {2, -1}
-return_berry.ignoredFields = { "nodes", "_name", "_id", "originX", "originY" }
+returnBerry.name = "SorbetHelper/ReturnBerry"
+returnBerry.depth = -100
+returnBerry.nodeLineRenderType = false
+returnBerry.nodeLimits = {2, -1}
 
-return_berry.fieldInformation = {
-    order = {
-        fieldType = "integer",
-    },
-    checkpointID = {
-        fieldType = "integer"
-    },
-    delay = {
-        minimumValue = 0.0
-    }
-}
-
-function return_berry.fieldOrder(entity)
-    local fields = {}
-    if entity.checkpointID == nil then
-        fields = {
-            "x", "y", "delay", "winged", "moon", "bubbleParticles"
-        }
-    else
-        fields = {
-            "x", "y", "checkpointID", "order", "delay", "winged", "moon", "bubbleParticles"
-        }
-    end
-    return fields
-end
-
-return_berry.placements = {
+returnBerry.placements = {
     {
-        name = "normal",
-        alternativeName = "normalalt",
+        name = "strawberry_with_return",
+        alternativeName = "search_engine_optimization",
         placementType = "point",
         data = {
             winged = false,
@@ -59,8 +33,8 @@ return_berry.placements = {
         }
     },
     {
-        name = "winged",
-        alternativeName = "wingedalt",
+        name = "strawberry_with_return_winged",
+        alternativeName = "search_engine_optimization_winged",
         placementType = "point",
         data = {
             winged = true,
@@ -77,8 +51,27 @@ return_berry.placements = {
     }
 }
 
-local function getWhite(opacity)
-    return {1, 1, 1, opacity or 1}
+returnBerry.fieldOrder = {
+    "x", "y",
+    "checkpointID", "order",
+    "delay", "winged", "moon",
+    "bubbleParticles"
+}
+
+returnBerry.fieldInformation = {
+    order = {
+        fieldType = "integer"
+    },
+    checkpointID = {
+        fieldType = "integer"
+    },
+    delay = {
+        minimumValue = 0.0
+    }
+}
+
+local function getWhite(alpha)
+    return {1, 1, 1, alpha or 1}
 end
 
 local function addSeeds(sprites, entity, lines)
@@ -88,7 +81,6 @@ local function addSeeds(sprites, entity, lines)
     local nodes = entity.nodes
     local entityX, entityY = entity.x or 0, entity.y or 0
 
-    -- skip if not seeded
     if not nodes or #nodes < 3 then
         return
     end
@@ -108,9 +100,9 @@ local function addSeeds(sprites, entity, lines)
     end
 end
 
-function return_berry.sprite(room, entity, viewport)
-    local bubbleTexture = "characters/player/bubble"
-    local smallBubbleTexture = "particles/bubble"
+function returnBerry.sprite(room, entity, viewport)
+    local playerBubbleTexture = "characters/player/bubble"
+    local bubbleParticleTexture = "particles/bubble"
     local berryTexture = ""
 
     local x, y = entity.x or 0, entity.y or 0
@@ -146,18 +138,18 @@ function return_berry.sprite(room, entity, viewport)
     local sprites = {}
 
     -- bubbles behind berry
-    table.insert(sprites, drawableSprite.fromTexture(smallBubbleTexture, {x = x + 2, y = y - 8, color = getWhite(0.25)}))
+    table.insert(sprites, drawableSprite.fromTexture(bubbleParticleTexture, {x = x + 2, y = y - 8, color = getWhite(0.25)}))
 
     -- berry
     table.insert(sprites, drawableSprite.fromTexture(berryTexture, entity))
 
     -- bubbles above berry
-    table.insert(sprites, drawableSprite.fromTexture(smallBubbleTexture, {x = x - 5, y = y - 2, color = getWhite(0.6)}))
-    table.insert(sprites, drawableSprite.fromTexture(smallBubbleTexture, {x = x + 4, y = y + 3, color = getWhite(0.6)}))
+    table.insert(sprites, drawableSprite.fromTexture(bubbleParticleTexture, {x = x - 5, y = y - 2, color = getWhite(0.6)}))
+    table.insert(sprites, drawableSprite.fromTexture(bubbleParticleTexture, {x = x + 4, y = y + 3, color = getWhite(0.6)}))
 
     -- end bubble
     local nx, ny = nodes[2].x or 0, nodes[2].y or 0
-    table.insert(sprites, drawableSprite.fromTexture(bubbleTexture, {x = nx, y = ny, color = getWhite(0.5)}))
+    table.insert(sprites, drawableSprite.fromTexture(playerBubbleTexture, {x = nx, y = ny, color = getWhite(0.5)}))
 
     -- seeds
     addSeeds(sprites, entity, false)
@@ -165,13 +157,11 @@ function return_berry.sprite(room, entity, viewport)
     return sprites
 end
 
-function return_berry.nodeSprite(room, entity, node, nodeIndex, viewport)
-    -- node sprite is used for stuff that should only be rendered when selected so im wrapping it all in the "first node"
+function returnBerry.nodeSprite(room, entity, node, nodeIndex, viewport)
+    -- the node sprite is used for stuff that should only be rendered when selected so we just put it all in the first node
     if nodeIndex > 1 then
         return {}
     end
-
-    local bubbleTexture = "characters/player/bubble"
 
     local nodes = entity.nodes
 
@@ -189,10 +179,10 @@ function return_berry.nodeSprite(room, entity, node, nodeIndex, viewport)
     -- seed lines
     addSeeds(sprites, entity, true)
 
-    return sprites-- drawableSprite.fromTexture("util/noise", node)
+    return sprites
 end
 
-function return_berry.selection(room, entity)
+function returnBerry.selection(room, entity)
     local x, y = entity.x or 0, entity.y or 0
     local winged = entity.winged
     local moon = entity.moon
@@ -223,7 +213,8 @@ function return_berry.selection(room, entity)
     return mainRectangle, nodeRectangles
 end
 
-function return_berry.nodeAdded(room, entity, nodeIndex)
+-- seeds should always be added after the return nodes
+function returnBerry.nodeAdded(room, entity, nodeIndex)
     local nodes = entity.nodes or {{x = 0, y = 0}, {x = 0, y = 0}}
     if nodeIndex == 0 then
         local nodeX = entity.x + (entity.width or 0) + 8
@@ -244,7 +235,9 @@ function return_berry.nodeAdded(room, entity, nodeIndex)
     return true
 end
 
-function return_berry.delete(room, targetEntity, nodeIndex)
+-- deleting the return nodes should alwasy be treated as deleting the entity, even if there are seeds present
+-- wish lönn had a nicer api for this but oh well
+function returnBerry.delete(room, targetEntity, nodeIndex)
     local entities = entities.getRoomItems(room, "entities")
     local nodes = targetEntity.nodes or {{x = 0, y = 0}, {x = 0, y = 0}}
     for i, entity in ipairs(entities) do
@@ -260,4 +253,4 @@ function return_berry.delete(room, targetEntity, nodeIndex)
     end
 end
 
-return return_berry
+return returnBerry

@@ -6,7 +6,7 @@ local entities = require("entities")
 
 local sorbetUtils = {}
 
----
+--- util functions
 
 -- adapted from https://forums.solar2d.com/t/split-utf-8-string-word-with-foreign-characters-to-letters/320463/2
 function sorbetUtils.UTF8ToCharArray(str)
@@ -48,7 +48,7 @@ function sorbetUtils.UTF8ToCharArray(str)
     return charArray
 end
 
----
+--- field information options
 
 function sorbetUtils.getAllSIDs()
     local sids = {}
@@ -79,7 +79,92 @@ function sorbetUtils.getMapSIDs()
     return sids
 end
 
----
+function sorbetUtils.getDepths(extraOptions)
+    local depthOptions = {
+        {"BG Terrain (10000)", 10000},
+        {"BG Mirrors (9500)", 9500},
+        {"BG Decals (9000)", 9000},
+        {"BG Particles (8000)", 8000},
+        {"Solids Below (5000)", 5000},
+        {"Below (2000)", 2000},
+        {"NPCs (1000)", 1000},
+        {"Theo Crystal (100)", 100},
+        {"Player (0)", 0},
+        {"Dust (-50)", -50},
+        {"Pickups (-100)", -100},
+        {"Seeker (-200)", -200},
+        {"Particles (-8000)", -8000},
+        {"Above (-8500)", -8500},
+        {"Solids (-9000)", -9000},
+        {"FG Terrain (-10000)", -10000},
+        {"FG Decals (-10500)", -10500},
+        {"Dream Blocks (-11000)", -11000},
+        {"Crystal Spinners (-11500)", -11500},
+        {"Player Dream Dashing (-12000)", -12000},
+        {"Enemy (-12500)", -12500},
+        {"Fake Walls (-13000)", -13000},
+        {"FG Particles (-50000)", -50000},
+        {"Top (-1000000)", -1000000},
+        {"Formation Sequences (-2000000)", -2000000}
+    }
+
+    if extraOptions then
+        for _, option in ipairs(extraOptions) do
+            local depth = option[2]
+            local name = option[1] .. " (" .. depth .. ")"
+
+            for i, origOption in ipairs(depthOptions) do
+                local origDepth = origOption[2]
+
+                -- rename if depth already exists
+                if origDepth == depth then
+                    depthOptions[i][1] = name
+                    break
+                end
+
+                -- otherwise insert before the first lower depth in the list
+                if depth > origDepth then
+                    table.insert(depthOptions, i, {name, depth})
+                    break
+                end
+
+                -- if there are no lower depths, insert it at the end of the list
+                if i == #depthOptions then
+                    table.insert(depthOptions, {name, depth})
+                    break
+                end
+            end
+        end
+    end
+
+    return depthOptions
+end
+
+sorbetUtils.simpleEasings = {
+    "Linear",
+    "SineIn", "SineOut", "SineInOut",
+    "QuadIn", "QuadOut", "QuadInOut",
+    "CubeIn", "CubeOut", "CubeInOut",
+    "QuintIn", "QuintOut", "QuintInOut",
+    "ExpoIn", "ExpoOut", "ExpoInOut"
+}
+
+sorbetUtils.allEasings = {
+    "Linear",
+    "SineIn", "SineOut", "SineInOut",
+    "QuadIn", "QuadOut", "QuadInOut",
+    "CubeIn", "CubeOut", "CubeInOut",
+    "QuintIn", "QuintOut", "QuintInOut",
+    "ExpoIn", "ExpoOut", "ExpoInOut",
+    "BackIn", "BackOut", "BackInOut",
+    "BigBackIn", "BigBackOut", "BigBackInOut",
+    "ElasticIn", "ElasticOut", "ElasticInOut",
+    "BounceIn", "BounceOut", "BounceInOut"
+}
+
+--- sprite utils
+
+sorbetUtils.controllerDepth = -1000010
 
 function sorbetUtils.checkForDuplicateInMap(self, isTrigger, duplicateCheck)
     isTrigger = isTrigger or false
@@ -103,7 +188,7 @@ function sorbetUtils.checkForDuplicateInMap(self, isTrigger, duplicateCheck)
     return false
 end
 
----
+--- sprite functions
 
 function sorbetUtils.getGenericNodeSprite(x, y, color)
     local color = color or colors.selectionCompleteNodeLineColor
@@ -133,9 +218,9 @@ function sorbetUtils.getControllerSprites(x, y, texture, global, warning)
 end
 
 function sorbetUtils.getControllerSpriteFunction(textureName, globalCheck, noDuplicates)
-    globalCheck = globalCheck or function (room, entity) return entity.global or false end
+    globalCheck = globalCheck or function(room, entity) return entity.global or false end
 
-    return function (room, entity)
+    return function(room, entity)
         local warning = noDuplicates and sorbetUtils.checkForDuplicateInMap(entity) and "!Duplicate!" or nil
         local global = type(globalCheck) == "boolean" and globalCheck or globalCheck(room, entity)
         return sorbetUtils.getControllerSprites(entity.x or 0, entity.y or 0, textureName, global, warning)

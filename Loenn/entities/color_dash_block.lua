@@ -10,11 +10,6 @@ local colors = {
     "fca700",
 }
 
-local frames = {
-    "objects/SorbetHelper/colorDashBlock/solid",
-    "objects/SorbetHelper/colorDashBlock/solid",
-}
-
 local colorNames = {
     ["Cyan"] = 0,
     ["Yellow"] = 1,
@@ -23,18 +18,11 @@ local colorNames = {
 colorDashBlock.name = "SorbetHelper/ColorDashBlock"
 colorDashBlock.warnBelowSize = {16, 16}
 colorDashBlock.depth = -10
-colorDashBlock.fieldInformation = {
-    index = {
-        fieldType = "integer",
-        options = colorNames,
-        editable = false
-    }
-}
-colorDashBlock.placements = {}
 
+colorDashBlock.placements = {}
 for i, _ in ipairs(colors) do
     colorDashBlock.placements[i] = {
-        name = string.format("colorDashBlock_%s", i - 1),
+        name = string.format("color_dash_block_%s", i - 1),
         alternativeName = "coloUr",
         data = {
             index = i - 1,
@@ -44,6 +32,20 @@ for i, _ in ipairs(colors) do
         }
     }
 end
+
+colorDashBlock.fieldOrder = {
+    "x", "y",
+    "width", "height",
+    "index", "switchOnDreamTunnel"
+}
+
+colorDashBlock.fieldInformation = {
+    index = {
+        fieldType = "integer",
+        options = colorNames,
+        editable = false
+    }
+}
 
 -- Filter by cassette blocks sharing the same index
 local function getSearchPredicate(entity)
@@ -133,7 +135,7 @@ function colorDashBlock.sprite(room, entity)
 
     local index = entity.index or 0
     local color = colors[index + 1] or colors[1]
-    local frame = frames[index + 1] or frames[1]
+    local frameTexture = "objects/SorbetHelper/colorDashBlock/solid"
 
     local fillRectangle = drawableRectangle.fromRectangle("fill", entity.x or 0, entity.y or 0, width, height, color)
     table.insert(sprites, fillRectangle)

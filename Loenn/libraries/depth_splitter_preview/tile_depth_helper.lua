@@ -2,7 +2,7 @@ local logging = require("logging")
 local mods = require("mods")
 local depths = require("consts.object_depths")
 local smartDrawingBatch = require("structs.smart_drawing_batch")
-local sorbetUtils = mods.requireFromPlugin("libraries.utils")
+local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
 
 local tilesFgDepth = depths.fgTerrain
 local tilesBgDepth = depths.bgTerrain

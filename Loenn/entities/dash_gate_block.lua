@@ -5,29 +5,25 @@ local utils = require("utils")
 local drawing = require("utils.drawing")
 local entities = require("entities")
 
--- somewhat based on flag switch gates from maddiehelpinghand as is the case for most game block stuff :p
--- https://github.com/maddie480/MaddieHelpingHand/blob/master/Loenn/entities/flagSwitchGate.lua
--- (rendering is mostly mine though and based on exclamation blocks if anything)
-
 local dashGateBlock = {}
 
 dashGateBlock.name = "SorbetHelper/DashGateBlock"
-dashGateBlock.depth = 0
+dashGateBlock.depth = -9000
 dashGateBlock.nodeLimits = {1, 1}
 dashGateBlock.nodeLineRenderType = false
 dashGateBlock.warnBelowSize = {16, 16}
 
-local axes = {
+local hittableAxes = {
     "Both",
     "Horizontal",
     "Vertical",
 }
 
 dashGateBlock.placements = {}
-for k,v in ipairs(axes) do
+for k,v in ipairs(hittableAxes) do
     table.insert(dashGateBlock.placements, {
-        name = v,
-        alternativeName = "kevinswitchgate",
+        name = string.format("dash_gate_block_%s", string.lower(v)),
+        alternativeName = "kevin_switch_gate",
         data = {
             width = 16,
             height = 16,
@@ -95,9 +91,9 @@ dashGateBlock.fieldInformation = {
         default = true
     },
     axes = {
-        options = axes,
+        options = hittableAxes,
         editable = false
-    },
+    }
 }
 
 local ninePatchOptions = {
@@ -124,10 +120,10 @@ local function createSprites(entity, x, y, width, height, color)
     local blockPath = entity.blockSprite or "SorbetHelper/gateblock/dash/block"
     local iconPath = entity.iconSprite or "switchgate/icon"
 
-    local axes = entity.axes or "Both"
-    if axes == "Horizontal" then
+    local hittableAxes = entity.axes or "Both"
+    if hittableAxes == "Horizontal" then
         blockPath ..= "_h"
-    elseif axes == "Vertical" then
+    elseif hittableAxes == "Vertical" then
         blockPath ..= "_v"
     end
 

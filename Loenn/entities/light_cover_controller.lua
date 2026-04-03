@@ -1,57 +1,55 @@
-local sorbetUtils = require("mods").requireFromPlugin("libraries.utils")
+local mods = require("mods")
+local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
 
-local lightCover = {}
+local lightCoverController = {}
 
-lightCover.name = "SorbetHelper/LightCoverController"
-lightCover.sprite = sorbetUtils.getControllerSpriteFunction("lightCoverController")
-lightCover.depth = -1000010
-lightCover.placements = {
-    name = "controller",
+lightCoverController.name = "SorbetHelper/LightCoverController"
+lightCoverController.sprite = sorbetUtils.getControllerSpriteFunction("lightCoverController")
+lightCoverController.depth = sorbetUtils.controllerDepth
+lightCoverController.placements = {
+    name = "light_cover_controller",
     data = {
+        alpha = 1,
         classNames = "",
         minDepth = "",
         maxDepth = "",
-        global = false,
-
-        alpha = 1,
+        global = false
     }
 }
 
-lightCover.fieldInformation = function()
-    return {
-        classNames = {
-            fieldType = "list",
-            elementSeparator = ",",
-            elementDefault = "",
-            elementOptions = {
-                 options = sorbetUtils.getMapSIDs(),
-                 searchable = true,
-            }
-        },
-        minDepth = {
-            fieldType = "integer",
-            allowEmpty = true
-        },
-        maxDepth = {
-            fieldType = "integer",
-            allowEmpty = true
-        },
-        alpha = {
-            minimumValue = 0,
-            maximumValue = 1
-        }
-    }
-end
-
-lightCover.ignoredFields = {
+lightCoverController.ignoredFields = {
     "_id", "_name",
     "useFullClassNames"
 }
 
-lightCover.fieldOrder = {
+lightCoverController.fieldOrder = {
     "x", "y",
     "alpha", "maxDepth",
     "classNames", "minDepth"
 }
 
-return lightCover
+lightCoverController.fieldInformation = {
+    classNames = {
+        fieldType = "list",
+        elementSeparator = ",",
+        elementDefault = "",
+        elementOptions = {
+             options = function() return sorbetUtils.getMapSIDs() end,
+             searchable = true
+        }
+    },
+    minDepth = {
+        fieldType = "integer",
+        allowEmpty = true
+    },
+    maxDepth = {
+        fieldType = "integer",
+        allowEmpty = true
+    },
+    alpha = {
+        minimumValue = 0,
+        maximumValue = 1
+    }
+}
+
+return lightCoverController

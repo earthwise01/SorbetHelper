@@ -3,6 +3,7 @@ local killzone = {}
 killzone.name = "SorbetHelper/KillZone"
 killzone.fillColor = {176 / 255, 99 / 255, 100 / 255, 0.3}
 killzone.borderColor = {145 / 255, 59 / 255, 95 / 255, 0.7}
+killzone.depth = -1000005
 killzone.canResize = {true, true}
 killzone.placements = {
     name = "killzone",

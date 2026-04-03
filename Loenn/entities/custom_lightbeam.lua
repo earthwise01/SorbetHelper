@@ -1,23 +1,19 @@
 local lightBeamHelper = require("helpers.light_beam")
-local drawing = require("utils.drawing")
 local utils = require("utils")
 local drawableLine = require("structs.drawable_line")
-local drawableRectangle = require("structs.drawable_rectangle")
 local drawableSprite = require("structs.drawable_sprite")
 local drawableText = require("structs.drawable_text")
 local constColors = require("consts.colors")
 local mods = require("mods")
-local depths = mods.requireFromPlugin("libraries.depths")
-local sorbetUtils = mods.requireFromPlugin("libraries.utils")
+local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
 local rainbowHelper = mods.requireFromPlugin("libraries.rainbow_helper")
 
-local lightBeam = {}
+local customLightbeam = {}
 
-lightBeam.name = "SorbetHelper/CustomLightbeam"
-lightBeam.depth = -9998
-lightBeam.placements = {
+customLightbeam.name = "SorbetHelper/CustomLightbeam"
+customLightbeam.placements = {
     {
-        name = "customlightbeam",
+        name = "custom_lightbeam",
         data = {
             width = 32,
             height = 24,
@@ -45,8 +41,8 @@ lightBeam.placements = {
         }
     },
     {
-        name = "customlightbeamrainbow",
-        alternativeName = "rainbowlightbeam",
+        name = "custom_lightbeam_rainbow",
+        alternativeName = "rainbow_lightbeam",
         data = {
             width = 32,
             height = 24,
@@ -75,39 +71,24 @@ lightBeam.placements = {
     },
 }
 
-lightBeam.fieldInformation = {
-    colors = {
-        fieldType = "list",
-        elementOptions = {
-            fieldType = "color",
-            allowXNAColors = false,
-            showAlpha = true,
-        }
-    },
-    color = {
-        fieldType = "color",
-        allowXNAColors = false
-    },
-    alpha = {
-        maximumValue = 1.0,
-        minimumValue = 0.0
-    },
-    flagFadeTime = {
-        minimumValue = 0.0
-    },
-    depth = {
-        fieldType = "integer",
-        options = depths.addDepth(depths.getDepths(), "Lightbeams", -9998),
-        editable = true
-    },
-    -- wip (update nvm   some other time i guess)
-    -- scrollAnchor = {
-    --     fieldType = "sorbetHelper.vector",
-    -- }
-}
-
 -- hide rainbow specific fields unless rainbow is enabled and vice versa
-function lightBeam.fieldOrder(entity)
+function customLightbeam.ignoredFields(entity)
+    local ignored = {}
+    if entity.rainbow == true and entity.useCustomRainbowColors == true then
+        ignored = {
+            "_id", "_name",
+            "color"
+        }
+    else
+        ignored = {
+            "_id", "_name",
+            "colors", "gradientSize", "gradientSpeed", "centerX", "centerY", "loopColors"
+        }
+    end
+    return ignored
+end
+
+function customLightbeam.fieldOrder(entity)
     local fields = {}
     --  this sucksss  why do i always put effort into trying to make these look pretty
     if entity.rainbow == true and entity.useCustomRainbowColors == true then
@@ -142,41 +123,32 @@ function lightBeam.fieldOrder(entity)
     return fields
 end
 
-function lightBeam.ignoredFields(entity)
-    local ignored = {}
-    if entity.rainbow == true and entity.useCustomRainbowColors == true then
-        ignored = {
-            "_id", "_name",
-            "color"
+customLightbeam.fieldInformation = {
+    colors = {
+        fieldType = "list",
+        elementOptions = {
+            fieldType = "color",
+            showAlpha = true
         }
-    else
-        ignored = {
-            "_id", "_name",
-            "colors", "gradientSize", "gradientSpeed", "centerX", "centerY", "loopColors"
-        }
-    end
-    return ignored
-end
+    },
+    color = {
+        fieldType = "color"
+    },
+    alpha = {
+        maximumValue = 1.0,
+        minimumValue = 0.0
+    },
+    flagFadeTime = {
+        minimumValue = 0.0
+    },
+    depth = {
+        fieldType = "integer",
+        options = sorbetUtils.getDepths({{"Lightbeams", -9998}}),
+        editable = true
+    }
+}
 
-
-function lightBeam.selection(room, entity)
-    local base = lightBeamHelper.getSelection(room, entity)
-    local nodes = entity.nodes or {}
-
-    if #nodes < 1 then
-        return base, nil
-    end
-
-    -- for scroll anchor
-    local nx, ny = nodes[1].x or 0, nodes[1].y or 0
-    return base, {utils.rectangle(nx - 4, ny - 4, 8, 8)}
-end
-
-lightBeam.rotate = lightBeamHelper.rotate
-lightBeam.updateResizeSelection = lightBeamHelper.updateResizeSelection
-
--- rendering stuff
-function lightBeam.sprite(room, entity)
+function customLightbeam.sprite(room, entity)
     local result = {}
 
     if entity.rainbow then
@@ -185,7 +157,7 @@ function lightBeam.sprite(room, entity)
         if entity.singleColor then
             result = lightBeamHelper.getSprites(room, entity, colors[1], false)
         else
-            result = lightBeam.getSpritesRainbow(room, entity, colors, false)
+            result = customLightbeam.getSpritesRainbow(room, entity, colors, false)
         end
     else
         result = lightBeamHelper.getSprites(room, entity, utils.getColor(entity.color), false)
@@ -195,10 +167,8 @@ function lightBeam.sprite(room, entity)
 end
 
 -- modified from lightBeamHelper.getSprites to have a rainbow gradient effect
-function lightBeam.getSpritesRainbow(room, entity, colors, onlyBase)
+function customLightbeam.getSpritesRainbow(room, entity, colors, onlyBase)
     local lightBeamTexture = "util/lightbeam"
-    -- Shallowcopy so we can change the alpha later
-    --local color = table.shallowcopy(colors[1] or { 0.8, 1.0, 1.0, 0.4 })
     local sprites = {}
     local x, y = entity.x + room.x, entity.y + room.y
 
@@ -267,8 +237,27 @@ function lightBeam.getSpritesRainbow(room, entity, colors, onlyBase)
     return sprites
 end
 
--- node stuff, only for scroll anchor sadly, no node based rotation (yet? if i ever get around to it,)
-function lightBeam.nodeLimits(room, entity)
+function customLightbeam.depth(room, entity)
+    return entity.depth or -9998
+end
+
+function customLightbeam.selection(room, entity)
+    local base = lightBeamHelper.getSelection(room, entity)
+    local nodes = entity.nodes or {}
+
+    if #nodes < 1 then
+        return base, nil
+    end
+
+    -- for scroll anchor
+    local nx, ny = nodes[1].x or 0, nodes[1].y or 0
+    return base, {utils.rectangle(nx - 4, ny - 4, 8, 8)}
+end
+
+customLightbeam.rotate = lightBeamHelper.rotate
+customLightbeam.updateResizeSelection = lightBeamHelper.updateResizeSelection
+
+function customLightbeam.nodeLimits(room, entity)
     if entity.scroll then
         return 0, 1
     end
@@ -276,17 +265,17 @@ function lightBeam.nodeLimits(room, entity)
     return 0, 0
 end
 
-function lightBeam.nodeSprite(room, entity, node)
+function customLightbeam.nodeSprite(room, entity, node)
     local x, y = entity.x or 0, entity.y or 0
     local nx, ny = node.x or 0, node.y or 0
     local anchor = sorbetUtils.getGenericNodeSprite(nx, ny, constColors.selectionCompleteNodeLineColor)
     local line = drawableLine.fromPoints({x, y, nx, ny}, constColors.selectionCompleteNodeLineColor)
     local desc = drawableText.fromText("Parallax Anchor", nx - 16, ny - 14, 32, 8, nil, 0.75)
 
-    return { anchor, line, desc }
+    return {anchor, line, desc}
 end
 
-function lightBeam.nodeAdded(room, entity, nodeIndex)
+function customLightbeam.nodeAdded(room, entity, nodeIndex)
     local nodes = entity.nodes or {}
 
     if nodeIndex == 0 then
@@ -305,4 +294,4 @@ function lightBeam.nodeAdded(room, entity, nodeIndex)
     return true
 end
 
-return lightBeam
+return customLightbeam

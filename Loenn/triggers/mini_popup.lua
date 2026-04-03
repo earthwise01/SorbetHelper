@@ -1,8 +1,15 @@
-local trigger = {}
+local miniPopupTrigger = {}
 
-trigger.name = "SorbetHelper/MiniPopupTrigger"
-trigger.placements = {
-    name = "miniPopup",
+local modes = {
+    "OnPlayerEnter",
+    "OnFlagEnabled",
+    "OnFlagDisabled",
+    "WhilePlayerInside"
+}
+
+miniPopupTrigger.name = "SorbetHelper/MiniPopupTrigger"
+miniPopupTrigger.placements = {
+    name = "mini_popup",
     data = {
         activeTime = 8.0,
         titleText = "AREA_7",
@@ -20,29 +27,7 @@ trigger.placements = {
     }
 }
 
-trigger.fieldInformation = {
-    activeTime = {
-        minimumValue = 0.0
-    },
-    baseColor = {
-        fieldType = "color",
-        allowXNAColors = false
-    },
-    accentColor = {
-        fieldType = "color",
-        allowXNAColors = false
-    },
-    titleColor = {
-        fieldType = "color",
-        allowXNAColors = false
-    },
-    mode = {
-        options = { "OnPlayerEnter", "OnFlagEnabled", "OnFlagDisabled", "WhilePlayerInside" },
-        editable = false
-    }
-}
-
-trigger.fieldOrder = {
+miniPopupTrigger.fieldOrder = {
     "x", "y",
     "width", "height",
     "titleText", "titleColor",
@@ -53,4 +38,23 @@ trigger.fieldOrder = {
     "onlyOnce", "removeOnLeave"
 }
 
-return trigger
+miniPopupTrigger.fieldInformation = {
+    activeTime = {
+        minimumValue = 0.0
+    },
+    baseColor = {
+        fieldType = "color"
+    },
+    accentColor = {
+        fieldType = "color"
+    },
+    titleColor = {
+        fieldType = "color"
+    },
+    mode = {
+        options = modes,
+        editable = false
+    }
+}
+
+return miniPopupTrigger
