@@ -2,12 +2,47 @@ local logging = require("logging")
 local mods = require("mods")
 local depths = require("consts.object_depths")
 local smartDrawingBatch = require("structs.smart_drawing_batch")
+local autotiler = require("autotiler")
+local meta = require("meta")
+local version = require("utils.version_parser")
 local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
 
 local tilesFgDepth = depths.fgTerrain
 local tilesBgDepth = depths.bgTerrain
 
 local tileDepthHelper = {}
+
+---
+
+local currentLoennVersion = meta.version
+local afterV105 = currentLoennVersion > version("v1.0.5")
+
+-- the `meta` argument was replaced with the `tileMeta` argument in v1.0.6
+function tileDepthHelper.autotiler_getQuads_compat(x, y, tiles, meta, tileMeta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile)
+    if afterV105 then
+        return autotiler.getQuads(x, y, tiles, tileMeta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile)
+    end
+
+    return autotiler.getQuads(x, y, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile)
+end
+
+-- v1.0.6 fixed a bug where the tileset randomMatrix wasn't in the correct 0-1 range (i think?), which also changed how the random quad index needs to be calculated
+function tileDepthHelper.celesteRender_getRandQuadIndex_compat(rng, quadCount)
+   if afterV105 then
+       return 1 + math.floor(rng * (quadCount - 1))
+   end
+
+    return utils.mod1(rng, quadCount)
+end
+
+-- the `default` argument was removed in v1.0.6
+function tileDepthHelper.smartDrawingBatch_createMatrixBatch_compat(default, width, height, cellWidth, cellHeight)
+    if afterV105 then
+        return smartDrawingBatch.createMatrixBatch(width, height, cellWidth, cellHeight)
+    end
+
+    return smartDrawingBatch.createMatrixBatch(default, width, height, cellWidth, cellHeight)
+end
 
 ---
 
@@ -56,7 +91,7 @@ end
 ---
 
 local function getOrCreateSmartTilesBatch(batches, depth, width, height, mode)
-    batches[depth] = batches[depth] or (mode == "gridCanvasDrawingBatch" and smartDrawingBatch.createGridCanvasBatch(false, width, height, 8, 8) or smartDrawingBatch.createMatrixBatch(false, width, height, 8, 8))
+    batches[depth] = batches[depth] or (mode == "gridCanvasDrawingBatch" and smartDrawingBatch.createGridCanvasBatch(false, width, height, 8, 8) or tileDepthHelper.smartDrawingBatch_createMatrixBatch_compat(false, width, height, 8, 8))
 
     return batches[depth]
 end

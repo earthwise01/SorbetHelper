@@ -17,18 +17,20 @@ local brushHelperHooks = {}
 function brushHelperHooks.load()
     local brushHelper = require("brushes")
 
-    -- taken from https://github.com/CelestialCartographers/Loenn/blob/v1.0.5/src/brushes.lua#L49
+    -- taken from https://github.com/CelestialCartographers/Loenn/blob/v1.0.7/src/brushes.lua#L49
     -- (needed for the brushHelper.updateRender hook below)
     local function addNeighborIfMissing(x, y, needsUpdate, addedUpdate)
-        if not addedUpdate:get(x, y) then
+        if not addedUpdate or not addedUpdate:get(x, y) then
             table.insert(needsUpdate, x)
             table.insert(needsUpdate, y)
 
-            addedUpdate:set(x, y, true)
+            if addedUpdate then
+                addedUpdate:set(x, y, true)
+            end
         end
     end
 
-    -- taken from https://github.com/CelestialCartographers/Loenn/blob/v1.0.5/src/brushes.lua#L59
+    -- taken from https://github.com/CelestialCartographers/Loenn/blob/v1.0.7/src/brushes.lua#L61
     -- (needed for the brushHelper.updateRender hook below)
     -- Inlined for 3x3 tilesets
     local function addMissingNeighbors(x, y, needsUpdate, addedUpdate)
@@ -52,7 +54,7 @@ function brushHelperHooks.load()
         addNeighborIfMissing(x, y - 2, needsUpdate, addedUpdate)
     end
 
-    -- taken from https://github.com/CelestialCartographers/Loenn/blob/v1.0.5/src/brushes.lua#L80
+    -- taken from https://github.com/CelestialCartographers/Loenn/blob/v1.0.7/src/brushes.lua#L82
     -- (needed for the brushHelper.updateRender hook below)
     local function addMissingNeighborsCustomSize(x, y, tileMeta, needsUpdate, addedUpdate)
         local scanWidth, scanHeight = tileMeta.scanWidth, tileMeta.scanHeight
@@ -74,8 +76,9 @@ function brushHelperHooks.load()
     end
 
     local _orig_updateRender = brushHelper.updateRender
-    -- modified from https://github.com/CelestialCartographers/Loenn/blob/v1.0.5/src/brushes.lua#L103
-    -- to match the changes made to celesteRender.getTilesBatch (since this function copies code from/has very similar code to it)
+    -- modified from https://github.com/CelestialCartographers/Loenn/blob/v1.0.7/src/brushes.lua#L105
+    -- to match the changes made to celesteRender.getTilesBatch (since this function copies code from/has very similar code to it),
+    -- and to keep compatibility with older loenn versions
     -- todo: check if this works on later versions/port any new changes over
     function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
         if not tileDepthHelper.shouldEnableMultipleTileDepths() then
@@ -105,23 +108,31 @@ function brushHelperHooks.load()
         local defaultQuad = {{0, 0}}
         local defaultSprite = ""
 
-        local width, height = tilesMatrix:size()
-        local addedUpdate = matrix.filled(nil, width, height)
+        local materialType = utils.typeof(material)
+
+        -- No need to create matrix for single tile brushing
+        local trackAddedUpdates = materialType == "matrix"
+        local addedUpdate
+
+        if trackAddedUpdates then
+            local width, height = tilesMatrix:size()
+
+            addedUpdate = matrix.filled(nil, width, height)
+        end
+
         local needsUpdate = {}
 
         local random = randomMatrix or celesteRender.getRoomRandomMatrix(room, layer)
         local roomCache = celesteRender.getRoomCache(room.name, layer)
-        local batches = roomCache and roomCache.result
+        local batches = roomCache and roomCache.result -- edited
         local batchWrapper = tileDepthHelper.createBatchWrapper(batches, width, height) -- added
 
-        local sceneryMatrix = scenery and scenery.matrix or matrix.filled(-1, width, height)
+        local sceneryMatrix = scenery and scenery.matrix
         local sceneryMeta = celesteRender.getSceneryMeta()
 
-        if not batches then
+        if not batches then -- edited
             return false
         end
-
-        local materialType = utils.typeof(material)
 
         if materialType == "matrix" then
             local materialWidth, materialHeight = material:size()
@@ -177,9 +188,8 @@ function brushHelperHooks.load()
             local x, y = needsUpdate[updateIndex], needsUpdate[updateIndex + 1]
 
             if tilesMatrix:inbounds(x, y) then
-                local rng = random:getInbounds(x, y)
                 local tile = tilesMatrix:getInbounds(x, y)
-                local sceneryTile = sceneryMatrix:getInbounds(x, y) or -1
+                    local sceneryTile = sceneryMatrix:getInbounds(x, y, -1) or -1
 
                 if sceneryTile > -1 then
                     local quad = celesteRender.getOrCacheScenerySpriteQuad(sceneryTile)
@@ -194,16 +204,17 @@ function brushHelperHooks.load()
                 else
                     -- TODO - Update overlay sprites
                     local tileMeta = meta[tile]
+                    local texture = tileMeta.path
 
                     if tileMeta and tileMeta.path then
-                        local quads, sprites = autotiler.getQuads(x, y, tilesMatrix, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
+                        local quads, sprites = tileDepthHelper.autotiler_getQuads_compat(x, y, tilesMatrix, meta, tileMeta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band) -- edited
                         local quadCount = #quads
 
                         if quadCount > 0 then
-                            local randQuad = quads[utils.mod1(rng, quadCount)]
-                            local texture = meta[tile].path or emptyTile
+                            local rng = random:getInbounds(x, y)
+                            local randQuad = quads[tileDepthHelper.celesteRender_getRandQuadIndex_compat(rng, quadCount)]
 
-                            local spriteMeta = atlases.gameplay[texture]
+                            local spriteMeta = gameplayAtlas[texture]
 
                             if spriteMeta then
                                 local quad = celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, randQuad, fg)

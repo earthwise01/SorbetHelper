@@ -26,8 +26,9 @@ function celesteRenderHooks.load()
     logging.warning("[SorbetHelper/DepthSplitterPreview] hooked celesteRender.loadCustomTilesetAutotiler!")
 
     local _orig_getTilesBatch = celesteRender.getTilesBatch
-    -- modified from https://github.com/CelestialCartographers/Loenn/blob/v1.0.5/src/celeste_render.lua#L408
-    -- to add tiles to multiple batches depending on their depths in sorbet helper solid tiles depth splitters
+    -- modified from https://github.com/CelestialCartographers/Loenn/blob/v1.0.5/src/celeste_render.lua#L410
+    -- to add tiles to multiple batches depending on their depths in sorbet helper solid tiles depth splitters,
+    -- and to keep compatibility with older loenn versions
     -- todo: check if this works on later versions/port any new changes over
     function celesteRender.getTilesBatch(room, tiles, meta, scenery, fg, randomMatrix, batchMode, shouldYield)
         if not tileDepthHelper.shouldEnableMultipleTileDepths() then
@@ -47,6 +48,9 @@ function celesteRenderHooks.load()
         local bxor = bit.bxor
         local band = bit.band
 
+        local canvasOrMatrixBatch = batchMode == "gridCanvasDrawingBatch" or batchMode == "matrixDrawingBatch"
+        local tableBatch = batchMode == "table"
+
         local airTile = "0"
         local emptyTile = " "
         local wildcard = "*"
@@ -59,52 +63,54 @@ function celesteRenderHooks.load()
 
         local random = randomMatrix or celesteRender.getRoomRandomMatrix(room, fg and "tilesFg" or "tilesBg")
 
-        local sceneryMatrix = scenery and scenery.matrix or matrix.filled(-1, width, height)
+        local sceneryMatrix = scenery and scenery.matrix
         local sceneryMeta = celesteRender.getSceneryMeta()
         local sceneryWidth, sceneryHeight = sceneryMeta.realWidth, sceneryMeta.realHeight
+
+        local gameplayAtlas = atlases.gameplay
 
         local missingTiles = {}
 
         for x = 1, width do
             for y = 1, height do
-                local rng = random:getInbounds(x, y)
-                local tile = tilesMatrix:getInbounds(x, y) or airTile
-                local sceneryTile = sceneryMatrix:getInbounds(x, y) or -1
+                local tile = tilesMatrix:getInbounds(x, y)
+                local sceneryTile = sceneryMatrix and sceneryMatrix:getInbounds(x, y, -1) or -1
 
                 if sceneryTile > -1 then
                     local quad = celesteRender.getOrCacheScenerySpriteQuad(sceneryTile)
 
                     if quad then
-                        if batchMode == "gridCanvasDrawingBatch" or batchMode == "matrixDrawingBatch" then
+                        if canvasOrMatrixBatch then
                             batchWrapper:getBatch(fg and tilesFgDepth or tilesBgDepth):set(x, y, sceneryMeta, quad, x * 8 - 8, y * 8 - 8) -- edited
 
-                        elseif batchMode == "table" then
+                        elseif tableBatch then
                             table.insert(batchWrapper.batches, {sceneryMeta, quad, x * 8 - 8, y * 8 - 8}) -- edited
                         end
                     end
 
-                elseif tile ~= airTile then
+                elseif tile and tile ~= airTile then
                     local tileMeta = meta[tile]
-                    if tileMeta and tileMeta.path then
+                    local texture = tileMeta.path
+                    if tileMeta and texture then
                         -- TODO - Render overlay sprites
-                        local quads, sprites = autotiler.getQuads(x, y, tilesMatrix, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
+                        local quads, sprites = tileDepthHelper.autotiler_getQuads_compat(x, y, tilesMatrix, meta, tileMeta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
                         local quadCount = #quads
 
                         if quadCount > 0 then
-                            local randQuad = quads[utils.mod1(rng, quadCount)]
-                            local texture = tileMeta.path or emptyTile
+                            local rng = random:getInbounds(x, y)
+                            local randQuad = quads[tileDepthHelper.celesteRender_getRandQuadIndex_compat(rng, quadCount)]
 
-                            local spriteMeta = atlases.gameplay[texture]
+                            local spriteMeta = gameplayAtlas[texture]
 
                             if spriteMeta then
                                 local quad = celesteRender.getOrCacheTileSpriteQuad(tileCache, tile, texture, randQuad, fg)
 
-                                if batchMode == "gridCanvasDrawingBatch" or batchMode == "matrixDrawingBatch" then
+                                if canvasOrMatrixBatch then
                                     local tileDepth = tileDepthHelper.getTiletypeDepth(tile, fg) -- added
 
                                     batchWrapper:getBatch(tileDepth):set(x, y, spriteMeta, quad, x * 8 - 8, y * 8 - 8) -- edited
 
-                                elseif batchMode == "table" then
+                                elseif tableBatch then
                                     table.insert(batchWrapper.batches, {spriteMeta, quad, x * 8 - 8, y * 8 - 8}) -- edited
                                 end
 
