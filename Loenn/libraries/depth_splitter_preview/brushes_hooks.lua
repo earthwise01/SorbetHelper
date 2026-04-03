@@ -189,7 +189,7 @@ function brushHelperHooks.load()
 
             if tilesMatrix:inbounds(x, y) then
                 local tile = tilesMatrix:getInbounds(x, y)
-                    local sceneryTile = sceneryMatrix:getInbounds(x, y, -1) or -1
+                local sceneryTile = sceneryMatrix:getInbounds(x, y, -1) or -1
 
                 if sceneryTile > -1 then
                     local quad = celesteRender.getOrCacheScenerySpriteQuad(sceneryTile)
