@@ -14,7 +14,6 @@ local function createFallingBlockPlugin(entityName, placementName, placementAltN
 
     fallingBlock.name = entityName
 
-    -- placements
     local placementData = {
         width = 8,
         height = 8,
@@ -152,7 +151,11 @@ local dashFallingBlockFieldOrder = {
 
 local dashFallingBlockFieldInfo = {
     fallDashMode = {
-        options = { "Disabled", "Push", "Pull" },
+        options = {
+            "Disabled",
+            "Push",
+            "Pull"
+        },
         editable = false
     }
 }

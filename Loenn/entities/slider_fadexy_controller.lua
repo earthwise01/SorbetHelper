@@ -12,8 +12,14 @@ sliderFadeXYController.placements = {
         slider = "",
         fadeX = "",
         fadeY = "",
-        global = true
+        global = false
     }
+}
+
+sliderFadeXYController.fieldOrder = {
+    "x", "y"
+    "fadeX", "fadeY",
+    "slider", "global"
 }
 
 return sliderFadeXYController

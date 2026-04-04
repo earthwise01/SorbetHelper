@@ -9,7 +9,7 @@ darknessTransparencyFixController.depth = sorbetUtils.controllerDepth
 darknessTransparencyFixController.placements = {
     name = "darkness_transparency_fix_controller",
     data = {
-        global = false,
+        global = false
     }
 }
 

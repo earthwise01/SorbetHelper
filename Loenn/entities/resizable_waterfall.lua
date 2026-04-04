@@ -7,11 +7,6 @@ local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
 
 local resizableWaterfall = {}
 
-local depthOptions = sorbetUtils.getDepths({
-    {"Water & Waterfalls", -9999},
-    {"FG Waterfalls", -49900}
-})
-
 local splashParticleDepths = {
     {"BG Particles (8000)", "ParticlesBG"},
     {"Particles (-8000)", "Particles"},
@@ -91,7 +86,10 @@ resizableWaterfall.fieldInformation = {
     },
     depth = {
         fieldType = "integer",
-        options = depthOptions,
+        options = sorbetUtils.getDepths({
+            {"Water & Waterfalls", -9999},
+            {"FG Waterfalls", -49900}
+        }),
         editable = true
     },
     splashParticleDepth = {

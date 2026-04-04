@@ -14,7 +14,6 @@ local modes = {
 colorDashBlockStateTrigger.name = "SorbetHelper/ColorDashBlockStateTrigger"
 colorDashBlockStateTrigger.placements = {
     name = "color_dash_block_state",
-    alternativeName = "colour_dash_block_state",
     data = {
         index = 0,
         mode = "OnPlayerEnter",

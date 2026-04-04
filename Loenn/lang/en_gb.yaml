@@ -830,8 +830,6 @@ Entities:
       color_dash_block_1:
         Name: Color Dash Block (Yellow)
         Description: A block which switches collidability according the current color index, and switches the current color index when dashed into.
-      coloUr:
-        Name: Colour Dash Block
     Attributes:
       index:
         Description: The index of the block.
@@ -939,8 +937,6 @@ Triggers:
       color_dash_block_state:
         Name: Color Dash Block State Trigger
         Description: A trigger which sets the color dash block index to a specified value.
-      colour_dash_block_state:
-        Name: Colour Dash Block State Trigger
     Attributes:
       index:
         Description: The index to set color dash blocks to.

@@ -26,7 +26,7 @@ function celesteRenderHooks.load()
     logging.warning("[SorbetHelper/DepthSplitterPreview] hooked celesteRender.loadCustomTilesetAutotiler!")
 
     local _orig_getTilesBatch = celesteRender.getTilesBatch
-    -- modified from https://github.com/CelestialCartographers/Loenn/blob/v1.0.5/src/celeste_render.lua#L410
+    -- modified from https://github.com/CelestialCartographers/Loenn/blob/v1.0.8/src/celeste_render.lua#L410
     -- to add tiles to multiple batches depending on their depths in sorbet helper solid tiles depth splitters,
     -- and to keep compatibility with older loenn versions
     -- todo: check if this works on later versions/port any new changes over
@@ -94,12 +94,12 @@ function celesteRenderHooks.load()
 
                     if texture then
                         -- TODO - Render overlay sprites
-                        local quads, sprites = tileDepthHelper.autotiler_getQuads_compat(x, y, tilesMatrix, meta, tileMeta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
+                        local quads, sprites = tileDepthHelper.autotiler_getQuads_compat(x, y, tilesMatrix, meta, tileMeta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band) -- edited
                         local quadCount = #quads
 
                         if quadCount > 0 then
                             local rng = random:getInbounds(x, y)
-                            local randQuad = quads[tileDepthHelper.celesteRender_getRandQuadIndex_compat(rng, quadCount)]
+                            local randQuad = quads[tileDepthHelper.getRandQuadIndex_compat(rng, quadCount)] -- edited
 
                             local spriteMeta = gameplayAtlas[texture]
 
@@ -142,8 +142,6 @@ function celesteRenderHooks.load()
         return batchWrapper.batches, missingTiles -- edited
     end
     logging.warning("[SorbetHelper/DepthSplitterPreview] hooked celesteRender.getTilesBatch!")
-
-    ---
 
     return {
         unload = function()

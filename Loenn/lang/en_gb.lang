@@ -421,7 +421,6 @@ entities.SorbetHelper/ColorDashBlock.placements.name.color_dash_block_0=Color Da
 entities.SorbetHelper/ColorDashBlock.placements.description.color_dash_block_0=A block which switches collidability according the current color index, and switches the current color index when dashed into.
 entities.SorbetHelper/ColorDashBlock.placements.name.color_dash_block_1=Color Dash Block (Yellow)
 entities.SorbetHelper/ColorDashBlock.placements.description.color_dash_block_1=A block which switches collidability according the current color index, and switches the current color index when dashed into.
-entities.SorbetHelper/ColorDashBlock.placements.name.coloUr=Colour Dash Block
 entities.SorbetHelper/ColorDashBlock.attributes.description.index=The index of the block.
 entities.SorbetHelper/ColorDashBlock.attributes.description.switchOnDreamTunnel=Whether the block should switch if the player dashes through it with a Communal Helper Dream Tunnel Dash.
 
@@ -470,7 +469,6 @@ triggers.SorbetHelper/MiniPopupTrigger.attributes.description.flag=A session fla
 # Color Dash Block State Trigger
 triggers.SorbetHelper/ColorDashBlockStateTrigger.placements.name.color_dash_block_state=Color Dash Block State Trigger
 triggers.SorbetHelper/ColorDashBlockStateTrigger.placements.description.color_dash_block_state=A trigger which sets the color dash block index to a specified value.
-triggers.SorbetHelper/ColorDashBlockStateTrigger.placements.name.colour_dash_block_state=Colour Dash Block State Trigger
 triggers.SorbetHelper/ColorDashBlockStateTrigger.attributes.description.index=The index to set color dash blocks to.
 triggers.SorbetHelper/ColorDashBlockStateTrigger.attributes.name.mode=Activation Mode
 triggers.SorbetHelper/ColorDashBlockStateTrigger.attributes.description.mode=Determines how the trigger will activate.

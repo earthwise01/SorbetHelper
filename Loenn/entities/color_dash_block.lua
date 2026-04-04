@@ -23,7 +23,6 @@ colorDashBlock.placements = {}
 for i, _ in ipairs(colors) do
     colorDashBlock.placements[i] = {
         name = string.format("color_dash_block_%s", i - 1),
-        alternativeName = "coloUr",
         data = {
             index = i - 1,
             switchOnDreamTunnel = false,

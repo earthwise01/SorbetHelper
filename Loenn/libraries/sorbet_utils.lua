@@ -6,7 +6,7 @@ local entities = require("entities")
 
 local sorbetUtils = {}
 
---- util functions
+--- util functions ---
 
 -- adapted from https://forums.solar2d.com/t/split-utf-8-string-word-with-foreign-characters-to-letters/320463/2
 function sorbetUtils.UTF8ToCharArray(str)
@@ -48,7 +48,7 @@ function sorbetUtils.UTF8ToCharArray(str)
     return charArray
 end
 
---- field information options
+--- field information options ---
 
 function sorbetUtils.getAllSIDs()
     local sids = {}
@@ -162,7 +162,7 @@ sorbetUtils.allEasings = {
     "BounceIn", "BounceOut", "BounceInOut"
 }
 
---- sprite utils
+--- sprite utils ---
 
 sorbetUtils.controllerDepth = -1000010
 
@@ -188,7 +188,7 @@ function sorbetUtils.checkForDuplicateInMap(self, isTrigger, duplicateCheck)
     return false
 end
 
---- sprite functions
+--- sprite functions ---
 
 function sorbetUtils.getGenericNodeSprite(x, y, color)
     local color = color or colors.selectionCompleteNodeLineColor

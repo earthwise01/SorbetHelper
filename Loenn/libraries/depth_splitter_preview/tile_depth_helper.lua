@@ -12,39 +12,39 @@ local tilesBgDepth = depths.bgTerrain
 
 local tileDepthHelper = {}
 
----
+--- backwards compat with older loenn versions ---
 
 local currentLoennVersion = meta.version
-local afterV105 = currentLoennVersion > version("v1.0.5")
+local beforeV106 = currentLoennVersion < version("v1.0.6")
 
--- the `meta` argument was replaced with the `tileMeta` argument in v1.0.6
 function tileDepthHelper.autotiler_getQuads_compat(x, y, tiles, meta, tileMeta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile)
-    if afterV105 then
-        return autotiler.getQuads(x, y, tiles, tileMeta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile)
+    -- versions before v1.0.6 had a `meta` argument instead of a `tileMeta` argument
+    if beforeV106 then
+        return autotiler.getQuads(x, y, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile)
     end
 
-    return autotiler.getQuads(x, y, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile)
+    return autotiler.getQuads(x, y, tiles, tileMeta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile)
 end
 
--- v1.0.6 fixed a bug where the tileset randomMatrix wasn't in the correct 0-1 range (i think?), which also changed how the random quad index needs to be calculated
-function tileDepthHelper.celesteRender_getRandQuadIndex_compat(rng, quadCount)
-   if afterV105 then
-       return 1 + math.floor(rng * (quadCount - 1))
-   end
+function tileDepthHelper.getRandQuadIndex_compat(rng, quadCount)
+    -- versions before v1.0.6 had a bug where the matrix used for tile randomization wasn't in the correct 0-1 range (i think?), which meant that the random quad index also had to be calculated differently
+    if beforeV106 then
+        return utils.mod1(rng, quadCount)
+    end
 
-    return utils.mod1(rng, quadCount)
+    return 1 + math.floor(rng * (quadCount - 1))
 end
 
--- the `default` argument was removed in v1.0.6
 function tileDepthHelper.smartDrawingBatch_createMatrixBatch_compat(default, width, height, cellWidth, cellHeight)
-    if afterV105 then
-        return smartDrawingBatch.createMatrixBatch(width, height, cellWidth, cellHeight)
+    -- versions before v1.0.6 had a `default` argument
+    if beforeV106 then
+        return smartDrawingBatch.createMatrixBatch(default, width, height, cellWidth, cellHeight)
     end
 
-    return smartDrawingBatch.createMatrixBatch(default, width, height, cellWidth, cellHeight)
+    return smartDrawingBatch.createMatrixBatch(width, height, cellWidth, cellHeight)
 end
 
----
+--- tiletype depths ---
 
 -- todo: currently updated in celesteRender.loadCustomTilesetAutotiler but idk if thats enough or not
 local enableMultipleTileDepths
@@ -88,7 +88,7 @@ function tileDepthHelper.getTiletypeDepth(tiletype, fg)
     end
 end
 
----
+--- tile depth batch wrapper ---
 
 local function getOrCreateSmartTilesBatch(batches, depth, width, height, mode)
     batches[depth] = batches[depth] or (mode == "gridCanvasDrawingBatch" and smartDrawingBatch.createGridCanvasBatch(false, width, height, 8, 8) or tileDepthHelper.smartDrawingBatch_createMatrixBatch_compat(false, width, height, 8, 8))

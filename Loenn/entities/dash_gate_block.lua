@@ -63,7 +63,6 @@ dashGateBlock.fieldOrder = {
     "smoke", "drawOutline"
 }
 
-
 dashGateBlock.fieldInformation = {
     inactiveColor = {
         fieldType = "color"

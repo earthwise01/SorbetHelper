@@ -73,26 +73,23 @@ customLightbeam.placements = {
 
 -- hide rainbow specific fields unless rainbow is enabled and vice versa
 function customLightbeam.ignoredFields(entity)
-    local ignored = {}
-    if entity.rainbow == true and entity.useCustomRainbowColors == true then
-        ignored = {
+    if entity.rainbow and entity.useCustomRainbowColors then
+        return {
             "_id", "_name",
             "color"
         }
     else
-        ignored = {
+        return {
             "_id", "_name",
             "colors", "gradientSize", "gradientSpeed", "centerX", "centerY", "loopColors"
         }
     end
-    return ignored
 end
 
 function customLightbeam.fieldOrder(entity)
-    local fields = {}
     --  this sucksss  why do i always put effort into trying to make these look pretty
-    if entity.rainbow == true and entity.useCustomRainbowColors == true then
-        fields = {
+    if entity.rainbow and entity.useCustomRainbowColors then
+        return {
             "x", "y",
             "width", "height",
             "colors", "centerX",
@@ -107,7 +104,7 @@ function customLightbeam.fieldOrder(entity)
             "singleColor", "loopColors"
         }
     else
-        fields = {
+        return {
             "x", "y",
             "width", "height",
             "color", "alpha",
@@ -120,7 +117,6 @@ function customLightbeam.fieldOrder(entity)
             "singleColor"
         }
     end
-    return fields
 end
 
 customLightbeam.fieldInformation = {
@@ -143,27 +139,29 @@ customLightbeam.fieldInformation = {
     },
     depth = {
         fieldType = "integer",
-        options = sorbetUtils.getDepths({{"Lightbeams", -9998}}),
+        options = sorbetUtils.getDepths({
+            {"Lightbeams", -9998}
+        }),
         editable = true
     }
 }
 
 function customLightbeam.sprite(room, entity)
-    local result = {}
+    local sprites = {}
 
     if entity.rainbow then
         local colors = rainbowHelper.getColors(entity.colors or "89E5AE,88E0E0,87A9DD,9887DB,D088E2")
 
         if entity.singleColor then
-            result = lightBeamHelper.getSprites(room, entity, colors[1], false)
+            sprites = lightBeamHelper.getSprites(room, entity, colors[1], false)
         else
-            result = customLightbeam.getSpritesRainbow(room, entity, colors, false)
+            sprites = customLightbeam.getSpritesRainbow(room, entity, colors, false)
         end
     else
-        result = lightBeamHelper.getSprites(room, entity, utils.getColor(entity.color), false)
+        sprites = lightBeamHelper.getSprites(room, entity, utils.getColor(entity.color), false)
     end
 
-    return result
+    return sprites
 end
 
 -- modified from lightBeamHelper.getSprites to have a rainbow gradient effect

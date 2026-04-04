@@ -17,7 +17,7 @@ local brushHelperHooks = {}
 function brushHelperHooks.load()
     local brushHelper = require("brushes")
 
-    -- taken from https://github.com/CelestialCartographers/Loenn/blob/v1.0.7/src/brushes.lua#L49
+    -- taken from https://github.com/CelestialCartographers/Loenn/blob/v1.0.8/src/brushes.lua#L49
     -- (needed for the brushHelper.updateRender hook below)
     local function addNeighborIfMissing(x, y, needsUpdate, addedUpdate)
         if not addedUpdate or not addedUpdate:get(x, y) then
@@ -30,7 +30,7 @@ function brushHelperHooks.load()
         end
     end
 
-    -- taken from https://github.com/CelestialCartographers/Loenn/blob/v1.0.7/src/brushes.lua#L61
+    -- taken from https://github.com/CelestialCartographers/Loenn/blob/v1.0.8/src/brushes.lua#L61
     -- (needed for the brushHelper.updateRender hook below)
     -- Inlined for 3x3 tilesets
     local function addMissingNeighbors(x, y, needsUpdate, addedUpdate)
@@ -54,7 +54,7 @@ function brushHelperHooks.load()
         addNeighborIfMissing(x, y - 2, needsUpdate, addedUpdate)
     end
 
-    -- taken from https://github.com/CelestialCartographers/Loenn/blob/v1.0.7/src/brushes.lua#L82
+    -- taken from https://github.com/CelestialCartographers/Loenn/blob/v1.0.8/src/brushes.lua#L82
     -- (needed for the brushHelper.updateRender hook below)
     local function addMissingNeighborsCustomSize(x, y, tileMeta, needsUpdate, addedUpdate)
         local scanWidth, scanHeight = tileMeta.scanWidth, tileMeta.scanHeight
@@ -76,7 +76,7 @@ function brushHelperHooks.load()
     end
 
     local _orig_updateRender = brushHelper.updateRender
-    -- modified from https://github.com/CelestialCartographers/Loenn/blob/v1.0.7/src/brushes.lua#L105
+    -- modified from https://github.com/CelestialCartographers/Loenn/blob/v1.0.8/src/brushes.lua#L105
     -- to match the changes made to celesteRender.getTilesBatch (since this function copies code from/has very similar code to it),
     -- and to keep compatibility with older loenn versions
     -- todo: check if this works on later versions/port any new changes over
@@ -212,7 +212,7 @@ function brushHelperHooks.load()
 
                         if quadCount > 0 then
                             local rng = random:getInbounds(x, y)
-                            local randQuad = quads[tileDepthHelper.celesteRender_getRandQuadIndex_compat(rng, quadCount)]
+                            local randQuad = quads[tileDepthHelper.getRandQuadIndex_compat(rng, quadCount)] -- edited
 
                             local spriteMeta = gameplayAtlas[texture]
 
@@ -241,8 +241,6 @@ function brushHelperHooks.load()
         return batchWrapper.batches -- edited
     end
     logging.warning("[SorbetHelper/DepthSplitterPreview] hooked brushHelper.updateRender!")
-
-    ---
 
     return {
         unload = function()

@@ -9,7 +9,7 @@ local entities = require("entities")
 local touchGateBlock = {}
 
 touchGateBlock.name = "SorbetHelper/TouchGateBlock"
-touchGateBlock.depth = 0
+touchGateBlock.depth = -9000
 touchGateBlock.nodeLimits = {1, 1}
 touchGateBlock.nodeLineRenderType = false
 touchGateBlock.warnBelowSize = {16, 16}

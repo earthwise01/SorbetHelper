@@ -16,6 +16,12 @@ musicSyncController.placements = {
     }
 }
 
+musicSyncController.fieldOrder = {
+    "x", "y",
+    "eventNames", "showDebugUI",
+    "_infoButton"
+}
+
 musicSyncController.fieldInformation = {
     eventNames = {
         fieldType = "list",
@@ -24,12 +30,6 @@ musicSyncController.fieldInformation = {
     _infoButton = {
         fieldType = "sorbetHelper.infoButton"
     }
-}
-
-musicSyncController.fieldOrder = {
-    "x", "y",
-    "eventNames", "showDebugUI",
-    "_infoButton"
 }
 
 return musicSyncController

@@ -37,7 +37,9 @@ crumbleOnFlagBlock.fieldOrder = {
 crumbleOnFlagBlock.fieldInformation = fakeTilesHelper.addTileFieldInformation({
     depth = {
         fieldType = "integer",
-        options = sorbetUtils.getDepths({{"Crumble Wall On Rumble", -10010}}),
+        options = sorbetUtils.getDepths({
+            {"Crumble Wall On Rumble", -10010}
+        }),
         editable = true
     },
     fadeInTime = {
@@ -47,7 +49,8 @@ crumbleOnFlagBlock.fieldInformation = fakeTilesHelper.addTileFieldInformation({
 
 crumbleOnFlagBlock.sprite = fakeTilesHelper.getEntitySpriteFunction("tiletype", "blendin")
 
-crumbleOnFlagBlock.depth = function(room, entity) return entity.depth or -10010 end
-
+function crumbleOnFlagBlock.depth(room, entity)
+    return entity.depth or -10010
+end
 
 return crumbleOnFlagBlock
