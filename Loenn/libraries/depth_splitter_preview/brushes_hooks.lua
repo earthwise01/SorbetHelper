@@ -204,9 +204,9 @@ function brushHelperHooks.load()
                 else
                     -- TODO - Update overlay sprites
                     local tileMeta = meta[tile]
-                    local texture = tileMeta.path
+                    local texture = tileMeta and tileMeta.path
 
-                    if tileMeta and tileMeta.path then
+                    if texture then
                         local quads, sprites = tileDepthHelper.autotiler_getQuads_compat(x, y, tilesMatrix, meta, tileMeta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band) -- edited
                         local quadCount = #quads
 

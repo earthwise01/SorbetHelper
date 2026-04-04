@@ -90,8 +90,9 @@ function celesteRenderHooks.load()
 
                 elseif tile and tile ~= airTile then
                     local tileMeta = meta[tile]
-                    local texture = tileMeta.path
-                    if tileMeta and texture then
+                    local texture = tileMeta and tileMeta.path
+
+                    if texture then
                         -- TODO - Render overlay sprites
                         local quads, sprites = tileDepthHelper.autotiler_getQuads_compat(x, y, tilesMatrix, meta, tileMeta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
                         local quadCount = #quads
