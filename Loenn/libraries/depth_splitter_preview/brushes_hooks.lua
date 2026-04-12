@@ -108,6 +108,8 @@ function brushHelperHooks.load()
         local defaultQuad = {{0, 0}}
         local defaultSprite = ""
 
+        local width, height = tilesMatrix:size() -- moved
+
         local materialType = utils.typeof(material)
 
         -- No need to create matrix for single tile brushing
@@ -115,8 +117,6 @@ function brushHelperHooks.load()
         local addedUpdate
 
         if trackAddedUpdates then
-            local width, height = tilesMatrix:size()
-
             addedUpdate = matrix.filled(nil, width, height)
         end
 
