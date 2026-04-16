@@ -1,7 +1,3 @@
-using Celeste.Mod.SorbetHelper.Entities;
-using Microsoft.Xna.Framework.Graphics;
-using Celeste.Mod.SorbetHelper.Utils;
-
 namespace Celeste.Mod.SorbetHelper;
 
 public static class SorbetHelperGFX

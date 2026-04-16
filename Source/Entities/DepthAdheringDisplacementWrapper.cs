@@ -1,8 +1,3 @@
-using System.Linq;
-using Celeste.Mod.SorbetHelper.Components;
-using Celeste.Mod.SorbetHelper.Utils;
-using MonoMod.Utils;
-
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/DepthAdheringDisplacementWrapper")]

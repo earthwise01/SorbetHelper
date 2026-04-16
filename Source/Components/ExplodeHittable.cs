@@ -1,14 +1,10 @@
-using Celeste.Mod.Helpers;
-using Celeste.Mod.SorbetHelper.Utils;
-using MonoMod.Cil;
-using MonoMod.RuntimeDetour;
-using MonoMod.Utils;
 using static Celeste.Mod.SorbetHelper.Components.ExplodeHittable;
 
 namespace Celeste.Mod.SorbetHelper.Components;
 
 [Tracked]
-public class ExplodeHittable(ExplodeHitCallback onHit) : Component(false, false)
+public class ExplodeHittable(ExplodeHitCallback onHit)
+    : Component(false, false)
 {
     public delegate void ExplodeHitCallback(Entity entity, Vector2 direction);
 

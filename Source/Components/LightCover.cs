@@ -1,9 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework.Graphics;
-using Celeste.Mod.SorbetHelper.Utils;
-using MonoMod.Cil;
-
 namespace Celeste.Mod.SorbetHelper.Components;
 
 [Tracked]

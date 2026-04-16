@@ -1,6 +1,3 @@
-using Celeste.Mod.SorbetHelper.Utils;
-using MonoMod.Cil;
-
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/PufferTweaksController")]

@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Celeste.Mod.SorbetHelper.Utils;
 using FMOD.Studio;
 
 namespace Celeste.Mod.SorbetHelper.Entities;

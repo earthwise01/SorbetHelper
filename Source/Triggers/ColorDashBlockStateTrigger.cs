@@ -1,5 +1,3 @@
-using Celeste.Mod.SorbetHelper.Entities;
-
 namespace Celeste.Mod.SorbetHelper.Triggers;
 
 [CustomEntity("SorbetHelper/ColorDashBlockStateTrigger")]

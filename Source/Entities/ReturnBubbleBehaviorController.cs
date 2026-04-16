@@ -1,7 +1,3 @@
-using System.Collections;
-using Celeste.Mod.Helpers;
-using Celeste.Mod.SorbetHelper.Utils;
-using MonoMod.Cil;
 using FMOD.Studio;
 
 namespace Celeste.Mod.SorbetHelper.Entities;

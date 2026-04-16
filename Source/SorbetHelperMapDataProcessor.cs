@@ -1,8 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using Celeste.Mod.SorbetHelper.Utils;
-using Celeste.Mod.SorbetHelper.Entities;
-
 namespace Celeste.Mod.SorbetHelper;
 
 public class SorbetHelperMapDataProcessor : EverestMapDataProcessor

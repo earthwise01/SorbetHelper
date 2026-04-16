@@ -1,8 +1,4 @@
-using System.Collections;
 using System.Diagnostics;
-using System.Linq;
-using Celeste.Mod.SorbetHelper.Utils;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Celeste.Mod.SorbetHelper.Entities;
 

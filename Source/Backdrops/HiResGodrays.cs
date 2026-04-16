@@ -1,8 +1,3 @@
-using System.Linq;
-using Microsoft.Xna.Framework.Graphics;
-using Celeste.Mod.Backdrops;
-using Celeste.Mod.SorbetHelper.Utils;
-
 namespace Celeste.Mod.SorbetHelper.Backdrops;
 
 [CustomBackdrop("SorbetHelper/HiResGodrays")]

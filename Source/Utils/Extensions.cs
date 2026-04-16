@@ -1,10 +1,5 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Linq;
-using Celeste.Mod.Registry;
-using Mono.Cecil.Cil;
-using MonoMod.Cil;
 
 namespace Celeste.Mod.SorbetHelper.Utils;
 

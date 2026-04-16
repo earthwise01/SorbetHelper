@@ -1,7 +1,3 @@
-using MonoMod.Cil;
-using MonoMod.RuntimeDetour;
-using System.Reflection;
-
 namespace Celeste.Mod.SorbetHelper.Utils;
 
 // heavily copied from https://github.com/CelesteSecretSanta25/SecretSanta25/blob/main/Source/Utils/HookHelper.cs

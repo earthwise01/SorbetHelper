@@ -1,8 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework.Graphics;
 using Celeste.Mod.UI;
-using Celeste.Mod.SorbetHelper.Utils;
 
 namespace Celeste.Mod.SorbetHelper.Backdrops;
 

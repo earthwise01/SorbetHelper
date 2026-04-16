@@ -1,8 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using Celeste.Mod.Backdrops;
-using Celeste.Mod.SorbetHelper.Utils;
-
 namespace Celeste.Mod.SorbetHelper.Backdrops;
 
 [CustomBackdrop("SorbetHelper/SpiralStars")]

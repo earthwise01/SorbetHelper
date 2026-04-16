@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using Celeste.Mod.Backdrops;
-using Celeste.Mod.SorbetHelper.Components;
-
 namespace Celeste.Mod.SorbetHelper.Backdrops;
 
 /// <summary>

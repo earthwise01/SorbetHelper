@@ -1,5 +1,3 @@
-using Microsoft.Xna.Framework.Graphics;
-
 namespace Celeste.Mod.SorbetHelper.Utils;
 
 /// <summary>

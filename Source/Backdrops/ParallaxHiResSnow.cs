@@ -1,6 +1,3 @@
-using Celeste.Mod.Backdrops;
-using Celeste.Mod.SorbetHelper.Utils;
-
 namespace Celeste.Mod.SorbetHelper.Backdrops;
 
 [CustomBackdrop("SorbetHelper/ParallaxHiResSnow")]

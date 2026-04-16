@@ -1,5 +1,3 @@
-using Celeste.Mod.SorbetHelper.Utils;
-
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [TrackedAs(typeof(FallingBlock))]

@@ -1,7 +1,3 @@
-using Celeste.Mod.Helpers;
-using Celeste.Mod.SorbetHelper.Utils;
-using MonoMod.Cil;
-using MonoMod.RuntimeDetour;
 using TalkComponentUI = Celeste.TalkComponent.TalkComponentUI;
 
 namespace Celeste.Mod.SorbetHelper.Triggers;

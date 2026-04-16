@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using Celeste.Mod.SorbetHelper.Utils;
-
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [TrackedAs(typeof(FallingBlock))]

@@ -1,5 +1,3 @@
-using Celeste.Mod.SorbetHelper.Backdrops;
-
 namespace Celeste.Mod.SorbetHelper.Components;
 
 /// <summary>

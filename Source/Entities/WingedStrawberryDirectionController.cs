@@ -1,10 +1,3 @@
-using System.Collections.Generic;
-using System.Reflection;
-using Celeste.Mod.SorbetHelper.Utils;
-using MonoMod.Cil;
-using MonoMod.RuntimeDetour;
-using Mono.Cecil.Cil;
-
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/WingedStrawberryDirectionController")]

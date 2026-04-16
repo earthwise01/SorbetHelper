@@ -1,13 +1,10 @@
-using System.Collections.Generic;
-using Celeste.Mod.Helpers;
-using Celeste.Mod.SorbetHelper.Utils;
-using MonoMod.Cil;
 using static Celeste.Mod.SorbetHelper.Components.MovingPlatformHittable;
 
 namespace Celeste.Mod.SorbetHelper.Components;
 
 [Tracked]
-public class MovingPlatformHittable(PlatformHitCallback onHit, bool breakDashBlocksRequired = true) : Component(false, false)
+public class MovingPlatformHittable(PlatformHitCallback onHit, bool breakDashBlocksRequired = true)
+    : Component(false, false)
 {
     public delegate void PlatformHitCallback(Platform platform, Vector2 direction);
 

@@ -1,8 +1,3 @@
-using System.Linq;
-using Celeste.Mod.SorbetHelper.Entities;
-using Celeste.Mod.SorbetHelper.Utils;
-using MonoMod.RuntimeDetour;
-
 namespace Celeste.Mod.SorbetHelper.Components;
 
 [Tracked]

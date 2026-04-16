@@ -1,9 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using Celeste.Mod.Helpers;
-using Celeste.Mod.SorbetHelper.Utils;
-using MonoMod.Cil;
-using Mono.Cecil.Cil;
 using static Celeste.Mod.SorbetHelper.Components.EntityAwakeProcessor;
 
 namespace Celeste.Mod.SorbetHelper.Components;
