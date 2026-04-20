@@ -70,8 +70,7 @@ public class DepthAdheringDisplacementRenderHook : Component
     {
         hook_Entity_set_Depth = new Hook(
             typeof(Entity).GetProperty(nameof(Entity.Depth), HookHelper.Bind.PublicInstance)!.GetSetMethod()!,
-            On_Entity_set_Depth
-        );
+            On_Entity_set_Depth);
     }
 
     [OnUnload]
@@ -80,8 +79,8 @@ public class DepthAdheringDisplacementRenderHook : Component
         HookHelper.DisposeAndSetNull(ref hook_Entity_set_Depth);
     }
 
-    // i'm kinda bleh on hooking this but any other approaches seem slightly too unreliable and i guess depth doesn't change that often andddd communal helper dream sprites take this approach too
-    private static void On_Entity_set_Depth(Action<Entity, int> orig, Entity self, int value)
+    private delegate void orig_Entity_set_Depth(Entity self, int value);
+    private static void On_Entity_set_Depth(orig_Entity_set_Depth orig, Entity self, int value)
     {
         if (self.Depth == value || self.Scene is null || self.Scene.Tracker.CountComponents<DepthAdheringDisplacementRenderHook>() == 0)
         {

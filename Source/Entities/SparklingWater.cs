@@ -1,7 +1,3 @@
-using Microsoft.Xna.Framework.Graphics;
-using Celeste.Mod.SorbetHelper.Utils;
-using MonoMod;
-
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/SparklingWater")]

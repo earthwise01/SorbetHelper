@@ -26,8 +26,7 @@ public class ExplodeHittable(ExplodeHitCallback onHit)
         IL.Celeste.Puffer.Explode += IL_Puffer_Explode;
         ilHook_Seeker_RegenerateCoroutine = new ILHook(
             typeof(Seeker).GetMethod(nameof(Seeker.RegenerateCoroutine), HookHelper.Bind.NonPublicInstance)!.GetStateMachineTarget()!,
-            IL_Seeker_RegenerateCoroutine
-        );
+            IL_Seeker_RegenerateCoroutine);
     }
 
     [OnUnload]

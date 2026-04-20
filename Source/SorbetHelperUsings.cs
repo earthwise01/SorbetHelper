@@ -9,6 +9,7 @@ global using Microsoft.Xna.Framework.Graphics;
 
 global using Monocle;
 
+global using MonoMod;
 global using MonoMod.RuntimeDetour;
 global using MonoMod.Utils;
 global using MonoMod.Cil;

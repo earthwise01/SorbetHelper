@@ -1,9 +1,9 @@
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [Tracked]
-public class MiniPopupDisplay : Entity
+public class MiniPopupRenderer : Entity
 {
-    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(MiniPopupDisplay)}";
+    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(MiniPopupRenderer)}";
 
     private readonly MTexture fallbackBaseTex, fallbackAccentTex;
     private readonly List<Popup> popups = [];
@@ -14,7 +14,7 @@ public class MiniPopupDisplay : Entity
     private static int MiniPopupVisibleCap => Math.Min(SorbetHelperModule.Settings.MiniPopupVisibleCap, (int)(720f / (90f * MiniPopupScale)));
     private static float MiniPopupScale => SorbetHelperModule.Settings.MiniPopupScale + 0.1f;
 
-    private MiniPopupDisplay() : base()
+    private MiniPopupRenderer() : base()
     {
         Tag |= Tags.Global | Tags.TransitionUpdate | Tags.FrozenUpdate | Tags.HUD;
         Depth = Depths.Top;
@@ -154,16 +154,17 @@ public class MiniPopupDisplay : Entity
         popups.Clear();
     }
 
-    public static MiniPopupDisplay GetMiniPopupDisplay(Scene scene)
+    // weh
+    public static MiniPopupRenderer GetMiniPopupRenderer(Scene scene)
     {
-        if (scene.Tracker.GetEntities<MiniPopupDisplay>()
+        if (scene.Tracker.GetEntities<MiniPopupRenderer>()
                          .Concat(scene.Entities.ToAdd)
-                         .FirstOrDefault(e => e is MiniPopupDisplay)
-            is MiniPopupDisplay miniPopupDisplay)
+                         .FirstOrDefault(e => e is MiniPopupRenderer)
+            is MiniPopupRenderer miniPopupDisplay)
             return miniPopupDisplay;
 
-        Logger.Info(LogID, $"creating new {nameof(MiniPopupDisplay)}.");
-        scene.Add(miniPopupDisplay = new MiniPopupDisplay());
+        Logger.Info(LogID, $"creating new {nameof(MiniPopupRenderer)}.");
+        scene.Add(miniPopupDisplay = new MiniPopupRenderer());
 
         return miniPopupDisplay;
     }

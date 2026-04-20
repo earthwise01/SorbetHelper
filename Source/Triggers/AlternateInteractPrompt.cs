@@ -200,27 +200,26 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
 
         #region Hooks
 
-        private static Hook hook_set_Highlighted = null;
+        private static Hook hook_TalkComponentUI_set_Highlighted = null;
 
         [OnLoad]
         internal static void Load()
         {
-            hook_set_Highlighted = new Hook(
+            hook_TalkComponentUI_set_Highlighted = new Hook(
                 typeof(TalkComponentUI).GetProperty(nameof(Highlighted), HookHelper.Bind.PublicInstance)!.GetSetMethod()!,
-                On_set_Highlighted
-            );
+                On_TalkComponentUI_set_Highlighted);
             IL.Celeste.TalkComponent.Update += IL_TalkComponent_Update;
         }
 
         [OnUnload]
         internal static void Unload()
         {
-            HookHelper.DisposeAndSetNull(ref hook_set_Highlighted);
+            HookHelper.DisposeAndSetNull(ref hook_TalkComponentUI_set_Highlighted);
             IL.Celeste.TalkComponent.Update -= IL_TalkComponent_Update;
         }
 
-        private delegate void orig_set_Highlighted(TalkComponentUI self, bool value);
-        private static void On_set_Highlighted(orig_set_Highlighted orig, TalkComponentUI self, bool value)
+        private delegate void orig_TalkComponentUI_set_Highlighted(TalkComponentUI self, bool value);
+        private static void On_TalkComponentUI_set_Highlighted(orig_TalkComponentUI_set_Highlighted orig, TalkComponentUI self, bool value)
         {
             if (self is TalkComponentAltUI { options.HighlightEffects: false })
                 self.highlighted = value;

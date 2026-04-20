@@ -1,27 +1,18 @@
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [Tracked]
-public class DepthAdheringDisplacementRenderer : Entity
+public class DepthAdheringDisplacementRenderer : DepthRenderer<DepthAdheringDisplacementRenderer, DepthAdheringDisplacementRenderHook, bool>
 {
-    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(DepthAdheringDisplacementRenderer)}";
+    protected override bool Options { init => distortBehind = value; }
 
-    private readonly List<DepthAdheringDisplacementRenderHook> renderHooks = [];
+    protected override bool OptionsEquals(bool options) => distortBehind == options;
+    protected override string OptionsToString(bool options) => $"({nameof(distortBehind)}: {options})";
 
     private readonly bool distortBehind;
 
-    private DepthAdheringDisplacementRenderer(int depth, bool distortBehind)
-    {
-        Tag = Tags.Global;
-        Depth = depth;
-        this.distortBehind = distortBehind;
-    }
-
-    public void Track(DepthAdheringDisplacementRenderHook renderHook) => renderHooks.Add(renderHook);
-    public void Untrack(DepthAdheringDisplacementRenderHook renderHook) => renderHooks.Remove(renderHook);
-
     public override void Render()
     {
-        List<DepthAdheringDisplacementRenderHook> visibleRenderHooks = renderHooks.Where(renderHook => renderHook.EntityVisible).ToList();
+        List<DepthAdheringDisplacementRenderHook> visibleRenderHooks = Tracked.Where(renderHook => renderHook.EntityVisible).ToList();
         if (visibleRenderHooks.Count == 0)
             return;
 
@@ -37,8 +28,7 @@ public class DepthAdheringDisplacementRenderer : Entity
         if (prevRenderTargets.Length > 0)
             gameplayBuffer = prevRenderTargets[0].RenderTarget as RenderTarget2D ?? gameplayBuffer;
 
-
-        // prepare the displacement map
+        #region Displacement Map Rendering
 
         Color noDisplacementColor = DisplacementEffectBlocker.NoDisplacementColor;
         Engine.Instance.GraphicsDevice.SetRenderTarget(displacementMapBuffer);
@@ -72,8 +62,9 @@ public class DepthAdheringDisplacementRenderer : Entity
             Draw.SpriteBatch.End();
         }
 
+        #endregion
 
-        // prepare the entity buffer
+        #region Entity Rendering
 
         Engine.Instance.GraphicsDevice.SetRenderTarget(entityBuffer);
         Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
@@ -88,8 +79,9 @@ public class DepthAdheringDisplacementRenderer : Entity
 
         GameplayRenderer.End();
 
+        #endregion
 
-        // distort and render the result to the gameplay buffer
+        #region Displacement Rendering
 
         Engine.Instance.GraphicsDevice.SetRenderTargets(prevRenderTargets);
         // clear the gameplay buffer if it is already included on the entity buffer
@@ -104,20 +96,8 @@ public class DepthAdheringDisplacementRenderer : Entity
         RenderTargetHelper.ReturnTempBuffer(entityBuffer);
         RenderTargetHelper.ReturnTempBuffer(displacementMapBuffer);
 
+        #endregion
+
         GameplayRenderer.Begin();
-    }
-
-    public static DepthAdheringDisplacementRenderer GetRenderer(Scene scene, int depth, bool distortBehind)
-    {
-        if (scene.Tracker.GetEntities<DepthAdheringDisplacementRenderer>()
-                         .Concat(scene.Entities.ToAdd)
-                         .FirstOrDefault(e => e is DepthAdheringDisplacementRenderer r && r.Depth == depth && r.distortBehind == distortBehind)
-            is DepthAdheringDisplacementRenderer renderer)
-            return renderer;
-
-        Logger.Info(LogID, $"creating new {nameof(DepthAdheringDisplacementRenderer)} at depth {depth} with distort behind {(distortBehind ? "enabled" : "disabled")}.");
-        scene.Add(renderer = new DepthAdheringDisplacementRenderer(depth, distortBehind));
-
-        return renderer;
     }
 }

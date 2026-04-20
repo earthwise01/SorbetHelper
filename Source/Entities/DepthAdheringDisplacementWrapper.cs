@@ -1,32 +1,27 @@
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/DepthAdheringDisplacementWrapper")]
-[Tracked]
-public class DepthAdheringDisplacementWrapper : Entity
+public class DepthAdheringDisplacementWrapper : EntityProcessingController
 {
     private readonly bool distortBehind;
     private readonly bool ignoreBounds;
 
-    public DepthAdheringDisplacementWrapper(EntityData data, Vector2 offset) : base(data.Position + offset)
+    public DepthAdheringDisplacementWrapper(EntityData data, Vector2 offset) : base(data, offset)
     {
-        Collider = new Hitbox(data.Width, data.Height);
+        if (data.Attr("affectedTypes").Split(',', StringSplitOptions.TrimAndRemoveEmpty).ToHashSet() is { Count: > 0 } affectedTypes)
+            AffectedTypes = affectedTypes;
+        MinDepth = data.Int("minDepth", int.MinValue);
+        MaxDepth = data.Int("maxDepth", int.MaxValue);
+
         distortBehind = data.Bool("distortBehind");
         ignoreBounds = data.Bool("ignoreBounds");
-
-        EntityAwakeProcessor processor = new EntityAwakeProcessor(ProcessEntity)
-            .WithDepthCheck(data.Int("minDepth", int.MinValue), data.Int("maxDepth", int.MaxValue));
-
-        if (data.Attr("affectedTypes").Split(',', StringSplitOptions.TrimAndRemoveEmpty).ToHashSet() is { Count: > 0 } affectedTypes)
-            processor.WithTypeNameCheck(affectedTypes);
-
-        Add(processor);
     }
 
-    private void ProcessEntity(Entity entity)
-    {
-        if (!ignoreBounds && !CollideCheckWithNullHitboxFallback(entity))
-            return;
+    protected override bool ControllerContains(Entity entity)
+        => ignoreBounds || CollideCheckWithNullHitboxFallback(entity);
 
+    protected override void ProcessEntity(Entity entity)
+    {
         DisplacementRenderHook[] displacementRenderHooks = entity.Components.GetAll<DisplacementRenderHook>().ToArray();
         if (displacementRenderHooks.Length == 0)
             return;

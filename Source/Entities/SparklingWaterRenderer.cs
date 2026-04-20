@@ -1,16 +1,11 @@
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework.Graphics;
-using Celeste.Mod.SorbetHelper.Components;
-using Celeste.Mod.SorbetHelper.Utils;
-
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [Tracked]
-public class SparklingWaterRenderer : Entity
+public class SparklingWaterRenderer : DepthRenderer<SparklingWaterRenderer, SparklingWater>
 {
     #region Settings
 
+    // hmm session expression support could b fun if possible
     public class Settings(
         Color outlineColor, Color edgeColor, Color fillColor,
         string detailTexture,
@@ -60,24 +55,18 @@ public class SparklingWaterRenderer : Entity
     public static readonly Color BottomEdgeMaskColor = new Color(1f, 0f, 0f);
     public static readonly Color FillMaskColor = new Color(0f, 0.5f, 0f);
 
-    private readonly List<SparklingWater> sparklingWater = [];
-
     private VirtualRenderTarget buffer, displacementBuffer;
     private readonly DepthAdheringDisplacementRenderHook displacementRenderHook;
 
     private float timer;
 
-    private SparklingWaterRenderer(int depth) : base()
+    public SparklingWaterRenderer() : base()
     {
-        Tag = Tags.Global | Tags.TransitionUpdate;
-        Depth = depth;
+        Tag |= Tags.TransitionUpdate;
 
         Add(new BeforeRenderHook(BeforeRender));
         Add(displacementRenderHook = new DepthAdheringDisplacementRenderHook(Render, RenderDisplacement, true, true));
     }
-
-    public void Track(SparklingWater water) => sparklingWater.Add(water);
-    public void Untrack(SparklingWater water) => sparklingWater.Remove(water);
 
     public override void Update()
     {
@@ -87,7 +76,7 @@ public class SparklingWaterRenderer : Entity
 
     public void BeforeRender()
     {
-        List<SparklingWater> visibleWater = sparklingWater.Where(water => water.Visible && water.VisibleOnCamera).ToList();
+        List<SparklingWater> visibleWater = Tracked.Where(water => water.Visible && water.VisibleOnCamera).ToList();
 
         // don't attempt to render if no water is visible
         Visible = visibleWater.Count > 0;
@@ -137,11 +126,8 @@ public class SparklingWaterRenderer : Entity
         {
             pass.Apply();
 
-            foreach (SparklingWater water in sparklingWater)
-            {
-                if (water.Visible && water.VisibleOnCamera)
-                    water.DrawMesh();
-            }
+            foreach (SparklingWater water in visibleWater)
+                water.DrawMesh();
         }
 
         Engine.Graphics.GraphicsDevice.Textures[0] = prevTexture0;
@@ -180,20 +166,6 @@ public class SparklingWaterRenderer : Entity
     {
         RenderTargetHelper.DisposeAndSetNull(ref buffer);
         RenderTargetHelper.DisposeAndSetNull(ref displacementBuffer);
-    }
-
-    public static SparklingWaterRenderer GetRenderer(Scene scene, int depth)
-    {
-        if (scene.Tracker.GetEntities<SparklingWaterRenderer>()
-                         .Concat(scene.Entities.ToAdd)
-                         .FirstOrDefault(r => r is SparklingWaterRenderer && r.Depth == depth)
-            is SparklingWaterRenderer renderer)
-            return renderer;
-
-        Logger.Info($"{nameof(SorbetHelper)}/{nameof(SparklingWaterRenderer)}", $"creating new SparklingWaterRenderer at depth {depth}.");
-        scene.Add(renderer = new SparklingWaterRenderer(depth));
-
-        return renderer;
     }
 
     #endregion
