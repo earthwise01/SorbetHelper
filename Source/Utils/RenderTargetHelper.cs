@@ -11,6 +11,7 @@ internal static class RenderTargetHelper
     {
         if (target is not { IsDisposed: false })
         {
+            // todo: does the name matter ?
             target = VirtualContent.CreateRenderTarget("sorbet-helper-gameplay-buffer", GameplayWidth, GameplayHeight);
             return;
         }

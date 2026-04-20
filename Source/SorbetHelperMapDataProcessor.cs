@@ -74,7 +74,8 @@ internal class SorbetHelperMapDataProcessor : EverestMapDataProcessor
             { $"entity:{EntityStylegroundController.EntitySID}", ProcessGlobalOptionController },
             { $"entity:{LightCoverController.EntitySID}", ProcessGlobalOptionController },
             { $"entity:{SliderFadeXY.EntitySID}", ProcessGlobalOptionController },
-            { $"entity:{DarknessTransparencyFixController.EntitySID}", ProcessGlobalOptionController }
+            { $"entity:{DarknessTransparencyFixController.EntitySID}", ProcessGlobalOptionController },
+            { $"entity:{SparklingWaterColorController.EntitySID}", ProcessGlobalOptionController }
         };
     }
 

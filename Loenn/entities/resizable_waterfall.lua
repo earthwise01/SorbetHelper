@@ -105,7 +105,7 @@ resizableWaterfall.fieldInformation = {
 
 -- normally loenn doesnt check for pandoras box water but i do here anyway bc itd look weird sometimes otherwise
 local function waterSearchPredicate(entity)
-    return entity._name == "water" or entity._name == "pandorasBox/coloredWater" or entity._name == "SantasGifts25/SparklingWater"
+    return entity._name == "water" or entity._name == "pandorasBox/coloredWater" or entity._name == "SorbetHelper/SparklingWater"
 end
 
 local function collideFirst(rectangle, rectangles)

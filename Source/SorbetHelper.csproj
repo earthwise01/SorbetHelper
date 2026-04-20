@@ -41,9 +41,6 @@
         <Reference Include="$(ModCachePrefix)\ExtendedVariantMode.ExtendedVariantMode.dll" Private="false" />
         <Reference Include="$(ModCachePrefix)\ChronoHelper.ChronoHelper.dll" Private="false" />
     </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Utils\Imports\" />
-    </ItemGroup>
 
     <Target Name="CopyFiles" AfterTargets="Build" Inputs="$(OutputPath)\$(AssemblyName).dll;$(OutputPath)\$(AssemblyName).pdb" Outputs="..\bin\$(AssemblyName).dll;..\bin\$(AssemblyName).pdb">
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="..\bin" />

@@ -223,7 +223,7 @@ internal static class Extensions
     {
         public int Width => self.Viewport.Width;
         public int Height => self.Viewport.Height;
-        
+
         public Vector2 GetCenter()
             => self.Position + new Vector2(self.Viewport.Width / 2f, self.Viewport.Height / 2f);
         public Vector2 GetZoomOutCenterOffset()
