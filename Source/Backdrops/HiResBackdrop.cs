@@ -24,11 +24,13 @@ public abstract class HiResBackdrop : Backdrop
 
     #region Hooks
 
+    [OnLoad]
     internal static void Load()
     {
         Everest.Events.LevelLoader.OnLoadingThread += OnLoadingThread;
     }
 
+    [OnUnload]
     internal static void Unload()
     {
         Everest.Events.LevelLoader.OnLoadingThread -= OnLoadingThread;

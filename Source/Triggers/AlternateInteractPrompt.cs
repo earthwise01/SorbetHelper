@@ -161,7 +161,7 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
         // feel like there could b better input button textures than these
         public MTexture GetButtonTexture()
             => options.UseUpInput
-                ? GFX.Gui[GravityHelperInterop.IsImported && GravityHelperInterop.IsPlayerInverted()
+                ? GFX.Gui[GravityHelper.IsImported && GravityHelper.IsPlayerInverted()
                     ? "SorbetHelper/inputDown"
                     : "SorbetHelper/inputUp"]
                 : Input.GuiButton(Input.Talk, Input.PrefixMode.Latest);
@@ -202,15 +202,17 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
 
         private static Hook hook_set_Highlighted = null;
 
+        [OnLoad]
         internal static void Load()
         {
             hook_set_Highlighted = new Hook(
-                typeof(TalkComponentUI).GetProperty(nameof(TalkComponentUI.Highlighted), HookHelper.Bind.PublicInstance)!.GetSetMethod()!,
+                typeof(TalkComponentUI).GetProperty(nameof(Highlighted), HookHelper.Bind.PublicInstance)!.GetSetMethod()!,
                 On_set_Highlighted
             );
             IL.Celeste.TalkComponent.Update += IL_TalkComponent_Update;
         }
 
+        [OnUnload]
         internal static void Unload()
         {
             HookHelper.DisposeAndSetNull(ref hook_set_Highlighted);
@@ -268,7 +270,7 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
                 if (talkComponent.UI is not TalkComponentAltUI { options.UseUpInput: true } altUi)
                     return orig;
 
-                int playerUp = GravityHelperInterop.IsImported && GravityHelperInterop.IsPlayerInverted() ? 1 : -1; // is this a good idea?
+                int playerUp = GravityHelper.IsImported && GravityHelper.IsPlayerInverted() ? 1 : -1; // is this a good idea?
                 return Input.MoveY.Value == playerUp && altUi.lastMoveYValue != playerUp;
             }
 

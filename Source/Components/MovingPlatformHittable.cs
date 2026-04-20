@@ -25,12 +25,14 @@ public class MovingPlatformHittable(PlatformHitCallback onHit, bool breakDashBlo
 
     #region Hooks
 
+    [OnLoad]
     internal static void Load()
     {
         IL.Celeste.Platform.MoveHExactCollideSolids += IL_Platform_MoveHExactCollideSolids;
         IL.Celeste.Platform.MoveVExactCollideSolids += IL_Platform_MoveVExactCollideSolids;
     }
 
+    [OnUnload]
     internal static void Unload()
     {
         IL.Celeste.Platform.MoveHExactCollideSolids -= IL_Platform_MoveHExactCollideSolids;

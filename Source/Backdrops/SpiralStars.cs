@@ -98,9 +98,9 @@ public class SpiralStars : Backdrop
     public override void Render(Scene scene)
     {
         if (backgroundColor.A > 0)
-            Draw.Rect(-1f, -1f, SorbetHelperGFX.GameplayBufferWidth + 2f, SorbetHelperGFX.GameplayBufferHeight + 2f, backgroundColor);
+            Draw.Rect(-1f, -1f, RenderTargetHelper.GameplayWidth + 2f, RenderTargetHelper.GameplayHeight + 2f, backgroundColor);
 
-        Vector2 zoomCenterOffset = SorbetHelperGFX.GetZoomOutCameraCenterOffset((scene as Level)!.Camera);
+        Vector2 zoomCenterOffset = (scene as Level)!.Camera.GetZoomOutCenterOffset();
 
         foreach (Star star in stars)
         {

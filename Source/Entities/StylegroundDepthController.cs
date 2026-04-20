@@ -133,8 +133,7 @@ public class StylegroundDepthController : Entity
         if (mode == Modes.Normal)
             return;
 
-        buffer ??= VirtualContent.CreateRenderTarget("sorbetHelper_stylegroundDepthControllerBuffer", SorbetHelperGFX.GameplayBufferWidth, SorbetHelperGFX.GameplayBufferHeight);
-        SorbetHelperGFX.EnsureBufferSize(buffer);
+        RenderTargetHelper.CreateOrResizeGameplayBuffer(ref buffer);
 
         Engine.Instance.GraphicsDevice.SetRenderTarget(buffer);
         Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
@@ -175,6 +174,7 @@ public class StylegroundDepthController : Entity
 
     #region Hooks
 
+    [OnLoad]
     internal static void Load()
     {
         Everest.Events.LevelLoader.OnLoadingThread += Event_OnLoadingThread;
@@ -183,6 +183,7 @@ public class StylegroundDepthController : Entity
         IL.Celeste.Level.Render += IL_Level_Render;
     }
 
+    [OnUnload]
     internal static void Unload()
     {
         Everest.Events.LevelLoader.OnLoadingThread -= Event_OnLoadingThread;

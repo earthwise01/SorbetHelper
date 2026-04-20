@@ -1,14 +1,7 @@
 namespace Celeste.Mod.SorbetHelper.Utils;
 
-// heavily copied from https://github.com/CelesteSecretSanta25/SecretSanta25/blob/main/Source/Utils/HookHelper.cs
-// licensed under the MIT License https://github.com/CelesteSecretSanta25/SecretSanta25/blob/main/LICENSE
-
-// at the time of writing this the above repo has not been made public yet, so i will alsoooo link
-// https://github.com/aonkeeper4/aonHelper/blob/main/Source/Helpers/HookHelper.cs
-// (also licenced under the MIT License https://github.com/aonkeeper4/aonHelper/blob/main/LICENSE)
-// which was implemented by the same person (ty aon) and is the closest public version i'm aware of
-
-public static class HookHelper
+// ty aon
+internal static class HookHelper
 {
     public static void DisposeAndSetNull(ref Hook hook)
     {

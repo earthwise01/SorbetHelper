@@ -75,11 +75,13 @@ public sealed class EntityAwakeProcessor(Action<Entity> onProcessEntity, Process
 
     #region Hooks
 
+    [OnLoad]
     internal static void Load()
     {
         IL.Monocle.EntityList.UpdateLists += IL_EntityList_UpdateLists;
     }
 
+    [OnUnload]
     internal static void Unload()
     {
         IL.Monocle.EntityList.UpdateLists -= IL_EntityList_UpdateLists;

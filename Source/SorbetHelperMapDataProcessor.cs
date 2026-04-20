@@ -1,8 +1,10 @@
 namespace Celeste.Mod.SorbetHelper;
 
-public class SorbetHelperMapDataProcessor : EverestMapDataProcessor
+internal class SorbetHelperMapDataProcessor : EverestMapDataProcessor
 {
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(SorbetHelperMapDataProcessor)}";
+
+    public const string MapDataProcessedSID = "SorbetHelper/MapDataProcessed";
 
     public static Dictionary<(int, AreaMode), List<StylegroundDepthController.StylegroundDepthControllerData>> StylegroundDepthControllers { get; private set; } = [];
     public static Dictionary<(int, AreaMode), HashSet<string>> MusicSyncEvents { get; private set; } = [];
@@ -30,7 +32,7 @@ public class SorbetHelperMapDataProcessor : EverestMapDataProcessor
 
             Logger.Verbose(LogID, $"found a StylegroundDepthController in {AreaKey.SID} {AreaKey.ID} ({AreaKey.Mode}), with depth {depthAttr}!");
 
-            data.Name = "SorbetHelper/MapDataProcessed"; // don't get any annoying "failed to load" warnings (see global entities loading event)
+            data.Name = MapDataProcessedSID;
         }
 
         // convert to a styleground depth controller

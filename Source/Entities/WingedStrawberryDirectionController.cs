@@ -18,11 +18,13 @@ public class WingedStrawberryDirectionController(EntityData data, Vector2 offset
 
     private static ILHook ilHook_Strawberry_orig_Update;
 
+    [OnLoad]
     internal static void Load()
     {
         ilHook_Strawberry_orig_Update = new ILHook(typeof(Strawberry).GetMethod("orig_Update", HookHelper.Bind.PublicInstance)!, IL_Strawberry_orig_Update);
     }
 
+    [OnUnload]
     internal static void Unload()
     {
         HookHelper.DisposeAndSetNull(ref ilHook_Strawberry_orig_Update);

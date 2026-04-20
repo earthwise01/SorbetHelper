@@ -49,11 +49,13 @@ public class DisplacementEffectBlocker : Entity
 
     #region Hooks
 
+    [OnLoad]
     internal static void Load()
     {
         IL.Celeste.DisplacementRenderer.BeforeRender += IL_DisplacementRenderer_BeforeRender;
     }
 
+    [OnUnload]
     internal static void Unload()
     {
         IL.Celeste.DisplacementRenderer.BeforeRender -= IL_DisplacementRenderer_BeforeRender;

@@ -8,11 +8,13 @@ public class LightCover(float alpha) : Component(false, true)
 
     #region Hooks
 
+    [OnLoad]
     internal static void Load()
     {
         IL.Celeste.LightingRenderer.BeforeRender += IL_LightingRenderer_BeforeRender;
     }
 
+    [OnUnload]
     internal static void Unload()
     {
         IL.Celeste.LightingRenderer.BeforeRender -= IL_LightingRenderer_BeforeRender;
@@ -43,12 +45,13 @@ public class LightCover(float alpha) : Component(false, true)
                 return;
 
             // split the components up based on alpha (is there a better way to do this?)
-            List<IGrouping<byte, LightCover>> alphaBatches =
-                components.Cast<LightCover>().GroupBy(lightCover => lightCover.alpha).ToList();
+            List<IGrouping<byte, LightCover>> alphaBatches = components.Cast<LightCover>()
+                                                                       .GroupBy(lightCover => lightCover.alpha)
+                                                                       .ToList();
             int batchCount = alphaBatches.Count;
 
             RenderTargetBinding[] initalBuffer = Engine.Instance.GraphicsDevice.GetRenderTargets();
-            VirtualRenderTarget[] tempBuffers = RenderTargetHelper.GetGameplayBuffers(batchCount);
+            VirtualRenderTarget[] tempBuffers = RenderTargetHelper.GetTempBuffers(batchCount);
 
             for (int i = 0; i < batchCount; i++)
             {
@@ -87,7 +90,7 @@ public class LightCover(float alpha) : Component(false, true)
 
             Draw.SpriteBatch.End();
 
-            RenderTargetHelper.ReturnGameplayBuffers(tempBuffers);
+            RenderTargetHelper.ReturnTempBuffers(ref tempBuffers);
         }
     }
 

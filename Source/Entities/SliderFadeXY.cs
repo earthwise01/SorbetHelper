@@ -35,7 +35,7 @@ public class SliderFadeXY : Entity
         base.Update();
 
         Level level = SceneAs<Level>();
-        Vector2 camera = level.Camera.Center;
+        Vector2 camera = level.Camera.GetCenter();
         level.Session.SetSlider(sliderName, fadeX.Value(camera.X) * fadeY.Value(camera.Y));
     }
 

@@ -20,6 +20,7 @@ public class ExplodeHittable(ExplodeHitCallback onHit)
 
     private static ILHook ilHook_Seeker_RegenerateCoroutine;
 
+    [OnLoad]
     internal static void Load()
     {
         IL.Celeste.Puffer.Explode += IL_Puffer_Explode;
@@ -29,6 +30,7 @@ public class ExplodeHittable(ExplodeHitCallback onHit)
         );
     }
 
+    [OnUnload]
     internal static void Unload()
     {
         IL.Celeste.Puffer.Explode -= IL_Puffer_Explode;

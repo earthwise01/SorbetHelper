@@ -152,7 +152,7 @@ public class ParallaxHiResSnow : HiResBackdrop
         }
 
         Camera camera = (scene as Level)!.Camera;
-        Vector2 zoomCenterOffset = SorbetHelperGFX.GetZoomOutCameraCenterOffset(camera);
+        Vector2 zoomCenterOffset = camera.GetZoomOutCenterOffset();
         Vector2 cameraPos = camera.Position.Floor() + zoomCenterOffset;
 
         for (int i = 0; i < particles.Length; i++)
@@ -176,16 +176,10 @@ public class ParallaxHiResSnow : HiResBackdrop
             if (additiveMultiplier < 1f)
                 particleColor = new Color(particleColor.R, particleColor.G, particleColor.B, (int)(particleColor.A * additiveMultiplier));
 
-            if (!SorbetHelperGFX.ZoomOutActive)
-            {
-                particleTexture.DrawCentered(renderPosition, particleColor, renderScale, shouldStretch ? stretchRotate : particle.Rotation);
-            }
-            else
-            {
-                for (float x = 0f; x < camera.Width + OffscreenPadding; x += 320f + OffscreenPadding * 2f)
-                for (float y = 0f; y < camera.Height + OffscreenPadding; y += 180f + OffscreenPadding * 2f)
-                    particleTexture.DrawCentered(renderPosition + new Vector2(x, y), particleColor, renderScale, shouldStretch ? stretchRotate : particles[i].Rotation);
-            }
+
+            for (float x = 0f; x < camera.Width + OffscreenPadding; x += 320f + OffscreenPadding * 2f)
+            for (float y = 0f; y < camera.Height + OffscreenPadding; y += 180f + OffscreenPadding * 2f)
+                particleTexture.DrawCentered(renderPosition + new Vector2(x, y), particleColor, renderScale, shouldStretch ? stretchRotate : particles[i].Rotation);
         }
     }
 

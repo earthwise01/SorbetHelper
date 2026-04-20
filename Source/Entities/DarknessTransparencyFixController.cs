@@ -20,11 +20,13 @@ public class DarknessTransparencyFixController : Entity
 
     #region Hooks
 
+    [OnLoad]
     internal static void Load()
     {
         On.Celeste.Level.Render += On_Level_Render;
     }
 
+    [OnUnload]
     internal static void Unload()
     {
         On.Celeste.Level.Render -= On_Level_Render;

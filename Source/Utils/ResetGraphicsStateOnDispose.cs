@@ -3,7 +3,7 @@ namespace Celeste.Mod.SorbetHelper.Utils;
 /// <summary>
 /// Resets the <see cref="Texture"/> slots, <see cref="SamplerState"/> slots, <see cref="BlendState"/>, <see cref="DepthStencilState"/>, <see cref="RasterizerState"/>, and optionally the render targets of a given <see cref="GraphicsDevice"/> when disposed.
 /// </summary>
-public readonly ref struct ResetGraphicsStateOnDispose
+internal readonly ref struct ResetGraphicsStateOnDispose
 {
     private readonly GraphicsDevice graphicsDevice;
 

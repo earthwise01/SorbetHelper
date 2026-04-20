@@ -53,7 +53,7 @@ public class DashFallingBlock : CustomFallingBlock
             return DashCollisionResults.NormalCollision;
 
         // gravity helper support
-        bool gravityInverted = GravityHelperInterop.IsImported && GravityHelperInterop.IsPlayerInverted();
+        bool gravityInverted = GravityHelper.IsImported && GravityHelper.IsPlayerInverted();
 
         // make wallbouncing easier if dash corner correction is enabled
         if (dashCornerCorrection && (player.Left >= Right - 4f || player.Right < Left + 4f) && dir.Y == (gravityInverted ? 1f : -1f))
@@ -132,7 +132,8 @@ public class DashFallingBlock : CustomFallingBlock
         hitOffset.Y = Calc.Approach(hitOffset.Y, 0f, Engine.DeltaTime * 15f);
     }
 
-    internal static void LoadParticles()
+    [OnLoadContent]
+    internal static void LoadParticles(bool firstLoad)
     {
         P_HitFallDust = new ParticleType(P_FallDustB)
         {

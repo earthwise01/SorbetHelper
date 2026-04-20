@@ -19,8 +19,11 @@ global using Celeste.Mod.Backdrops;
 global using Celeste.Mod.Helpers;
 global using Celeste.Mod.Registry;
 
+global using Celeste.Mod.Roslyn.ModLifecycleAttributes;
+
 global using Celeste.Mod.SorbetHelper.Entities;
 global using Celeste.Mod.SorbetHelper.Triggers;
 global using Celeste.Mod.SorbetHelper.Components;
 global using Celeste.Mod.SorbetHelper.Backdrops;
 global using Celeste.Mod.SorbetHelper.Utils;
+global using Celeste.Mod.SorbetHelper.Imports;

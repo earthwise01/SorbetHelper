@@ -18,7 +18,7 @@
         <CelestePrefix Condition="'$(CelestePrefix)' == ''">lib-stripped</CelestePrefix>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="CelesteMod.Publicizer" Version="*" CelesteAssembly="$(CelestePrefix)\Celeste.dll" />
+        <PackageReference Include="CelesteMod.Publicizer" Version="1.1.2" CelesteAssembly="$(CelestePrefix)\Celeste.dll" />
         <Reference Include="$(CelestePrefix)\MMHOOK_Celeste.dll" Private="false" />
         <Reference Include="$(CelestePrefix)\FNA.dll" Private="false" />
     </ItemGroup>
@@ -27,8 +27,9 @@
     <ItemGroup>
         <PackageReference Include="MonoMod.RuntimeDetour" Version="25.3.1" PrivateAssets="all" ExcludeAssets="runtime" />
         <PackageReference Include="MonoMod.Patcher" Version="25.0.0-prerelease.2" />
-        <PackageReference Include="CelesteAnalyzer" Version="*" />
-        <PackageReference Include="ModInteropImportGenerator" Version="*" />
+        <PackageReference Include="CelesteAnalyzer" Version="1.0.3.1" />
+        <PackageReference Include="ModInteropImportGenerator" Version="1.1.3" />
+        <PackageReference Include="CelesteMod.Roslyn.ModLifecycleAttributes" Version="1.0.0" />
     </ItemGroup>
 
     <!-- references to other mods -->
@@ -39,6 +40,9 @@
     <ItemGroup>
         <Reference Include="$(ModCachePrefix)\ExtendedVariantMode.ExtendedVariantMode.dll" Private="false" />
         <Reference Include="$(ModCachePrefix)\ChronoHelper.ChronoHelper.dll" Private="false" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Utils\Imports\" />
     </ItemGroup>
 
     <Target Name="CopyFiles" AfterTargets="Build" Inputs="$(OutputPath)\$(AssemblyName).dll;$(OutputPath)\$(AssemblyName).pdb" Outputs="..\bin\$(AssemblyName).dll;..\bin\$(AssemblyName).pdb">

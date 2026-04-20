@@ -52,7 +52,7 @@ public class ColorDashBlock : Solid
 
         // switch if communal helper dream tunnel dashed
         bool switchOnDreamTunnel = data.Bool("switchOnDreamTunnel", false);
-        if (switchOnDreamTunnel && CommunalHelperDashStatesInterop.IsImported)
+        if (switchOnDreamTunnel && CommunalHelperDashStates.IsImported)
         {
             void OnEnter(Player player) { }
             void OnExit(Player player)
@@ -72,7 +72,7 @@ public class ColorDashBlock : Solid
                 Glitch.Value = 0.0f;
             }
 
-            Add(CommunalHelperDashStatesInterop.DreamTunnelInteraction(OnEnter, OnExit));
+            Add(CommunalHelperDashStates.DreamTunnelInteraction(OnEnter, OnExit));
         }
     }
 
@@ -146,44 +146,42 @@ public class ColorDashBlock : Solid
 
         // cassette block autotiling
         for (float x = Left; x < Right; x += 8f)
+        for (float y = Top; y < Bottom; y += 8f)
         {
-            for (float y = Top; y < Bottom; y += 8f)
-            {
-                bool leftCheck = CheckForSame(x - 8f, y);
-                bool rightCheck = CheckForSame(x + 8f, y);
-                bool topCheck = CheckForSame(x, y - 8f);
-                bool bottomCheck = CheckForSame(x, y + 8f);
+            bool leftCheck = CheckForSame(x - 8f, y);
+            bool rightCheck = CheckForSame(x + 8f, y);
+            bool topCheck = CheckForSame(x, y - 8f);
+            bool bottomCheck = CheckForSame(x, y + 8f);
 
-                if (leftCheck && rightCheck && topCheck && bottomCheck)
-                {
-                    if (!CheckForSame(x + 8f, y - 8f))
-                        SetImage(x, y, 3, 0);
-                    else if (!CheckForSame(x - 8f, y - 8f))
-                        SetImage(x, y, 3, 1);
-                    else if (!CheckForSame(x + 8f, y + 8f))
-                        SetImage(x, y, 3, 2);
-                    else if (!CheckForSame(x - 8f, y + 8f))
-                        SetImage(x, y, 3, 3);
-                    else
-                        SetImage(x, y, 1, 1);
-                }
-                else if (leftCheck && rightCheck && !topCheck && bottomCheck)
-                    SetImage(x, y, 1, 0);
-                else if (leftCheck && rightCheck && topCheck && !bottomCheck)
-                    SetImage(x, y, 1, 2);
-                else if (leftCheck && !rightCheck && topCheck && bottomCheck)
-                    SetImage(x, y, 2, 1);
-                else if (!leftCheck && rightCheck && topCheck && bottomCheck)
-                    SetImage(x, y, 0, 1);
-                else if (leftCheck && !rightCheck && !topCheck && bottomCheck)
-                    SetImage(x, y, 2, 0);
-                else if (!leftCheck && rightCheck && !topCheck && bottomCheck)
-                    SetImage(x, y, 0, 0);
-                else if (leftCheck && !rightCheck && topCheck && !bottomCheck)
-                    SetImage(x, y, 2, 2);
-                else if (!leftCheck && rightCheck && topCheck && !bottomCheck)
-                    SetImage(x, y, 0, 2);
+            if (leftCheck && rightCheck && topCheck && bottomCheck)
+            {
+                if (!CheckForSame(x + 8f, y - 8f))
+                    SetImage(x, y, 3, 0);
+                else if (!CheckForSame(x - 8f, y - 8f))
+                    SetImage(x, y, 3, 1);
+                else if (!CheckForSame(x + 8f, y + 8f))
+                    SetImage(x, y, 3, 2);
+                else if (!CheckForSame(x - 8f, y + 8f))
+                    SetImage(x, y, 3, 3);
+                else
+                    SetImage(x, y, 1, 1);
             }
+            else if (leftCheck && rightCheck && !topCheck && bottomCheck)
+                SetImage(x, y, 1, 0);
+            else if (leftCheck && rightCheck && topCheck && !bottomCheck)
+                SetImage(x, y, 1, 2);
+            else if (leftCheck && !rightCheck && topCheck && bottomCheck)
+                SetImage(x, y, 2, 1);
+            else if (!leftCheck && rightCheck && topCheck && bottomCheck)
+                SetImage(x, y, 0, 1);
+            else if (leftCheck && !rightCheck && !topCheck && bottomCheck)
+                SetImage(x, y, 2, 0);
+            else if (!leftCheck && rightCheck && !topCheck && bottomCheck)
+                SetImage(x, y, 0, 0);
+            else if (leftCheck && !rightCheck && topCheck && !bottomCheck)
+                SetImage(x, y, 2, 2);
+            else if (!leftCheck && rightCheck && topCheck && !bottomCheck)
+                SetImage(x, y, 0, 2);
         }
 
         if (!Collidable)

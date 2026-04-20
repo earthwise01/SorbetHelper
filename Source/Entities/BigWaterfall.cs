@@ -108,7 +108,7 @@ public class BigWaterfall : Entity
 
         Level level = SceneAs<Level>();
 
-        loopingSfx?.Position.Y = Calc.Clamp(level.Camera.Center.Y, Y, height);
+        loopingSfx?.Position.Y = Calc.Clamp(level.Camera.GetCenter().Y, Y, height);
 
         // if changing Visible here explodes im gonna do     something
         // (also using Visible makes depth adhering displacement not interrupt the spritebatch unnecessarily if the waterfall is offscreen)

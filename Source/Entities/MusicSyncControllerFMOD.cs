@@ -156,11 +156,13 @@ public class MusicSyncControllerFMOD : Entity
 
     #region Hooks
 
+    [OnLoad]
     internal static void Load()
     {
         On.Celeste.Audio.SetMusic += On_Audio_SetMusic;
     }
 
+    [OnUnload]
     internal static void Unload()
     {
         On.Celeste.Audio.SetMusic -= On_Audio_SetMusic;

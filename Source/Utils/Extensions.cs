@@ -134,7 +134,7 @@ internal static class Extensions
             float zoom = self.Zoom;
             if (ExtendedVariantsCompat.IsLoaded)
                 zoom *= ExtendedVariantsCompat.GetZoomLevel();
-            float zoomTarget = ExtendedCameraDynamicsInterop.IsImported && ExtendedCameraDynamicsInterop.ExtendedCameraHooksEnabled()
+            float zoomTarget = ExtendedCameraDynamics.IsImported && ExtendedCameraDynamics.ExtendedCameraHooksEnabled()
                 ? self.Zoom
                 : self.ZoomTarget;
             Vector2 dimensions = new Vector2(320f, 180f);
@@ -172,7 +172,7 @@ internal static class Extensions
     {
         /// <summary>
         /// Shortcut function for getting a Component from the Entity's Components list.<br/>
-        /// Searches from end to start, which may be more efficient if you know the Component was added later.
+        /// Searches from end to start, which may be more efficient if you can guarantee the Component was added later.
         /// </summary>
         public T GetComponentFromEnd<T>() where T : Component
         {
@@ -189,22 +189,19 @@ internal static class Extensions
 
         /// <summary>
         /// Shortcut function for getting a Component from the Entity's Components list.<br/>
-        /// Searches using the Tracker, instead of iterating through the Entity's Components list.<br/>
-        /// This may be more efficient if the target Component could be anywhere in the list, and/or the number of possible target Components in the scene is less than the entity's number of Components.
+        /// If the number of components in the tracker is less than the size of the entity's components list, searches using the Tracker instead.<br/>
         /// </summary>
         public T GetComponentFromTracker<T>() where T : Component
-        {
-            if (self.Scene?.Tracker.GetComponents<T>() is not { } trackedComponents || trackedComponents.Count > self.Components.Count)
-                return self.Get<T>();
-
-            return trackedComponents.FirstOrDefault(c => c.Entity == self) as T;
-        }
+            => self.Scene is not null
+               && self.Scene.Tracker.Components.TryGetValue(typeof(T), out List<Component> trackedComponents)
+               && trackedComponents.Count < self.Components.Count
+                ? trackedComponents.FirstOrDefault(c => c.Entity == self) as T
+                : self.Components.Get<T>();
 
         public bool CheckTypeName(params HashSet<string> typeNames)
         {
             Type type = self.GetType();
-            IReadOnlySet<string> knownSidsFromType = EntityRegistry.GetKnownSidsFromType(type);
-            return typeNames.Any(typeName => knownSidsFromType.Contains(typeName) || type.Name == typeName || type.FullName == typeName);
+            return typeNames.Overlaps(EntityRegistry.GetKnownSidsFromType(type)) || typeNames.Contains(type.Name) || typeNames.Contains(type.FullName);
         }
     }
 
@@ -214,7 +211,8 @@ internal static class Extensions
 
     extension(Session self)
     {
-        public bool GetFlag(string flag, bool inverted) => self.GetFlag(flag) != inverted;
+        public bool GetFlag(string flag, bool inverted)
+            => self.GetFlag(flag) != inverted;
     }
 
     #endregion
@@ -225,7 +223,11 @@ internal static class Extensions
     {
         public int Width => self.Viewport.Width;
         public int Height => self.Viewport.Height;
-        public Vector2 Center => self.Position + new Vector2(self.Viewport.Width / 2f, self.Viewport.Height / 2f);
+        
+        public Vector2 GetCenter()
+            => self.Position + new Vector2(self.Viewport.Width / 2f, self.Viewport.Height / 2f);
+        public Vector2 GetZoomOutCenterOffset()
+            => new Vector2(self.Viewport.Width / 2f - 320f / 2f, self.Viewport.Height / 2f - 180f / 2f);
     }
 
     #endregion

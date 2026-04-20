@@ -65,6 +65,7 @@ public class DepthAdheringDisplacementRenderHook : Component
 
     private static Hook hook_Entity_set_Depth;
 
+    [OnLoad]
     internal static void Load()
     {
         hook_Entity_set_Depth = new Hook(
@@ -73,6 +74,7 @@ public class DepthAdheringDisplacementRenderHook : Component
         );
     }
 
+    [OnUnload]
     internal static void Unload()
     {
         HookHelper.DisposeAndSetNull(ref hook_Entity_set_Depth);

@@ -29,8 +29,8 @@ public class DepthAdheringDisplacementRenderer : Entity
 
         Camera camera = SceneAs<Level>().Camera;
 
-        VirtualRenderTarget entityBuffer = RenderTargetHelper.GetGameplayBuffer();
-        VirtualRenderTarget displacementMapBuffer = RenderTargetHelper.GetGameplayBuffer();
+        VirtualRenderTarget entityBuffer = RenderTargetHelper.GetTempBuffer();
+        VirtualRenderTarget displacementMapBuffer = RenderTargetHelper.GetTempBuffer();
 
         RenderTargetBinding[] prevRenderTargets = Engine.Instance.GraphicsDevice.GetRenderTargets();
         RenderTarget2D gameplayBuffer = GameplayBuffers.Gameplay;
@@ -101,8 +101,8 @@ public class DepthAdheringDisplacementRenderer : Entity
         using (new SetTemporaryValue<float>(ref Distort.gamerate, 1f))
             Distort.Render((RenderTarget2D)entityBuffer, (RenderTarget2D)displacementMapBuffer, hasDistortion: true);
 
-        RenderTargetHelper.ReturnGameplayBuffer(entityBuffer);
-        RenderTargetHelper.ReturnGameplayBuffer(displacementMapBuffer);
+        RenderTargetHelper.ReturnTempBuffer(entityBuffer);
+        RenderTargetHelper.ReturnTempBuffer(displacementMapBuffer);
 
         GameplayRenderer.Begin();
     }

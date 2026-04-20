@@ -39,7 +39,7 @@ public class CustomLightBeam : Entity
                 return Position;
 
             // hopefully i   mathed right and this actually fully does what i think it does
-            Vector2 cam = SceneAs<Level>().Camera.Center;
+            Vector2 cam = SceneAs<Level>().Camera.GetCenter();
             return cam + (Position - scrollAnchor * (1f - scroll) - cam * scroll);
         }
     }
@@ -133,20 +133,6 @@ public class CustomLightBeam : Entity
             distanceAlpha = 0f;
 
         alpha = baseAlpha * distanceAlpha * flagAlpha;
-    }
-
-    public override void Removed(Scene scene)
-    {
-        base.Removed(scene);
-        if (rainbow)
-            RainbowHelper.SetGetHueScene(null);
-    }
-
-    public override void SceneEnd(Scene scene)
-    {
-        base.SceneEnd(scene);
-        if (rainbow)
-            RainbowHelper.SetGetHueScene(null);
     }
 
     public override void Update()

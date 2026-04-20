@@ -27,18 +27,18 @@ public class ReturnBubbleBehaviorController : Entity
         public bool PlayerYOffsetApplied;
     }
 
-    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(ReturnBubbleBehaviorController)}";
-
     private readonly CassetteFlyOptions options;
 
     public ReturnBubbleBehaviorController(EntityData data, Vector2 offset) : base(data.Position + offset)
     {
         options = new CassetteFlyOptions(data);
+        // hmm
         LoadLazyHooksIfNeeded(options);
     }
 
     #region Hooks
 
+    [OnLoad]
     internal static void Load()
     {
         On.Celeste.Player.CassetteFlyCoroutine += On_CassetteFlyCoroutine;
@@ -47,6 +47,7 @@ public class ReturnBubbleBehaviorController : Entity
         On.Celeste.Player.OnSquish += On_OnSquish;
     }
 
+    [OnUnload]
     internal static void Unload()
     {
         On.Celeste.Player.CassetteFlyCoroutine -= On_CassetteFlyCoroutine;
@@ -106,11 +107,11 @@ public class ReturnBubbleBehaviorController : Entity
         self.Sprite.Scale = new Vector2(1.25f);
         self.Depth = Depths.FormationSequences;
 
-        Audio.Play("event:/sorbethelper/sfx/bubblereturn_split/start", self.level.Camera.Center);
+        Audio.Play("event:/sorbethelper/sfx/bubblereturn_split/start", self.level.Camera.GetCenter());
 
         yield return 0.4f;
 
-        Audio.Play("event:/sorbethelper/sfx/bubblereturn_split/slide", self.level.Camera.Center);
+        Audio.Play("event:/sorbethelper/sfx/bubblereturn_split/slide", self.level.Camera.GetCenter());
 
         float time = cassetteFlyComponent.Options.UseSpeed
             ? self.cassetteFlyCurve.GetLengthParametric(100) / cassetteFlyComponent.Options.Speed
@@ -151,7 +152,7 @@ public class ReturnBubbleBehaviorController : Entity
             cassetteFlyComponent.PlayerYOffsetApplied = false;
         }
 
-        Audio.Play("event:/sorbethelper/sfx/bubblereturn_split/pop", self.level.Camera.Center);
+        Audio.Play("event:/sorbethelper/sfx/bubblereturn_split/pop", self.level.Camera.GetCenter());
 
         yield return 0.2f;
 
@@ -169,7 +170,7 @@ public class ReturnBubbleBehaviorController : Entity
         if (self.GetComponentFromTracker<CassetteFlyOptionsComponent>() is not { } cassetteFlyComponent)
             return;
 
-        // in case the routine was maybe interrupted
+        // in case the routine was interrupted
         if (cassetteFlyComponent.PlayerYOffsetApplied)
         {
             self.Sprite.Y -= 5f;
@@ -211,7 +212,7 @@ public class ReturnBubbleBehaviorController : Entity
 
         ILLabel returnLabel = null;
         if (!cursor.TryGotoNextBestFit(MoveType.After,
-            instr => instr.MatchLdfld<Entity>(nameof(Entity.Collidable)),
+            instr => instr.MatchLdfld<Entity>(nameof(Collidable)),
             instr => instr.MatchBrfalse(out returnLabel)))
             throw new HookHelper.HookException(il, "Unable to find `Collidable` check to modify.");
 

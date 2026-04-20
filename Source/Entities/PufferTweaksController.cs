@@ -14,7 +14,8 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
 
     private static ParticleType P_ExplodeSmoke;
 
-    internal static void LoadParticles()
+    [OnLoadContent]
+    internal static void LoadParticles(bool firstLoad)
     {
         P_ExplodeSmoke = new ParticleType(Player.P_SummitLandB)
         {
@@ -27,28 +28,29 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
 
     #region Hooks
 
-    // this is so many hooks help
+    [OnLoad]
     internal static void Load()
     {
-        On.Celeste.Puffer.Update += On_Update;
-        IL.Celeste.Puffer.Update += IL_Update;
-        On.Celeste.Puffer.OnSquish += On_OnSquish;
-        On.Celeste.Puffer.HitSpring += On_HitSpring;
-        IL.Celeste.Puffer.HitSpring += IL_HitSpring;
-        On.Celeste.Puffer.Explode += On_Explode;
+        On.Celeste.Puffer.Update += On_Puffer_Update;
+        IL.Celeste.Puffer.Update += IL_Puffer_Update;
+        On.Celeste.Puffer.OnSquish += On_Puffer_OnSquish;
+        On.Celeste.Puffer.HitSpring += On_Puffer_HitSpring;
+        IL.Celeste.Puffer.HitSpring += IL_Puffer_HitSpring;
+        On.Celeste.Puffer.Explode += On_Puffer_Explode;
     }
 
+    [OnUnload]
     internal static void Unload()
     {
-        On.Celeste.Puffer.Update -= On_Update;
-        IL.Celeste.Puffer.Update -= IL_Update;
-        On.Celeste.Puffer.OnSquish -= On_OnSquish;
-        On.Celeste.Puffer.HitSpring -= On_HitSpring;
-        IL.Celeste.Puffer.HitSpring -= IL_HitSpring;
-        On.Celeste.Puffer.Explode -= On_Explode;
+        On.Celeste.Puffer.Update -= On_Puffer_Update;
+        IL.Celeste.Puffer.Update -= IL_Puffer_Update;
+        On.Celeste.Puffer.OnSquish -= On_Puffer_OnSquish;
+        On.Celeste.Puffer.HitSpring -= On_Puffer_HitSpring;
+        IL.Celeste.Puffer.HitSpring -= IL_Puffer_HitSpring;
+        On.Celeste.Puffer.Explode -= On_Puffer_Explode;
     }
 
-    private static void On_Update(On.Celeste.Puffer.orig_Update orig, Puffer self)
+    private static void On_Puffer_Update(On.Celeste.Puffer.orig_Update orig, Puffer self)
     {
         orig(self);
 
@@ -56,7 +58,7 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
             self.TreatNaive = self.state == Puffer.States.Gone;
     }
 
-    private static void IL_Update(ILContext il)
+    private static void IL_Puffer_Update(ILContext il)
     {
         ILCursor cursor = new ILCursor(il)
         {
@@ -82,7 +84,7 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
         }
     }
 
-    private static void On_OnSquish(On.Celeste.Puffer.orig_OnSquish orig, Puffer self, CollisionData data)
+    private static void On_Puffer_OnSquish(On.Celeste.Puffer.orig_OnSquish orig, Puffer self, CollisionData data)
     {
         if (self.Scene.Tracker.GetEntity<PufferTweaksController>() is { fixSquishExplode: true } && (self.state == Puffer.States.Gone || self.cantExplodeTimer > 0f))
             return;
@@ -90,7 +92,7 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
         orig(self, data);
     }
 
-    private static bool On_HitSpring(On.Celeste.Puffer.orig_HitSpring orig, Puffer self, Spring spring)
+    private static bool On_Puffer_HitSpring(On.Celeste.Puffer.orig_HitSpring orig, Puffer self, Spring spring)
     {
         bool result = orig(self, spring);
 
@@ -103,7 +105,7 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
         return result;
     }
 
-    private static void IL_HitSpring(ILContext il)
+    private static void IL_Puffer_HitSpring(ILContext il)
     {
         ILCursor cursor = new ILCursor(il);
 
@@ -152,7 +154,7 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
         }
     }
 
-    private static void On_Explode(On.Celeste.Puffer.orig_Explode orig, Puffer self)
+    private static void On_Puffer_Explode(On.Celeste.Puffer.orig_Explode orig, Puffer self)
     {
         orig(self);
 

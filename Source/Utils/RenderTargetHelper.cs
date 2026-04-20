@@ -4,112 +4,108 @@ internal static class RenderTargetHelper
 {
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(RenderTargetHelper)}";
 
-    private static Queue<VirtualRenderTarget> RenderTargets { get; } = [];
+    public static int GameplayWidth => GameplayBuffers.Gameplay?.Width ?? 320;
+    public static int GameplayHeight => GameplayBuffers.Gameplay?.Height ?? 180;
 
-    /// <summary>
-    /// get a gameplay buffer<br/>
-    /// make sure to either dispose it manually at some point or return it for later use
-    /// </summary>
-    /// <returns>a <see cref="VirtualRenderTarget"/> with dimensions matching the vanilla gameplay buffer <see cref="GameplayBuffers.Gameplay"/> (usually 320x180)</returns>
-    public static VirtualRenderTarget GetGameplayBuffer()
+    public static void CreateOrResizeGameplayBuffer(ref VirtualRenderTarget target)
     {
-        if (RenderTargets.Count == 0)
-            return VirtualContent.CreateRenderTarget("sorbetHelper-tempBuffer", SorbetHelperGFX.GameplayBufferWidth, SorbetHelperGFX.GameplayBufferHeight);
-
-        VirtualRenderTarget cached = RenderTargets.Dequeue();
-        if (cached.IsDisposed)
-            cached = VirtualContent.CreateRenderTarget("sorbetHelper-tempBuffer", SorbetHelperGFX.GameplayBufferWidth, SorbetHelperGFX.GameplayBufferHeight);
-        else
-            SorbetHelperGFX.EnsureBufferSize(cached);
-
-        return cached;
-    }
-
-    /// <summary>
-    /// return a gameplay buffer to the queue for later use<br/>
-    /// </summary>
-    /// <param name="vrt">the gameplay buffer to return</param>
-    public static void ReturnGameplayBuffer(VirtualRenderTarget vrt) => RenderTargets.Enqueue(vrt);
-
-    /// <summary>
-    /// get an array of gameplay buffers
-    /// </summary>
-    /// <param name="count">how many gameplay buffers</param>
-    /// <returns>the gameplay buffers</returns>
-    public static VirtualRenderTarget[] GetGameplayBuffers(int count)
-    {
-        VirtualRenderTarget[] buffers = new VirtualRenderTarget[count];
-
-        for (int i = 0; i < count; i++)
-            buffers[i] = GetGameplayBuffer();
-
-        return buffers;
-    }
-
-    /// <summary>
-    /// return an array of gameplay buffers to the queue for later use<br/>
-    /// replaces all values in the array with null
-    /// </summary>
-    /// <param name="vrts">the gameplay buffers to return</param>
-    public static void ReturnGameplayBuffers(VirtualRenderTarget[] vrts)
-    {
-        int count = vrts.Length;
-
-        for (int i = 0; i < count; i++)
+        if (target is not { IsDisposed: false })
         {
-            ReturnGameplayBuffer(vrts[i]);
-            vrts[i] = null;
+            target = VirtualContent.CreateRenderTarget("sorbet-helper-gameplay-buffer", GameplayWidth, GameplayHeight);
+            return;
         }
+
+        if (target.Width == GameplayWidth && target.Height == GameplayHeight)
+            return;
+
+        target.Width = GameplayWidth;
+        target.Height = GameplayHeight;
+        target.Reload();
     }
 
-    /// <summary>
-    /// dispose a <see cref="VirtualRenderTarget"/> and set it to null
-    /// </summary>
-    /// <param name="renderTarget">the <see cref="VirtualRenderTarget"/> to dispose</param>
     public static void DisposeAndSetNull(ref VirtualRenderTarget renderTarget)
     {
         renderTarget?.Dispose();
         renderTarget = null;
     }
 
+    #region Temporary Gameplay Buffers
+
+    private static readonly Queue<VirtualRenderTarget> TempBuffers = [];
+
+    public static VirtualRenderTarget GetTempBuffer()
+    {
+        if (!TempBuffers.TryDequeue(out VirtualRenderTarget tempBuffer))
+            tempBuffer = null;
+
+        CreateOrResizeGameplayBuffer(ref tempBuffer);
+
+        return tempBuffer;
+    }
+
+    public static void ReturnTempBuffer(VirtualRenderTarget gameplayBuffer)
+    {
+        if (gameplayBuffer is not null && !gameplayBuffer.IsDisposed)
+            TempBuffers.Enqueue(gameplayBuffer);
+    }
+
+    public static VirtualRenderTarget[] GetTempBuffers(int count)
+    {
+        VirtualRenderTarget[] tempBuffers = new VirtualRenderTarget[count];
+
+        for (int i = 0; i < count; i++)
+            tempBuffers[i] = GetTempBuffer();
+
+        return tempBuffers;
+    }
+
+    public static void ReturnTempBuffers(ref VirtualRenderTarget[] gameplayBuffers)
+    {
+        foreach (VirtualRenderTarget gameplayBuffer in gameplayBuffers)
+            ReturnTempBuffer(gameplayBuffer);
+
+        gameplayBuffers = null;
+    }
+
     private static void DisposeQueue()
     {
         try
         {
-            foreach (VirtualRenderTarget vrt in RenderTargets)
-                vrt?.Dispose();
+            foreach (VirtualRenderTarget vrt in TempBuffers)
+                vrt.Dispose();
 
-            RenderTargets.Clear();
+            TempBuffers.Clear();
         }
         catch (Exception e)
         {
-            Logger.Error(LogID, $"???? literally how? {e}"); // this threw an error one time when reloading the mod and i cant replicate it anymore. fun!
+            Logger.Error(LogID, $"Error while trying to dispose temporary gameplay buffer queue! {e}");
         }
     }
 
-    // private static void Log() {
-    //     Engine.Commands.Log($"{RenderTargets.Count} render targets are currently queued");
-    // }
-
     #region Hooks
 
+    [OnLoad]
     internal static void Load()
     {
         On.Celeste.GameplayBuffers.Unload += On_GameplayBuffers_Unload;
     }
 
+    [OnUnload]
     internal static void Unload()
     {
         On.Celeste.GameplayBuffers.Unload -= On_GameplayBuffers_Unload;
+
         DisposeQueue();
     }
 
-    // unload any leftover queued buffers with the normal gameplay buffers
     private static void On_GameplayBuffers_Unload(On.Celeste.GameplayBuffers.orig_Unload orig)
     {
         orig();
+
         DisposeQueue();
     }
+
+    #endregion
 
     #endregion
 }

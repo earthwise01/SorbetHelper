@@ -1,6 +1,4 @@
-﻿using MonoMod.ModInterop;
-
-namespace Celeste.Mod.SorbetHelper;
+﻿namespace Celeste.Mod.SorbetHelper;
 
 public class SorbetHelperModule : EverestModule
 {
@@ -18,87 +16,29 @@ public class SorbetHelperModule : EverestModule
 
     public override void Initialize()
     {
-        base.Initialize();
-
-        // mod compat
-        GravityHelperInterop.Load();
-        ExtendedCameraDynamicsInterop.Load();
-        CommunalHelperDashStatesInterop.Load();
-        ExtendedVariantsCompat.Load();
-        ChronoHelperCompat.Load();
+        SorbetHelperImports.Initialize();
     }
 
     public override void Load()
     {
-        // mod interop exports
-        typeof(SorbetHelperExports).ModInterop();
-
-        // sorbet helper misc stuff
-        RenderTargetHelper.Load();
-        GlobalEntities.ProcessAttributes(typeof(SorbetHelperModule).Assembly);
-        GlobalEntities.Load();
+        SorbetHelperExports.Load();
         SorbetHelperDecalRegistry.LoadHandlers();
 
-        // entities
-        WingedStrawberryDirectionController.Load();
-        DisplacementEffectBlocker.Load();
-        AlternateInteractPromptWrapper.TalkComponentAltUI.Load();
-        ReturnBubbleBehaviorController.Load();
-        StylegroundDepthController.Load();
-        MusicSyncControllerFMOD.Load();
-        PufferTweaksController.Load();
-        DarknessTransparencyFixController.Load();
-
-        // triggers
-        ColorDashBlockStateTrigger.Load();
-
-        // components
-        VisibleOverride.Load();
-        DepthAdheringDisplacementRenderHook.Load();
-        MovingPlatformHittable.Load();
-        ExplodeHittable.Load();
-        LightCover.Load();
-        EntityAwakeProcessor.Load();
-
-        // backdrops
-        HiResBackdrop.Load();
+        LifecycleMethods.OnLoad();
     }
 
     public override void LoadContent(bool firstLoad)
     {
-        SorbetHelperGFX.LoadContent();
+        SorbetHelperGFX.LoadContent(firstLoad);
+
+        LifecycleMethods.OnLoadContent(firstLoad);
     }
 
     public override void Unload()
     {
-        // sorbet helper misc stuff
         SorbetHelperGFX.UnloadContent();
-        RenderTargetHelper.Unload();
-        GlobalEntities.Unload();
 
-        // entities
-        WingedStrawberryDirectionController.Unload();
-        DisplacementEffectBlocker.Unload();
-        AlternateInteractPromptWrapper.TalkComponentAltUI.Unload();
-        ReturnBubbleBehaviorController.Unload();
-        StylegroundDepthController.Unload();
-        MusicSyncControllerFMOD.Unload();
-        PufferTweaksController.Unload();
-        DarknessTransparencyFixController.Unload();
-
-        // triggers
-        ColorDashBlockStateTrigger.Unload();
-
-        // components
-        VisibleOverride.Unload();
-        DepthAdheringDisplacementRenderHook.Unload();
-        MovingPlatformHittable.Unload();
-        ExplodeHittable.Unload();
-        LightCover.Unload();
-        EntityAwakeProcessor.Unload();
-
-        // backdrops
-        HiResBackdrop.Unload();
+        LifecycleMethods.OnUnload();
     }
 
     public override void PrepareMapDataProcessors(MapDataFixup context)
