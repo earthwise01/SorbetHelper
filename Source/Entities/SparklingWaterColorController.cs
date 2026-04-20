@@ -2,15 +2,15 @@ using Celeste.Mod.SorbetHelper.Utils;
 
 namespace Celeste.Mod.SorbetHelper.Entities;
 
-[GlobalEntity(              EntityDataID + "Global")]
-[CustomEntity(EntityDataID, EntityDataID + "Global")]
+[GlobalEntity(           EntitySID + "Global")]
+[CustomEntity(EntitySID, EntitySID + "Global")]
 [Tracked]
 public class SparklingWaterColorController(EntityData data, Vector2 offset) : Entity(data.Position + offset)
 {
-    public const string EntityDataID = "SorbetHelper/SparklingWaterColorController";
+    public const string EntitySID = "SorbetHelper/SparklingWaterColorController";
 
     public readonly SparklingWaterRenderer.Settings Settings = new SparklingWaterRenderer.Settings(data);
-    public readonly int? AffectedDepth = data.NullableInt("affectedDepth");
+    public readonly int? AffectedDepth = data.Nullable<int>("affectedDepth");
 
     public static SparklingWaterColorController GetController(Scene scene, int depth)
     {

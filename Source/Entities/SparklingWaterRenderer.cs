@@ -101,11 +101,9 @@ public class SparklingWaterRenderer : Entity
         displacementRenderHook.Visible = settings.DisplacementSpeed > 0f;
 
         // set buffers
-        buffer ??= VirtualContent.CreateRenderTarget($"SorbetHelper_SparklingWaterBuffer_{Depth}", SorbetHelperGFX.GameplayBufferWidth, SorbetHelperGFX.GameplayBufferHeight);
-        displacementBuffer ??= VirtualContent.CreateRenderTarget($"SorbetHelper_SparklingWaterDisplacementBuffer_{Depth}", SorbetHelperGFX.GameplayBufferWidth, SorbetHelperGFX.GameplayBufferHeight);
-        SorbetHelperGFX.EnsureBufferSize(buffer);
-        SorbetHelperGFX.EnsureBufferSize(displacementBuffer);
-        Engine.Instance.GraphicsDevice.SetRenderTargets(new(buffer), new(displacementBuffer));
+        RenderTargetHelper.CreateOrResizeGameplayBuffer(ref buffer);
+        RenderTargetHelper.CreateOrResizeGameplayBuffer(ref displacementBuffer);
+        Engine.Instance.GraphicsDevice.SetRenderTargets(buffer.Target, displacementBuffer.Target);
         Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
         Engine.Instance.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
         Engine.Instance.GraphicsDevice.BlendState = BlendState.AlphaBlend;
