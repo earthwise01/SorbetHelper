@@ -136,9 +136,9 @@ public abstract class EntityProcessingController : Entity
                                          .ToArray();
         }
 
-        static void ProcessEntity(Entity entity, EntityProcessingController[] entityAwakeProcessors)
+        static void ProcessEntity(Entity entity, EntityProcessingController[] entityProcessors)
         {
-            foreach (EntityProcessingController processor in entityAwakeProcessors)
+            foreach (EntityProcessingController processor in entityProcessors)
                 processor.Process(entity);
         }
     }
