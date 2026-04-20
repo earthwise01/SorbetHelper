@@ -1,12 +1,11 @@
 local fakeTilesHelper = require("helpers.fake_tiles")
 local mods = require("mods")
-local depths = mods.requireFromPlugin("libraries.depths")
+local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
 
-local block = {}
+local crumbleOnFlagBlock = {}
 
-block.name = "SorbetHelper/CrumbleOnFlagBlock"
-block.depth = -10010
-function block.placements()
+crumbleOnFlagBlock.name = "SorbetHelper/CrumbleOnFlagBlock"
+function crumbleOnFlagBlock.placements()
     return {
         name = "crumble_on_flag_block",
         alternativeName = "crumble_wall_on_flag",
@@ -26,22 +25,32 @@ function block.placements()
     }
 end
 
+crumbleOnFlagBlock.fieldOrder = {
+    "x", "y",
+    "width", "height",
+    "depth", "fadeInTime",
+    "flag", "tiletype",
+    "playAudio", "destroyAttached", "blendin", "showDebris",
+    "inverted"
+}
 
-local fieldInfo = {
+crumbleOnFlagBlock.fieldInformation = fakeTilesHelper.addTileFieldInformation({
     depth = {
         fieldType = "integer",
-        options = depths.addDepth(depths.getDepths(), "Crumble Wall On Rumble", -10010),
+        options = sorbetUtils.getDepths({
+            {"Crumble Wall On Rumble", -10010}
+        }),
         editable = true
     },
     fadeInTime = {
         minimumValue = 0
     }
-}
-block.fieldInformation = fakeTilesHelper.addTileFieldInformation(fieldInfo, "tiletype")
-block.fieldOrder = {
-    "x", "y", "width", "height", "depth", "fadeInTime", "flag", "tiletype", "playAudio", "destroyAttached", "blendin", "showDebris", "inverted"
-}
+}, "tiletype")
 
-block.sprite = fakeTilesHelper.getEntitySpriteFunction("tiletype", "blendin")
+crumbleOnFlagBlock.sprite = fakeTilesHelper.getEntitySpriteFunction("tiletype", "blendin")
 
-return block
+function crumbleOnFlagBlock.depth(room, entity)
+    return entity.depth or -10010
+end
+
+return crumbleOnFlagBlock

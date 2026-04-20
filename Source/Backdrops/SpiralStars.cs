@@ -1,86 +1,81 @@
-using System.Collections.Generic;
-using System.Linq;
-using Celeste.Mod.Backdrops;
-using Celeste.Mod.SorbetHelper.Utils;
-
 namespace Celeste.Mod.SorbetHelper.Backdrops;
 
 [CustomBackdrop("SorbetHelper/SpiralStars")]
 public class SpiralStars : Backdrop
 {
-    private class Star
+    private class Star(int textureSet, Color color, int trailLength)
     {
-        public int TextureSet;
-        public float AnimationTimer;
-        public int FrameIndex;
-        public Color Color;
+        public struct StarSprite
+        {
+            public Vector2 Position;
+            public float Scale;
+            public int FrameIndex;
+        }
 
-        public float Angle;
+        public readonly int TextureSet = textureSet;
+        public readonly Color Color = color;
+
         public float Distance;
-        public float Scale;
-        public Vector2 Position;
+        public float Angle;
+        public float AnimationTimer;
 
-        public readonly record struct Trail(Vector2 Position, float Scale, int FrameIndex);
-        public readonly List<Trail> Trails = [];
+        public StarSprite Sprite;
+        public readonly StarSprite[] Trail = new StarSprite[trailLength];
     }
 
-    private readonly List<List<MTexture>> textures;
-    private readonly Vector2 textureCenter;
-    private readonly float[] trailAlphas;
-
     private readonly Color backgroundColor;
-    private readonly Star[] stars;
 
     private readonly Vector2 center;
     private readonly float speed;
     private readonly float rotationSpeed;
-    private readonly float eventHorizonDistance;
-    private readonly float spawningDistance;
-    private readonly int trailLength;
+    private readonly float innerRadius;
+    private readonly float outerRadius;
     private readonly float trailDelay;
+
+    private readonly List<List<MTexture>> textureSets = [];
+    private readonly Vector2 textureCenter;
+    private readonly float[] trailAlphas;
+
+    private readonly Star[] stars;
 
     public SpiralStars(BinaryPacker.Element data) : base()
     {
-        center.X = data.AttrFloat("centerX", 160f);
-        center.Y = data.AttrFloat("centerY", 90f);
-
-        speed = data.AttrFloat("speed", 70f);
-        rotationSpeed = Calc.DegToRad * data.AttrFloat("rotationSpeed", -40f);
-        eventHorizonDistance = data.AttrFloat("centerRadius", 70f);
-        spawningDistance = data.AttrFloat("spawnRadius", 190f);
-        trailLength = data.AttrInt("trailLength", 8);
-        trailDelay = data.AttrFloat("trailDelay", 1f / 60f);
-
-        string spritePath = data.Attr("spritePath", "bgs/02/stars");
-        textures =
-        [
-            GFX.Game.GetAtlasSubtextures(spritePath + "/a"),
-            GFX.Game.GetAtlasSubtextures(spritePath + "/b"),
-            GFX.Game.GetAtlasSubtextures(spritePath + "/c"),
-        ];
-        textureCenter = new Vector2(textures[0][0].Width, textures[0][0].Height) / 2f;
-
-        trailAlphas = new float[trailLength];
-        for (int j = 0; j < trailAlphas.Length; j++)
-            trailAlphas[j] = 0.7f * (1f - (float)j / (float)trailAlphas.Length);
-
         backgroundColor = Calc.HexToColorWithNonPremultipliedAlpha(data.Attr("backgroundColor", "00000000"));
         Color[] colors = data.AttrList("colors", Calc.HexToColorWithNonPremultipliedAlpha, "ffffff").ToArray();
+        center = new Vector2(data.AttrFloat("centerX", 160f), data.AttrFloat("centerY", 90f));
+        speed = data.AttrFloat("speed", 70f);
+        rotationSpeed = data.AttrFloat("rotationSpeed", -40f).ToRad();
+        innerRadius = data.AttrFloat("centerRadius", 70f);
+        outerRadius = data.AttrFloat("spawnRadius", 190f);
+        trailDelay = data.AttrFloat("trailDelay", 1f / 60f);
+        int trailLength = data.AttrInt("trailLength", 8);
 
-        int starCount = data.AttrInt("starCount", 100);
-        stars = new Star[starCount];
+        string spriteDir = data.Attr("spritePath", "bgs/02/stars");
+        textureSets.Add(GFX.Game.GetAtlasSubtextures(spriteDir + "/a"));
+        for (char c = 'b'; c <= 'z'; c++)
+        {
+            string spritePath = spriteDir + "/" + c;
+            if (GFX.Game.HasAtlasSubtextures(spritePath))
+                textureSets.Add(GFX.Game.GetAtlasSubtextures(spritePath));
+            else
+                break;
+        }
+        textureCenter = new Vector2(textureSets[0][0].Width, textureSets[0][0].Height) / 2f;
+
+        trailAlphas = new float[trailLength];
+        for (int i = 0; i < trailAlphas.Length; i++)
+            trailAlphas[i] = 0.7f * (1f - (float)i / (float)trailAlphas.Length);
+
+        stars = new Star[data.AttrInt("starCount", 100)];
         for (int i = 0; i < stars.Length; i++)
         {
-            Star star = new Star
+            Star star = new Star(Calc.Random.Next(textureSets.Count), colors[Calc.Random.Next(colors.Length)], trailLength)
             {
-                AnimationTimer = Calc.Random.NextFloat(MathF.PI * 2f),
-                TextureSet = Calc.Random.Next(textures.Count),
-                Color = colors[Calc.Random.Next(colors.Length)],
+                Distance = Calc.Random.NextFloat(outerRadius),
                 Angle = Calc.Random.NextAngle(),
-                Distance = Calc.Random.NextFloat(spawningDistance),
+                AnimationTimer = Calc.Random.NextFloat(MathF.PI * 2f)
             };
-
-            UpdateStar(star);
+            UpdateStarSprites(star);
 
             stars[i] = star;
         }
@@ -92,72 +87,55 @@ public class SpiralStars : Backdrop
 
         foreach (Star star in stars)
         {
-            star.Distance = Mod(star.Distance - Engine.DeltaTime * speed, spawningDistance + 1);
+            star.Distance = Mod(star.Distance - Engine.DeltaTime * speed, outerRadius + 1);
             star.Angle += Engine.DeltaTime * rotationSpeed;
             star.AnimationTimer += Engine.DeltaTime;
 
-            UpdateStar(star);
+            UpdateStarSprites(star);
         }
     }
 
     public override void Render(Scene scene)
     {
         if (backgroundColor.A > 0)
-            Draw.Rect(-1f, -1f, SorbetHelperGFX.GameplayBufferWidth + 2f, SorbetHelperGFX.GameplayBufferHeight + 2f, backgroundColor);
+            Draw.Rect(-1f, -1f, RenderTargetHelper.GameplayWidth + 2f, RenderTargetHelper.GameplayHeight + 2f, backgroundColor);
 
-        Vector2 zoomCenterOffset = SorbetHelperGFX.GetZoomOutCameraCenterOffset((scene as Level)!.Camera);
+        Vector2 zoomCenterOffset = (scene as Level)!.Camera.GetZoomOutCenterOffset();
 
         foreach (Star star in stars)
         {
-            List<MTexture> textureSet = textures[star.TextureSet];
+            List<MTexture> textureSet = textureSets[star.TextureSet];
 
-            for (int j = 0; j < star.Trails.Count; j++)
-            {
-                Star.Trail trail = star.Trails[j];
-                float trailScale = trail.Scale;
+            for (int i = 0; i < star.Trail.Length; i++)
+                textureSet[star.Trail[i].FrameIndex].Draw(star.Trail[i].Position + zoomCenterOffset, textureCenter, star.Color * star.Trail[i].Scale * trailAlphas[i], star.Trail[i].Scale);
 
-                textureSet[trail.FrameIndex].Draw(trail.Position + zoomCenterOffset, textureCenter, star.Color * trailScale * trailAlphas[j], trailScale);
-            }
-
-            textureSet[star.FrameIndex].Draw(star.Position + zoomCenterOffset, textureCenter, star.Color * star.Scale, star.Scale);
+            textureSet[star.Sprite.FrameIndex].Draw(star.Sprite.Position + zoomCenterOffset, textureCenter, star.Color * star.Sprite.Scale, star.Sprite.Scale);
         }
     }
 
-    private void UpdateStar(Star star)
+    private void UpdateStarSprites(Star star)
     {
-        Vector2 position = center + Calc.AngleToVector(star.Angle, star.Distance);
-        float scale = Math.Clamp(star.Distance / eventHorizonDistance, 0f, 1f);
+        for (int i = 0; i < star.Trail.Length; i++)
+            UpdateStarSprite(star, ref star.Trail[i], -trailDelay * (i + 1));
 
-        List<MTexture> list = textures[star.TextureSet];
-        int frameIndex = (int)((Math.Sin(star.AnimationTimer) + 1.0) / 2.0 * list.Count);
-        frameIndex %= list.Count;
-
-        if (trailLength > 0)
-        {
-            star.Trails.Clear();
-
-            for (int i = 1; i <= trailLength; i++)
-                star.Trails.Add(GetTrailWithTimeOffset(star, i * -trailDelay));
-        }
-
-        star.Position = position;
-        star.Scale = scale;
-        star.FrameIndex = frameIndex;
+        UpdateStarSprite(star, ref star.Sprite, 0f);
     }
 
-    private Star.Trail GetTrailWithTimeOffset(Star star, float timeOffset)
+    private void UpdateStarSprite(Star star, ref Star.StarSprite starSprite, float timeOffset)
     {
-        float distance = Mod(star.Distance - timeOffset * speed, spawningDistance + 1);
+        float distance = Mod(star.Distance - timeOffset * speed, outerRadius + 1);
         float angle = star.Angle + timeOffset * rotationSpeed;
 
         Vector2 position = center + Calc.AngleToVector(angle, distance);
-        float scale = Math.Clamp(distance / eventHorizonDistance, 0f, 1f);
+        float scale = Math.Clamp(distance / innerRadius, 0f, 1f);
 
-        List<MTexture> list = textures[star.TextureSet];
-        int frameIndex = (int)((Math.Sin(star.AnimationTimer + timeOffset) + 1.0) / 2.0 * list.Count);
-        frameIndex %= list.Count;
+        List<MTexture> textureSet = textureSets[star.TextureSet];
+        int frameIndex = (int)((Math.Sin(star.AnimationTimer + timeOffset) + 1.0) / 2.0 * textureSet.Count);
+        frameIndex %= textureSet.Count;
 
-        return new Star.Trail(position, scale, frameIndex);
+        starSprite.Position = position;
+        starSprite.Scale = scale;
+        starSprite.FrameIndex = frameIndex;
     }
 
     private static float Mod(float x, float m) => (x % m + m) % m;

@@ -1,13 +1,10 @@
-using System.Reflection;
-using Celeste.Mod.SorbetHelper.Utils;
-using MonoMod.Cil;
-using MonoMod.RuntimeDetour;
-using MonoMod.Utils;
+using static Celeste.Mod.SorbetHelper.Components.ExplodeHittable;
 
 namespace Celeste.Mod.SorbetHelper.Components;
 
 [Tracked]
-public class ExplodeHittable(ExplodeHittable.ExplodeHitCallback onHit) : Component(false, false)
+public class ExplodeHittable(ExplodeHitCallback onHit)
+    : Component(false, false)
 {
     public delegate void ExplodeHitCallback(Entity entity, Vector2 direction);
 
@@ -23,6 +20,7 @@ public class ExplodeHittable(ExplodeHittable.ExplodeHitCallback onHit) : Compone
 
     private static ILHook ilHook_Seeker_RegenerateCoroutine;
 
+    [OnLoad]
     internal static void Load()
     {
         IL.Celeste.Puffer.Explode += IL_Puffer_Explode;
@@ -32,6 +30,7 @@ public class ExplodeHittable(ExplodeHittable.ExplodeHitCallback onHit) : Compone
         );
     }
 
+    [OnUnload]
     internal static void Unload()
     {
         IL.Celeste.Puffer.Explode -= IL_Puffer_Explode;
@@ -42,7 +41,7 @@ public class ExplodeHittable(ExplodeHittable.ExplodeHitCallback onHit) : Compone
     {
         ILCursor cursor = new ILCursor(il);
 
-        if (!cursor.TryGotoNext(MoveType.Before,
+        if (!cursor.TryGotoNextBestFit(MoveType.Before,
             instr => instr.MatchLdarg0(),
             instr => instr.MatchCallOrCallvirt<Entity>(nameof(Entity.CollideFirst)),
             instr => instr.MatchStloc(out _)))
@@ -57,7 +56,7 @@ public class ExplodeHittable(ExplodeHittable.ExplodeHitCallback onHit) : Compone
         ILCursor cursor = new ILCursor(il);
         int seekerVariable = 1;
 
-        if (!cursor.TryGotoNext(MoveType.Before,
+        if (!cursor.TryGotoNextBestFit(MoveType.Before,
             instr => instr.MatchLdloc(out seekerVariable),
             instr => instr.MatchCallOrCallvirt<Entity>(nameof(Entity.CollideFirst)),
             instr => instr.MatchStloc(out _)))

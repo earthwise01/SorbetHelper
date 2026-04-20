@@ -42,18 +42,18 @@ function buttonField.getElement(name, value, options)
     local minWidth = options.minWidth or options.width or 160
     local maxWidth = options.maxWidth or options.width or 160
 
-    local button = uiElements.button(options.displayName or name, function () end)
+    local button = uiElements.button(options.displayName or name, function() end)
     -- button.tooltipText = "Click button to open menu."
 
     local description = options.tooltipText or "Error! No description found!"
 
     local buttonWithContext = contextMenu.addContextMenu(
         button,
-        function ()
+        function()
             return grid.getGrid({uiElements.label(description)}, 1)
         end,
         {
-            shouldShowMenu = function (self, x, y, button, istouch) return true end,
+            shouldShowMenu = function(self, x, y, button, istouch) return true end,
             mode = "focused"
         }
     )

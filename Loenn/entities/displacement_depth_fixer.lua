@@ -1,25 +1,16 @@
-local sorbetUtils = require("mods").requireFromPlugin("libraries.utils")
+local mods = require("mods")
+local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
 
 local displacementDepthFixer = {}
 
 displacementDepthFixer.name = "SorbetHelper/DepthAdheringDisplacementWrapper"
+displacementDepthFixer.fillColor = {100 / 255, 225 / 255, 245 / 255, 0.25}
+displacementDepthFixer.borderColor = {183 / 255, 250 / 255, 221 / 255, 0.5}
+displacementDepthFixer.depth = sorbetUtils.controllerDepth
 displacementDepthFixer.placements = {
     {
-        name = "entityOnly",
-        alternativeName = "altName",
-        data = {
-            width = 8,
-            height = 8,
-            distortBehind = false,
-            ignoreBounds = false,
-            minDepth = "",
-            maxDepth = "",
-            affectedTypes = ""
-        }
-    },
-    {
-        name = "distortBehind",
-        alternativeName = "altName",
+        name = "displacement_depth_fixer",
+        alternativeName = "depth_adhering_displacment_wrapper",
         data = {
             width = 8,
             height = 8,
@@ -29,44 +20,52 @@ displacementDepthFixer.placements = {
             maxDepth = "",
             affectedTypes = ""
         }
+    },
+    {
+        name = "displacement_depth_fixer_entity_only",
+        alternativeName = "depth_adhering_displacment_wrapper",
+        data = {
+            width = 8,
+            height = 8,
+            distortBehind = false,
+            ignoreBounds = false,
+            minDepth = "",
+            maxDepth = "",
+            affectedTypes = ""
+        }
     }
 }
 
-displacementDepthFixer.fieldInformation = function()
-    return {
-        ignoreBounds = {
-            default = false
-        },
-        affectedTypes = {
-            fieldType = "list",
-            elementSeparator = ",",
-            elementDefault = "",
-            elementOptions = {
-                 options = sorbetUtils.getMapSIDs(),
-                 searchable = true,
-            },
-
-            default = ""
-        },
-        minDepth = {
-            fieldType = "integer",
-            allowEmpty = true
-        },
-        maxDepth = {
-            fieldType = "integer",
-            allowEmpty = true
-        }
-    }
-end
-
 displacementDepthFixer.fieldOrder = {
-    "x", "y", "width", "height",
+    "x", "y",
+    "width", "height",
     "maxDepth", "affectedTypes",
     "minDepth", "ignoreBounds", "distortBehind"
 }
 
-displacementDepthFixer.depth = -1000010
-displacementDepthFixer.fillColor = {100 / 255, 225 / 255, 245 / 255, 0.25}
-displacementDepthFixer.borderColor = {183 / 255, 250 / 255, 221 / 255, 0.5}
+displacementDepthFixer.fieldInformation = {
+    ignoreBounds = {
+        default = false
+    },
+    affectedTypes = {
+        fieldType = "list",
+        elementSeparator = ",",
+        elementDefault = "",
+        elementOptions = {
+             options = function() return sorbetUtils.getMapSIDs() end,
+             searchable = true
+        },
+
+        default = ""
+    },
+    minDepth = {
+        fieldType = "integer",
+        allowEmpty = true
+    },
+    maxDepth = {
+        fieldType = "integer",
+        allowEmpty = true
+    }
+}
 
 return displacementDepthFixer

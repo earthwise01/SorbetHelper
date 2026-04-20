@@ -1,15 +1,15 @@
-local effect = {}
+local entityStylegroundRenderer = {}
 
-effect.name = "SorbetHelper/EntityStylegroundRenderer"
+entityStylegroundRenderer.name = "SorbetHelper/EntityStylegroundRenderer"
 
-effect.defaultData = {
+entityStylegroundRenderer.defaultData = {
     _instructionsButton = true
 }
 
-effect.fieldInformation = {
+entityStylegroundRenderer.fieldInformation = {
     _instructionsButton = {
         fieldType = "sorbetHelper.infoButton"
     }
 }
 
-return effect
+return entityStylegroundRenderer

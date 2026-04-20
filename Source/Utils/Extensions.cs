@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using Celeste.Mod.Registry;
+using System.Globalization;
 
 namespace Celeste.Mod.SorbetHelper.Utils;
 
@@ -123,6 +121,47 @@ internal static class Extensions
 
             return entity;
         }
+
+        /// <summary>
+        /// Get a matrix that can be used to transform a vector from camera space to screen space. Accounts for compatibility with ExtendedVariants and ExtendedCameraDynamics.
+        /// </summary>
+        /// <returns>A <see cref="Matrix"/> that can be used to transform a vector from camera space to screen space.</returns>
+        public Matrix GetCameraToScreenMatrix()
+        {
+            Matrix matrix = Matrix.Identity;
+
+            // zoom & padding
+            float zoom = self.Zoom;
+            if (ExtendedVariantsCompat.IsLoaded)
+                zoom *= ExtendedVariantsCompat.GetZoomLevel();
+            float zoomTarget = ExtendedCameraDynamics.IsImported && ExtendedCameraDynamics.ExtendedCameraHooksEnabled()
+                ? self.Zoom
+                : self.ZoomTarget;
+            Vector2 dimensions = new Vector2(320f, 180f);
+            Vector2 scaledDimensions = dimensions / zoomTarget;
+            Vector2 zoomOrigin = zoomTarget != 1f ? (self.ZoomFocusPoint - scaledDimensions / 2f) / (dimensions - scaledDimensions) * dimensions : Vector2.Zero;
+
+            Vector2 paddingOffset = new Vector2(self.ScreenPadding, self.ScreenPadding * (9f / 16f));
+            if (ExtendedVariantsCompat.IsLoaded)
+                paddingOffset = ExtendedVariantsCompat.AddZoomPaddingOffset(paddingOffset);
+
+            float scale = zoom * (320f - self.ScreenPadding * 2f) / 320f;
+
+            matrix *= Matrix.CreateTranslation(-zoomOrigin.X, -zoomOrigin.Y, 0f)
+                      * Matrix.CreateScale(scale)
+                      * Matrix.CreateTranslation(zoomOrigin.X + paddingOffset.X, zoomOrigin.Y + paddingOffset.Y, 0f);
+
+            // mirror mode & upside down
+            if (SaveData.Instance.Assists.MirrorMode)
+                matrix *= Matrix.CreateScale(-1f, 1f, 1f) * Matrix.CreateTranslation(320f, 0f, 0f);
+            if (ExtendedVariantsCompat.IsLoaded && ExtendedVariantsCompat.GetUpsideDown())
+                matrix *= Matrix.CreateScale(1f, -1f, 1f) * Matrix.CreateTranslation(0f, 180f, 0f);
+
+            // scale to screen size
+            matrix *= Matrix.CreateScale(6f);
+
+            return matrix;
+        }
     }
 
     #endregion
@@ -131,6 +170,10 @@ internal static class Extensions
 
     extension(Entity self)
     {
+        /// <summary>
+        /// Shortcut function for getting a Component from the Entity's Components list.<br/>
+        /// Searches from end to start, which may be more efficient if you can guarantee the Component was added later.
+        /// </summary>
         public T GetComponentFromEnd<T>() where T : Component
         {
             List<Component> components = self.Components.components;
@@ -144,11 +187,21 @@ internal static class Extensions
             return null;
         }
 
+        /// <summary>
+        /// Shortcut function for getting a Component from the Entity's Components list.<br/>
+        /// If the number of components in the tracker is less than the size of the entity's components list, searches using the Tracker instead.<br/>
+        /// </summary>
+        public T GetComponentFromTracker<T>() where T : Component
+            => self.Scene is not null
+               && self.Scene.Tracker.Components.TryGetValue(typeof(T), out List<Component> trackedComponents)
+               && trackedComponents.Count < self.Components.Count
+                ? trackedComponents.FirstOrDefault(c => c.Entity == self) as T
+                : self.Components.Get<T>();
+
         public bool CheckTypeName(params HashSet<string> typeNames)
         {
             Type type = self.GetType();
-            IReadOnlySet<string> knownSidsFromType = EntityRegistry.GetKnownSidsFromType(type);
-            return typeNames.Any(typeName => knownSidsFromType.Contains(typeName) || type.Name == typeName || type.FullName == typeName);
+            return typeNames.Overlaps(EntityRegistry.GetKnownSidsFromType(type)) || typeNames.Contains(type.Name) || typeNames.Contains(type.FullName);
         }
     }
 
@@ -158,7 +211,8 @@ internal static class Extensions
 
     extension(Session self)
     {
-        public bool GetFlag(string flag, bool inverted) => self.GetFlag(flag) != inverted;
+        public bool GetFlag(string flag, bool inverted)
+            => self.GetFlag(flag) != inverted;
     }
 
     #endregion
@@ -169,7 +223,11 @@ internal static class Extensions
     {
         public int Width => self.Viewport.Width;
         public int Height => self.Viewport.Height;
-        public Vector2 Center => self.Position + new Vector2(self.Viewport.Width / 2f, self.Viewport.Height / 2f);
+
+        public Vector2 GetCenter()
+            => self.Position + new Vector2(self.Viewport.Width / 2f, self.Viewport.Height / 2f);
+        public Vector2 GetZoomOutCenterOffset()
+            => new Vector2(self.Viewport.Width / 2f - 320f / 2f, self.Viewport.Height / 2f - 180f / 2f);
     }
 
     #endregion
@@ -202,30 +260,16 @@ internal static class Extensions
             return defaultValue;
         }
 
-        public int? NullableInt(string key)
+        public T? Nullable<T>(string key) where T : struct, IParsable<T>
         {
             if (self.Values is null || !self.Values.TryGetValue(key, out object value))
                 return null;
 
-            if (value is int num)
-                return num;
+            if (value is T tResult)
+                return tResult;
 
-            if (int.TryParse(value.ToString(), out int result))
-                return result;
-
-            return null;
-        }
-
-        public float? NullableFloat(string key)
-        {
-            if (self.Values is null || !self.Values.TryGetValue(key, out object value))
-                return null;
-
-            if (value is float num)
-                return num;
-
-            if (float.TryParse(value.ToString(), out float result))
-                return result;
+            if (T.TryParse(value.ToString(), CultureInfo.InvariantCulture, out T parsedResult))
+                return parsedResult;
 
             return null;
         }
@@ -310,6 +354,23 @@ internal static class Extensions
         /// maps all Monocle <see cref="Ease.Easer"/>s to their names (i.e. <c>"SineInOut"</c> => <see cref="Ease.SineInOut"/>)
         /// </summary>
         public static ReadOnlyDictionary<string, Ease.Easer> StringToEaser => EaseExtensions_StringToEaser;
+    }
+
+    #endregion
+
+    #region ILCursor Extensions
+
+    extension(ILCursor self)
+    {
+        public VariableDefinition AddVariable(Type type)
+        {
+            VariableDefinition variableDefinition = new VariableDefinition(self.Context.Import(type));
+            self.Body.Variables.Add(variableDefinition);
+            return variableDefinition;
+        }
+
+        public VariableDefinition AddVariable<T>()
+            => AddVariable(self, typeof(T));
     }
 
     #endregion

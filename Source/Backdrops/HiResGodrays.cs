@@ -1,8 +1,3 @@
-using System.Linq;
-using Microsoft.Xna.Framework.Graphics;
-using Celeste.Mod.Backdrops;
-using Celeste.Mod.SorbetHelper.Utils;
-
 namespace Celeste.Mod.SorbetHelper.Backdrops;
 
 [CustomBackdrop("SorbetHelper/HiResGodrays")]
@@ -139,7 +134,6 @@ public class HiResGodrays : HiResBackdrop
 
         base.Update(scene);
 
-        // fading
         if (doVisibleFade)
         {
             visibleFade = Calc.Approach(visibleFade, IsVisible(level) ? 1f : 0f, Engine.DeltaTime * 2f);
@@ -155,7 +149,9 @@ public class HiResGodrays : HiResBackdrop
         if (FadeY != null)
             cameraFade *= FadeY.Value(level.Camera.Y + level.Camera.Height / 2f);
 
-        float alpha = visibleFade * cameraFade * ExtendedVariantsCompat.ForegroundEffectOpacity;
+        float alpha = visibleFade * cameraFade;
+        if (ExtendedVariantsCompat.IsLoaded)
+            alpha *= ExtendedVariantsCompat.GetForegroundEffectOpacity();
 
         // resize vertex buffer for zoom out if needed,
         int visibleScreens = (int)Math.Ceiling((level.Camera.Width + offscreenPadding * 2f) / (320f + offscreenPadding * 2f));
@@ -227,12 +223,12 @@ public class HiResGodrays : HiResBackdrop
         vertexCount = vertexIndex;
     }
 
-    public override void RenderHiRes(Scene scene, Matrix upscaleMatrix)
+    public override void RenderHiRes(Scene scene, Matrix cameraToScreenMatrix)
     {
         if (useTextureParticles)
             DrawTextureParticles(scene);
         else
-            DrawGodrays(upscaleMatrix);
+            DrawGodrays(cameraToScreenMatrix);
     }
 
     private void DrawGodrays(Matrix matrix)

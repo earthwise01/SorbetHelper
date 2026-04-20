@@ -6,21 +6,16 @@ local utils = require("utils")
 local drawing = require("utils.drawing")
 local entities = require("entities")
 
--- somewhat based on flag switch gates from maddiehelpinghand as is the case for most game block stuff :p
--- https://github.com/maddie480/MaddieHelpingHand/blob/master/Loenn/entities/flagSwitchGate.lua
--- (rendering is mostly mine though and based on exclamation blocks if anything)
-
 local touchGateBlock = {}
 
 touchGateBlock.name = "SorbetHelper/TouchGateBlock"
-touchGateBlock.depth = 0
+touchGateBlock.depth = -9000
 touchGateBlock.nodeLimits = {1, 1}
 touchGateBlock.nodeLineRenderType = false
 touchGateBlock.warnBelowSize = {16, 16}
 touchGateBlock.placements = {
     {
-        name = "normal",
-        alternativeName = "normalaltname",
+        name = "touch_gate_block",
         data = {
             width = 16,
             height = 16,
@@ -39,7 +34,7 @@ touchGateBlock.placements = {
             allowReturn = false,
             moveOnGrab = true,
             moveOnStaticMoverInteract = true,
-            linkTag = "" -- this is flag on activate in editor
+            linkTag = ""
         }
     }
 }
@@ -81,7 +76,7 @@ touchGateBlock.fieldInformation = {
     },
     drawOutline = {
         default = true
-    },
+    }
 }
 
 local ninePatchOptions = {

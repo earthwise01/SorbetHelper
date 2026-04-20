@@ -1,14 +1,9 @@
-using System.Collections.Generic;
-using System.Linq;
-using Celeste.Mod.Helpers;
-using Celeste.Mod.SorbetHelper.Utils;
-using MonoMod.Cil;
-using Mono.Cecil.Cil;
+using static Celeste.Mod.SorbetHelper.Components.EntityAwakeProcessor;
 
 namespace Celeste.Mod.SorbetHelper.Components;
 
 [Tracked]
-public sealed class EntityAwakeProcessor(Action<Entity> onProcessEntity, EntityAwakeProcessor.ProcessModes processMode = EntityAwakeProcessor.ProcessModes.OnEntityAwake)
+public sealed class EntityAwakeProcessor(Action<Entity> onProcessEntity, ProcessModes processMode = ProcessModes.OnEntityAwake)
     : Component(false, false)
 {
     public enum ProcessModes
@@ -80,11 +75,13 @@ public sealed class EntityAwakeProcessor(Action<Entity> onProcessEntity, EntityA
 
     #region Hooks
 
+    [OnLoad]
     internal static void Load()
     {
         IL.Monocle.EntityList.UpdateLists += IL_EntityList_UpdateLists;
     }
 
+    [OnUnload]
     internal static void Unload()
     {
         IL.Monocle.EntityList.UpdateLists -= IL_EntityList_UpdateLists;
@@ -102,23 +99,21 @@ public sealed class EntityAwakeProcessor(Action<Entity> onProcessEntity, EntityA
             instr => instr.MatchCallOrCallvirt<HashSet<Entity>>(nameof(HashSet<Entity>.Clear))))
             throw new HookHelper.HookException(il, "Unable to find where to prepare the EntityAwakeProcessor list.");
 
-        VariableDefinition entityAwakeProcessors = new VariableDefinition(il.Import(typeof(EntityAwakeProcessor[])));
-        il.Body.Variables.Add(entityAwakeProcessors);
+        VariableDefinition entityAwakeProcessorsVariable = cursor.AddVariable<EntityAwakeProcessor[]>();
 
         cursor.EmitLdarg0();
         cursor.EmitDelegate(GetEntityAwakeProcessors);
-        cursor.EmitStloc(entityAwakeProcessors);
+        cursor.EmitStloc(entityAwakeProcessorsVariable);
 
-        if (!cursor.TryGotoNext(MoveType.After,
-            instr => instr.MatchCallOrCallvirt<Entity>("Awake")))
-            throw new HookHelper.HookException(il, "Unable to find Entity.Awake call to emit processing after.");
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallOrCallvirt<Entity>("Awake")))
+            throw new HookHelper.HookException(il, "Unable to find `Entity.Awake` call to add processing after.");
 
         ILLabel noEntityAwakeProcessorsLabel = cursor.DefineLabel();
 
-        cursor.EmitLdloc(entityAwakeProcessors);
+        cursor.EmitLdloc(entityAwakeProcessorsVariable);
         cursor.EmitBrfalse(noEntityAwakeProcessorsLabel);
         cursor.EmitLdloc(5); // entity
-        cursor.EmitLdloc(entityAwakeProcessors);
+        cursor.EmitLdloc(entityAwakeProcessorsVariable);
         cursor.EmitDelegate(ProcessEntity);
         cursor.MarkLabel(noEntityAwakeProcessorsLabel);
 

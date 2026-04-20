@@ -1,10 +1,10 @@
-﻿local effect = {}
+﻿local hiResSnow = {}
 
-effect.name = "SorbetHelper/ParallaxHiResSnow"
-effect.canBackground = false
-effect.canForeground = true
+hiResSnow.name = "SorbetHelper/ParallaxHiResSnow"
+hiResSnow.canBackground = false
+hiResSnow.canForeground = true
 
-effect.defaultData = {
+hiResSnow.defaultData = {
     only = "*", exclude = "", fadex = "", fadey = "", fadeInOut = true,
     tag = "", flag = "", notflag = "",
     texturePath = "snow", randomRotation = true, fadeTowardsForeground = true,
@@ -19,7 +19,7 @@ effect.defaultData = {
 
 }
 
-effect.fieldOrder = {
+hiResSnow.fieldOrder = {
     "only", "exclude", "tag", "flag",
     "color", "alpha", "additive", "notflag",
     "texturePath", "particleCount", "fadex", "fadey",
@@ -29,10 +29,9 @@ effect.fieldOrder = {
     "randomRotation", "speedStretching", "sineHorizontal", "fadeTowardsForeground", "fadeInOut"
 }
 
-effect.fieldInformation = {
+hiResSnow.fieldInformation = {
     color = {
-        fieldType = "color",
-        allowXNAColors = false
+        fieldType = "color"
     },
     alpha = {
         maximumValue = 1.0,
@@ -51,4 +50,4 @@ effect.fieldInformation = {
     }
 }
 
-return effect
+return hiResSnow

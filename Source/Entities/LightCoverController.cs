@@ -1,14 +1,10 @@
-using System.Linq;
-using Celeste.Mod.SorbetHelper.Components;
-using Celeste.Mod.SorbetHelper.Utils;
-
 namespace Celeste.Mod.SorbetHelper.Entities;
 
-[GlobalEntity(EntityDataID + "Global")] // global version is swapped to in mapdataprocessor based on data.Bool("global")
-[CustomEntity(EntityDataID, EntityDataID + "Global")]
+[GlobalEntity(           EntitySID + "Global")] // global version is swapped to in mapdataprocessor based on data.Bool("global")
+[CustomEntity(EntitySID, EntitySID + "Global")]
 public class LightCoverController : Entity
 {
-    public const string EntityDataID = "SorbetHelper/LightCoverController";
+    public const string EntitySID = "SorbetHelper/LightCoverController";
 
     private readonly float alpha;
 

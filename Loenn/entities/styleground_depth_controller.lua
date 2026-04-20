@@ -1,22 +1,27 @@
 local drawableText = require("structs.drawable_text")
 local mods = require("mods")
-local depths = mods.requireFromPlugin("libraries.depths")
-local sorbetUtils = require("mods").requireFromPlugin("libraries.utils")
+local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
 
 local stylegroundDepthController = {}
 
+local depthOptions = sorbetUtils.getDepths()
+table.insert(depthOptions, {"————————", ""})
+table.insert(depthOptions, {"Above Colorgrade", "AboveColorgrade"})
+table.insert(depthOptions, {"Above HUD", "AboveHud"})
+table.insert(depthOptions, {"Above Pause HUD", "AbovePauseHud"})
+
 stylegroundDepthController.name = "SorbetHelper/StylegroundDepthController"
-stylegroundDepthController.depth = -1000010
+stylegroundDepthController.depth = sorbetUtils.controllerDepth
 stylegroundDepthController.placements = {
     {
-        name = "depth",
+        name = "styleground_depth_controller",
         data = {
             depth = 0,
             tag = ""
         }
     },
     {
-        name = "aboveHud",
+        name = "styleground_depth_controller_above_hud",
         data = {
             depth = "AboveHud",
             tag = ""
@@ -24,16 +29,15 @@ stylegroundDepthController.placements = {
     }
 }
 
-local depths = depths.getDepths()
-table.insert(depths, {"————————", ""})
-table.insert(depths, {"Above Colorgrade", "AboveColorgrade"})
-table.insert(depths, {"Above HUD", "AboveHud"})
-table.insert(depths, {"Above Pause HUD", "AbovePauseHud"})
+stylegroundDepthController.fieldOrder = {
+    "x", "y",
+    "tag", "depth"
+}
 
 stylegroundDepthController.fieldInformation = {
     depth = {
         fieldType = "sorbetHelper.integerAndEnum",
-        options = depths,
+        options = depthOptions,
         enum = {
             AboveColorgrade = true,
             AboveHud = true,
@@ -41,11 +45,6 @@ stylegroundDepthController.fieldInformation = {
         },
         editable = true
     }
-}
-
-stylegroundDepthController.fieldOrder = {
-    "x", "y",
-    "tag", "depth",
 }
 
 function stylegroundDepthController.sprite(room, entity)

@@ -1,31 +1,41 @@
-local trigger = {}
-
-trigger.name = "SorbetHelper/ColorDashBlockStateTrigger"
-trigger.placements = {
-    name = "colorDashBlockState",
-    alternativeName = "coloUr",
-    data = {
-        index = 0,
-        mode = "OnPlayerEnter",
-    }
-}
-
+local colorDashBlockStateTrigger = {}
 
 local colorNames = {
     ["Cyan"] = 0,
     ["Yellow"] = 1,
 }
 
-trigger.fieldInformation = {
+local modes = {
+    "OnPlayerEnter",
+    "OnPlayerSpawn",
+    "OnLevelLoad"
+}
+
+colorDashBlockStateTrigger.name = "SorbetHelper/ColorDashBlockStateTrigger"
+colorDashBlockStateTrigger.placements = {
+    name = "color_dash_block_state",
+    data = {
+        index = 0,
+        mode = "OnPlayerEnter",
+    }
+}
+
+colorDashBlockStateTrigger.fieldOrder = {
+    "x", "y",
+    "width", "height",
+    "index", "mode"
+}
+
+colorDashBlockStateTrigger.fieldInformation = {
     index = {
         fieldType = "integer",
         options = colorNames,
         editable = false
     },
     mode = {
-        options = { "OnPlayerEnter", "OnPlayerSpawn", "OnLevelLoad" },
+        options = modes,
         editable = false
     }
 }
 
-return trigger
+return colorDashBlockStateTrigger

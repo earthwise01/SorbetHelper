@@ -1,17 +1,25 @@
-local sorbetUtils = require("mods").requireFromPlugin("libraries.utils")
+local mods = require("mods")
+local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
 
-local sliderFadeXY = {}
+local sliderFadeXYController = {}
 
-sliderFadeXY.name = "SorbetHelper/SliderFadeXY"
-sliderFadeXY.sprite = sorbetUtils.getControllerSpriteFunction("sliderFadeXY")
-sliderFadeXY.depth = -1000010
-sliderFadeXY.placements = {
-    name = "sliderFadeXY",
+sliderFadeXYController.name = "SorbetHelper/SliderFadeXY"
+sliderFadeXYController.sprite = sorbetUtils.getControllerSpriteFunction("sliderFadeXYController")
+sliderFadeXYController.depth = sorbetUtils.controllerDepth
+sliderFadeXYController.placements = {
+    name = "camera_fade_xy_to_slider_controller",
     data = {
         slider = "",
-        fadeX = "", fadeY = "",
-        global = true
+        fadeX = "",
+        fadeY = "",
+        global = false
     }
 }
 
-return sliderFadeXY
+sliderFadeXYController.fieldOrder = {
+    "x", "y"
+    "fadeX", "fadeY",
+    "slider", "global"
+}
+
+return sliderFadeXYController

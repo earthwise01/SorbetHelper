@@ -1,26 +1,20 @@
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework.Graphics;
-using Celeste.Mod.SorbetHelper.Utils;
-using MonoMod.Cil;
-
 namespace Celeste.Mod.SorbetHelper.Components;
 
 [Tracked]
 public class LightCover(float alpha) : Component(false, true)
 {
-    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(LightCover)}";
-
     // storing this as a byte because otherwise im worried about using floats when grouping the alpha batches
     private readonly byte alpha = (byte)MathHelper.Clamp(alpha * 255f, 0f, 255f);
 
     #region Hooks
 
+    [OnLoad]
     internal static void Load()
     {
         IL.Celeste.LightingRenderer.BeforeRender += IL_LightingRenderer_BeforeRender;
     }
 
+    [OnUnload]
     internal static void Unload()
     {
         IL.Celeste.LightingRenderer.BeforeRender -= IL_LightingRenderer_BeforeRender;
@@ -33,14 +27,8 @@ public class LightCover(float alpha) : Component(false, true)
             Index = -1
         };
 
-        if (!cursor.TryGotoPrev(MoveType.After,
-            instr => instr.MatchCallOrCallvirt(typeof(GFX), nameof(GFX.DrawIndexedVertices))))
-        {
-            Logger.Warn(LogID, $"Failed to inject check to render LightCover components in CIL code for {cursor.Method.Name}!");
-            return;
-        }
-
-        Logger.Verbose(LogID, $"Injecting check to render LightCover components at {cursor.Index} in CIL code for {cursor.Method.Name}");
+        if (!cursor.TryGotoPrev(MoveType.After, instr => instr.MatchCallOrCallvirt(typeof(GFX), nameof(GFX.DrawIndexedVertices))))
+            throw new HookHelper.HookException(il, "Unable to find light occluder rendering to insert light cover rendering after.");
 
         cursor.EmitLdloc0();
         cursor.EmitDelegate(DrawLightCovers);
@@ -57,13 +45,13 @@ public class LightCover(float alpha) : Component(false, true)
                 return;
 
             // split the components up based on alpha (is there a better way to do this?)
-            List<IGrouping<byte, LightCover>> alphaBatches =
-                components.Cast<LightCover>().GroupBy(lightCover => lightCover.alpha)
-                          .ToList();
+            List<IGrouping<byte, LightCover>> alphaBatches = components.Cast<LightCover>()
+                                                                       .GroupBy(lightCover => lightCover.alpha)
+                                                                       .ToList();
             int batchCount = alphaBatches.Count;
 
             RenderTargetBinding[] initalBuffer = Engine.Instance.GraphicsDevice.GetRenderTargets();
-            VirtualRenderTarget[] tempBuffers = RenderTargetHelper.GetGameplayBuffers(batchCount);
+            VirtualRenderTarget[] tempBuffers = RenderTargetHelper.GetTempBuffers(batchCount);
 
             for (int i = 0; i < batchCount; i++)
             {
@@ -102,7 +90,7 @@ public class LightCover(float alpha) : Component(false, true)
 
             Draw.SpriteBatch.End();
 
-            RenderTargetHelper.ReturnGameplayBuffers(tempBuffers);
+            RenderTargetHelper.ReturnTempBuffers(ref tempBuffers);
         }
     }
 

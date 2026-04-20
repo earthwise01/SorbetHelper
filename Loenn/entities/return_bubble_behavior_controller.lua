@@ -1,30 +1,44 @@
-local easings = require("mods").requireFromPlugin("libraries.easings")
-local collisionModes = { "Vanilla", "SquishFix", "TriggersOnly", "NoCollide" }
+local mods = require("mods")
+local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
 
-local returnBubbleBehavior = {}
+local returnBubbleBehaviorController = {}
 
-returnBubbleBehavior.name = "SorbetHelper/ReturnBubbleBehaviorController"
-returnBubbleBehavior.texture = "editorSprites/SorbetHelper/returnBubbleBehavior"
-returnBubbleBehavior.depth = -1000010
-returnBubbleBehavior.placements = {
-    name = "controller",
+local collisionModes = {
+    "Vanilla",
+    "SquishFix",
+    "TriggersOnly",
+    "NoCollide"
+}
+
+returnBubbleBehaviorController.name = "SorbetHelper/ReturnBubbleBehaviorController"
+returnBubbleBehaviorController.texture = "editorSprites/SorbetHelper/returnBubbleBehaviorController"
+returnBubbleBehaviorController.depth = sorbetUtils.controllerDepth
+returnBubbleBehaviorController.placements = {
+    name = "return_bubble_controller",
     data = {
         time = 0.625,
         speed = 192,
         useSpeed = false,
-        easing = "SineInOut", -- this is a mistake probably but whatever
-        smoothCamera = true, -- vanilla value is off but its nicer on i think
-        -- canSkip = false,
+        easing = "SineInOut",
+        smoothCamera = false,
         refillDash = false,
-        collisionMode = "SquishFix"
+        collisionMode = "Vanilla"
     }
 }
-returnBubbleBehavior.fieldInformation = {
+
+returnBubbleBehaviorController.fieldOrder = {
+    "x", "y",
+    "time", "easing",
+    "speed", "collisionMode",
+    "useSpeed", "smoothCamera"
+}
+
+returnBubbleBehaviorController.fieldInformation = {
     time = {
         minimumValue = 0.0
     },
     easing = {
-        options = easings.all,
+        options = sorbetUtils.allEasings,
         editable = false
     },
     collisionMode = {
@@ -33,11 +47,4 @@ returnBubbleBehavior.fieldInformation = {
     }
 }
 
-returnBubbleBehavior.fieldOrder = {
-    "x", "y",
-    "time", "easing",
-    "speed", "collisionMode",
-    "useSpeed", "smoothCamera"
-}
-
-return returnBubbleBehavior
+return returnBubbleBehaviorController

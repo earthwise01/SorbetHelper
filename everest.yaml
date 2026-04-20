@@ -4,12 +4,3 @@
   Dependencies:
     - Name: EverestCore
       Version: 1.5986.0
-  OptionalDependencies:
-    - Name: GravityHelper
-      Version: 1.2.0
-    - Name: ExtendedVariantMode
-      Version: 0.38.0
-    - Name: ChronoHelper
-      Version: 1.2.2
-    - Name: CommunalHelper
-      Version: 1.24.1

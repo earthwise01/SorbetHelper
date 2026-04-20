@@ -1,23 +1,26 @@
 local drawableRectangle = require("structs.drawable_rectangle")
-local roomStruct = require("structs.room")
-local xnaColors = require("consts.xna_colors")
 local utils = require("utils")
 local waterfallHelper = require("helpers.waterfalls")
 local connectedEntities = require("helpers.connected_entities")
-
 local mods = require("mods")
-local depths = mods.requireFromPlugin("libraries.depths")
+local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
 
 local resizableWaterfall = {}
+
+local splashParticleDepths = {
+    {"BG Particles (8000)", "ParticlesBG"},
+    {"Particles (-8000)", "Particles"},
+    {"FG Particles (-50000)", "ParticlesFG"},
+    {"None", "None"}
+}
 
 resizableWaterfall.name = "SorbetHelper/BigWaterfall"
 resizableWaterfall.canResize = {true, false}
 resizableWaterfall.minimumSize = {8, 0}
-
 resizableWaterfall.placements = {
     {
-        name = "normal",
-        alternativeName = "bigwaterfall",
+        name = "resizable_waterfall_lines",
+        alternativeName = "search_engine_optimization",
         data = {
             width = 8,
             lines = true,
@@ -32,8 +35,8 @@ resizableWaterfall.placements = {
         }
     },
     {
-        name = "small",
-        alternativeName = "bigwaterfall",
+        name = "resizable_waterfall",
+        alternativeName = "search_engine_optimization",
         data = {
             width = 8,
             lines = false,
@@ -48,8 +51,8 @@ resizableWaterfall.placements = {
         }
     },
     {
-        name = "abovefg",
-        alternativeName = "bigwaterfall",
+        name = "resizable_waterfall_lines_above",
+        alternativeName = "search_engine_optimization",
         data = {
             width = 8,
             lines = true,
@@ -65,35 +68,6 @@ resizableWaterfall.placements = {
     }
 }
 
-resizableWaterfall.fieldInformation = {
-    color = {
-        fieldType = "color",
-        allowXNAColors = false
-    },
-    alpha = {
-        minimumValue = 0,
-        maximumValue = 1
-    },
-    depth = {
-        fieldType = "integer",
-        options = depths.addDepths(depths.getDepths(), {
-            {"Water & Waterfalls", -9999}, {"FG Waterfalls", -49900}
-        }),
-        editable = true
-    },
-    splashParticleDepth = {
-        options = {
-            {"BG Particles (8000)", "ParticlesBG"}, {"Particles (-8000)", "Particles"}, {"FG Particles (-50000)", "ParticlesFG"}, {"None", "None"}
-        },
-        editable = false
-    },
-    wavePercent = {
-        options = {1.0, 0.8},
-        minimumValue = 0,
-        maximumValue = 1
-    }
-}
-
 resizableWaterfall.fieldOrder = {
     "x", "y",
     "width", "color",
@@ -102,8 +76,31 @@ resizableWaterfall.fieldOrder = {
     "ignoreSolids", "ignoreWater", "rippleWater", "lines"
 }
 
-resizableWaterfall.ignoredFields = {
-    "height", "_id", "_name"
+resizableWaterfall.fieldInformation = {
+    color = {
+        fieldType = "color"
+    },
+    alpha = {
+        minimumValue = 0,
+        maximumValue = 1
+    },
+    depth = {
+        fieldType = "integer",
+        options = sorbetUtils.getDepths({
+            {"Water & Waterfalls", -9999},
+            {"FG Waterfalls", -49900}
+        }),
+        editable = true
+    },
+    splashParticleDepth = {
+        options = splashParticleDepths,
+        editable = false
+    },
+    wavePercent = {
+        options = {1.0, 0.8},
+        minimumValue = 0,
+        maximumValue = 1
+    }
 }
 
 -- normally loenn doesnt check for pandoras box water but i do here anyway bc itd look weird sometimes otherwise

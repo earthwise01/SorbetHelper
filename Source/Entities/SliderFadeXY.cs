@@ -1,15 +1,14 @@
 using System.Globalization;
-using Celeste.Mod.SorbetHelper.Utils;
 
 namespace Celeste.Mod.SorbetHelper.Entities;
 
-[GlobalEntity(              EntityDataID + "Global")] // global version is swapped to in mapdataprocessor based on data.Bool("global")
-[CustomEntity(EntityDataID, EntityDataID + "Global")]
+[GlobalEntity(           EntitySID + "Global")] // global version is swapped to in mapdataprocessor based on data.Bool("global")
+[CustomEntity(EntitySID, EntitySID + "Global")]
 public class SliderFadeXY : Entity
 {
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(SliderFadeXY)}";
 
-    public const string EntityDataID = "SorbetHelper/SliderFadeXY";
+    public const string EntitySID = "SorbetHelper/SliderFadeXY";
 
     private readonly string sliderName;
     private readonly Backdrop.Fader fadeX, fadeY;
@@ -27,7 +26,6 @@ public class SliderFadeXY : Entity
     {
         base.Added(scene);
 
-        // no empty slider attribute
         if (string.IsNullOrEmpty(sliderName))
             RemoveSelf();
     }
@@ -37,7 +35,7 @@ public class SliderFadeXY : Entity
         base.Update();
 
         Level level = SceneAs<Level>();
-        Vector2 camera = level.Camera.Center;
+        Vector2 camera = level.Camera.GetCenter();
         level.Session.SetSlider(sliderName, fadeX.Value(camera.X) * fadeY.Value(camera.Y));
     }
 
@@ -50,54 +48,65 @@ public class SliderFadeXY : Entity
         {
             string[] zone = zones[i].Split(',');
 
+            // todo: hmm i still feel like this could b tidier
             if (zone.Length == 2)
             {
                 // values
                 string[] values = zone[1].Split('-');
+
                 if (values.Length != 2)
                 {
-                    if (values.Length < 2)
-                        Logger.Warn(LogID, $"Fader formatting error! Less than 2 values specified for zone {i + 1}.");
-                    if (values.Length > 2)
-                        Logger.Warn(LogID, $"Fader formatting error! More than 2 values specified for zone {i + 1}.");
-
+                    Logger.Warn(LogID, $"Fader formatting error! Wrong number of values specified for zone {i + 1} ({values.Length} instead of 2).");
                     continue;
                 }
 
-                float fromValue = float.Parse(values[0], CultureInfo.InvariantCulture);
-                float toValue = float.Parse(values[1], CultureInfo.InvariantCulture);
+                if (!TryParseWarnOnFailure(values[0], "Could not parse value", out float fromValue)
+                    || !TryParseWarnOnFailure(values[1], "Could not parse value", out float toValue))
+                    continue;
 
                 // positions
                 string[] positions = zone[0].Split('-');
+
                 if (positions.Length != 2)
                 {
-                    if (positions.Length < 2)
-                        Logger.Warn(LogID, $"Fader formatting error! Less than 2 positions specified for zone {i + 1}.");
-                    if (positions.Length > 2)
-                        Logger.Warn(LogID, $"Fader formatting error! More than 2 positions specified for zone {i + 1}. (Remember that negative numbers are prefixed with 'n' and not '-'!)");
-
+                    Logger.Warn(LogID, $"Fader formatting error! Wrong number of positions specified for zone {i + 1} ({positions.Length} instead of 2). Remember that negative numbers are prefixed with `n` and not `-`!");
                     continue;
                 }
 
-                int posFrom = 1;
-                int posTo = 1;
+                int fromPositionSign = 1;
                 if (positions[0][0] == 'n')
                 {
-                    posFrom = -1;
+                    fromPositionSign = -1;
                     positions[0] = positions[0].Substring(1);
                 }
 
+                if (!TryParseWarnOnFailure(positions[0], "Could not parse position", out int fromPosition))
+                    continue;
+
+                int toPositionSign = 1;
                 if (positions[1][0] == 'n')
                 {
-                    posTo = -1;
+                    toPositionSign = -1;
                     positions[1] = positions[1].Substring(1);
                 }
 
-                fader.Add(posFrom * int.Parse(positions[0]), posTo * int.Parse(positions[1]), fromValue, toValue);
+                if (!TryParseWarnOnFailure(positions[1], "Could not parse position", out int toPosition))
+                    continue;
+
+                fader.Add(fromPositionSign * fromPosition, toPositionSign * toPosition, fromValue, toValue);
+
+                static bool TryParseWarnOnFailure<T>(string s, string error, out T result) where T : struct, IParsable<T>
+                {
+                    if (T.TryParse(s, CultureInfo.InvariantCulture, out result))
+                        return true;
+
+                    Logger.Warn(LogID, $"Fader formatting error! {error} {s}.");
+                    return false;
+                }
             }
             else if (zone.Length != 0)
             {
-                Logger.Warn(LogID, $"Fader formatting error! Zone {i + 1} has wrong number of arguments. (Remember that each zone needs 1 pair of positions followed by 1 pair of values!)");
+                Logger.Warn(LogID, $"Fader formatting error! Zone {i + 1} has wrong number of arguments ({zone.Length} instead of 2). Each zone needs 1 pair of positions followed by 1 pair of values!");
             }
         }
 

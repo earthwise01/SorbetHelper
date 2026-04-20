@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Celeste.Mod.SorbetHelper.Utils;
 using FMOD.Studio;
 
 namespace Celeste.Mod.SorbetHelper.Entities;
@@ -158,11 +156,13 @@ public class MusicSyncControllerFMOD : Entity
 
     #region Hooks
 
+    [OnLoad]
     internal static void Load()
     {
         On.Celeste.Audio.SetMusic += On_Audio_SetMusic;
     }
 
+    [OnUnload]
     internal static void Unload()
     {
         On.Celeste.Audio.SetMusic -= On_Audio_SetMusic;

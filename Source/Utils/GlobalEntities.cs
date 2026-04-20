@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Reflection;
-
 namespace Celeste.Mod.SorbetHelper.Utils;
 
 internal static class GlobalEntities
@@ -54,12 +51,20 @@ internal static class GlobalEntities
 
     #region Hooks
 
+    [OnLoad]
+    internal static void ProcessSorbetHelperAssembly()
+    {
+        ProcessAttributes(typeof(SorbetHelperModule).Assembly);
+    }
+
+    [OnLoad]
     internal static void Load()
     {
         Everest.Events.LevelLoader.OnLoadingThread += Event_OnLoadingThread;
         Everest.Events.Level.OnLoadEntity += Event_OnLoadEntity;
     }
 
+    [OnUnload]
     internal static void Unload()
     {
         Everest.Events.LevelLoader.OnLoadingThread -= Event_OnLoadingThread;
@@ -118,7 +123,7 @@ internal static class GlobalEntities
     private static bool Event_OnLoadEntity(Level level, LevelData levelData, Vector2 offset, EntityData entityData)
     {
         // don't give any failed to load warnings for map data processed entities
-        if (entityData.Name == "SorbetHelper/MapDataProcessed")
+        if (entityData.Name == SorbetHelperMapDataProcessor.MapDataProcessedSID)
             return true;
 
         // don't load global entities in Level.LoadCustomEntity

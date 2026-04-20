@@ -1,5 +1,3 @@
-using MonoMod.Cil;
-
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/PufferTweaksController")]
@@ -14,30 +12,45 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
     private readonly bool canRespawnWhenHomeBlocked = data.Bool("canRespawnWhenHomeBlocked", true);
     private readonly bool moreExplodeParticles = data.Bool("moreExplodeParticles", false);
 
+    private static ParticleType P_ExplodeSmoke;
+
+    [OnLoadContent]
+    internal static void LoadParticles(bool firstLoad)
+    {
+        P_ExplodeSmoke = new ParticleType(Player.P_SummitLandB)
+        {
+            SpeedMin = 60,
+            SpeedMax = 90,
+            SpeedMultiplier = 0.25f,
+            Acceleration = Vector2.UnitY * -30f,
+        };
+    }
+
     #region Hooks
 
-    // this is so many hooks help
+    [OnLoad]
     internal static void Load()
     {
-        On.Celeste.Puffer.Update += On_Update;
-        IL.Celeste.Puffer.Update += IL_Update;
-        On.Celeste.Puffer.OnSquish += On_OnSquish;
-        On.Celeste.Puffer.HitSpring += On_HitSpring;
-        IL.Celeste.Puffer.HitSpring += IL_HitSpring;
-        On.Celeste.Puffer.Explode += On_Explode;
+        On.Celeste.Puffer.Update += On_Puffer_Update;
+        IL.Celeste.Puffer.Update += IL_Puffer_Update;
+        On.Celeste.Puffer.OnSquish += On_Puffer_OnSquish;
+        On.Celeste.Puffer.HitSpring += On_Puffer_HitSpring;
+        IL.Celeste.Puffer.HitSpring += IL_Puffer_HitSpring;
+        On.Celeste.Puffer.Explode += On_Puffer_Explode;
     }
 
+    [OnUnload]
     internal static void Unload()
     {
-        On.Celeste.Puffer.Update -= On_Update;
-        IL.Celeste.Puffer.Update -= IL_Update;
-        On.Celeste.Puffer.OnSquish -= On_OnSquish;
-        On.Celeste.Puffer.HitSpring -= On_HitSpring;
-        IL.Celeste.Puffer.HitSpring -= IL_HitSpring;
-        On.Celeste.Puffer.Explode -= On_Explode;
+        On.Celeste.Puffer.Update -= On_Puffer_Update;
+        IL.Celeste.Puffer.Update -= IL_Puffer_Update;
+        On.Celeste.Puffer.OnSquish -= On_Puffer_OnSquish;
+        On.Celeste.Puffer.HitSpring -= On_Puffer_HitSpring;
+        IL.Celeste.Puffer.HitSpring -= IL_Puffer_HitSpring;
+        On.Celeste.Puffer.Explode -= On_Puffer_Explode;
     }
 
-    private static void On_Update(On.Celeste.Puffer.orig_Update orig, Puffer self)
+    private static void On_Puffer_Update(On.Celeste.Puffer.orig_Update orig, Puffer self)
     {
         orig(self);
 
@@ -45,7 +58,7 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
             self.TreatNaive = self.state == Puffer.States.Gone;
     }
 
-    private static void IL_Update(ILContext il)
+    private static void IL_Puffer_Update(ILContext il)
     {
         ILCursor cursor = new ILCursor(il)
         {
@@ -53,7 +66,9 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
         };
 
         ILLabel stayInStGoneLabel = null;
-        cursor.GotoPrev(MoveType.After, i => i.MatchBgtUn(out stayInStGoneLabel));
+        if (!cursor.TryGotoPrev(MoveType.After, instr => instr.MatchBgtUn(out stayInStGoneLabel)))
+            throw new HookHelper.HookException(il, "Failed to find check for whether to stay in `States.Gone` to modify.");
+
         cursor.EmitLdarg0();
         cursor.EmitDelegate(CheckForSolid);
         cursor.EmitBrtrue(stayInStGoneLabel);
@@ -69,7 +84,7 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
         }
     }
 
-    private static void On_OnSquish(On.Celeste.Puffer.orig_OnSquish orig, Puffer self, CollisionData data)
+    private static void On_Puffer_OnSquish(On.Celeste.Puffer.orig_OnSquish orig, Puffer self, CollisionData data)
     {
         if (self.Scene.Tracker.GetEntity<PufferTweaksController>() is { fixSquishExplode: true } && (self.state == Puffer.States.Gone || self.cantExplodeTimer > 0f))
             return;
@@ -77,7 +92,7 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
         orig(self, data);
     }
 
-    private static bool On_HitSpring(On.Celeste.Puffer.orig_HitSpring orig, Puffer self, Spring spring)
+    private static bool On_Puffer_HitSpring(On.Celeste.Puffer.orig_HitSpring orig, Puffer self, Spring spring)
     {
         bool result = orig(self, spring);
 
@@ -90,22 +105,25 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
         return result;
     }
 
-    private static void IL_HitSpring(ILContext il)
+    private static void IL_Puffer_HitSpring(ILContext il)
     {
         ILCursor cursor = new ILCursor(il);
 
-        // upwards springs
-        cursor.GotoNext(MoveType.After, i => i.MatchLdcR4(0f));
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(0f)))
+            throw new HookHelper.HookException(il, "Unable to find upwards speed threshold `0f` to modify.");
+
         cursor.EmitLdarg0();
         cursor.EmitDelegate(ModifyUpwardsThreshold);
 
-        // right facing springs
-        cursor.GotoNext(MoveType.After, i => i.MatchLdcR4(60f));
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(60f)))
+            throw new HookHelper.HookException(il, "Unable to find rightwards speed threshold `60f` to modify.");
+
         cursor.EmitLdarg0();
         cursor.EmitDelegate(ModifyRightThreshold);
 
-        // left facing spring
-        cursor.GotoNext(MoveType.After, i => i.MatchLdcR4(-60f));
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(-60f)))
+            throw new HookHelper.HookException(il, "Unable to find leftwards speed threshold `-60f` to modify.");
+
         cursor.EmitLdarg0();
         cursor.EmitDelegate(ModifyLeftThreshold);
 
@@ -136,7 +154,7 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
         }
     }
 
-    private static void On_Explode(On.Celeste.Puffer.orig_Explode orig, Puffer self)
+    private static void On_Puffer_Explode(On.Celeste.Puffer.orig_Explode orig, Puffer self)
     {
         orig(self);
 
@@ -155,13 +173,7 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
         for (float angle = 0f; angle < MathF.PI * 2f; angle += MathF.PI / 6f)
         {
             Vector2 position = self.Center + Calc.AngleToVector(angle + Calc.Random.Range(-MathF.PI / 90f, MathF.PI / 90f), Calc.Random.Range(12, 18));
-            level.ParticlesFG.Emit(new ParticleType(Player.P_SummitLandB)
-            {
-                SpeedMin = 60,
-                SpeedMax = 90,
-                SpeedMultiplier = 0.25f,
-                Acceleration = Vector2.UnitY * -30f,
-            }, position, angle);
+            level.ParticlesFG.Emit(P_ExplodeSmoke, position, angle);
         }
     }
 

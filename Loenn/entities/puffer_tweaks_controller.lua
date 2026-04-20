@@ -1,9 +1,9 @@
-local controller = {}
+local pufferTweaksController = {}
 
-controller.name = "SorbetHelper/PufferTweaksController"
-controller.texture = "editorSprites/SorbetHelper/pufferTweaksController"
-controller.placements = {
-    name = "controller",
+pufferTweaksController.name = "SorbetHelper/PufferTweaksController"
+pufferTweaksController.texture = "editorSprites/SorbetHelper/pufferTweaksController"
+pufferTweaksController.placements = {
+    name = "puffer_tweaks_controller",
     data = {
         fixSquishExplode = true,
         snapToSpring = true,
@@ -11,15 +11,15 @@ controller.placements = {
         springYSpeedThreshold = 0,
         canBePushedWhileExploded = false,
         canRespawnWhenHomeBlocked = false,
-        moreExplodeParticles = false,
+        moreExplodeParticles = false
     }
 }
 
-controller.fieldOrder = {
+pufferTweaksController.fieldOrder = {
     "x", "y",
     "springXSpeedThreshold", "springYSpeedThreshold",
     "canBePushedWhileExploded", "moreExplodeParticles", "snapToSpring", "fixSquishExplode",
     "canRespawnWhenHomeBlocked"
 }
 
-return controller
+return pufferTweaksController

@@ -32,8 +32,10 @@ Entities:
     Placements:
       flag_toggled_killbox:
         Name: Killbox (Flag Toggled)
+        Description: A killbox that can be toggled by a session flag.
       accurate_killbox:
         Name: Accurate Killbox
+        Description: A custom killbox that only kills the player once they are fully beneath the top of the killbox, matching how the bottom of a room behaves.
     Attributes:
       flag:
         Description: An optional session flag that needs to be set in order for the killbox to be able to activate.
@@ -54,6 +56,7 @@ Entities:
     Placements:
       killzone:
         Name: Kill Zone
+        Description: An invisible barrier which kills the player when touched.
     Attributes:
       flag:
         Description: The flag that needs to be set in order for the kill zone to be activated. Leaving this empty causes the kill zone to always be active.
@@ -69,15 +72,15 @@ Entities:
 
   SorbetHelper/ReturnBerry:
     Placements:
-      normal:
+      strawberry_with_return:
         Name: Strawberry (With Noded Return)
-        Description: Similar to a Strawberry, but when the player grabs it they are placed into a bubble and moved along a path of nodes.
-      winged:
+        Description: A strawberry which puts the player in a bubble and moves them to its node when grabbed.
+      strawberry_with_return_winged:
         Name: Strawberry (Winged, With Noded Return)
-        Description: Similar to a Strawberry (Winged), but when the player grabs it they are placed into a bubble and moved along a path of nodes.
-      normalalt:
+        Description: A winged strawberry which puts the player in a bubble and moves them to its node when grabbed.
+      search_engine_optimization:
         Name: Strawberry With Return Berry
-      wingedalt:
+      search_engine_optimization_winged:
         Name: Winged Strawberry With Return Berry Winged Return Berry
     Attributes:
       winged:
@@ -97,8 +100,9 @@ Entities:
 
   SorbetHelper/CustomFallingBlock:
     Placements:
-      fallingBlock:
+      custom_falling_block:
         Name: Custom Falling Block
+        Description: A customizable falling block.
     Attributes:
       tiletype:
         Description: Determines the visual appearance of the falling block.
@@ -150,9 +154,9 @@ Entities:
 
   SorbetHelper/DashFallingBlock:
     Placements:
-      fallingBlock:
+      dash_falling_block:
         Name: Dash Falling Block
-        Description: a falling block that falls when dashed into
+        Description: A falling block that falls when dashed into.
     Copy:
       - SorbetHelper/CustomFallingBlock
       # ^^^ copies attributes from custom falling block
@@ -176,18 +180,20 @@ Entities:
 
   SorbetHelper/CustomGravityFallingBlock:
     Placements:
-      fallingBlock:
+      custom_gravity_falling_block:
         Name: Custom Gravity Falling Block
-      altName:
+        Description: A customizable falling block that changes direction when a chrono helper gravity falling block switch is triggered.
+      gravity_custom_falling_block:
         Name: Gravity Custom Falling Block
     Copy:
       - SorbetHelper/CustomFallingBlock
 
   SorbetHelper/GravityDashFallingBlock:
     Placements:
-      fallingBlock:
+      gravity_dash_falling_block:
         Name: Gravity Dash Falling Block
-      altName:
+        Description: A falling block that falls when dashed into, and changes direction when a chrono helper gravity falling block switch is triggered.
+      dash_gravity_falling_block:
         Name: Dash Gravity Falling Block
     Copy:
       - SorbetHelper/CustomFallingBlock
@@ -197,11 +203,12 @@ Entities:
     Placements:
       crumble_on_flag_block:
         Name: Crumble On Flag Block
+        Description: A block that crumbles when a session flag is set.
       crumble_wall_on_flag:
         Name: Crumble Wall On Flag
     Attributes:
       blendin:
-        Description: Blends the block in with the walls it touches, making it less apparent.
+        Description: Whether the block should blend in with the walls it touches, making it less apparent.
       tiletype:
         Description: Determines the visual appearance of the block.
       inverted:
@@ -214,27 +221,28 @@ Entities:
       playAudio:
         Description: Determines whether the block plays sound effects when breaking/appearing.
       depth:
-        Description: Determines what visual layer the block should be on (higher values mean farther behind in the scene, default value is -10010).
+        Description: |-
+          Determines the visual depth of the block.
+          Higher values mean farther behind in the scene, default value is -10010.
       destroyAttached:
         Description: Whether objects such as spikes that are attached to the block should be affected as well.
       fadeInTime:
-        Description: How long (in seconds) the block takes to visually fade back in when (re)appearing.
+        Description: Determines how long (in seconds) the block takes to visually fade back in when appearing.
 
   SorbetHelper/BigWaterfall:
     Placements:
-      normal:
+      resizable_waterfall_lines:
         Name: Resizable Waterfall (Detail Lines)
-        Description: A custom waterfall combining the behaviour of a small waterfall with the resizability and visuals of a big waterfall.
-      small:
+        Description: A customizable waterfall that can be resized and collides with water and solids, with a similar appearance to vanilla big waterfalls.
+      resizable_waterfall:
         Name: Resizable Waterfall
-        Description: A custom waterfall combining the behaviour and visuals of a small waterfall with the resizability of a big waterfall.
-      abovefg:
+        Description: A customizable waterfall that can be resized and collides with water and solids, with a similar appearance to vanilla small waterfalls.
+      resizable_waterfall_lines_above:
         Name: Resizable Waterfall (Detail Lines, Above Tiles)
         Description:  |-
-          A custom waterfall combining the behaviour and visuals of a small waterfall with the resizability and visuals of a big waterfall.
-          Doesn't collide with and appears above foreground tiles.
-      # show in search results for big waterfall/custom waterfall
-      bigwaterfall:
+          A customizable waterfall that can be resized and collides with water, with a similar appearance to vanilla big waterfalls.
+          Renders at a lower depth and doesn't collide with solids.
+      search_engine_optimization:
         Name: Big Waterfall Custom Waterfall
     Attributes:
       lines:
@@ -252,11 +260,11 @@ Entities:
           Ranges from 0.0 to 1.0, values closer to 1.0 result in faster waves. Vanilla small waterfalls use 0.8 and big waterfalls use 1.0.
       depth:
         Description: |-
-          Determines what visual layer the waterfall should be on.
-          Higher values mean farther behind in the scene, defaults are -9999 for the normal placement and -49900 for the above tiles placement.
-          Does not affect the displacement waves, which will still render above everything (unless used with a displacment depth fixer).
+          The visual depth of the waterfall.
+          Higher values mean farther behind in the scene. Defaults to -9999 for the normal placement and -49900 for the above tiles placement.
+          Does not affect the displacement waves, which will still render above everything (unless used with a displacement depth fixer).
       splashParticleDepth:
-        Description: The visual depth to render the splash particles at, or whether to disable them completely.
+        Description: Determines the visual depth to render the splash particles at, or whether to disable them completely.
       ignoreSolids:
         Description: Whether the waterfall can collide with solids (such as foreground tiles).
       ignoreWater:
@@ -266,22 +274,27 @@ Entities:
 
   SorbetHelper/CustomLightbeam:
     Placements:
-      customlightbeam:
+      custom_lightbeam:
         Name: Custom Lightbeam
-      rainbowlightbeam:
-        Name: Rainbow Lightbeam
-      customlightbeamrainbow:
+        Description: A customizable lightbeam.
+      custom_lightbeam_rainbow:
         Name: Custom Lightbeam (Rainbow)
+        Description: A customizable lightbeam which uses a rainbow gradient for its color.
+      rainbow_lightbeam:
+        Name: Rainbow Lightbeam
+        Description: A customizable lightbeam which uses a rainbow gradient for its color.
     Attributes:
       # tooltips for most of the rainbow related attributes stolen from MaddieHelpingHand
       # https://github.com/maddie480/MaddieHelpingHand/blob/master/Loenn/lang/en_gb.lang#L559
       flag:
-        Description: The flag that needs to be set in order for the lightbeam to be activated. Leaving this empty causes the lightbeam to always be active.
+        Description: |-
+          Determines the flag that needs to be set in order for the lightbeam to be activated.
+          Leaving this empty causes the lightbeam to always be active.
       inverted:
         Name: Invert Flag
         Description: When checked, the lightbeam will only be active when the flag is disabled, rather than when it is enabled.
       flagFadeTime:
-        Description: The time (in seconds) the lightbeam takes to fade in or out according to the flag.
+        Description: Determines the time (in seconds) the lightbeam takes to fade in or out according to the flag.
       rotation:
         Description: The rotation of the lightbeam.
       depth:
@@ -289,7 +302,7 @@ Entities:
           Determines what visual layer the lightbeam should be on (higher values mean farther behind in the scene, default value is -9998).
           Does not affect the particles.
       noParticles:
-        Description: Determines whether the lightbeam emits particles.
+        Description: Whether the lightbeam should emit not particles.
       texture:
         Description: The texture of the lightbeam. Vanilla texture is 'util/lightbeam'.
       color:
@@ -297,7 +310,7 @@ Entities:
       alpha:
         Description: The alpha of the lightbeam.
       rainbow:
-        Description: Determines whether the lightbeam is rainbow.
+        Description: Whether the lightbeam is rainbow.
       useCustomRainbowColors:
         Description: |-
           When checked, overrides the normal rainbow colors (whether vanilla or from a rainbow spinner color controller) with custom ones specified by the lightbeam.
@@ -329,36 +342,31 @@ Entities:
         Description: Determines how fast the gradient scrolls, in pixels per second. You can use negative values to make it scroll in the opposite direction. Vanilla value is 50.
       singleColor:
         Name: Uniform Rainbow Color
-        # ^^^ this might not be an accurate way of saying this but honestly at this point i've given up trying to find anything better.
         Description: |-
-          Determines whether the rainbow lightbeam is the same color throughout or uses a gradient across all the beams of light.
-          (Requires rainbow to be checked)
-        # ^^^ last bit sounds a bit off i think but i can't come up with anything better currently.
+          Whether the rainbow lightbeam should be the same color everywhere instead of using a gradient across all of its beams.
+          Requires `Rainbow` to be enabled.
       fadeWhenNear:
-        Description: Determines whether the lightbeam fades out when the player is close to it.
+        Description: Whether the lightbeam should fade out when the player is close to it.
       fadeOnTransition:
-        Description: Determines whether the lightbeam fades out during screen transitions.
+        Description: Whether the lightbeam should fade out during screen transitions.
       scroll:
         Name: Parallax
         Description: |-
           Determines how fast the lightbeam should scroll compared to the camera.
           The "anchor" position of the parallax effect can optionally be controlled by adding a node, to allow multiple lightbeams to scroll together more smoothly.
+
   SorbetHelper/WingedStrawberryDirectionController:
     Placements:
-      wingedStrawberryController:
+      winged_strawberry_direction_controller:
         Name: Winged Strawberry Direction Controller
+        Description: A controller that changes the direction winged strawberries in the room will fly.
     Attributes:
       direction:
-        Description: The direction winged strawberries in the room will fly.
+        Description: Determines the direction winged strawberries in the room will fly.
 
   SorbetHelper/StylegroundOverHudController:
-    # Replaced by Styleground Depth Controller
-    #
-    # Placements:
-    #   stylegroundOverHud:
-    #     Name: Stylegrounds Above HUD Controller
-    #   altname:
-    #     Name: Styleground Over GUI Controller
+    # Legacy, replaced by the Styleground Depth Controller
+
     Attributes:
       pauseBehavior:
         Description: |-
@@ -371,9 +379,6 @@ Entities:
       #    Pause Above-
       #        The stylegrounds will pause, but still appear above the pause menu.
 
-      #  probably maybe could've put this on like the gb or github page or a wiki or smth but fancy loenn plugins are cool :3 and its probably useful to have the instructions in editor rather than on some random page (even if theyre pretty simple i think)
-      # also sadfsadf i wish i wasnt so "rambly" but hopefully this is still useful and not just annoying to anyone trying to use the controller,,
-      # goodbyeee weh
       _instructionsButton:
         Name: Usage Instructions
         Description: |-
@@ -393,19 +398,12 @@ Entities:
             see the tooltip as well, but in the end it probably mostly comes down to personal preference abt what'd work best for your stylegrounds, though i would vaugely suggest:
               'Disable When Paused' for consistency with vanilla or if your stylegrounds are decently busy in general/might cover up too much of the pause menu.
               'Update When Paused' if your stylegrounds have at least some movement, aren't insanely busy and you want maximum *atmosphere and immersion* or something.
-        #      'Pause Above' if you still want the stylegrounds above the pause menu, but don't have moving stylegrounds or find the stylegrounds moving while paused weird/distracting.
-        # currently additive blend mode stylegrounds doesn't work properly, and colorgrading doesn't have any effect on affected stylegrounds due to technical limitations.
-        # i'm still looking to see if i can get them working but if i do theres a good chance there'll probably be some sort of jank (at least on the code side).
-
-        # by default the controller will disable itself when the game is paused.
-        # this can be adjusted to either stop the stylegrounds from pausing altogether, or to keep them pausing but still render them above the pause menu.
-        # see the tooltip as well but personally: use Update When Paused if your stylegrounds have some movement, aren't insanely busy and you want ~maximum atmosphere~, and,
-        # use Disable When Paused otherwise or if your stylegrounds are kinda busy and would cover too much of the pause menu. (or just, yknow, try all 3 and see which you prefer idk)
 
   SorbetHelper/ReturnBubbleBehaviorController:
     Placements:
-      controller:
+      return_bubble_controller:
         Name: Return Bubble Controller
+        Description: A controller which has options for configuring the return bubble player state (StCassetteFly).
     Attributes:
       time:
         Description: |-
@@ -429,7 +427,7 @@ Entities:
           Vanilla value is disabled.
       collisionMode:
         Description: |-
-          How the player should be able to collide with stuff while in the bubble.
+          Determines how the player collides with stuff while in the bubble.
           - Vanilla
               The player collides with stuff the same as in a vanilla return bubble.
           - SquishFix
@@ -443,29 +441,30 @@ Entities:
 
   SorbetHelper/LightCoverController:
     Placements:
-      controller:
+      light_cover_controller:
         Name: Light Cover Controller
+        Description: A controller which makes specified entity types cover up any light touching them.
     Copy:
       - $TypeNameController
     Attributes:
       alpha:
-        Description: How strong the light cover is.
+        Description: The alpha of the light cover.
 
   SorbetHelper/DepthAdheringDisplacementWrapper:
     Placements:
       # names probably still kinda suck but i literally cant think of anything better
       # update: renamed from displacement wrappers to displacement depth fixers which i think im actually somewhat happy with,,
-      distortBehind:
+      displacement_depth_fixer:
         Name: Displacement Depth Fixer
         Description: |-
-          Makes the displacement effects from certain entities (e.g. water and waterfalls) only affect their entities and everything behind them.
+          A modifier which makes the displacement effects from certain entities (e.g. water and waterfalls) respect the depths of their entities.
           For reference, vanilla displacement always affects everything both below *and above* its entity.
-      entityOnly:
+      displacement_depth_fixer_entity_only:
         Name: Displacement Depth Fixer (Only Distort Entity)
         Description: |-
-          Makes the displacement effects from certain entities (e.g. water and waterfalls) only affect their entities and nothing else.
-          For reference, vanilla displacement always affects everything *both below and above* its entity.
-      altName:
+          A modifier which makes the displacement effects from certain entities (e.g. water and waterfalls) only affect the entities producing them.
+          For reference, vanilla displacement always affects *everything both below and above* its entity.
+      depth_adhering_displacment_wrapper:
         Name: Depth Adhering Displacement Wrapper
     Attributes:
       distortBehind:
@@ -492,15 +491,15 @@ Entities:
 
   SorbetHelper/DisplacementEffectBlocker:
     Placements:
-      normal:
+      displacement_effect_blocker_full:
         Name: Displacement Effect Blocker (Full)
-        Description: Completely blocks the displacement effect produced by entities such as water or waterfalls, along with stuff like the burst offset effects from Madeline dashing or pulsing strawberries.
-      waterOnly:
+        Description: A field which blocks the wavy displacement effect produced by entities such as water or waterfalls, and the burst displacement effects produced by things such as Madeline dashing, strawberries pulsing, etc.
+      displacement_effect_blocker_water_only:
         Name: Displacement Effect Blocker (Waves Only)
-        Description: Completely blocks the displacement effect produced by entities such as water or waterfalls.
-      depthAdhering:
+        Description: A field which blocks the wavy displacement effect produced by entities such as water or waterfalls.
+      displacement_effect_blocker_depth_adhering:
         Name: Displacement Effect Blocker (for Displacement Depth Fixer)
-        Description: Blocks the displacement effect produced by entities such as water or waterfalls at a certain depth that are *affected by a Displacement Depth Fixer*.
+        Description: A field which blocks the displacement effects produced by entities such as water or waterfalls that are at a certain depth and are affected by a Displacement Depth Fixer.
     Attributes:
       waterOnly:
         Name: Waves Only
@@ -519,28 +518,30 @@ Entities:
 
   SorbetHelper/DisplacementEffectArea:
     Placements:
-      normal:
+      displacement_effect_area:
         Name: Displacement Effect Area
-      depthAdhering:
+        Description: A field which produces a displacement effect.
+      displacement_effect_area_depth_adhering:
         Name: Displacement Effect Area (Supports Depth)
+        Description: A field which produces a displacement effect at a specific depth.
     Attributes:
       horizontalDisplacement:
         Description: |-
           The horizontal displacement amount.
-          Ranges from -1.0 (leftwards displacement) to 1.0 (rightwards displacement), with 0.0 resulting in no displacement.
+          Ranges from -1.0 (14px leftwards displacement) to 1.0 (14px rightwards displacement), with 0.0 resulting in no displacement.
       verticalDisplacement:
         Description: |-
           The vertical displacement amount.
-          Ranges from -1.0 (upwards displacement) to 1.0 (downwards displacement), with 0.0 resulting in no displacement.
+          Ranges from -1.0 (14px upwards displacement) to 1.0 (14px downwards displacement), with 0.0 resulting in no displacement.
       waterDisplacement:
         Description: |-
           The water displacement amount.
           Ranges from 0.0 to 1.0, values closer to 1.0 result in faster waves.
           Water uses 0.25, small waterfalls use 0.8, big waterfalls use 1.0, and heatwaves use 0.1.
       alpha:
-        Description: The overall strength of the displacement.
+        Description: Determines the strength of the displacement.
       depth:
-        Description: The visual depth the effect should be applied at (using the power of depth adhering displacement).
+        Description: The visual depth the effect should be applied at.
       flag:
         Description: |-
           A session flag that needs to be enabled in order for the displacement to be visible. Leaving this empty causes the displacement to always be visible.
@@ -548,9 +549,9 @@ Entities:
 
   SorbetHelper/EntityStylegroundController:
     Placements:
-      controller:
+      entity_as_styleground_controller:
         Name: Entity As Styleground Controller
-        Description: Marks specified entity types to be drawn as a styleground layer by an Entity As Styleground Renderer styleground.
+        Description: Marks specified entity types to be drawn as a part of a styleground layer by an Entity As Styleground Renderer styleground.
     Copy:
       - $TypeNameController
     Attributes:
@@ -576,15 +577,7 @@ Entities:
 
   SorbetHelper/StylegroundEntityController:
     # Replaced by Styleground Depth Controller
-    #
-    # Placements:
-    #   controller:
-    #     Name: Styleground As Entity Controller
-    #     Description: |-
-    #       Makes stylegrounds with a specified tag render as an entity, with a customizable depth.
-    #       Basically a "Styleground Depth Controller".
-    #   altname:
-    #     Name: Styleground Depth Controller
+
     Attributes:
       tag:
         Description: The styleground tag to affect.
@@ -595,10 +588,12 @@ Entities:
 
   SorbetHelper/StylegroundDepthController:
     Placements:
-      depth:
+      styleground_depth_controller:
         Name: Styleground Depth Controller
-      aboveHud:
+        Description: Makes stylegrounds with a specified tag render as an entity at a specified depth.
+      styleground_depth_controller_above_hud:
         Name: Styleground Depth Controller (Above HUD)
+        Description: Makes stylegrounds with a specified tag render above the hud.
     Attributes:
       tag:
         Description: The styleground tag to affect.
@@ -609,8 +604,9 @@ Entities:
 
   SorbetHelper/SliderFadeXY:
     Placements:
-      sliderFadeXY:
+      camera_fade_xy_to_slider_controller:
         Name: Camera Fade XY To Slider Controller
+        Description: A controller that sets a session slider according to the Fade X and Fade Y options usually found on stylegrounds.
     Attributes:
       slider:
         Description: The name of the session slider to control.
@@ -633,7 +629,12 @@ Entities:
 
   SorbetHelper/SolidTilesDepthSplitter:
     Placements:
-      depthSplitter:
+      # this shouldve probablyyy been called like Tiletype Depth Controller or something but   oh well,
+      # does tiletype depth splitter work maybee ..?
+      tiletype_depth_splitter:
+        Name: Tiletype Depth Splitter
+        Description: A controller which allows changing the visual depth of specified tiletypes, and can automatically fill in any gaps on their edges visible from using the ignores attribute.
+      solid_tiles_depth_splitter:
         Name: Solid Tiles Depth Splitter
     Attributes:
       depth:
@@ -643,20 +644,19 @@ Entities:
       tiletypes:
         Description: The list of tiletypes to split.
       tryFillBehind:
-        Description: |-
-          Whether to try and automatically cover up any gaps left below the split tilesets.
-          Recommended for tilesets that use the "ignores" XML attribute.
+        Description: Whether to try and automatically fill in any gaps behind the edges of the split tiletypes with the tiletypes around them.
       backgroundTiles:
         Description: |-
-          Whether to split background tiles instead of solid tiles.
+          Whether to split background tiles instead of foreground tiles.
           Changing this requires clicking save changes and reopening this menu for the tiletype menu to show the correct options.
 
   SorbetHelper/MusicSyncControllerFMOD:
     Placements:
-      markerToFlag:
+      fmod_marker_to_flag_controller:
         Name: FMOD Marker to Flag/Counter Controller
-      controller:
-        Name: Music Session Sync Controller
+        Description: A controller which sets flags/counters according to the destination markers/tempo markers in the currently playing music event.
+      music_sync_controller:
+        Name: Music Sync Controller
     Attributes:
       eventNames:
         Description: A comma seperated list of music events this controller should affect. Leave empty to affect all events.
@@ -689,13 +689,16 @@ Entities:
 
   SorbetHelper/DashGateBlock:
     Placements:
-      Both:
+      dash_gate_block_both:
         Name: Dash Gate Block (Both)
-      Horizontal:
+        Description: A block which moves to its node when the player dashes into it.
+      dash_gate_block_horizontal:
         Name: Dash Gate Block (Horizontal)
-      Vertical:
+        Description: A block which moves to its node when the player dashes into its left/right sides.
+      dash_gate_block_vertical:
         Name: Dash Gate Block (Vertical)
-      kevinswitchgate:
+        Description: A block which moves to its node when the player dashes into its top/bottom sides.
+      kevin_switch_gate:
         Name: Kevin Switch Gate
     Attributes:
       # most tooltips stolen from maddie's helping hand
@@ -746,8 +749,9 @@ Entities:
 
   SorbetHelper/TouchGateBlock:
     Placements:
-      normal:
+      touch_gate_block:
         Name: Touch Gate Block
+        Description: A block which moves to its node when the player stands on/grabs it.
     Attributes:
       # most tooltips stolen from maddie's helping hand
       # https://github.com/maddie480/MaddieHelpingHand/blob/1297e45c72dbf27972e8396139406dd55e65c227/Loenn/lang/en_gb.lang#L194
@@ -795,8 +799,9 @@ Entities:
 
   SorbetHelper/PufferTweaksController:
     Placements:
-      controller:
+      puffer_tweaks_controller:
         Name: Puffer Tweaks Controller
+        Description: A controller which has options for configuring the behavior of puffers.
     Attributes:
       fixSquishExplode:
         Description: Fixes puffers exploding multiple times in quick succession when squished by a moving platform.
@@ -819,12 +824,12 @@ Entities:
 
   SorbetHelper/ColorDashBlock:
     Placements:
-      colorDashBlock_0:
+      color_dash_block_0:
         Name: Color Dash Block (Cyan)
-      colorDashBlock_1:
+        Description: A block which switches collidability according the current color index, and switches the current color index when dashed into.
+      color_dash_block_1:
         Name: Color Dash Block (Yellow)
-      coloUr:
-        Name: Colour Dash Block
+        Description: A block which switches collidability according the current color index, and switches the current color index when dashed into.
     Attributes:
       index:
         Description: The index of the block.
@@ -833,9 +838,9 @@ Entities:
 
   SorbetHelper/DarknessTransparencyFixController:
     Placements:
-      controller:
+      darkness_transparency_fix_controller:
         Name: Fix Darkness Transparency Controller
-        Description: Fixes darkness causing transparent objects (e.g. waterfalls, lightbeams, dash trails) to fade towards black as they get more transparent.
+        Description: A controller which fixes darkness causing transparent objects (e.g. waterfalls, lightbeams, dash trails) to fade towards black as they get more transparent.
     Attributes:
       global:
         Description: Whether this controller should work globally.
@@ -899,14 +904,17 @@ Entities:
 Triggers:
   SorbetHelper/AlternateInteractPrompt:
     Placements:
-      altTalkUIBottomCorner:
-        Name: Alt Style Interact Prompt (Bottom Corner)
-        Description: Replaces the normal interaction/talk prompt with one that slides in from the bottom corner.
-      altTalkUISmallArrow:
-        Name: Alt Style Interact Prompt (Small Arrow)
-        Description: Replaces the normal interaction/talk prompt with a smaller floaty arrow that expands to reveal the prompt when approached.
-      altNameAltTalkUI:
-        Name: Alternate Interact Prompt
+      alternate_interact_prompt_bottom_corner:
+        Name: Alternate Interact Prompt (Bottom Corner)
+        Description: A trigger which replaces the normal interaction/talk prompt with one that slides in from the bottom corner.
+      alternate_interact_prompt_small_arrow:
+        Name: Alternate Interact Prompt (Small Arrow)
+        Description: A trigger which replaces the normal interaction/talk prompt with a smaller floaty arrow that expands to reveal the prompt when approached.
+      alternate_interact_prompt_vanilla_use_up_input:
+        Name: Alternate Interact Prompt (Vanilla, Use Up Input)
+        Description: A trigger which replaces the normal interaction/talk prompt with a visually identical version that responds to `Up` inputs instead of `Talk` inputs.
+      alt_style_interact_prompt:
+        Name: Alt Style Interact Prompt
     Attributes:
       dialogId:
         Name: Label Dialog ID
@@ -914,22 +922,35 @@ Triggers:
       style:
         Description: |-
           The alternate style to use.
+          
           Bottom Corner:
-            The prompt will slide in from the bottom right corner when approached. Only appears when highlighted / does not have an indicator.
+            A simple prompt that slides in from the bottom right corner of the screen when highlighted. Does not have an indicator when not highlighted.
+          
           Small Arrow:
-            The normal UI is replaced with a smaller floaty arrow, which the button prompt appears on top of when approached.
+            A smaller floaty arrow, which the button prompt appears above when highlighted.
+          
+          Vanilla:
+            Identical to the vanilla interact prompt. Does not support the `Label Dialog ID` field.
       playHighlightSfx:
         Name: Has Highlight Effects
         Description: Whether to still play the vanilla sfx (and bounce effects) when the prompt is highlighted.
       onLeft:
+        Name: Flip Prompt
         Description: |-
-          Whether the prompt (in the BottomCorner style) should come from the left side of the screen, instead of the right.
-          For the sake of consistency this is recommended to be left off unless necessary.
+          Bottom Corner:
+            Whether to render the prompt on the left side of the screen, instead of the right.
+            For the sake of consistency this is recommended to be kept disabled unless necessary.
+          
+          Small Arrow/Vanilla:
+            Whether to render the prompt upside down.
+      useUpInput:
+        Description: Whether the interact prompt should respond to `Up` inputs instead of `Talk` inputs.
 
   SorbetHelper/MiniPopupTrigger:
     Placements:
       miniPopup:
         Name: Mini Popup Trigger
+        Description: A trigger which shows a small popup with a name, description, and icon, in the top right corner of the screen.
     Attributes:
       activeTime:
         Description: |-
@@ -969,10 +990,9 @@ Triggers:
 
   SorbetHelper/ColorDashBlockStateTrigger:
     Placements:
-      colorDashBlockState:
+      color_dash_block_state:
         Name: Color Dash Block State Trigger
-      coloUr:
-        Name: Colour Dash Block State Trigger
+        Description: A trigger which sets the color dash block index to a specified value.
     Attributes:
       index:
         Description: The index to set color dash blocks to.

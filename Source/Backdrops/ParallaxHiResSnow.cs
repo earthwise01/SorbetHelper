@@ -1,6 +1,3 @@
-using Celeste.Mod.Backdrops;
-using Celeste.Mod.SorbetHelper.Utils;
-
 namespace Celeste.Mod.SorbetHelper.Backdrops;
 
 [CustomBackdrop("SorbetHelper/ParallaxHiResSnow")]
@@ -8,13 +5,16 @@ public class ParallaxHiResSnow : HiResBackdrop
 {
     private struct Particle
     {
-        public float Alpha;
         public float Scale;
         public float Speed;
         public Vector2 Scroll;
-        public float Sin;
-        public float Rotation;
+        public float Alpha;
+
+        public float Sine;
         public Vector2 Position;
+
+        public float Rotation;
+
 
         public void Reset(ParallaxHiResSnow backdrop)
         {
@@ -25,13 +25,13 @@ public class ParallaxHiResSnow : HiResBackdrop
             Speed = Scale * Calc.Random.Range(backdrop.minSpeed, backdrop.maxSpeed);
             Scroll.X = Calc.Map(scalePercent, 0f, 1f, backdrop.minScroll.X, backdrop.maxScroll.X);
             Scroll.Y = Calc.Map(scalePercent, 0f, 1f, backdrop.minScroll.Y, backdrop.maxScroll.Y);
+            Alpha = backdrop.fadeTowardsForeground ? MathHelper.Lerp(1f, 0f, scalePercent * 0.8f) : 1f;
 
+            Sine = Calc.Random.NextFloat(MathF.PI * 2f);
             Position.X = (-OffscreenPadding + Calc.Random.NextFloat(320f + OffscreenPadding * 2f)) * UpscaleAmount;
             Position.Y = (-OffscreenPadding + Calc.Random.NextFloat(180f + OffscreenPadding * 2f)) * UpscaleAmount;
 
-            Sin = Calc.Random.NextFloat(MathF.PI * 2f);
             Rotation = backdrop.randomTextureRotation ? Calc.Random.NextFloat(MathF.PI * 2f) : 0f;
-            Alpha = backdrop.fadeTowardsForeground ? MathHelper.Lerp(1f, 0f, scalePercent * 0.8f) : 1f;
         }
     }
 
@@ -105,7 +105,6 @@ public class ParallaxHiResSnow : HiResBackdrop
 
         base.Update(scene);
 
-        // fading
         if (doVisibleFade)
         {
             visibleFade = Calc.Approach(visibleFade, IsVisible(level) ? 1f : 0f, Engine.DeltaTime * 2f);
@@ -127,16 +126,18 @@ public class ParallaxHiResSnow : HiResBackdrop
 
             particle.Position += Direction * particle.Speed * Engine.DeltaTime;
             if (!sineHorizontal)
-                particle.Position.Y += (float)Math.Sin(particle.Sin) * sineAmplitude * Engine.DeltaTime;
+                particle.Position.Y += (float)Math.Sin(particle.Sine) * sineAmplitude * Engine.DeltaTime;
             else
-                particle.Position.X += (float)Math.Sin(particle.Sin) * sineAmplitude * Engine.DeltaTime;
-            particle.Sin += Engine.DeltaTime * sineFrequency;
+                particle.Position.X += (float)Math.Sin(particle.Sine) * sineAmplitude * Engine.DeltaTime;
+            particle.Sine += Engine.DeltaTime * sineFrequency;
         }
     }
 
-    public override void RenderHiRes(Scene scene, Matrix upscaleMatrix)
+    public override void RenderHiRes(Scene scene, Matrix cameraToScreenMatrix)
     {
-        Color color = Color * visibleFade * cameraFade * ExtendedVariantsCompat.ForegroundEffectOpacity;
+        Color color = Color * visibleFade * cameraFade;
+        if (ExtendedVariantsCompat.IsLoaded)
+            color *= ExtendedVariantsCompat.GetForegroundEffectOpacity();
         float additiveMultiplier = 1f - additiveBlend;
 
         float stretchSpeed = Calc.Clamp(Direction.Length(), 0f, 20f);
@@ -150,34 +151,22 @@ public class ParallaxHiResSnow : HiResBackdrop
             stretchScale = new Vector2(stretchSpeed, 0.2f + (1f - stretchSpeed / 20f) * 0.8f);
         }
 
-        // zoom (out) support is kinda based on https://github.com/Ikersfletch/ExCameraDynamics/blob/main/Code/Backdrops/ZoomParticleParallax.cs
-        // could've maybe gone for a depth based approach where the "distance" of the particles determines how affected they are by the "zoom" but eh idk this works
-
-        // bwehh
         Camera camera = (scene as Level)!.Camera;
-        Vector2 zoomCenterOffset = SorbetHelperGFX.GetZoomOutCameraCenterOffset(camera);
+        Vector2 zoomCenterOffset = camera.GetZoomOutCenterOffset();
         Vector2 cameraPos = camera.Position.Floor() + zoomCenterOffset;
 
         for (int i = 0; i < particles.Length; i++)
         {
             ref Particle particle = ref particles[i];
 
-            // need to divide by UpscaleAmount here since the snow particles are positioned at the screen resolution (1920x1080) as a leftover from vanilla HiResSnow,
+            // need to divide the position by UpscaleAmount here since the snow particles are positioned at 6x scale (1920x1080) as a leftover from vanilla HiResSnow,
             // while the matrix used for rendering HiResBackdrops expects positions in camera space (320x180)
             Vector2 renderPosition = new Vector2()
             {
-                X = -OffscreenPadding + Mod(particle.Position.X / UpscaleAmount - cameraPos.X * particle.Scroll.X, 320f + OffscreenPadding * 2f),
-                Y = -OffscreenPadding + Mod(particle.Position.Y / UpscaleAmount - cameraPos.Y * particle.Scroll.Y, 180f + OffscreenPadding * 2f)
+                X = -OffscreenPadding + Mod(particle.Position.X / UpscaleAmount - cameraPos.X * particle.Scroll.X + zoomCenterOffset.X, 320f + OffscreenPadding * 2f),
+                Y = -OffscreenPadding + Mod(particle.Position.Y / UpscaleAmount - cameraPos.Y * particle.Scroll.Y + zoomCenterOffset.Y, 180f + OffscreenPadding * 2f)
             };
             Vector2 renderScale = stretchScale * particle.Scale / UpscaleAmount;
-
-            // i dont remember why i did so much stuff again here and i dont feel like testing rn so   yay
-            if (SorbetHelperGFX.ZoomOutActive)
-            {
-                renderPosition += zoomCenterOffset;
-                renderPosition.X = -OffscreenPadding + Mod(OffscreenPadding + renderPosition.X, 320f + OffscreenPadding * 2f);
-                renderPosition.Y = -OffscreenPadding + Mod(OffscreenPadding + renderPosition.Y, 180f + OffscreenPadding * 2f);
-            }
 
             Color particleColor = color;
             if (particle.Alpha < 1f)
@@ -187,16 +176,10 @@ public class ParallaxHiResSnow : HiResBackdrop
             if (additiveMultiplier < 1f)
                 particleColor = new Color(particleColor.R, particleColor.G, particleColor.B, (int)(particleColor.A * additiveMultiplier));
 
-            if (!SorbetHelperGFX.ZoomOutActive)
-            {
-                particleTexture.DrawCentered(renderPosition, particleColor, renderScale, shouldStretch ? stretchRotate : particle.Rotation);
-            }
-            else
-            {
-                for (float x = 0f; x < camera.Width + OffscreenPadding; x += 320f + OffscreenPadding * 2f)
-                for (float y = 0f; y < camera.Height + OffscreenPadding; y += 180f + OffscreenPadding * 2f)
-                    particleTexture.DrawCentered(renderPosition + new Vector2(x, y), particleColor, renderScale, shouldStretch ? stretchRotate : particles[i].Rotation);
-            }
+
+            for (float x = 0f; x < camera.Width + OffscreenPadding; x += 320f + OffscreenPadding * 2f)
+            for (float y = 0f; y < camera.Height + OffscreenPadding; y += 180f + OffscreenPadding * 2f)
+                particleTexture.DrawCentered(renderPosition + new Vector2(x, y), particleColor, renderScale, shouldStretch ? stretchRotate : particles[i].Rotation);
         }
     }
 

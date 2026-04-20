@@ -1,6 +1,3 @@
-using System.Collections;
-using Celeste.Mod.SorbetHelper.Utils;
-
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/ReturnBerry")]
@@ -22,7 +19,6 @@ public class ReturnBerry : Strawberry
 
         // recreate the strawberry seed list but accounting for the first 2 nodes being for the bubble
         Seeds.Clear();
-
         if (data.Nodes is { Length: > 2 })
         {
             for (int i = 0; i < data.Nodes.Length - 2; i++)
@@ -34,18 +30,17 @@ public class ReturnBerry : Strawberry
     {
         base.Update();
 
-        // bubbles !!
-        // i think ive seen like a map or two do this before with a seperate emitter entity but honestly i feel like itd be cool to have it built in
-        if (!bubbleParticles || Follower.HasLeader || collected || WaitingOnSeeds || !Visible || CollideCheck<FakeWall>() || CollideCheck<Solid>())
-            return;
-
-        if (Scene.OnInterval(0.75f, ID.ID / 9f)) // not sure abt speed still or whether it shd be fast or slow
+        if (bubbleParticles
+            && !Follower.HasLeader && !collected && !WaitingOnSeeds && Visible && !CollideCheck<FakeWall>() && !CollideCheck<Solid>()
+            && Scene.OnInterval(0.75f, ID.ID / 9f))
+        {
             SceneAs<Level>().Particles.Emit(Player.P_CassetteFly, 2, Center + new Vector2(0f, 1f), new Vector2(4f, 5f));
+        }
     }
 
     private new void OnPlayer(Player player)
     {
-        // not an override method but still need to call "base" because the original playercollider get removed
+        // not an override method but still need to call "base" because the original playercollider got removed
         base.OnPlayer(player);
 
         if (nodes is { Length: >= 2 })
@@ -63,7 +58,7 @@ public class ReturnBerry : Strawberry
         // if maddy is still alive put her in a bubble
         if (!player.Dead && player.StateMachine.State != Player.StCassetteFly)
         {
-            Audio.Play("event:/game/general/cassette_bubblereturn", SceneAs<Level>().Camera.Center);
+            Audio.Play("event:/game/general/cassette_bubblereturn", SceneAs<Level>().Camera.GetCenter());
             player.StartCassetteFly(nodes[1], nodes[0]);
         }
     }

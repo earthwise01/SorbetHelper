@@ -1,13 +1,10 @@
-using System.Collections.Generic;
-using System.Linq;
-using Celeste.Mod.SorbetHelper.Utils;
-using Celeste.Mod.SorbetHelper.Entities;
-
 namespace Celeste.Mod.SorbetHelper;
 
-public class SorbetHelperMapDataProcessor : EverestMapDataProcessor
+internal class SorbetHelperMapDataProcessor : EverestMapDataProcessor
 {
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(SorbetHelperMapDataProcessor)}";
+
+    public const string MapDataProcessedSID = "SorbetHelper/MapDataProcessed";
 
     public static Dictionary<(int, AreaMode), List<StylegroundDepthController.StylegroundDepthControllerData>> StylegroundDepthControllers { get; private set; } = [];
     public static Dictionary<(int, AreaMode), HashSet<string>> MusicSyncEvents { get; private set; } = [];
@@ -35,7 +32,7 @@ public class SorbetHelperMapDataProcessor : EverestMapDataProcessor
 
             Logger.Verbose(LogID, $"found a StylegroundDepthController in {AreaKey.SID} {AreaKey.ID} ({AreaKey.Mode}), with depth {depthAttr}!");
 
-            data.Name = "SorbetHelper/MapDataProcessed"; // don't get any annoying "failed to load" warnings (see global entities loading event)
+            data.Name = MapDataProcessedSID;
         }
 
         // convert to a styleground depth controller
@@ -74,11 +71,11 @@ public class SorbetHelperMapDataProcessor : EverestMapDataProcessor
             { "entity:SorbetHelper/MusicSyncControllerFMOD", ProcessMusicSyncController },
 
             // global controllers
-            { $"entity:{EntityStylegroundController.EntityDataID}", ProcessGlobalOptionController },
-            { $"entity:{LightCoverController.EntityDataID}", ProcessGlobalOptionController },
-            { $"entity:{SliderFadeXY.EntityDataID}", ProcessGlobalOptionController },
-            { $"entity:{DarknessTransparencyFixController.EntityDataID}", ProcessGlobalOptionController },
-            { $"entity:{SparklingWaterColorController.EntityDataID}", ProcessGlobalOptionController}
+            { $"entity:{EntityStylegroundController.EntitySID}", ProcessGlobalOptionController },
+            { $"entity:{LightCoverController.EntitySID}", ProcessGlobalOptionController },
+            { $"entity:{SliderFadeXY.EntitySID}", ProcessGlobalOptionController },
+            { $"entity:{DarknessTransparencyFixController.EntitySID}", ProcessGlobalOptionController },
+            { $"entity:{SparklingWaterColorController.EntitySID}", ProcessGlobalOptionController}
         };
     }
 

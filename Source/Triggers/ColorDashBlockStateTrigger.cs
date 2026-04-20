@@ -1,5 +1,3 @@
-using Celeste.Mod.SorbetHelper.Entities;
-
 namespace Celeste.Mod.SorbetHelper.Triggers;
 
 [CustomEntity("SorbetHelper/ColorDashBlockStateTrigger")]
@@ -33,11 +31,13 @@ public class ColorDashBlockStateTrigger(EntityData data, Vector2 offset) : Trigg
 
     #region Hooks
 
+    [OnLoad]
     internal static void Load()
     {
         Everest.Events.Player.OnSpawn += Event_Player_Spawn;
     }
 
+    [OnUnload]
     internal static void Unload()
     {
         Everest.Events.Player.OnSpawn -= Event_Player_Spawn;

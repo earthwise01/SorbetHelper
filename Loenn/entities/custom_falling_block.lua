@@ -1,10 +1,20 @@
 local fakeTilesHelper = require("helpers.fake_tiles")
 local mods = require("mods")
-local depths = mods.requireFromPlugin("libraries.depths")
+local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
 
-local function getFallingBlock(id, altName, placementData, fieldInfo, fieldOrder)
-    -- placements
-    local data = {
+local function createFallingBlockPlugin(entityName, placementName, placementAltName, fieldOrder, extraPlacementData, extraFieldInformation)
+    local fallingBlock = {}
+
+    local directions = {
+        "Down",
+        "Up",
+        "Left",
+        "Right"
+    }
+
+    fallingBlock.name = entityName
+
+    local placementData = {
         width = 8,
         height = 8,
         direction = "Down",
@@ -24,37 +34,36 @@ local function getFallingBlock(id, altName, placementData, fieldInfo, fieldOrder
         shakeSfx = "event:/game/general/fallblock_shake",
         impactSfx = "event:/game/general/fallblock_impact",
         depth = -9000,
-        -- chronoHelperGravity = false,
         chronoHelperGravityChangeShakeTime = 0.0, -- grrr
     }
 
-    if placementData then
-        for k,v in pairs(placementData) do
-
-            data[k] = v
+    if extraPlacementData then
+        for k, v in pairs(extraPlacementData) do
+            placementData[k] = v
         end
     end
 
-    local placements = function()
-        data.tiletype = fakeTilesHelper.getPlacementMaterial()
+    function fallingBlock.placements()
+        placementData.tiletype = fakeTilesHelper.getPlacementMaterial()
 
         return {
-            name = "fallingBlock",
-            alternativeName = altName,
-            data = data
+            name = placementName,
+            alternativeName = placementAltName,
+            data = placementData
         }
     end
 
-    -- field information
-    local fieldInformation = {
+    fallingBlock.ignoredFields = { "_id", "_name", "chronoHelperGravityChangeShakeTime" }
+
+    fallingBlock.fieldOrder = fieldOrder
+
+    fallingBlock.fieldInformation = {
         tiletype = {
-            options = function()
-                return fakeTilesHelper.getTilesOptions()
-            end,
+            options = function() return fakeTilesHelper.getTilesOptions() end,
             editable = false,
         },
         direction = {
-            options = { "Down", "Up", "Left", "Right" },
+            options = directions,
             editable = false
         },
         initialShakeTime = {
@@ -83,48 +92,26 @@ local function getFallingBlock(id, altName, placementData, fieldInfo, fieldOrder
         },
         depth = {
             fieldType = "integer",
-            options = depths.getDepths(),
+            options = sorbetUtils.getDepths(),
             editable = true
         }
     }
 
-    if fieldInfo then
-        for k,v in pairs(fieldInfo) do
-            fieldInformation[k] = v
+    if extraFieldInformation then
+        for k, v in pairs(extraFieldInformation) do
+            fallingBlock.fieldInformation[k] = v
         end
     end
 
-    -- create the falling block
-    local fallingBlock = {}
-    fallingBlock.name = id
-    fallingBlock.depth = function (room, entity) return entity.depth or -9000 end
-    fallingBlock.placements = placements
-    fallingBlock.fieldInformation = fieldInformation
-    fallingBlock.ignoredFields = { "_id", "_name", "chronoHelperGravityChangeShakeTime" }
-    fallingBlock.fieldOrder = fieldOrder
     fallingBlock.sprite = fakeTilesHelper.getEntitySpriteFunction("tiletype", false)
+
+    function fallingBlock.depth(room, entity)
+        return entity.depth or -9000
+    end
+
     return fallingBlock
 end
 
--- dash falling block info
-local dashFallingBlockPlacementInfo = {
-    allowWavedash = false,
-    dashCornerCorrection = true,
-    refillDash = false,
-    fallDashMode = "Disabled",
-    -- dashActivated = true, -- not needed anymore since custom falling blocks exist as their own entity
-    fallOnTouch = false,
-    fallOnStaticMover = false,
-}
-local dashFallingBlockFieldInfo = {
-    fallDashMode = {
-        options = { "Disabled", "Push", "Pull" },
-        editable = false
-    }
-}
-
--- field orders
--- this is   manual because i hate myself  !
 local customFallingBlockFieldOrder = {
     "x", "y",
     "width", "height",
@@ -136,6 +123,16 @@ local customFallingBlockFieldOrder = {
     "tiletype", "direction",
     "fallOnTouch", "climbFall", "fallOnStaticMover", "breakDashBlocks",
     "ignoreSolids", "resetFlags", "chronoHelperGravity"
+}
+
+local dashFallingBlockPlacementData = {
+    allowWavedash = false,
+    dashCornerCorrection = true,
+    refillDash = false,
+    fallDashMode = "Disabled",
+    -- dashActivated = true, -- not needed anymore since custom falling blocks exist as their own entity
+    fallOnTouch = false,
+    fallOnStaticMover = false,
 }
 
 local dashFallingBlockFieldOrder = {
@@ -152,11 +149,32 @@ local dashFallingBlockFieldOrder = {
     "refillDash", "dashActivated", "ignoreSolids", "resetFlags", "chronoHelperGravity"
 }
 
-local customFallingBlock = getFallingBlock("SorbetHelper/CustomFallingBlock", nil, nil, nil, customFallingBlockFieldOrder)
-local dashFallingBlock = getFallingBlock("SorbetHelper/DashFallingBlock", nil, dashFallingBlockPlacementInfo, dashFallingBlockFieldInfo, dashFallingBlockFieldOrder)
-local customGravityFallingBlock = getFallingBlock("SorbetHelper/CustomGravityFallingBlock", "altName", nil, nil, customFallingBlockFieldOrder)
-local gravityDashFallingBlock = getFallingBlock("SorbetHelper/GravityDashFallingBlock", "altName", dashFallingBlockPlacementInfo, dashFallingBlockFieldInfo, dashFallingBlockFieldOrder)
-customGravityFallingBlock.associatedMods = { "SorbetHelper", "ChronoHelper" }
-gravityDashFallingBlock.associatedMods = { "SorbetHelper", "ChronoHelper" }
+local dashFallingBlockFieldInfo = {
+    fallDashMode = {
+        options = {
+            "Disabled",
+            "Push",
+            "Pull"
+        },
+        editable = false
+    }
+}
 
-return { customFallingBlock, dashFallingBlock, customGravityFallingBlock, gravityDashFallingBlock }
+local gravityFallingBlockAssociatedMods = {
+    "SorbetHelper",
+    "ChronoHelper"
+}
+
+local customFallingBlock = createFallingBlockPlugin("SorbetHelper/CustomFallingBlock", "custom_falling_block", nil, nil, customFallingBlockFieldOrder, nil)
+local dashFallingBlock = createFallingBlockPlugin("SorbetHelper/DashFallingBlock", "dash_falling_block", nil, dashFallingBlockPlacementData, dashFallingBlockFieldOrder, dashFallingBlockFieldInfo)
+local customGravityFallingBlock = createFallingBlockPlugin("SorbetHelper/CustomGravityFallingBlock", "custom_gravity_falling_block", "gravity_custom_falling_block", nil, customFallingBlockFieldOrder, nil)
+local gravityDashFallingBlock = createFallingBlockPlugin("SorbetHelper/GravityDashFallingBlock", "gravity_dash_falling_block", "dash_gravity_falling_block", dashFallingBlockPlacementData, dashFallingBlockFieldOrder, dashFallingBlockFieldInfo)
+customGravityFallingBlock.associatedMods = gravityFallingBlockAssociatedMods
+gravityDashFallingBlock.associatedMods = gravityFallingBlockAssociatedMods
+
+return {
+    customFallingBlock,
+    dashFallingBlock,
+    customGravityFallingBlock,
+    gravityDashFallingBlock
+}

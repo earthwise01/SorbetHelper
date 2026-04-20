@@ -1,18 +1,13 @@
-using System.Linq;
-using Celeste.Mod.SorbetHelper.Backdrops;
-using Celeste.Mod.SorbetHelper.Components;
-using Celeste.Mod.SorbetHelper.Utils;
-
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 /// <summary>
 /// Marks entities with the specified type names with <see cref="EntityStylegroundMarker"/> components to be rendered by an <see cref="EntityStylegroundRenderer"/><br/>
 /// </summary>
-[GlobalEntity(              EntityDataID + "Global")] // global version is swapped to in mapdataprocessor based on data.Bool("global")
-[CustomEntity(EntityDataID, EntityDataID + "Global")]
+[GlobalEntity(           EntitySID + "Global")] // global version is swapped to in mapdataprocessor based on data.Bool("global")
+[CustomEntity(EntitySID, EntitySID + "Global")]
 public class EntityStylegroundController : Entity
 {
-    public const string EntityDataID = "SorbetHelper/EntityStylegroundController";
+    public const string EntitySID = "SorbetHelper/EntityStylegroundController";
 
     private readonly string stylegroundTag;
 

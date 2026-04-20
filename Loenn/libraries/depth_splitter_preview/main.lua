@@ -11,9 +11,9 @@ local depthSplitterPreview = {}
 
 -- check loenn version
 local currentLoennVersion = meta.version
-local expectedLoennVersion = version("v1.0.5")
-if currentLoennVersion > expectedLoennVersion then
-    logging.error("[SorbetHelper/DepthSplitterPreview] expected loenn version <= " .. tostring(expectedLoennVersion) .. " while current version is " .. tostring(currentLoennVersion) .. "! refusing to load.")
+local latestSupportedLoennVersion = version("v1.0.9")
+if currentLoennVersion > latestSupportedLoennVersion then
+    logging.error("[SorbetHelper/DepthSplitterPreview] expected loenn version <= " .. tostring(latestSupportedLoennVersion) .. " while current version is " .. tostring(currentLoennVersion) .. "! refusing to load.")
     return {}
 end
 

@@ -1,26 +1,37 @@
+local mods = require("mods")
+local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
+
 local wingedStrawberryDirectionController = {}
+
+local directions = {
+    "Up",
+    "Down",
+    "Left",
+    "Right",
+    "UpLeft",
+    "UpRight",
+    "DownLeft",
+    "DownRight"
+}
 
 wingedStrawberryDirectionController.name = "SorbetHelper/WingedStrawberryDirectionController"
 wingedStrawberryDirectionController.texture = "editorSprites/SorbetHelper/wingedStrawberryDirectionController"
-wingedStrawberryDirectionController.depth = -1000010
+wingedStrawberryDirectionController.depth = sorbetUtils.controllerDepth
 wingedStrawberryDirectionController.placements = {
-    name = "wingedStrawberryController",
+    name = "winged_strawberry_direction_controller",
     data = {
         direction = "Up"
     }
 }
+
+wingedStrawberryDirectionController.fieldOrder = {
+    "x", "y",
+    "direction"
+}
+
 wingedStrawberryDirectionController.fieldInformation = {
     direction = {
-        options = {
-            "Up",
-            "Down",
-            "Left",
-            "Right",
-            "UpLeft",
-            "UpRight",
-            "DownLeft",
-            "DownRight"
-        },
+        options = directions,
         editable = false
     }
 }

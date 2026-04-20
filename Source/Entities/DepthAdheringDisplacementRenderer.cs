@@ -1,9 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework.Graphics;
-using Celeste.Mod.SorbetHelper.Components;
-using Celeste.Mod.SorbetHelper.Utils;
-
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [Tracked]
@@ -35,8 +29,8 @@ public class DepthAdheringDisplacementRenderer : Entity
 
         Camera camera = SceneAs<Level>().Camera;
 
-        VirtualRenderTarget entityBuffer = RenderTargetHelper.GetGameplayBuffer();
-        VirtualRenderTarget displacementMapBuffer = RenderTargetHelper.GetGameplayBuffer();
+        VirtualRenderTarget entityBuffer = RenderTargetHelper.GetTempBuffer();
+        VirtualRenderTarget displacementMapBuffer = RenderTargetHelper.GetTempBuffer();
 
         RenderTargetBinding[] prevRenderTargets = Engine.Instance.GraphicsDevice.GetRenderTargets();
         RenderTarget2D gameplayBuffer = GameplayBuffers.Gameplay;
@@ -103,16 +97,12 @@ public class DepthAdheringDisplacementRenderer : Entity
             Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
 
         // temporarily trick Distort.Render into only using the "Displace" technique as to not apply the anxiety effect
-        float anxietyBackup = Distort.anxiety;
-        float gamerateBackup = Distort.gamerate;
-        Distort.anxiety = 0f;
-        Distort.gamerate = 1f;
-        Distort.Render((RenderTarget2D)entityBuffer, (RenderTarget2D)displacementMapBuffer, hasDistortion: true);
-        Distort.anxiety = anxietyBackup;
-        Distort.gamerate = gamerateBackup;
+        using (new SetTemporaryValue<float>(ref Distort.anxiety, 0f))
+        using (new SetTemporaryValue<float>(ref Distort.gamerate, 1f))
+            Distort.Render((RenderTarget2D)entityBuffer, (RenderTarget2D)displacementMapBuffer, hasDistortion: true);
 
-        RenderTargetHelper.ReturnGameplayBuffer(entityBuffer);
-        RenderTargetHelper.ReturnGameplayBuffer(displacementMapBuffer);
+        RenderTargetHelper.ReturnTempBuffer(entityBuffer);
+        RenderTargetHelper.ReturnTempBuffer(displacementMapBuffer);
 
         GameplayRenderer.Begin();
     }

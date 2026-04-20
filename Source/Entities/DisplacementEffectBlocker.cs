@@ -1,9 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework.Graphics;
-using Celeste.Mod.SorbetHelper.Utils;
-using MonoMod.Cil;
-
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [Tracked]
@@ -55,11 +49,13 @@ public class DisplacementEffectBlocker : Entity
 
     #region Hooks
 
+    [OnLoad]
     internal static void Load()
     {
         IL.Celeste.DisplacementRenderer.BeforeRender += IL_DisplacementRenderer_BeforeRender;
     }
 
+    [OnUnload]
     internal static void Unload()
     {
         IL.Celeste.DisplacementRenderer.BeforeRender -= IL_DisplacementRenderer_BeforeRender;
@@ -73,22 +69,14 @@ public class DisplacementEffectBlocker : Entity
         };
 
         if (!cursor.TryGotoPrev(MoveType.Before, instr => instr.MatchCallvirt<SpriteBatch>("End")))
-        {
-            Logger.Error(LogID, $"failed to inject check for full DisplacementEffectBlockers in CIL code for {cursor.Method.Name}!");
-            return;
-        }
+            throw new HookHelper.HookException(il, "Unable to find `SpriteBatch.End` call to insert full displacement blocking before.");
 
-        Logger.Verbose(LogID, $"injecting check for full DisplacementEffectBlockers at {cursor.Index} in CIL code for {cursor.Method.Name}");
         cursor.EmitLdarg1();
         cursor.EmitDelegate(RenderFullBlockers);
 
         if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<SpriteBatch>("End")))
-        {
-            Logger.Error(LogID, $"failed to inject check for water DisplacementEffectBlockers in CIL code for {cursor.Method.Name}!");
-            return;
-        }
+            throw new HookHelper.HookException(il, "Unable to find `SpriteBatch.End` call to insert water displacement blocking after.");
 
-        Logger.Verbose(LogID, $"injecting check for water DisplacementEffectBlockers at {cursor.Index} in CIL code for {cursor.Method.Name}");
         cursor.EmitLdarg1();
         cursor.EmitDelegate(RenderWaterBlockers);
 
@@ -97,7 +85,7 @@ public class DisplacementEffectBlocker : Entity
         static void RenderFullBlockers(Scene scene)
         {
             foreach (Entity entity in scene.Tracker.GetEntities<DisplacementEffectBlocker>()
-                                                   .Where(entity => entity is DisplacementEffectBlocker { Visible: true, DepthAdhering: false, WaterOnly: false }))
+                                                   .Where(e => e is DisplacementEffectBlocker { Visible: true, DepthAdhering: false, WaterOnly: false }))
             {
                 Draw.Rect(entity.Position, entity.Width, entity.Height, NoDisplacementColor);
             }
@@ -106,7 +94,7 @@ public class DisplacementEffectBlocker : Entity
         static void RenderWaterBlockers(Scene scene)
         {
             List<Entity> waterBlockers = scene.Tracker.GetEntities<DisplacementEffectBlocker>()
-                                                      .Where(entity => entity is DisplacementEffectBlocker { Visible: true, DepthAdhering: false, WaterOnly: true })
+                                                      .Where(e => e is DisplacementEffectBlocker { Visible: true, DepthAdhering: false, WaterOnly: true })
                                                       .ToList();
             if (waterBlockers.Count <= 0)
                 return;
