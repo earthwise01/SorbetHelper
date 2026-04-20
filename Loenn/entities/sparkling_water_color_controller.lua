@@ -1,5 +1,5 @@
 local drawableText = require("structs.drawable_text")
-local sorbetUtils = require("mods").requireFromPlugin("libraries.utils")
+local sorbetUtils = require("mods").requireFromPlugin("libraries.sorbet_utils")
 
 local controller = {}
 
