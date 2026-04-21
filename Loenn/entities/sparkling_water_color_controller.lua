@@ -1,12 +1,12 @@
 local drawableText = require("structs.drawable_text")
 local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
 
-local controller = {}
+local sparklingWaterColorController = {}
 
-controller.name = "SorbetHelper/SparklingWaterColorController"
-controller.depth = -1000010
-controller.placements = {
-    name = "normal",
+sparklingWaterColorController.name = "SorbetHelper/SparklingWaterColorController"
+sparklingWaterColorController.depth = sorbetHelper.controllerDepth
+sparklingWaterColorController.placements = {
+    name = "sparkling_water_color_controller",
     data = {
         outlineColor = "87cefaf0",
         edgeColor = "87cefa80",
@@ -21,7 +21,7 @@ controller.placements = {
     }
 }
 
-controller.fieldOrder = {
+sparklingWaterColorController.fieldOrder = {
     "x", "y",
     "outlineColor", "edgeColor",
     "detailTexture", "fillColor",
@@ -30,7 +30,7 @@ controller.fieldOrder = {
     "affectedDepth", "global"
 }
 
-controller.fieldInformation = {
+sparklingWaterColorController.fieldInformation = {
     outlineColor = {
         fieldType = "color",
         showAlpha = true
@@ -61,8 +61,8 @@ controller.fieldInformation = {
     }
 }
 
--- todo: would b cool if the water color was previewed on the controller sprite    uses shaders tho so might be evil weh
-function controller.sprite(room, entity)
+-- todo: would b cool if the water color was previewed on the sparklingWaterColorController sprite    uses shaders tho so might be evil weh
+function sparklingWaterColorController.sprite(room, entity)
     local x, y = entity.x or 0, entity.y or 0
 
     local sprites = sorbetHelper.getControllerSprites(x, y, "sparklingWaterColorController", entity.global or false)
@@ -75,4 +75,4 @@ function controller.sprite(room, entity)
     return sprites
 end
 
-return controller
+return sparklingWaterColorController

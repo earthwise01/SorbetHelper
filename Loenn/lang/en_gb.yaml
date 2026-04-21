@@ -847,8 +847,9 @@ Entities:
 
   SorbetHelper/SparklingWater:
     Placements:
-      normal:
+      sparkling_water:
         Name: Sparkling Water
+        Description: A custom version of water with a different aesthetic.
     Attributes:
       depth:
         Description: |-
@@ -868,8 +869,9 @@ Entities:
 
   SorbetHelper/SparklingWaterColorController:
     Placements:
-      normal:
+      sparkling_water_color_controller:
         Name: Sparkling Water Color Controller
+        Description: A controller which can customize the visual appearance of Sparkling Water entities.
     Attributes:
       outlineColor:
         Description: The color to use for the outline and details of the water.

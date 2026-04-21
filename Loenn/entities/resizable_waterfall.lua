@@ -102,9 +102,8 @@ resizableWaterfall.fieldInformation = {
     }
 }
 
--- normally loenn doesnt check for pandoras box water but i do here anyway bc itd look weird sometimes otherwise
 local function waterSearchPredicate(entity)
-    return entity._name == "water" or entity._name == "pandorasBox/coloredWater" or entity._name == "SorbetHelper/SparklingWater"
+    return entity._name == "water" or entity._name == "pandorasBox/coloredWater" or utils.endsWith(entity._name, "SparklingWater")
 end
 
 local function collideFirst(rectangle, rectangles)
@@ -117,7 +116,7 @@ local function collideFirst(rectangle, rectangles)
     return nil
 end
 
--- stolen from loenn waterfallHelper but with the ability to ignore tiles
+-- stolen from loenn waterfallHelper but with the ability to ignore tiles & water
 local function getWaterfallHeight(room, entity, ignoreTiles, ignoreWater)
     local waterBlocks = utils.filter(waterSearchPredicate, room.entities)
     local waterRectangles = connectedEntities.getEntityRectangles(waterBlocks)

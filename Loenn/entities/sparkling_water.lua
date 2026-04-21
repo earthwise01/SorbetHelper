@@ -3,12 +3,12 @@ local utils = require("utils")
 local loadedState = require("loaded_state")
 local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
 
-local water = {}
+local sparklingWater = {}
 
-water.name = "SorbetHelper/SparklingWater"
-water.warnBelowSize = {8, 8}
-water.placements = {
-    name = "normal",
+sparklingWater.name = "SorbetHelper/SparklingWater"
+sparklingWater.warnBelowSize = {8, 8}
+sparklingWater.placements = {
+    name = "sparkling_water",
     data = {
         width = 8,
         height = 8,
@@ -20,14 +20,14 @@ water.placements = {
     }
 }
 
-water.fieldOrder = {
+sparklingWater.fieldOrder = {
     "x", "y",
     "width", "height",
     "depth", "collidable", "canSplash",
-    "topSurface", "bottomSurface",
+    "topSurface", "bottomSurface",=
 }
 
-water.fieldInformation = {
+sparklingWater.fieldInformation = {
     depth = {
         fieldType = "integer",
         options = sorbetHelper.getDepths({
@@ -37,7 +37,7 @@ water.fieldInformation = {
     },
 }
 
-function water.rectangle(room, entity)
+function sparklingWater.rectangle(room, entity)
     return utils.rectangle(entity.x, entity.y, entity.width or 8, entity.height or 16)
 end
 
@@ -71,7 +71,7 @@ local function getColors(currentRoom, self)
     return defaultOutline, defaultFill
 end
 
-function water.sprite(room, entity)
+function sparklingWater.sprite(room, entity)
     local x, y = entity.x or 0, entity.y or 0
     local width, height = entity.width or 8, entity.height or 16
 
@@ -83,8 +83,8 @@ function water.sprite(room, entity)
     return drawableRectangle.fromRectangle("bordered", x, y, width, height, fillColor, outlineColor)
 end
 
-function water.depth(room, entity)
+function sparklingWater.depth(room, entity)
     return entity.depth or -9999
 end
 
-return water
+return sparklingWater
