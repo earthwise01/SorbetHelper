@@ -2,8 +2,8 @@ using FMOD.Studio;
 
 namespace Celeste.Mod.SorbetHelper.Entities;
 
-[Tracked]
 [CustomEntity("SorbetHelper/ReturnBubbleBehaviorController")]
+[Tracked]
 public class ReturnBubbleBehaviorController : Entity
 {
     private class CassetteFlyOptions(EntityData data)

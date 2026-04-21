@@ -6,11 +6,22 @@ internal class SorbetHelperMapDataProcessor : EverestMapDataProcessor
 
     public const string MapDataProcessedSID = "SorbetHelper/MapDataProcessed";
 
-    public static Dictionary<(int, AreaMode), List<StylegroundDepthController.StylegroundDepthControllerData>> StylegroundDepthControllers { get; private set; } = [];
-    public static Dictionary<(int, AreaMode), HashSet<string>> MusicSyncEvents { get; private set; } = [];
+    public static Dictionary<(int, AreaMode), List<StylegroundDepthController.StylegroundDepthControllerData>> StylegroundDepthControllers { get; } = [];
+    public static Dictionary<(int, AreaMode), HashSet<string>> MusicSyncEvents { get; } = [];
 
     public override Dictionary<string, Action<BinaryPacker.Element>> Init()
     {
+        return new Dictionary<string, Action<BinaryPacker.Element>>() {
+            ["entity:SorbetHelper/StylegroundDepthController"] = ProcessStylegroundDepthController,
+            // backwards compat
+            ["entity:SorbetHelper/StylegroundOverHudController"] = ProcessStylegroundOverHudController,
+            ["entity:SorbetHelper/StylegroundEntityController"] = ProcessStylegroundDepthController,
+
+            ["entity:SorbetHelper/MusicSyncControllerFMOD"] = ProcessMusicSyncController
+        };
+
+        #region Styleground Depth Controller
+
         void ProcessStylegroundDepthController(BinaryPacker.Element data)
         {
             if (!StylegroundDepthControllers.TryGetValue((AreaKey.ID, AreaKey.Mode), out List<StylegroundDepthController.StylegroundDepthControllerData> depthControllers))
@@ -35,48 +46,26 @@ internal class SorbetHelperMapDataProcessor : EverestMapDataProcessor
             data.Name = MapDataProcessedSID;
         }
 
-        // convert to a styleground depth controller
-        void ProcessStylegroundOverHudController(BinaryPacker.Element entityData)
+        void ProcessStylegroundOverHudController(BinaryPacker.Element data)
         {
-            entityData.Attributes["depth"] = entityData.AttrInt("pauseBehavior", 0) < 2 ? "AbovePauseHud" : "AboveHud";
-            entityData.Attributes["tag"] = "sorbetHelper_drawAboveHud";
-            ProcessStylegroundDepthController(entityData);
+            data.Attributes["depth"] = data.AttrInt("pauseBehavior", 0) < 2 ? "AbovePauseHud" : "AboveHud";
+            data.Attributes["tag"] = "sorbetHelper_drawAboveHud";
+            ProcessStylegroundDepthController(data);
         }
 
-        void ProcessMusicSyncController(BinaryPacker.Element entityData)
+        #endregion
+
+        #region Music Sync Controller
+
+        void ProcessMusicSyncController(BinaryPacker.Element data)
         {
-            HashSet<string> eventNames = entityData.AttrList("eventNames", str => str).ToHashSet();
+            HashSet<string> eventNames = data.AttrList("eventNames", str => str).ToHashSet();
             MusicSyncEvents[(AreaKey.ID, AreaKey.Mode)] = eventNames;
 
             Logger.Verbose(LogID, $"found a MusicSyncController in {AreaKey.SID} ({AreaKey.Mode})!");
         }
 
-        // swap to the global versions based on a "global" attribute
-        static void ProcessGlobalOptionController(BinaryPacker.Element entityData)
-        {
-            if (entityData.AttrBool("global", false))
-                entityData.Name += "Global";
-        }
-
-        return new Dictionary<string, Action<BinaryPacker.Element>>
-        {
-            // styleground depth controller
-            { "entity:SorbetHelper/StylegroundDepthController", ProcessStylegroundDepthController },
-            // styleground over hud
-            { "entity:SorbetHelper/StylegroundOverHudController", ProcessStylegroundOverHudController },
-            // styleground entity controller
-            { "entity:SorbetHelper/StylegroundEntityController", ProcessStylegroundDepthController },
-
-            // music sync
-            { "entity:SorbetHelper/MusicSyncControllerFMOD", ProcessMusicSyncController },
-
-            // global controllers
-            { $"entity:{EntityStylegroundController.EntitySID}", ProcessGlobalOptionController },
-            { $"entity:{LightCoverController.EntitySID}", ProcessGlobalOptionController },
-            { $"entity:{SliderFadeXY.EntitySID}", ProcessGlobalOptionController },
-            { $"entity:{DarknessTransparencyFixController.EntitySID}", ProcessGlobalOptionController },
-            { $"entity:{SparklingWaterColorController.EntitySID}", ProcessGlobalOptionController }
-        };
+        #endregion
     }
 
     public override void Reset()

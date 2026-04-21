@@ -1,12 +1,10 @@
 namespace Celeste.Mod.SorbetHelper.Entities;
 
-[GlobalEntity(           EntitySID + "Global")]
-[CustomEntity(EntitySID, EntitySID + "Global")]
+[GlobalEntity(OnlyIfAttr = "global")]
+[CustomEntity("SorbetHelper/SparklingWaterColorController")]
 [Tracked]
 public class SparklingWaterColorController(EntityData data, Vector2 offset) : Entity(data.Position + offset)
 {
-    public const string EntitySID = "SorbetHelper/SparklingWaterColorController";
-
     public readonly SparklingWaterRenderer.Settings Settings = new SparklingWaterRenderer.Settings(data);
     public readonly int? AffectedDepth = data.Nullable<int>("affectedDepth");
 

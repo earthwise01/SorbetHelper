@@ -1,12 +1,10 @@
 namespace Celeste.Mod.SorbetHelper.Entities;
 
+[GlobalEntity(OnlyIfAttr = "global")]
+[CustomEntity("SorbetHelper/DarknessTransparencyFixController")]
 [Tracked]
-[GlobalEntity(           EntitySID + "Global")] // global version is swapped to in mapdataprocessor based on data.Bool("global")
-[CustomEntity(EntitySID, EntitySID + "Global")]
 public class DarknessTransparencyFixController : Entity
 {
-    public const string EntitySID = "SorbetHelper/DarknessTransparencyFixController";
-
     private static readonly BlendState DestinationTransparencySubtractAlphaFixed = new BlendState()
     {
         // use ColorSourceBlend = Blend.DestinationAlpha instead so that darkness behaves correctly with premultiplied alpha

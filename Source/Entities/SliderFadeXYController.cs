@@ -2,18 +2,16 @@ using System.Globalization;
 
 namespace Celeste.Mod.SorbetHelper.Entities;
 
-[GlobalEntity(           EntitySID + "Global")] // global version is swapped to in mapdataprocessor based on data.Bool("global")
-[CustomEntity(EntitySID, EntitySID + "Global")]
-public class SliderFadeXY : Entity
+[GlobalEntity(OnlyIfAttr = "global")]
+[CustomEntity("SorbetHelper/SliderFadeXY")]
+public class SliderFadeXYController : Entity
 {
-    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(SliderFadeXY)}";
-
-    public const string EntitySID = "SorbetHelper/SliderFadeXY";
+    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(SliderFadeXYController)}";
 
     private readonly string sliderName;
     private readonly Backdrop.Fader fadeX, fadeY;
 
-    public SliderFadeXY(EntityData data, Vector2 offset) : base(data.Position + offset)
+    public SliderFadeXYController(EntityData data, Vector2 offset) : base(data.Position + offset)
     {
         sliderName = data.Attr("slider", "");
         fadeX = CreateFader(data.Attr("fadeX", ""));

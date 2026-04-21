@@ -4,15 +4,16 @@ internal static class GlobalEntities
 {
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(GlobalEntities)}";
 
-    public const string ForceGlobalAttribute = "sorbetHelper_makeGlobal"; // could be useful idk
+    public const string ForceGlobalAttribute = "sorbetHelper_makeGlobal";
 
-    private static readonly HashSet<string> GlobalEntityIDs = [];
-    private static readonly HashSet<string> OnlyOneEntities = [];
+    private static readonly Dictionary<string, string> GlobalEntityIDs = [];
 
     private static bool loadingGlobalEntities = false;
 
     private static bool IsGlobalEntity(EntityData entityData)
-        => GlobalEntityIDs.Contains(entityData.Name) || entityData.Bool(ForceGlobalAttribute);
+        => (GlobalEntityIDs.TryGetValue(entityData.Name, out string onlyIfAttr)
+            && (string.IsNullOrEmpty(onlyIfAttr) || entityData.Bool(onlyIfAttr)))
+        || entityData.Bool(ForceGlobalAttribute);
 
 
     public static void ProcessAttributes(Assembly assembly)
@@ -26,7 +27,7 @@ internal static class GlobalEntities
                 continue;
 
             string[] ids = globalAttr.IDs;
-            bool onlyOne = globalAttr.OnlyOne;
+            string onlyIfAttr = globalAttr.OnlyIfAttr;
 
             // if no ids specified try grabbing them from a custom entity attribute
             if (ids.Length == 0 && type.GetCustomAttribute<CustomEntityAttribute>() is { } customEntity)
@@ -37,17 +38,12 @@ internal static class GlobalEntities
             }
 
             foreach (string id in ids)
-                RegisterGlobalEntity(id, onlyOne);
+                RegisterGlobalEntity(id, onlyIfAttr);
         }
     }
 
-    public static void RegisterGlobalEntity(string id, bool onlyOne)
-    {
-        GlobalEntityIDs.Add(id);
-
-        if (onlyOne)
-            OnlyOneEntities.Add(id);
-    }
+    public static void RegisterGlobalEntity(string id, string onlyIfAttr)
+        => GlobalEntityIDs.Add(id, onlyIfAttr);
 
     #region Hooks
 
@@ -73,50 +69,35 @@ internal static class GlobalEntities
 
     private static void Event_OnLoadingThread(Level level)
     {
-        HashSet<string> onlyOneLoaded = [];
-
         string origLevel = level.Session.Level;
-        MapData mapData = level.Session.MapData;
+        loadingGlobalEntities = true;
 
+        List<Entity> loadedEntities = [];
+
+        MapData mapData = level.Session.MapData;
         foreach (LevelData levelData in mapData.Levels)
         {
-            loadingGlobalEntities = true;
-            // LoadCustomEntity doesn't take a LevelData argument and instead gets it through level.Session.LevelData,
-            // so to make sure global entities are loading with the correct offsets/EntityIDs/etc, Session.Level needs to be modified temporarily
+            // LoadCustomEntity doesn't take a LevelData argument and instead uses level.Session.LevelData, so we need to change the current level temporarily
             level.Session.Level = levelData.Name;
             Calc.PushRandom(levelData.LoadSeed);
 
             try
             {
-                List<Entity> loaded = [];
-
-                foreach (EntityData entityData in levelData.Entities)
-                {
-                    string name = entityData.Name;
-                    if (!IsGlobalEntity(entityData) || onlyOneLoaded.Contains(name))
-                        continue;
-
-                    Level.LoadAndGetCustomEntity(entityData, level, loaded);
-
-                    // wonder if i should make this result in only adding the entity with the highest id instead of the first found in the map,
-                    // actually i wonder if this would be a good place for like    a mapdataprocessor or something idk
-                    if (OnlyOneEntities.Contains(name))
-                        onlyOneLoaded.Add(name);
-                }
-
-                // apply the global tag
-                foreach (Entity entity in loaded)
-                    entity.Tag |= Tags.Global;
+                foreach (EntityData entityData in levelData.Entities.Where(IsGlobalEntity))
+                    Level.LoadAndGetCustomEntity(entityData, level, loadedEntities);
             }
             catch (Exception e)
             {
                 Logger.Error(LogID, $"error while loading global entities for room {levelData.Name} in map {mapData.Area.SID}!\n{e}");
             }
 
-            loadingGlobalEntities = false;
             Calc.PopRandom();
         }
 
+        foreach (Entity entity in loadedEntities)
+            entity.Tag |= Tags.Global;
+
+        loadingGlobalEntities = false;
         level.Session.Level = origLevel;
     }
 
@@ -136,13 +117,19 @@ internal static class GlobalEntities
     #endregion
 }
 
+
 /// <summary>
-/// Mark a Monocle.Entity with a CustomEntityAttribute to be loaded during the Everest LevelLoader.OnLoadingThread event rather than when its room is loaded.<br/>
-/// Automatically adds the Tags.Global BitTag.
+/// Registers an <see cref="Entity"/> that has a <see cref="CustomEntityAttribute"/> to be loaded during the <see cref="Everest.Events.LevelLoader.OnLoadingThread"/> event rather than when its room is loaded.<br/>
+/// Automatically adds the <see cref="Tags.Global"/> tag.
 /// </summary>
-[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+/// <param name="ids">A list of entity SIDs associated with the targetted entity to treat as global entities. If empty, defaults to all SIDs listed in its <see cref="CustomEntityAttribute"/>.</param>
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
 public class GlobalEntityAttribute(params string[] ids) : Attribute
 {
-    public string[] IDs = ids;
-    public bool OnlyOne;
+    public readonly string[] IDs = ids;
+
+    /// <summary>
+    /// If not null, the name of a <see langword="bool"/> value in the entity's <see cref="EntityData"/> that must be true for the entity to be treated as a global entity.
+    /// </summary>
+    public string OnlyIfAttr = null;
 }

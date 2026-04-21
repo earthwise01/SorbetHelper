@@ -1,7 +1,7 @@
 namespace Celeste.Mod.SorbetHelper.Entities;
 
-[Tracked]
 [CustomEntity("SorbetHelper/DisplacementEffectBlocker")]
+[Tracked]
 public class DisplacementEffectBlocker : Entity
 {
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(DisplacementEffectBlocker)}";

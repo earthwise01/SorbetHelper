@@ -10,12 +10,14 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 // (old communal helper branch i found later that helped a bit)
 // https://github.com/CommunalHelper/CommunalHelper/tree/music-synced-entities
 
-// still dont know if ill go for this methodd but it seems to also "work" i think
+// bleughh this rly needs a refactor
 [GlobalEntity]
 [CustomEntity("SorbetHelper/MusicSyncControllerFMOD")]
 [Tracked]
 public class MusicSyncControllerFMOD : Entity
 {
+    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(MusicSyncControllerFMOD)}";
+
     private const string SessionPrefix = "musicSync_";
 
     private readonly bool showDebugUI;
@@ -33,6 +35,17 @@ public class MusicSyncControllerFMOD : Entity
             Tag |= Tags.PauseUpdate;
 
         Depth = 1;
+    }
+
+    public override void Added(Scene scene)
+    {
+        base.Added(scene);
+
+        if (scene.Tracker.CountEntities<MusicSyncControllerFMOD>() < 2)
+            return;
+
+        Logger.Warn(LogID, $"Tried to load a duplicate {nameof(MusicSyncControllerFMOD)} from room {SourceData?.Level?.Name ?? "???"} at position {SourceData?.Position.ToString() ?? "{X:??? Y:???}"}!");
+        RemoveSelf();
     }
 
     public override void Update()

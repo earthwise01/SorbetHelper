@@ -3,12 +3,10 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 /// <summary>
 /// Marks entities with the specified type names with <see cref="EntityStylegroundMarker"/> components to be rendered by an <see cref="EntityStylegroundRenderer"/><br/>
 /// </summary>
-[GlobalEntity(           EntitySID + "Global")] // global version is swapped to in mapdataprocessor based on data.Bool("global")
-[CustomEntity(EntitySID, EntitySID + "Global")]
+[GlobalEntity(OnlyIfAttr = "global")]
+[CustomEntity("SorbetHelper/EntityStylegroundController")]
 public class EntityStylegroundController : EntityProcessingController
 {
-    public const string EntitySID = "SorbetHelper/EntityStylegroundController";
-
     private readonly string stylegroundTag;
 
     public EntityStylegroundController(EntityData data, Vector2 offset)

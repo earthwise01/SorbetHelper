@@ -1,7 +1,7 @@
 namespace Celeste.Mod.SorbetHelper.Entities;
 
-[Tracked]
 [CustomEntity("SorbetHelper/KillZone")]
+[Tracked]
 public class KillZone : Entity
 {
     private readonly string flag;

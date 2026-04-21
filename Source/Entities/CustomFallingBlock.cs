@@ -1,7 +1,7 @@
 namespace Celeste.Mod.SorbetHelper.Entities;
 
-[TrackedAs(typeof(FallingBlock))]
 [CustomEntity("SorbetHelper/CustomFallingBlock", "SorbetHelper/CustomGravityFallingBlock = LoadGravity")]
+[TrackedAs(typeof(FallingBlock))]
 public class CustomFallingBlock : FallingBlock
 {
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(CustomFallingBlock)}";

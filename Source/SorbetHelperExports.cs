@@ -13,7 +13,7 @@ public static class SorbetHelperExports
     public static class Utils
     {
         // is this even worth keeping around
-        public static void RegisterGlobalEntity(string entitySID, bool onlyOne)
-            => GlobalEntities.RegisterGlobalEntity(entitySID, onlyOne);
+        public static void RegisterGlobalEntity(string entitySID, string onlyIfAttr)
+            => GlobalEntities.RegisterGlobalEntity(entitySID, onlyIfAttr);
     }
 }

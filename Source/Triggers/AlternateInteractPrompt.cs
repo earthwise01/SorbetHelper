@@ -2,8 +2,8 @@ using TalkComponentUI = Celeste.TalkComponent.TalkComponentUI;
 
 namespace Celeste.Mod.SorbetHelper.Triggers;
 
-[Tracked]
 [CustomEntity("SorbetHelper/AlternateInteractPrompt")]
+[Tracked]
 public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : Trigger(data, offset)
 {
     public class TalkComponentAltUI : TalkComponentUI

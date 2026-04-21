@@ -1,7 +1,7 @@
 namespace Celeste.Mod.SorbetHelper.Entities;
 
-[TrackedAs(typeof(FallingBlock))]
 [CustomEntity("SorbetHelper/DashFallingBlock", "SorbetHelper/GravityDashFallingBlock = LoadGravity")]
+[TrackedAs(typeof(FallingBlock))]
 public class DashFallingBlock : CustomFallingBlock
 {
     /*

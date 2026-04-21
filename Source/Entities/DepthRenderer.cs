@@ -8,18 +8,20 @@ public abstract class DepthRenderer<TSelf, TTrack, TOptions> : Entity
 
     protected abstract TOptions Options { init; }
 
+    // hmm
     protected abstract bool OptionsEquals(TOptions options);
-    protected virtual string OptionsToString(TOptions options) => options.ToString(); // hmm
+    protected virtual string OptionsToString(TOptions options) => options.ToString();
 
-    protected List<TTrack> Tracked { get; } = [];
+    private readonly List<TTrack> tracked = [];
+    protected IReadOnlyList<TTrack> Tracked => tracked;
 
     protected DepthRenderer()
     {
         Tag = Tags.Global;
     }
 
-    public void Track(TTrack toTrack) => Tracked.Add(toTrack);
-    public void Untrack(TTrack toUntrack) => Tracked.Remove(toUntrack);
+    public void Track(TTrack toTrack) => tracked.Add(toTrack);
+    public void Untrack(TTrack toUntrack) => tracked.Remove(toUntrack);
 
     public static TSelf GetRenderer(Scene scene, int depth, TOptions options)
     {
@@ -47,6 +49,7 @@ public abstract class DepthRenderer<TSelf, TTracked> : DepthRenderer<TSelf, TTra
 
     protected sealed override NoOptions Options { init { } }
     protected sealed override bool OptionsEquals(NoOptions options) => true;
+    protected sealed override string OptionsToString(NoOptions options) => throw new InvalidOperationException();
 
     public static TSelf GetRenderer(Scene scene, int depth) => GetRenderer(scene, depth, null);
 }
