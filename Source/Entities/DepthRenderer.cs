@@ -1,8 +1,8 @@
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 // generics :yum:
-public abstract class DepthRenderer<TSelf, TTracked, TOptions> : Entity
-    where TSelf : DepthRenderer<TSelf, TTracked, TOptions>, new()
+public abstract class DepthRenderer<TSelf, TTrack, TOptions> : Entity
+    where TSelf : DepthRenderer<TSelf, TTrack, TOptions>, new()
 {
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(DepthRenderer<,,>)}";
 
@@ -11,15 +11,15 @@ public abstract class DepthRenderer<TSelf, TTracked, TOptions> : Entity
     protected abstract bool OptionsEquals(TOptions options);
     protected virtual string OptionsToString(TOptions options) => options.ToString(); // hmm
 
-    protected List<TTracked> Tracked { get; } = [];
+    protected List<TTrack> Tracked { get; } = [];
 
     protected DepthRenderer()
     {
         Tag = Tags.Global;
     }
 
-    public void Track(TTracked toTrack) => Tracked.Add(toTrack);
-    public void Untrack(TTracked toUntrack) => Tracked.Remove(toUntrack);
+    public void Track(TTrack toTrack) => Tracked.Add(toTrack);
+    public void Untrack(TTrack toUntrack) => Tracked.Remove(toUntrack);
 
     public static TSelf GetRenderer(Scene scene, int depth, TOptions options)
     {
@@ -43,7 +43,7 @@ public abstract class DepthRenderer<TSelf, TTracked, TOptions> : Entity
 public abstract class DepthRenderer<TSelf, TTracked> : DepthRenderer<TSelf, TTracked, DepthRenderer<TSelf, TTracked>.NoOptions>
     where TSelf : DepthRenderer<TSelf, TTracked>, new()
 {
-    public class NoOptions { private NoOptions() { } }
+    public sealed class NoOptions { private NoOptions() { } }
 
     protected sealed override NoOptions Options { init { } }
     protected sealed override bool OptionsEquals(NoOptions options) => true;
