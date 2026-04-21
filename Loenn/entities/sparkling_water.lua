@@ -1,7 +1,7 @@
 local drawableRectangle = require("structs.drawable_rectangle")
 local utils = require("utils")
 local loadedState = require("loaded_state")
-local depths = require("mods").requireFromPlugin("libraries.depths")
+local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
 
 local water = {}
 
@@ -30,8 +30,8 @@ water.fieldOrder = {
 water.fieldInformation = {
     depth = {
         fieldType = "integer",
-        options = depths.addDepths(depths.getDepths(), {
-            {"Water", -9999},
+        options = sorbetHelper.getDepths({
+            {"Water", -9999}
         }),
         editable = true
     },

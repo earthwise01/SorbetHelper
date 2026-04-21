@@ -1,11 +1,10 @@
-local mods = require("mods")
-local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
+local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
 
 local entityStylegroundController = {}
 
 entityStylegroundController.name = "SorbetHelper/EntityStylegroundController"
-entityStylegroundController.sprite = sorbetUtils.getControllerSpriteFunction("entityStylegroundController")
-entityStylegroundController.depth = sorbetUtils.controllerDepth
+entityStylegroundController.sprite = sorbetHelper.getControllerSpriteFunction("entityStylegroundController")
+entityStylegroundController.depth = sorbetHelper.controllerDepth
 entityStylegroundController.placements = {
     name = "entity_as_styleground_controller",
     data = {
@@ -37,7 +36,7 @@ entityStylegroundController.fieldInformation = {
         elementSeparator = ",",
         elementDefault = "",
         elementOptions = {
-             options = function() return sorbetUtils.getMapSIDs() end,
+             options = function() return sorbetHelper.getMapSIDs() end,
              searchable = true
         }
     },
@@ -50,7 +49,7 @@ entityStylegroundController.fieldInformation = {
         allowEmpty = true
     },
     _instructionsButton = {
-        fieldType = "sorbetHelper.infoButton"
+        fieldType = "sorbet_helper.info_button"
     }
 }
 

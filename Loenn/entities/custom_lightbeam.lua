@@ -5,7 +5,7 @@ local drawableSprite = require("structs.drawable_sprite")
 local drawableText = require("structs.drawable_text")
 local constColors = require("consts.colors")
 local mods = require("mods")
-local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
+local sorbetHelper = mods.requireFromPlugin("libraries.sorbet_helper")
 local rainbowHelper = mods.requireFromPlugin("libraries.rainbow_helper")
 
 local customLightbeam = {}
@@ -139,7 +139,7 @@ customLightbeam.fieldInformation = {
     },
     depth = {
         fieldType = "integer",
-        options = sorbetUtils.getDepths({
+        options = sorbetHelper.getDepths({
             {"Lightbeams", -9998}
         }),
         editable = true
@@ -266,7 +266,7 @@ end
 function customLightbeam.nodeSprite(room, entity, node)
     local x, y = entity.x or 0, entity.y or 0
     local nx, ny = node.x or 0, node.y or 0
-    local anchor = sorbetUtils.getGenericNodeSprite(nx, ny, constColors.selectionCompleteNodeLineColor)
+    local anchor = sorbetHelper.getGenericNodeSprite(nx, ny, constColors.selectionCompleteNodeLineColor)
     local line = drawableLine.fromPoints({x, y, nx, ny}, constColors.selectionCompleteNodeLineColor)
     local desc = drawableText.fromText("Parallax Anchor", nx - 16, ny - 14, 32, 8, nil, 0.75)
 

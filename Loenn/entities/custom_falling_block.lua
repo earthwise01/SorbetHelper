@@ -1,6 +1,5 @@
 local fakeTilesHelper = require("helpers.fake_tiles")
-local mods = require("mods")
-local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
+local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
 
 local function createFallingBlockPlugin(entityName, placementName, placementAltName, fieldOrder, extraPlacementData, extraFieldInformation)
     local fallingBlock = {}
@@ -92,7 +91,7 @@ local function createFallingBlockPlugin(entityName, placementName, placementAltN
         },
         depth = {
             fieldType = "integer",
-            options = sorbetUtils.getDepths(),
+            options = sorbetHelper.getDepths(),
             editable = true
         }
     }

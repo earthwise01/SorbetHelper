@@ -2,8 +2,7 @@ local drawableRectangle = require("structs.drawable_rectangle")
 local utils = require("utils")
 local waterfallHelper = require("helpers.waterfalls")
 local connectedEntities = require("helpers.connected_entities")
-local mods = require("mods")
-local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
+local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
 
 local resizableWaterfall = {}
 
@@ -86,7 +85,7 @@ resizableWaterfall.fieldInformation = {
     },
     depth = {
         fieldType = "integer",
-        options = sorbetUtils.getDepths({
+        options = sorbetHelper.getDepths({
             {"Water & Waterfalls", -9999},
             {"FG Waterfalls", -49900}
         }),

@@ -6,23 +6,15 @@ local grid = require("ui.widgets.grid")
 
 local buttonField = {}
 
-buttonField.fieldType = "sorbetHelper.infoButton"
+buttonField.fieldType = "sorbet_helper.info_button"
 
 buttonField._MT = {}
 buttonField._MT.__index = {}
 
 -- these all do nothing since this field isn't intended for actually storing data
-function buttonField._MT.__index:setValue(value)
-    -- self.currentValue = value
-end
-
-function buttonField._MT.__index:getValue()
-    return true
-end
-
-function buttonField._MT.__index:fieldValid()
-    return true
-end
+function buttonField._MT.__index:setValue(value) end
+function buttonField._MT.__index:getValue() return true end
+function buttonField._MT.__index:fieldValid() return true end
 
 local function fieldChanged(formField)
     return function(element, new)
@@ -45,15 +37,15 @@ function buttonField.getElement(name, value, options)
     local button = uiElements.button(options.displayName or name, function() end)
     -- button.tooltipText = "Click button to open menu."
 
-    local description = options.tooltipText or "Error! No description found!"
+    local content = options.tooltipText or "No content found!"
 
     local buttonWithContext = contextMenu.addContextMenu(
         button,
         function()
-            return grid.getGrid({uiElements.label(description)}, 1)
+            return grid.getGrid({uiElements.label(content)}, 1)
         end,
         {
-            shouldShowMenu = function(self, x, y, button, istouch) return true end,
+            shouldShowMenu = function() return true end,
             mode = "focused"
         }
     )

@@ -1,6 +1,5 @@
 local fakeTilesHelper = require("helpers.fake_tiles")
-local mods = require("mods")
-local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
+local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
 
 local crumbleOnFlagBlock = {}
 
@@ -37,7 +36,7 @@ crumbleOnFlagBlock.fieldOrder = {
 crumbleOnFlagBlock.fieldInformation = fakeTilesHelper.addTileFieldInformation({
     depth = {
         fieldType = "integer",
-        options = sorbetUtils.getDepths({
+        options = sorbetHelper.getDepths({
             {"Crumble Wall On Rumble", -10010}
         }),
         editable = true

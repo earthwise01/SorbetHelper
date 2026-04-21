@@ -6,8 +6,8 @@ local matrix = require("utils.matrix")
 local bit = require("bit")
 local depths = require("consts.object_depths")
 local logging = require("logging")
-local mods = require("mods")
-local tileDepthHelper = mods.requireFromPlugin("libraries.depth_splitter_preview.tile_depth_helper")
+
+local tileDepthHelper = require("mods").requireFromPlugin("libraries.depth_splitter_preview.tile_depth_helper")
 
 local tilesFgDepth = depths.fgTerrain
 local tilesBgDepth = depths.bgTerrain

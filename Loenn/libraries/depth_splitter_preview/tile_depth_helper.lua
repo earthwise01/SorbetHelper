@@ -1,11 +1,10 @@
 local logging = require("logging")
-local mods = require("mods")
-local depths = require("consts.object_depths")
-local smartDrawingBatch = require("structs.smart_drawing_batch")
-local autotiler = require("autotiler")
 local meta = require("meta")
 local version = require("utils.version_parser")
-local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
+local depths = require("consts.object_depths")
+local utils = require("utils")
+local autotiler = require("autotiler")
+local smartDrawingBatch = require("structs.smart_drawing_batch")
 
 local tilesFgDepth = depths.fgTerrain
 local tilesBgDepth = depths.bgTerrain
@@ -64,7 +63,7 @@ function tileDepthHelper.updateTiletypeDepths(state)
             if entity._name == "SorbetHelper/SolidTilesDepthSplitter" then
                 local tiletypesToDepths = entity.backgroundTiles and tiletypesBgToDepths or tiletypesFgToDepths
 
-                for _, splitTiletype in ipairs(sorbetUtils.UTF8ToCharArray(entity.tiletypes)) do
+                for _, splitTiletype in ipairs(utils.splitUTF8(entity.tiletypes)) do
                     if tiletypesToDepths[splitTiletype] == nil then
                         tiletypesToDepths[splitTiletype] = tonumber(entity.depth)
                         enableMultipleTileDepths = true

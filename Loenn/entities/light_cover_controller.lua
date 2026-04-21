@@ -1,11 +1,10 @@
-local mods = require("mods")
-local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
+local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
 
 local lightCoverController = {}
 
 lightCoverController.name = "SorbetHelper/LightCoverController"
-lightCoverController.sprite = sorbetUtils.getControllerSpriteFunction("lightCoverController")
-lightCoverController.depth = sorbetUtils.controllerDepth
+lightCoverController.sprite = sorbetHelper.getControllerSpriteFunction("lightCoverController")
+lightCoverController.depth = sorbetHelper.controllerDepth
 lightCoverController.placements = {
     name = "light_cover_controller",
     data = {
@@ -34,7 +33,7 @@ lightCoverController.fieldInformation = {
         elementSeparator = ",",
         elementDefault = "",
         elementOptions = {
-             options = function() return sorbetUtils.getMapSIDs() end,
+             options = function() return sorbetHelper.getMapSIDs() end,
              searchable = true
         }
     },

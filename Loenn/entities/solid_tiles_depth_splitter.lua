@@ -1,12 +1,11 @@
 local fakeTilesHelper = require("helpers.fake_tiles")
-local mods = require("mods")
-local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
+local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
 
 local solidTilesDepthSplitter = {}
 
 solidTilesDepthSplitter.name = "SorbetHelper/SolidTilesDepthSplitter"
-solidTilesDepthSplitter.sprite = sorbetUtils.getControllerSpriteFunction("solidTilesDepthSplitter", true)
-solidTilesDepthSplitter.depth = sorbetUtils.controllerDepth
+solidTilesDepthSplitter.sprite = sorbetHelper.getControllerSpriteFunction("solidTilesDepthSplitter", true)
+solidTilesDepthSplitter.depth = sorbetHelper.controllerDepth
 solidTilesDepthSplitter.placements = {
     name = "tiletype_depth_splitter",
     alternativeName = "solid_tiles_depth_splitter",
@@ -28,7 +27,7 @@ function solidTilesDepthSplitter.fieldInformation(entity)
     return {
         depth = {
             fieldType = "integer",
-            options = sorbetUtils.getDepths({
+            options = sorbetHelper.getDepths({
                 {"Above FG Decals", -10510},
                 {"Above FG Terrain", -10010},
                 {"Above BG Terrain", 9990}
@@ -36,9 +35,8 @@ function solidTilesDepthSplitter.fieldInformation(entity)
             editable = true
         },
         tiletypes = {
-            fieldType = "sorbetHelper.unicodeCharList",
-            minimumElements = 0,
-            -- elementSeparator = "",
+            fieldType = "sorbet_helper.value_list",
+            elementSeparator = "",
             elementDefault = "3",
             elementOptions = {
                 options = fakeTilesHelper.getTilesOptions(entity.backgroundTiles and "tilesBg" or "tilesFg"),

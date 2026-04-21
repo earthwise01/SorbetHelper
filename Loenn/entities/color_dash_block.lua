@@ -141,7 +141,7 @@ function colorDashBlock.sprite(room, entity)
 
     for x = 1, tileWidth do
         for y = 1, tileHeight do
-            local sprite = getTileSprite(entity, x, y, frame, color, rectangles)
+            local sprite = getTileSprite(entity, x, y, frameTexture, color, rectangles)
 
             if sprite then
                 table.insert(sprites, sprite)

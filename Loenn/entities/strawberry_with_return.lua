@@ -4,8 +4,7 @@ local utils = require("utils")
 local drawing = require("utils.drawing")
 local colors = require("consts.colors")
 local entities = require("entities")
-local mods = require("mods")
-local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
+local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
 
 local returnBerry = {}
 
@@ -174,7 +173,7 @@ function returnBerry.nodeSprite(room, entity, node, nodeIndex, viewport)
     -- return curve
     table.insert(sprites, drawableLine.fromPoints(drawing.getSimpleCurve({x, y}, {endX, endY}, {anchorX, anchorY}), getWhite(0.65)))
     table.insert(sprites, drawableLine.fromPoints({x, y, anchorX, anchorY, endX, endY}, getWhite(0.2)))
-    table.insert(sprites, sorbetUtils.getGenericNodeSprite(anchorX, anchorY, getWhite(0.8)))
+    table.insert(sprites, sorbetHelper.getGenericNodeSprite(anchorX, anchorY, getWhite(0.8)))
 
     -- seed lines
     addSeeds(sprites, entity, true)

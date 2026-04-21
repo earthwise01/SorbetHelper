@@ -1,3 +1,7 @@
+-- copy of the default list field, modified to always use each item's raw value rather than current text (& i guess backport utf8 support to older loenn versions)
+-- https://github.com/CelestialCartographers/Loenn/blob/v1.0.9/src/ui/forms/fields/list.lua
+-- fixes issues with dropdowns
+
 local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
@@ -8,22 +12,18 @@ local iconUtils = require("ui.utils.icons")
 local contextMenu = require("ui.context_menu")
 local form = require("ui.forms.form")
 local languageRegistry = require("language_registry")
-local mods = require("mods")
-local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
 
--- 99.9% copy paste from the default loenn list field, just made to work when using unicode characters with an empty seperator
--- hopefully gets fixed upstreamm but this like   is better than letting it crash for now i guess
--- https://github.com/CelestialCartographers/Loenn/blob/ui-olympUI/src/ui/forms/fields/list.lua
-local listField = {}
+local valueListField = {}
 
-listField.fieldType = "sorbetHelper.unicodeCharList"
+valueListField.fieldType = "sorbet_helper.value_list"
 
 local function getValueParts(value, options)
     if value == nil then
         return {}
     end
 
-    local parts = sorbetUtils.UTF8ToCharArray(value)
+    local separator = options.elementSeparator ~= "" and options.elementSeparator or nil
+    local parts = utils.splitUTF8(value, separator)
 
     -- Special case for empty string and empty default
     -- Otherwise we will never be able to add when the field is empty
@@ -35,13 +35,13 @@ local function getValueParts(value, options)
 end
 
 local function joinValueParts(parts, options)
-    local joined = table.concat(parts)
+    local joined = table.concat(parts, options.elementSeparator)
 
     return joined
 end
 
 local function updateContextWindow(formField, options)
-    local content = listField.buildContextMenu(formField, options)
+    local content = valueListField.buildContextMenu(formField, options)
     local contextWindow = formField.contextWindow
 
     if contextWindow and contextWindow.parent then
@@ -142,20 +142,16 @@ local function getFormDataStrings(fields)
     local data = {}
 
     for _, field in ipairs(fields) do
-        local i = #data + 1
-
-        -- if field.getCurrentText then
-        --    data[i] = field:getCurrentText()
-
+        -- modified here !!
         if field.getValue then
-            data[i] = field:getValue()
+            data[#data + 1] = field:getValue()
         end
     end
 
     return data
 end
 
-function listField.updateSubElements(formField, options)
+function valueListField.updateSubElements(formField, options)
     if not formField then
         formField._subElements = {}
 
@@ -183,7 +179,7 @@ function listField.updateSubElements(formField, options)
     return formElements
 end
 
-function listField.buildContextMenu(formField, options)
+function valueListField.buildContextMenu(formField, options)
     local language = languageRegistry.getLanguage()
     local formElements = formField._subElements
     local columnElements = {}
@@ -247,7 +243,7 @@ local function addContextSpawner(formField, options)
             onClick = function(orig, self)
                 orig(self)
 
-                local contextWindow = contextMenu.showContextMenu(listField.buildContextMenu(formField, options), contextMenuOptions)
+                local contextWindow = contextMenu.showContextMenu(valueListField.buildContextMenu(formField, options), contextMenuOptions)
 
                 formField.contextWindow = contextWindow
             end
@@ -257,11 +253,12 @@ local function addContextSpawner(formField, options)
     end
 end
 
-function listField.getElement(name, value, options)
+function valueListField.getElement(name, value, options)
     -- Add extra options and pass it onto string field
     options = table.shallowcopy(options or {})
 
     options.elementOptions = options.elementOptions or {}
+    options.elementSeparator = options.elementSeparator or ","
     options.minimumElements = options.minimumElements or 0
     options.maximumElements = options.maximumElements or math.huge
 
@@ -276,14 +273,15 @@ function listField.getElement(name, value, options)
             return true
         end
 
-        local subElements = listField.updateSubElements(formField, options)
+        local subElements = valueListField.updateSubElements(formField, options)
 
         -- Do not trust the length of sub elements, might contain delete buttons
         local value = formField:getValue()
         local parts = {}
 
         if type(value) == "string" then
-            parts = sorbetUtils.UTF8ToCharArray(value)
+            local separator = options.elementSeparator ~= "" and options.elementSeparator or nil
+            parts = utils.splitUTF8(value, separator)
         end
 
         if #parts < options.minimumElements or #parts > options.maximumElements then
@@ -297,10 +295,10 @@ function listField.getElement(name, value, options)
 
     formField.options = options
 
-    listField.updateSubElements(formField, options)
+    valueListField.updateSubElements(formField, options)
     addContextSpawner(formField, options)
 
     return formField
 end
 
-return listField
+return valueListField

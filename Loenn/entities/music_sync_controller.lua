@@ -1,11 +1,10 @@
-local mods = require("mods")
-local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
+local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
 
 local musicSyncController = {}
 
 musicSyncController.name = "SorbetHelper/MusicSyncControllerFMOD"
-musicSyncController.sprite = sorbetUtils.getControllerSpriteFunction("musicSyncController", true, true)
-musicSyncController.depth = sorbetUtils.controllerDepth
+musicSyncController.sprite = sorbetHelper.getControllerSpriteFunction("musicSyncController", true, true)
+musicSyncController.depth = sorbetHelper.controllerDepth
 musicSyncController.placements = {
     name = "fmod_marker_to_flag_controller",
     alternativeName = "music_sync_controller",
@@ -28,7 +27,7 @@ musicSyncController.fieldInformation = {
         elementDefault = "event:/new_content/music/lvl10/final_run"
     },
     _infoButton = {
-        fieldType = "sorbetHelper.infoButton"
+        fieldType = "sorbet_helper.info_button"
     }
 }
 

@@ -1,13 +1,12 @@
 -- Legacy, replaced by the Styleground Depth Controller
 
-local mods = require("mods")
-local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
+local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
 
 local stylegroundEntityController = {}
 
 stylegroundEntityController.name = "SorbetHelper/StylegroundEntityController"
-stylegroundEntityController.sprite = sorbetUtils.getControllerSpriteFunction("stylegroundEntityController", true)
-stylegroundEntityController.depth = sorbetUtils.controllerDepth
+stylegroundEntityController.sprite = sorbetHelper.getControllerSpriteFunction("stylegroundEntityController", true)
+stylegroundEntityController.depth = sorbetHelper.controllerDepth
 
 stylegroundEntityController.fieldOrder = {
     "x", "y",
@@ -17,7 +16,7 @@ stylegroundEntityController.fieldOrder = {
 stylegroundEntityController.fieldInformation = {
     depth = {
         fieldType = "integer",
-        options = sorbetUtils.getDepths(),
+        options = sorbetHelper.getDepths(),
         editable = true
     }
 }

@@ -1,12 +1,11 @@
-local mods = require("mods")
-local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
+local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
 
 local displacementEffectBlocker = {}
 
 displacementEffectBlocker.name = "SorbetHelper/DisplacementEffectBlocker"
 displacementEffectBlocker.fillColor = {225 / 255, 245 / 255, 100 / 255, 0.25}
 displacementEffectBlocker.borderColor = {240 / 255, 210 / 255, 170 / 255, 0.5}
-displacementEffectBlocker.depth = sorbetUtils.controllerDepth
+displacementEffectBlocker.depth = sorbetHelper.controllerDepth
 displacementEffectBlocker.placements = {
     {
         name = "displacement_effect_blocker_full",
@@ -60,7 +59,7 @@ displacementEffectBlocker.fieldOrder = {
 displacementEffectBlocker.fieldInformation = {
     depth = {
         fieldType = "integer",
-        options = sorbetUtils.getDepths({
+        options = sorbetHelper.getDepths({
             {"Water & Waterfalls", -9999},
             {"FG Waterfalls", -49900}
         }),

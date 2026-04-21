@@ -1,5 +1,5 @@
 local drawableText = require("structs.drawable_text")
-local sorbetUtils = require("mods").requireFromPlugin("libraries.sorbet_utils")
+local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
 
 local controller = {}
 
@@ -65,7 +65,7 @@ controller.fieldInformation = {
 function controller.sprite(room, entity)
     local x, y = entity.x or 0, entity.y or 0
 
-    local sprites = sorbetUtils.getControllerSprites(x, y, "sparklingWaterColorController", entity.global or false)
+    local sprites = sorbetHelper.getControllerSprites(x, y, "sparklingWaterColorController", entity.global or false)
 
     if entity.affectedDepth then
         -- little silly but i think its cool mayb

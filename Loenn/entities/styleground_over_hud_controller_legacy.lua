@@ -1,13 +1,12 @@
 -- Legacy, replaced by the Styleground Depth Controller
 
-local mods = require("mods")
-local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
+local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
 
 local stylegroundOverHudController = {}
 
 stylegroundOverHudController.name = "SorbetHelper/StylegroundOverHudController"
-stylegroundOverHudController.sprite = sorbetUtils.getControllerSpriteFunction("stylegroundOverHudController", true, true)
-stylegroundOverHudController.depth = sorbetUtils.controllerDepth
+stylegroundOverHudController.sprite = sorbetHelper.getControllerSpriteFunction("stylegroundOverHudController", true, true)
+stylegroundOverHudController.depth = sorbetHelper.controllerDepth
 
 stylegroundOverHudController.fieldOrder = {
     "x", "y",
@@ -25,7 +24,7 @@ stylegroundOverHudController.fieldInformation = {
         editable = false
     },
     _instructionsButton = {
-        fieldType = "sorbetHelper.infoButton"
+        fieldType = "sorbet_helper.info_button"
     }
 }
 

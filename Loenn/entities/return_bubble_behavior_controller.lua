@@ -1,5 +1,4 @@
-local mods = require("mods")
-local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
+local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
 
 local returnBubbleBehaviorController = {}
 
@@ -12,7 +11,7 @@ local collisionModes = {
 
 returnBubbleBehaviorController.name = "SorbetHelper/ReturnBubbleBehaviorController"
 returnBubbleBehaviorController.texture = "editorSprites/SorbetHelper/returnBubbleBehaviorController"
-returnBubbleBehaviorController.depth = sorbetUtils.controllerDepth
+returnBubbleBehaviorController.depth = sorbetHelper.controllerDepth
 returnBubbleBehaviorController.placements = {
     name = "return_bubble_controller",
     data = {
@@ -38,7 +37,7 @@ returnBubbleBehaviorController.fieldInformation = {
         minimumValue = 0.0
     },
     easing = {
-        options = sorbetUtils.allEasings,
+        options = sorbetHelper.allEasings,
         editable = false
     },
     collisionMode = {

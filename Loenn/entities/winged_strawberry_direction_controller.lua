@@ -1,5 +1,4 @@
-local mods = require("mods")
-local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
+local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
 
 local wingedStrawberryDirectionController = {}
 
@@ -16,7 +15,7 @@ local directions = {
 
 wingedStrawberryDirectionController.name = "SorbetHelper/WingedStrawberryDirectionController"
 wingedStrawberryDirectionController.texture = "editorSprites/SorbetHelper/wingedStrawberryDirectionController"
-wingedStrawberryDirectionController.depth = sorbetUtils.controllerDepth
+wingedStrawberryDirectionController.depth = sorbetHelper.controllerDepth
 wingedStrawberryDirectionController.placements = {
     name = "winged_strawberry_direction_controller",
     data = {

@@ -4,53 +4,11 @@ local colors = require("consts.colors")
 local loadedState = require("loaded_state")
 local entities = require("entities")
 
-local sorbetUtils = {}
-
---- util functions ---
-
--- adapted from https://forums.solar2d.com/t/split-utf-8-string-word-with-foreign-characters-to-letters/320463/2
-function sorbetUtils.UTF8ToCharArray(str)
-    local charArray = {}
-    local iStart = 0
-    local strLen = str:len()
-
-    local function bit(b)
-        return 2 ^ (b - 1)
-    end
-    local function hasBit(w, b)
-        return w % (b + b) >= b
-    end
-    local function checkMultiByte(i)
-        if iStart ~= 0 then
-            charArray[#charArray + 1] = str:sub(iStart, i - 1)
-            iStart = 0
-        end
-    end
-
-    for i = 1, strLen do
-        local b = str:byte(i)
-        local multiStart = hasBit(b, bit(7)) and hasBit(b, bit(8))
-        local multiTrail = not hasBit(b, bit(7)) and hasBit(b, bit(8))
-
-        if multiStart then
-            checkMultiByte(i)
-            iStart = i
-
-        elseif not multiTrail then
-            checkMultiByte(i)
-            charArray[#charArray + 1] = str:sub(i, i)
-        end
-    end
-
-    -- process if last character is multi-byte
-    checkMultiByte(strLen + 1)
-
-    return charArray
-end
+local sorbetHelper = {}
 
 --- field information options ---
 
-function sorbetUtils.getAllSIDs()
+function sorbetHelper.getAllSIDs()
     local sids = {}
     for k, v in pairs(entities.registeredEntities) do
         table.insert(sids, k)
@@ -60,8 +18,8 @@ function sorbetUtils.getAllSIDs()
     return sids
 end
 
-function sorbetUtils.getMapSIDs()
-    if not loadedState.map then return sorbetUtils.getAllSIDs() end
+function sorbetHelper.getMapSIDs()
+    if not loadedState.map then return sorbetHelper.getAllSIDs() end
 
     local sidsInMap = {}
     for _, room in pairs(loadedState.map.rooms) do
@@ -79,7 +37,7 @@ function sorbetUtils.getMapSIDs()
     return sids
 end
 
-function sorbetUtils.getDepths(extraOptions)
+function sorbetHelper.getDepths(extraOptions)
     local depthOptions = {
         {"BG Terrain (10000)", 10000},
         {"BG Mirrors (9500)", 9500},
@@ -140,7 +98,7 @@ function sorbetUtils.getDepths(extraOptions)
     return depthOptions
 end
 
-sorbetUtils.simpleEasings = {
+sorbetHelper.simpleEasings = {
     "Linear",
     "SineIn", "SineOut", "SineInOut",
     "QuadIn", "QuadOut", "QuadInOut",
@@ -149,7 +107,7 @@ sorbetUtils.simpleEasings = {
     "ExpoIn", "ExpoOut", "ExpoInOut"
 }
 
-sorbetUtils.allEasings = {
+sorbetHelper.allEasings = {
     "Linear",
     "SineIn", "SineOut", "SineInOut",
     "QuadIn", "QuadOut", "QuadInOut",
@@ -164,9 +122,9 @@ sorbetUtils.allEasings = {
 
 --- sprite utils ---
 
-sorbetUtils.controllerDepth = -1000010
+sorbetHelper.controllerDepth = -1000010
 
-function sorbetUtils.checkForDuplicateInMap(self, isTrigger, duplicateCheck)
+function sorbetHelper.checkForDuplicateInMap(self, isTrigger, duplicateCheck)
     isTrigger = isTrigger or false
     local map = loadedState.map
     if not map then return false end
@@ -190,17 +148,17 @@ end
 
 --- sprite functions ---
 
-function sorbetUtils.getGenericNodeSprite(x, y, color)
+function sorbetHelper.getGenericNodeSprite(x, y, color)
     local color = color or colors.selectionCompleteNodeLineColor
 
     local sprite = drawableSprite.fromTexture("editorSprites/SorbetHelper/nodeMarker", {x = x, y = y, color = color})
     sprite.rotation = math.pi / 4
-    sprite:setScale(0.9428090415820632)
+    sprite:setScale(0.9428090415820632) -- evil magic constant ..
 
     return sprite
 end
 
-function sorbetUtils.getControllerSprites(x, y, texture, global, warning)
+function sorbetHelper.getControllerSprites(x, y, texture, global, warning)
     texture = texture and "editorSprites/SorbetHelper/" .. texture or "@Internal@/northern_lights"
 
     local sprite = drawableSprite.fromTexture(texture, {x = x, y = y})
@@ -217,16 +175,16 @@ function sorbetUtils.getControllerSprites(x, y, texture, global, warning)
     return sprites
 end
 
-function sorbetUtils.getControllerSpriteFunction(textureName, globalCheck, noDuplicates)
+function sorbetHelper.getControllerSpriteFunction(textureName, globalCheck, noDuplicates)
     globalCheck = globalCheck or function(room, entity) return entity.global or false end
 
     return function(room, entity)
-        local warning = noDuplicates and sorbetUtils.checkForDuplicateInMap(entity) and "!Duplicate!" or nil
+        local warning = noDuplicates and sorbetHelper.checkForDuplicateInMap(entity) and "!Duplicate!" or nil
         local global = type(globalCheck) == "boolean" and globalCheck or globalCheck(room, entity)
-        return sorbetUtils.getControllerSprites(entity.x or 0, entity.y or 0, textureName, global, warning)
+        return sorbetHelper.getControllerSprites(entity.x or 0, entity.y or 0, textureName, global, warning)
     end
 end
 
 ---
 
-return sorbetUtils
+return sorbetHelper

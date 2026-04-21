@@ -1,12 +1,11 @@
-local mods = require("mods")
-local sorbetUtils = mods.requireFromPlugin("libraries.sorbet_utils")
+local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
 
 local displacementDepthFixer = {}
 
 displacementDepthFixer.name = "SorbetHelper/DepthAdheringDisplacementWrapper"
 displacementDepthFixer.fillColor = {100 / 255, 225 / 255, 245 / 255, 0.25}
 displacementDepthFixer.borderColor = {183 / 255, 250 / 255, 221 / 255, 0.5}
-displacementDepthFixer.depth = sorbetUtils.controllerDepth
+displacementDepthFixer.depth = sorbetHelper.controllerDepth
 displacementDepthFixer.placements = {
     {
         name = "displacement_depth_fixer",
@@ -52,7 +51,7 @@ displacementDepthFixer.fieldInformation = {
         elementSeparator = ",",
         elementDefault = "",
         elementOptions = {
-             options = function() return sorbetUtils.getMapSIDs() end,
+             options = function() return sorbetHelper.getMapSIDs() end,
              searchable = true
         },
 
