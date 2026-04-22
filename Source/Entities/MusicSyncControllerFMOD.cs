@@ -11,8 +11,8 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 // https://github.com/CommunalHelper/CommunalHelper/tree/music-synced-entities
 
 // bleughh this rly needs a refactor
-[GlobalEntity]
 [CustomEntity("SorbetHelper/MusicSyncControllerFMOD")]
+[GlobalEntity]
 [Tracked]
 public class MusicSyncControllerFMOD : Entity
 {

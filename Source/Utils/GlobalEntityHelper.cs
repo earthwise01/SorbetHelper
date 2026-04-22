@@ -1,55 +1,64 @@
 namespace Celeste.Mod.SorbetHelper.Utils;
 
-internal static class GlobalEntities
+/// <summary>
+/// Registers an <see cref="Entity"/> that has a <see cref="CustomEntityAttribute"/> to be loaded during the <see cref="Everest.Events.LevelLoader.OnLoadingThread"/> event rather than when its room is loaded.<br/>
+/// Automatically adds the <see cref="Tags.Global"/> tag.
+/// </summary>
+/// <param name="onlyGlobalIf">If not <see langword="null"/>, the name of a <see langword="bool"/> value in the entity's <see cref="EntityData"/> that must be true for the entity to be treated as a global entity.</param>
+[AttributeUsage(AttributeTargets.Class, Inherited = false)]
+internal class GlobalEntityAttribute(string onlyGlobalIf = null) : Attribute
 {
-    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(GlobalEntities)}";
+    public readonly string OnlyGlobalIf = onlyGlobalIf;
+}
+
+internal static class GlobalEntityHelper
+{
+    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(GlobalEntityHelper)}";
 
     public const string ForceGlobalAttribute = "sorbetHelper_makeGlobal";
 
-    private static readonly Dictionary<string, string> GlobalEntityIDs = [];
+    private static readonly Dictionary<string, string> GlobalEntitySIDs = [];
 
     private static bool loadingGlobalEntities = false;
 
     private static bool IsGlobalEntity(EntityData entityData)
-        => (GlobalEntityIDs.TryGetValue(entityData.Name, out string onlyIfAttr)
-            && (string.IsNullOrEmpty(onlyIfAttr) || entityData.Bool(onlyIfAttr)))
+        => (GlobalEntitySIDs.TryGetValue(entityData.Name, out string onlyGlobalIf)
+            && (string.IsNullOrEmpty(onlyGlobalIf) || entityData.Bool(onlyGlobalIf)))
         || entityData.Bool(ForceGlobalAttribute);
 
 
-    public static void ProcessAttributes(Assembly assembly)
+    private static void ProcessAttributes(Assembly assembly)
     {
         Type[] types = assembly.GetTypesSafe();
 
         foreach (Type type in types)
         {
-            GlobalEntityAttribute globalAttr = type.GetCustomAttribute<GlobalEntityAttribute>();
-            if (globalAttr is null)
+            GlobalEntityAttribute globalEntityAttr = type.GetCustomAttribute<GlobalEntityAttribute>();
+            if (globalEntityAttr is null)
                 continue;
 
-            string[] ids = globalAttr.IDs;
-            string onlyIfAttr = globalAttr.OnlyIfAttr;
+            string onlyGlobalIf = globalEntityAttr.OnlyGlobalIf;
 
-            // if no ids specified try grabbing them from a custom entity attribute
-            if (ids.Length == 0 && type.GetCustomAttribute<CustomEntityAttribute>() is { } customEntity)
+            if (type.GetCustomAttribute<CustomEntityAttribute>() is not { } customEntityAttr)
             {
-                ids = new string[customEntity.IDs.Length];
-                for (int i = 0; i < ids.Length; i++)
-                    ids[i] = customEntity.IDs[i].Split('=')[0].Trim();
+                Logger.Warn(LogID, $"{type.FullName} has a {nameof(GlobalEntityAttribute)} without a corrosponding {nameof(CustomEntityAttribute)}!");
+                continue;
             }
 
-            foreach (string id in ids)
-                RegisterGlobalEntity(id, onlyIfAttr);
+            foreach (string entitySid in customEntityAttr.IDs)
+                RegisterGlobalEntity(entitySid.Split('=')[0].Trim(), onlyGlobalIf);
         }
     }
 
-    public static void RegisterGlobalEntity(string id, string onlyIfAttr)
-        => GlobalEntityIDs.Add(id, onlyIfAttr);
+    public static void RegisterGlobalEntity(string entitySid, string onlyGlobalIf)
+        => GlobalEntitySIDs.Add(entitySid, onlyGlobalIf);
 
     #region Hooks
 
     [OnLoad]
     internal static void ProcessSorbetHelperAssembly()
     {
+        // hmm
         ProcessAttributes(typeof(SorbetHelperModule).Assembly);
     }
 
@@ -101,13 +110,9 @@ internal static class GlobalEntities
         level.Session.Level = origLevel;
     }
 
+    // prevent global entities from loading normally
     private static bool Event_OnLoadEntity(Level level, LevelData levelData, Vector2 offset, EntityData entityData)
     {
-        // don't give any failed to load warnings for map data processed entities
-        if (entityData.Name == SorbetHelperMapDataProcessor.MapDataProcessedSID)
-            return true;
-
-        // don't load global entities in Level.LoadCustomEntity
         if (!loadingGlobalEntities && IsGlobalEntity(entityData))
             return true;
 
@@ -115,21 +120,4 @@ internal static class GlobalEntities
     }
 
     #endregion
-}
-
-
-/// <summary>
-/// Registers an <see cref="Entity"/> that has a <see cref="CustomEntityAttribute"/> to be loaded during the <see cref="Everest.Events.LevelLoader.OnLoadingThread"/> event rather than when its room is loaded.<br/>
-/// Automatically adds the <see cref="Tags.Global"/> tag.
-/// </summary>
-/// <param name="ids">A list of entity SIDs associated with the targetted entity to treat as global entities. If empty, defaults to all SIDs listed in its <see cref="CustomEntityAttribute"/>.</param>
-[AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
-public class GlobalEntityAttribute(params string[] ids) : Attribute
-{
-    public readonly string[] IDs = ids;
-
-    /// <summary>
-    /// If not null, the name of a <see langword="bool"/> value in the entity's <see cref="EntityData"/> that must be true for the entity to be treated as a global entity.
-    /// </summary>
-    public string OnlyIfAttr = null;
 }

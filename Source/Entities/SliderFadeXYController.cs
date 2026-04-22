@@ -2,8 +2,8 @@ using System.Globalization;
 
 namespace Celeste.Mod.SorbetHelper.Entities;
 
-[GlobalEntity(OnlyIfAttr = "global")]
 [CustomEntity("SorbetHelper/SliderFadeXY")]
+[GlobalEntity(onlyGlobalIf: "global")]
 public class SliderFadeXYController : Entity
 {
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(SliderFadeXYController)}";

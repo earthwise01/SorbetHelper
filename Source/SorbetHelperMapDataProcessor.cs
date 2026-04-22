@@ -4,7 +4,7 @@ internal class SorbetHelperMapDataProcessor : EverestMapDataProcessor
 {
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(SorbetHelperMapDataProcessor)}";
 
-    public const string MapDataProcessedSID = "SorbetHelper/MapDataProcessed";
+    private const string MapDataProcessedSID = "SorbetHelper/MapDataProcessed";
 
     public static Dictionary<(int, AreaMode), List<StylegroundDepthController.StylegroundDepthControllerData>> StylegroundDepthControllers { get; } = [];
     public static Dictionary<(int, AreaMode), HashSet<string>> MusicSyncEvents { get; } = [];
@@ -78,4 +78,29 @@ internal class SorbetHelperMapDataProcessor : EverestMapDataProcessor
     {
 
     }
+
+    #region Hooks
+
+    [OnLoad]
+    internal static void Load()
+    {
+        Everest.Events.Level.OnLoadEntity += Event_OnLoadEntity;
+    }
+
+    [OnUnload]
+    internal static void Unload()
+    {
+        Everest.Events.Level.OnLoadEntity -= Event_OnLoadEntity;
+    }
+
+    private static bool Event_OnLoadEntity(Level level, LevelData levelData, Vector2 offset, EntityData entityData)
+    {
+        // don't give any failed to load warnings for map data processed entities
+        if (entityData.Name == MapDataProcessedSID)
+            return true;
+
+        return false;
+    }
+
+    #endregion
 }

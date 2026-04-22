@@ -1,7 +1,7 @@
 namespace Celeste.Mod.SorbetHelper.Entities;
 
-[GlobalEntity]
 [CustomEntity("SorbetHelper/SolidTilesDepthSplitter")]
+[GlobalEntity]
 public class SolidTilesDepthSplitter : Entity
 {
     public static Entity Load(Level level, LevelData levelData, Vector2 position, EntityData entityData)
