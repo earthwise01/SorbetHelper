@@ -205,6 +205,7 @@ entities.SorbetHelper/CustomLightbeam.attributes.description.noParticles=Whether
 entities.SorbetHelper/CustomLightbeam.attributes.description.texture=The texture of the lightbeam. Vanilla texture is 'util/lightbeam'.
 entities.SorbetHelper/CustomLightbeam.attributes.description.color=The color of the lightbeam.
 entities.SorbetHelper/CustomLightbeam.attributes.description.alpha=The alpha of the lightbeam.
+entities.SorbetHelper/CustomLightbeam.attributes.description.additive=Whether the lightbeam should be rendered with additive blending.
 entities.SorbetHelper/CustomLightbeam.attributes.description.rainbow=Whether the lightbeam is rainbow.
 entities.SorbetHelper/CustomLightbeam.attributes.description.useCustomRainbowColors=When checked, overrides the normal rainbow colors (whether vanilla or from a rainbow spinner color controller) with custom ones specified by the lightbeam.\nChanging this requires clicking save changes and reopening this menu for the correct settings to appear.\n(Requires rainbow to be checked)
 entities.SorbetHelper/CustomLightbeam.attributes.name.colors=Rainbow Colors
@@ -237,7 +238,7 @@ entities.SorbetHelper/StylegroundOverHudController.attributes.name._instructions
 entities.SorbetHelper/StylegroundOverHudController.attributes.description._instructionsButton=hi! i wanted to put this somewhere decently visible so here's a rough overview on how to use this controller\n\n~~~ the Important Stuff ~~~\n- you only need *one controller per map*! so as long as you have one even just like. sitting in the corner of a random filler room or something, the controller should be enabled.\n- once you have a controller somewhere, in order for your stylegrounds to actually appear above the hud, you'll need to add 'sorbetHelper_drawAboveHud' into their tag fields.\n- you're done! any stylegrounds with that tag should now be rendering on top of input prompts, textboxes, etc.\n\n~~~ some additional info/random stuff ~~~\n- currently, above hud stylegrounds will be unaffected by colorgrades due to Technical Limitations.\n\n- additive blendmode stylegrounds are supported, but pls note that also due to Technical Limitations, will always render above non-additive stylegrounds.\n\n- the controller will disable its effect on stylegrounds if the game is paused, but this can be changed to make them completely unaffected by pausing.\n  see the tooltip as well, but in the end it probably mostly comes down to personal preference abt what'd work best for your stylegrounds, though i would vaugely suggest:\n    'Disable When Paused' for consistency with vanilla or if your stylegrounds are decently busy in general/might cover up too much of the pause menu.\n    'Update When Paused' if your stylegrounds have at least some movement, aren't insanely busy and you want maximum *atmosphere and immersion* or something.
 
 # Return Bubble Behavior Controller
-entities.SorbetHelper/ReturnBubbleBehaviorController.placements.name.return_bubble_controller=Return Bubble Controller
+entities.SorbetHelper/ReturnBubbleBehaviorController.placements.name.return_bubble_controller=Return Bubble Tweaks Controller
 entities.SorbetHelper/ReturnBubbleBehaviorController.placements.description.return_bubble_controller=A controller which has options for configuring the return bubble player state (StCassetteFly).
 entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.time=How long (in seconds) it should take the bubble to move to its destination.\nVanilla value is 0.625 (1 / 1.6).
 entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.speed=A speed the bubble should use to approximately determine its move time, if Use Speed is enabled.
@@ -330,11 +331,11 @@ entities.SorbetHelper/SliderFadeXY.attributes.description.fadeY=Format is "FromP
 entities.SorbetHelper/SliderFadeXY.attributes.description.global=Whether the slider's value should be updated globally, even when not in the room containing this controller.
 
 # Solid Tiles Depth Splitter
-entities.SorbetHelper/SolidTilesDepthSplitter.placements.name.tiletype_depth_splitter=Tiletype Depth Splitter
-entities.SorbetHelper/SolidTilesDepthSplitter.placements.description.tiletype_depth_splitter=A controller which allows changing the visual depth of specified tiletypes, and can automatically fill in any gaps on their edges visible from using the ignores attribute.
+entities.SorbetHelper/SolidTilesDepthSplitter.placements.name.tileset_depth_splitter=Tileset Depth Splitter
+entities.SorbetHelper/SolidTilesDepthSplitter.placements.description.tileset_depth_splitter=A controller which allows changing the visual depth of specified tiletypes, and can automatically fill in any gaps on their edges visible from using the ignores attribute.
 entities.SorbetHelper/SolidTilesDepthSplitter.placements.name.solid_tiles_depth_splitter=Solid Tiles Depth Splitter
-entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.depth=The visual depth the split tiles should be drawn at.\nHigher values mean farther behind in the scene.
-entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.tiletypes=The list of tiletypes to split.
+entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.depth=Determines the visual depth the split tiletypes should be drawn at.\nHigher values mean farther behind in the scene.
+entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.tiletypes=Determines the tiletypes the controller should split.
 entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.tryFillBehind=Whether to try and automatically fill in any gaps behind the edges of the split tiletypes with the tiletypes around them.
 entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.backgroundTiles=Whether to split background tiles instead of foreground tiles.\nChanging this requires clicking save changes and reopening this menu for the tiletype menu to show the correct options.
 
@@ -431,8 +432,8 @@ entities.SorbetHelper/DarknessTransparencyFixController.attributes.description.g
 
 # Sparkling Water
 entities.SorbetHelper/SparklingWater.placements.name.sparkling_water=Sparkling Water
-entities.SorbetHelper/SparklingWater.placements.description.sparkling_water=A custom version of water with a different aesthetic.
-entities.SorbetHelper/SparklingWater.attributes.description.depth=The visual depth of the water.\nHigher values mean farther behind in the scene, default value is -9999.\nIt is recommended to keep this value consistent between different water entities as much as possible for performance reasons.
+entities.SorbetHelper/SparklingWater.placements.description.sparkling_water=A custom variation of water with a different aesthetic.
+entities.SorbetHelper/SparklingWater.attributes.description.depth=The visual depth of the water.\nHigher values mean farther behind in the scene, default value is -9999.\nIt is recommended to keep this value consistent between different Sparkling Water entities as much as possible for performance reasons.
 entities.SorbetHelper/SparklingWater.attributes.description.collidable=Whether water is collidable and can be swam in.\nWaterfalls will still collide with the water, but only if placed before it.
 entities.SorbetHelper/SparklingWater.attributes.description.canSplash=Whether the water will ripple when the player touches it.
 entities.SorbetHelper/SparklingWater.attributes.description.topSurface=Whether the water has a top surface.

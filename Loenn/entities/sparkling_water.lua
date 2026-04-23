@@ -16,7 +16,7 @@ sparklingWater.placements = {
         collidable = true,
         canSplash = true,
         topSurface = true,
-        bottomSurface = false,
+        bottomSurface = false
     }
 }
 
@@ -24,7 +24,7 @@ sparklingWater.fieldOrder = {
     "x", "y",
     "width", "height",
     "depth", "collidable", "canSplash",
-    "topSurface", "bottomSurface",=
+    "topSurface", "bottomSurface"
 }
 
 sparklingWater.fieldInformation = {
@@ -34,7 +34,7 @@ sparklingWater.fieldInformation = {
             {"Water", -9999}
         }),
         editable = true
-    },
+    }
 }
 
 function sparklingWater.rectangle(room, entity)

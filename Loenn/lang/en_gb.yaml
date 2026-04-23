@@ -309,6 +309,8 @@ Entities:
         Description: The color of the lightbeam.
       alpha:
         Description: The alpha of the lightbeam.
+      additive:
+        Description: Whether the lightbeam should be rendered with additive blending.
       rainbow:
         Description: Whether the lightbeam is rainbow.
       useCustomRainbowColors:
@@ -402,7 +404,7 @@ Entities:
   SorbetHelper/ReturnBubbleBehaviorController:
     Placements:
       return_bubble_controller:
-        Name: Return Bubble Controller
+        Name: Return Bubble Tweaks Controller
         Description: A controller which has options for configuring the return bubble player state (StCassetteFly).
     Attributes:
       time:
@@ -630,19 +632,19 @@ Entities:
   SorbetHelper/SolidTilesDepthSplitter:
     Placements:
       # this shouldve probablyyy been called like Tiletype Depth Controller or something but   oh well,
-      # does tiletype depth splitter work maybee ..?
-      tiletype_depth_splitter:
-        Name: Tiletype Depth Splitter
+      # does tiletype/tileset depth splitter work maybee ..?
+      tileset_depth_splitter:
+        Name: Tileset Depth Splitter
         Description: A controller which allows changing the visual depth of specified tiletypes, and can automatically fill in any gaps on their edges visible from using the ignores attribute.
       solid_tiles_depth_splitter:
         Name: Solid Tiles Depth Splitter
     Attributes:
       depth:
         Description: |-
-          The visual depth the split tiles should be drawn at.
+          Determines the visual depth the split tiletypes should be drawn at.
           Higher values mean farther behind in the scene.
       tiletypes:
-        Description: The list of tiletypes to split.
+        Description: Determines the tiletypes the controller should split.
       tryFillBehind:
         Description: Whether to try and automatically fill in any gaps behind the edges of the split tiletypes with the tiletypes around them.
       backgroundTiles:
@@ -849,13 +851,13 @@ Entities:
     Placements:
       sparkling_water:
         Name: Sparkling Water
-        Description: A custom version of water with a different aesthetic.
+        Description: A custom variation of water with a different aesthetic.
     Attributes:
       depth:
         Description: |-
           The visual depth of the water.
           Higher values mean farther behind in the scene, default value is -9999.
-          It is recommended to keep this value consistent between different water entities as much as possible for performance reasons.
+          It is recommended to keep this value consistent between different Sparkling Water entities as much as possible for performance reasons.
       collidable:
         Description: |-
           Whether water is collidable and can be swam in.
