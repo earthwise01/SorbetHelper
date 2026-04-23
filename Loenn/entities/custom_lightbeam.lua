@@ -12,32 +12,38 @@ local customLightbeam = {}
 
 customLightbeam.name = "SorbetHelper/CustomLightbeam"
 customLightbeam.placements = {
+    -- todo: should i be using this or maybe just the `default` fieldInformation options ? or even some custom way of declaring them
+    default = {
+        data = {
+            rotation = 0.0,
+            depth = -9998,
+            flag = "",
+            inverted = false,
+            flagFadeTime = 0.25,
+            fadeWhenNear = true,
+            fadeOnTransition = true,
+            noParticles = false,
+            texture = "util/lightbeam",
+            color = "ccffff",
+            alpha = 1.0,
+            additive = false,
+            rainbow = false,
+            singleColor = false,
+            useCustomRainbowColors = false,
+            colors = "89e5ae,88e0e0,87a9dd,9887db,d088e2",
+            gradientSize = 280.0,
+            gradientSpeed = 50.0,
+            loopColors = false,
+            centerX = 0.0,
+            centerY = 0.0,
+            scroll = 1.0
+        }
+    },
     {
         name = "custom_lightbeam",
         data = {
             width = 32,
-            height = 24,
-            flag = "",
-            inverted = false,
-            rotation = 0.0,
-            depth = -9998,
-            noParticles = false,
-            texture = "util/lightbeam",
-            color = "CCFFFF",
-            alpha = 1.0,
-            rainbow = false,
-            useCustomRainbowColors = false,
-            colors = "89E5AE,88E0E0,87A9DD,9887DB,D088E2",
-            gradientSize = 280.0,
-            loopColors = false,
-            centerX = 0.0,
-            centerY = 0.0,
-            gradientSpeed = 50.0,
-            singleColor = false,
-            fadeWhenNear = true,
-            fadeOnTransition = true,
-            flagFadeTime = 0.25,
-            scroll = 1.0,
+            height = 24
         }
     },
     {
@@ -46,27 +52,7 @@ customLightbeam.placements = {
         data = {
             width = 32,
             height = 24,
-            flag = "",
-            inverted = false,
-            rotation = 0.0,
-            depth = -9998,
-            noParticles = false,
-            texture = "util/lightbeam",
-            color = "CCFFFF",
-            alpha = 1.0,
-            rainbow = true,
-            useCustomRainbowColors = false,
-            colors = "89E5AE,88E0E0,87A9DD,9887DB,D088E2",
-            gradientSize = 280.0,
-            loopColors = false,
-            centerX = 0.0,
-            centerY = 0.0,
-            gradientSpeed = 50.0,
-            singleColor = false,
-            fadeWhenNear = true,
-            fadeOnTransition = true,
-            flagFadeTime = 0.25,
-            scroll = 1.0,
+            rainbow = true
         }
     },
 }
@@ -87,39 +73,56 @@ function customLightbeam.ignoredFields(entity)
 end
 
 function customLightbeam.fieldOrder(entity)
-    --  this sucksss  why do i always put effort into trying to make these look pretty
-    if entity.rainbow and entity.useCustomRainbowColors then
-        return {
-            "x", "y",
-            "width", "height",
-            "colors", "centerX",
-            "gradientSize", "centerY",
-            "gradientSpeed", "alpha",
-            "depth", "rotation",
-            "flag",
-            "scroll",
-            "flagFadeTime",
-            "texture", "inverted", "fadeOnTransition",
-            "rainbow", "useCustomRainbowColors", "noParticles", "fadeWhenNear",
-            "singleColor", "loopColors"
-        }
-    else
+    if not entity.rainbow or not entity.useCustomRainbowColors then
         return {
             "x", "y",
             "width", "height",
             "color", "alpha",
             "depth", "rotation",
-            "flag",
-            "scroll",
-            "flagFadeTime",
-            "texture", "inverted", "fadeOnTransition",
-            "rainbow", "useCustomRainbowColors", "noParticles", "fadeWhenNear",
-            "singleColor"
+            "texture", "scroll",
+            "flag", "flagFadeTime",
+            "inverted", "fadeOnTransition", "fadeWhenNear", "noParticles",
+            "rainbow", "useCustomRainbowColors", "singleColor", "additive"
+        }
+    else
+        return {
+            "x", "y",
+            "width", "height",
+            "colors", "alpha",
+            "gradientSize", "centerX",
+            "gradientSpeed", "centerY",
+            "depth", "rotation",
+            "texture", "scroll",
+            "flag", "flagFadeTime",
+            "inverted", "fadeOnTransition", "fadeWhenNear", "noParticles",
+            "rainbow", "useCustomRainbowColors", "singleColor", "additive",
+            "loopColors"
         }
     end
 end
 
 customLightbeam.fieldInformation = {
+    depth = {
+        fieldType = "integer",
+        options = sorbetHelper.getDepths({
+            {"Lightbeams", -9998}
+        }),
+        editable = true
+    },
+    flagFadeTime = {
+        minimumValue = 0.0
+    },
+    color = {
+        fieldType = "color"
+    },
+    alpha = {
+        default = 1.0,
+        maximumValue = 1.0,
+        minimumValue = 0.0
+    },
+    additive = {
+        default = false
+    },
     colors = {
         fieldType = "list",
         elementOptions = {
@@ -127,22 +130,8 @@ customLightbeam.fieldInformation = {
             showAlpha = true
         }
     },
-    color = {
-        fieldType = "color"
-    },
-    alpha = {
-        maximumValue = 1.0,
-        minimumValue = 0.0
-    },
-    flagFadeTime = {
-        minimumValue = 0.0
-    },
-    depth = {
-        fieldType = "integer",
-        options = sorbetHelper.getDepths({
-            {"Lightbeams", -9998}
-        }),
-        editable = true
+    scroll = {
+        default = 1.0
     }
 }
 

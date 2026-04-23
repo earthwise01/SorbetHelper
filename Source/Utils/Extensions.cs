@@ -212,7 +212,7 @@ internal static class Extensions
     extension(Session self)
     {
         public bool GetFlag(string flag, bool inverted)
-            => self.GetFlag(flag) != inverted;
+            => self.GetFlag(flag) ^ inverted;
     }
 
     #endregion

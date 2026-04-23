@@ -138,13 +138,13 @@ public class ParallaxHiResSnow : HiResBackdrop
         Color color = Color * visibleFade * cameraFade;
         if (ExtendedVariantsCompat.IsLoaded)
             color *= ExtendedVariantsCompat.GetForegroundEffectOpacity();
-        float additiveMultiplier = 1f - additiveBlend;
+        if (additiveBlend > 0f)
+            color.A = (byte)(color.A * (1f - additiveBlend));
 
         float stretchSpeed = Calc.Clamp(Direction.Length(), 0f, 20f);
+        bool shouldStretch = speedStretching && stretchSpeed > 1f;
         float stretchRotate = 0f;
         Vector2 stretchScale = Vector2.One;
-        bool shouldStretch = stretchSpeed > 1f && speedStretching;
-
         if (shouldStretch)
         {
             stretchRotate = Direction.Angle();
@@ -172,14 +172,9 @@ public class ParallaxHiResSnow : HiResBackdrop
             if (particle.Alpha < 1f)
                 particleColor *= particle.Alpha;
 
-            // additive blending!! i love premultiplied alpha
-            if (additiveMultiplier < 1f)
-                particleColor = new Color(particleColor.R, particleColor.G, particleColor.B, (int)(particleColor.A * additiveMultiplier));
-
-
             for (float x = 0f; x < camera.Width + OffscreenPadding; x += 320f + OffscreenPadding * 2f)
             for (float y = 0f; y < camera.Height + OffscreenPadding; y += 180f + OffscreenPadding * 2f)
-                particleTexture.DrawCentered(renderPosition + new Vector2(x, y), particleColor, renderScale, shouldStretch ? stretchRotate : particles[i].Rotation);
+                particleTexture.DrawCentered(renderPosition + new Vector2(x, y), particleColor, renderScale, shouldStretch ? stretchRotate : particle.Rotation);
         }
     }
 

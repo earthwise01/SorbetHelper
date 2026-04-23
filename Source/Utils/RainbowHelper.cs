@@ -7,22 +7,11 @@ internal static class RainbowHelper
 {
     private static CrystalStaticSpinner rainbowSpinner;
 
-    public static void SetGetHueScene(Scene scene)
-    {
-        rainbowSpinner ??= new CrystalStaticSpinner(Vector2.Zero, false, CrystalColor.Rainbow);
-        rainbowSpinner.Scene = scene;
-    }
-
-    /// <summary>
-    /// Make sure to call <see cref="SetGetHueScene"/> beforehand!
-    /// </summary>
-    public static Color GetHue(Vector2 position)
-        => rainbowSpinner.GetHue(position);
-
     public static Color GetHue(Scene scene, Vector2 position)
     {
         rainbowSpinner ??= new CrystalStaticSpinner(Vector2.Zero, false, CrystalColor.Rainbow);
         rainbowSpinner.Scene = scene;
+
         return rainbowSpinner.GetHue(position);
     }
 
