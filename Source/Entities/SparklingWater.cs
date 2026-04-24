@@ -278,60 +278,60 @@ public class SparklingWater : Water
             surface.Update(cameraRect, mesh);
 
         // ripples & splash sfx for water interaction components
-        if (canSplash)
+        if (!canSplash)
+            return;
+
+        foreach (WaterInteraction waterInteraction in Scene.Tracker.GetComponents<WaterInteraction>())
         {
-            foreach (WaterInteraction waterInteraction in Scene.Tracker.GetComponents<WaterInteraction>())
+            Entity interactionEntity = waterInteraction.Entity;
+
+            bool wasInside = contains.Contains(waterInteraction);
+            bool isInside = waterInteraction.Check(this);
+
+            if (!initializedWaterInteractionsInside && isInside)
+                contains.Add(waterInteraction);
+            else if (wasInside != isInside)
             {
-                Entity interactionEntity = waterInteraction.Entity;
+                Vector2 interactionPos = waterInteraction.AbsoluteCenter;
+                DoSplash(interactionPos, interactionEntity.Width, 1f);
 
-                bool wasInside = contains.Contains(waterInteraction);
-                bool isInside = waterInteraction.Check(this);
+                bool isDashing = waterInteraction.IsDashing();
+                int deepParam = (interactionPos.Y < Center.Y && !Scene.CollideCheck<Solid>(new Vector2(waterInteraction.Bounds.Left, Top + 8f), new Vector2(waterInteraction.Bounds.Right, Top + 8f))) ? 1 : 0;
+                if (wasInside)
+                {
+                    Audio.Play(isDashing ? "event:/char/madeline/water_dash_out" : "event:/char/madeline/water_out", interactionPos, "deep", deepParam);
+                    waterInteraction.DrippingTimer = 2f;
+                }
+                else
+                {
+                    Audio.Play((isDashing && deepParam == 1) ? "event:/char/madeline/water_dash_in" : "event:/char/madeline/water_in", interactionPos, "deep", deepParam);
+                    waterInteraction.DrippingTimer = 0f;
+                }
 
-                if (!initializedWaterInteractionsInside && isInside)
+                if (wasInside)
+                    contains.Remove(waterInteraction);
+                else
                     contains.Add(waterInteraction);
-                else if (wasInside != isInside)
-                {
-                    Vector2 interactionPos = waterInteraction.AbsoluteCenter;
-                    DoSplash(interactionPos, interactionEntity.Width, 1f);
-
-                    bool isDashing = waterInteraction.IsDashing();
-                    int deepParam = (interactionPos.Y < Center.Y && !Scene.CollideCheck<Solid>(new Vector2(waterInteraction.Bounds.Left, Top + 8f), new Vector2(waterInteraction.Bounds.Right, Top + 8f))) ? 1 : 0;
-                    if (wasInside)
-                    {
-                        Audio.Play(isDashing ? "event:/char/madeline/water_dash_out" : "event:/char/madeline/water_out", interactionPos, "deep", deepParam);
-                        waterInteraction.DrippingTimer = 2f;
-                    }
-                    else
-                    {
-                        Audio.Play((isDashing && deepParam == 1) ? "event:/char/madeline/water_dash_in" : "event:/char/madeline/water_in", interactionPos, "deep", deepParam);
-                        waterInteraction.DrippingTimer = 0f;
-                    }
-
-                    if (wasInside)
-                        contains.Remove(waterInteraction);
-                    else
-                        contains.Add(waterInteraction);
-                }
-
-                if (BottomSurface is not null && interactionEntity is Player)
-                {
-                    if (isInside && interactionEntity.Y > Bottom - 8f)
-                    {
-                        playerBottomTension ??= BottomSurface.SetTension(interactionEntity.Position, 0f);
-
-                        playerBottomTension.Position = BottomSurface.GetPointAlong(interactionEntity.Position);
-                        playerBottomTension.Strength = Calc.ClampedMap(interactionEntity.Y, Bottom - 8f, Bottom + 4f) * 0.25f;
-                    }
-                    else if (playerBottomTension is not null)
-                    {
-                        BottomSurface.RemoveTension(playerBottomTension);
-                        playerBottomTension = null;
-                    }
-                }
             }
 
-            initializedWaterInteractionsInside = true;
+            if (BottomSurface is not null && interactionEntity is Player)
+            {
+                if (isInside && interactionEntity.Y > Bottom - 8f)
+                {
+                    playerBottomTension ??= BottomSurface.SetTension(interactionEntity.Position, 0f);
+
+                    playerBottomTension.Position = BottomSurface.GetPointAlong(interactionEntity.Position);
+                    playerBottomTension.Strength = Calc.ClampedMap(interactionEntity.Y, Bottom - 8f, Bottom + 4f) * 0.25f;
+                }
+                else if (playerBottomTension is not null)
+                {
+                    BottomSurface.RemoveTension(playerBottomTension);
+                    playerBottomTension = null;
+                }
+            }
         }
+
+        initializedWaterInteractionsInside = true;
     }
 
     public void DoSplash(Vector2 position, float width, float strength)
@@ -341,13 +341,11 @@ public class SparklingWater : Water
         if (surface is null)
             return;
 
-        surface.DoRipple(position, strength);
-        const int rippleDistance = 48;
-        for (int x = rippleDistance; x < width / 2f; x += rippleDistance)
-        {
-            surface.DoRipple(new Vector2(position.X + x, position.Y), strength);
-            surface.DoRipple(new Vector2(position.X - x, position.Y), strength);
-        }
+        int rippleCount = (int)MathF.Ceiling(width / 40f);
+        float rippleDistance = width / rippleCount;
+        float rippleStrengthMult = MathF.Pow(0.9f, MathF.Max(width / 40f - 1f, 0f)); // hmm
+        for (int i = 0; i < rippleCount; i++)
+            surface.DoRipple(new Vector2(position.X - width / 2f + (rippleDistance / 2f + rippleDistance * i), position.Y), strength * rippleStrengthMult);
 
         ParticleSystem particles = SceneAs<Level>().ParticlesFG;
         Color splashColor = SparklingWaterRenderer.GetSettings(Scene, Depth).OutlineColor;
