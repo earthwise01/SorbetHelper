@@ -82,7 +82,8 @@ public class ResizableWaterfall : Entity
         if (water is not null)
             height = Math.Max(water.Top - Y, 0f);
 
-        topWater = Scene.CollideFirst<Water>(new Rectangle((int)X, (int)(Y - 1), 8, 1));
+        if (!ignoreWater && Scene.CollideFirst<Water>(new Rectangle((int)X, (int)(Y - 1), 8, 1)) is { BottomSurface: not null } waterAbove)
+            topWater = waterAbove;
 
         Add(loopingSfx = new SoundSource());
         loopingSfx.Play(width <= 24 ? "event:/env/local/waterfall_small_main" : "event:/env/local/waterfall_big_main");
