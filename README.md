@@ -53,7 +53,7 @@ for any bugs/suggestions, pls feel free to either ping `@limimimia` in [celestec
     - creates a simple displacement effect in a specified area
 
 - Displacement Effect Blocker
-    - blocks the wavy displacement effect from water/waterfalls/etc and optionally the bur
+    - blocks the wavy displacement effect from water/waterfalls/etc, and optionally the offset/burst displacement effect from dashing/dream blocks/pulsing strawberries/etc
 
 - Displacement Depth Fixer
     - makes the displacement effect from stuff like water or waterfalls not distort things that render above them. can be useful if you want to have fg decals in front of water, put resizable waterfalls in the background, etc
