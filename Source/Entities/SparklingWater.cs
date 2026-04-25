@@ -3,7 +3,7 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [CustomEntity("SorbetHelper/SparklingWater")]
 [Tracked]
 [TrackedAs(typeof(Water))]
-public class SparklingWater : Water
+public class SparklingWater : Water, IDepthRendered<SparklingWaterRenderer.Options>
 {
     private class SparklingSurface : Surface
     {
@@ -159,18 +159,6 @@ public class SparklingWater : Water
         }
     }
 
-    private readonly bool collidable;
-    private readonly bool canSplash;
-
-    private readonly VertexPositionColor[] mesh;
-
-    private bool initializedWaterInteractionsInside;
-
-    private new SparklingSurface TopSurface => base.TopSurface as SparklingSurface;
-    private new SparklingSurface BottomSurface => base.BottomSurface as SparklingSurface;
-
-    public bool VisibleOnCamera = true;
-
     private static readonly ParticleType P_SparklingSplash = new ParticleType()
     {
         Source = GFX.Game["particles/feather"],
@@ -182,6 +170,21 @@ public class SparklingWater : Water
         RotationMode = ParticleType.RotationModes.Random,
         LifeMin = 0.4f, LifeMax = 0.6f
     };
+
+    private new SparklingSurface TopSurface => base.TopSurface as SparklingSurface;
+    private new SparklingSurface BottomSurface => base.BottomSurface as SparklingSurface;
+
+    private readonly bool collidable;
+    private readonly bool canSplash;
+
+    private readonly VertexPositionColor[] mesh;
+
+    private bool initializedWaterInteractionsInside;
+
+    // hmm
+    public SparklingWaterRenderer.Options RendererOptions;
+
+    public bool VisibleOnCamera = true;
 
     public SparklingWater(Vector2 position, float width, float height, bool topSurface, bool bottomSurface, int depth = -9999, bool collidable = true, bool canSplash = true)
         : base(position, false, false, width, height)
@@ -235,6 +238,9 @@ public class SparklingWater : Water
     private void TrackSelf() => SparklingWaterRenderer.GetRenderer(Scene, Depth).Track(this);
     private void UntrackSelf() => SparklingWaterRenderer.GetRenderer(Scene, Depth).Untrack(this);
 
+    public SparklingWaterRenderer.Options GetRendererOptions() => RendererOptions ?? SparklingWaterRenderer.Options.DefaultOptions;
+    public bool GetVisible() => Visible && VisibleOnCamera;
+
     [MonoModLinkTo("Monocle.Entity", "System.Void Added(Monocle.Scene)")]
     private extern void base_Added(Scene scene);
     public override void Added(Scene scene)
@@ -258,7 +264,6 @@ public class SparklingWater : Water
 
     [MonoModLinkTo("Monocle.Entity", "System.Void Update()")]
     private extern void base_Update();
-
     public override void Update()
     {
         // can't use base.Update() normally since that would call the vanilla surface update methods
@@ -273,11 +278,9 @@ public class SparklingWater : Water
         VisibleOnCamera = Left < cameraRect.Right && Right > cameraRect.Left
                           && Top < cameraRect.Bottom && Bottom > cameraRect.Top;
 
-        // update surfaces
         foreach (SparklingSurface surface in Surfaces)
             surface.Update(cameraRect, mesh);
 
-        // ripples & splash sfx for water interaction components
         if (!canSplash)
             return;
 
@@ -348,7 +351,7 @@ public class SparklingWater : Water
             surface.DoRipple(new Vector2(position.X - width / 2f + (rippleDistance / 2f + rippleDistance * i), position.Y), strength * rippleStrengthMult);
 
         ParticleSystem particles = SceneAs<Level>().ParticlesFG;
-        Color splashColor = SparklingWaterRenderer.GetSettings(Scene, Depth).OutlineColor;
+        Color splashColor = GetRendererOptions().OutlineColor;
         float splashY = onTop ? Top : Bottom;
         float splashDirection = onTop ? -MathF.PI / 2f : MathF.PI / 2f;
         for (int x = 0; x < width; x += 4)

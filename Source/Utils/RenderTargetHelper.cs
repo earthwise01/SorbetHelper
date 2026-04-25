@@ -7,21 +7,21 @@ internal static class RenderTargetHelper
     public static int GameplayWidth => GameplayBuffers.Gameplay?.Width ?? 320;
     public static int GameplayHeight => GameplayBuffers.Gameplay?.Height ?? 180;
 
-    public static void CreateOrResizeGameplayBuffer(ref VirtualRenderTarget target)
+    public static void CreateOrResizeGameplayBuffer(ref VirtualRenderTarget renderTarget)
     {
-        if (target is not { IsDisposed: false })
+        if (renderTarget is null || renderTarget.IsDisposed)
         {
             // todo: does the name matter ?
-            target = VirtualContent.CreateRenderTarget("sorbet-helper-gameplay-buffer", GameplayWidth, GameplayHeight);
+            renderTarget = VirtualContent.CreateRenderTarget("sorbet-helper-gameplay-buffer", GameplayWidth, GameplayHeight);
             return;
         }
 
-        if (target.Width == GameplayWidth && target.Height == GameplayHeight)
+        if (renderTarget.Width == GameplayWidth && renderTarget.Height == GameplayHeight)
             return;
 
-        target.Width = GameplayWidth;
-        target.Height = GameplayHeight;
-        target.Reload();
+        renderTarget.Width = GameplayWidth;
+        renderTarget.Height = GameplayHeight;
+        renderTarget.Reload();
     }
 
     public static void DisposeAndSetNull(ref VirtualRenderTarget renderTarget)
@@ -44,10 +44,10 @@ internal static class RenderTargetHelper
         return tempBuffer;
     }
 
-    public static void ReturnTempBuffer(VirtualRenderTarget gameplayBuffer)
+    public static void ReturnTempBuffer(VirtualRenderTarget tempBuffer)
     {
-        if (gameplayBuffer is not null && !gameplayBuffer.IsDisposed)
-            TempBuffers.Enqueue(gameplayBuffer);
+        if (tempBuffer is not null && !tempBuffer.IsDisposed)
+            TempBuffers.Enqueue(tempBuffer);
     }
 
     public static VirtualRenderTarget[] GetTempBuffers(int count)
@@ -60,20 +60,20 @@ internal static class RenderTargetHelper
         return tempBuffers;
     }
 
-    public static void ReturnTempBuffers(ref VirtualRenderTarget[] gameplayBuffers)
+    public static void ReturnTempBuffers(ref VirtualRenderTarget[] tempBuffers)
     {
-        foreach (VirtualRenderTarget gameplayBuffer in gameplayBuffers)
-            ReturnTempBuffer(gameplayBuffer);
+        foreach (VirtualRenderTarget tempBuffer in tempBuffers)
+            ReturnTempBuffer(tempBuffer);
 
-        gameplayBuffers = null;
+        tempBuffers = null;
     }
 
-    private static void DisposeQueue()
+    private static void DisposeTempBufferQueue()
     {
         try
         {
-            foreach (VirtualRenderTarget vrt in TempBuffers)
-                vrt.Dispose();
+            foreach (VirtualRenderTarget tempBuffer in TempBuffers)
+                tempBuffer.Dispose();
 
             TempBuffers.Clear();
         }
@@ -96,14 +96,14 @@ internal static class RenderTargetHelper
     {
         On.Celeste.GameplayBuffers.Unload -= On_GameplayBuffers_Unload;
 
-        DisposeQueue();
+        DisposeTempBufferQueue();
     }
 
     private static void On_GameplayBuffers_Unload(On.Celeste.GameplayBuffers.orig_Unload orig)
     {
         orig();
 
-        DisposeQueue();
+        DisposeTempBufferQueue();
     }
 
     #endregion

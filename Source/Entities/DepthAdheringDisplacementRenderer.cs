@@ -1,24 +1,14 @@
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [Tracked]
-public class DepthAdheringDisplacementRenderer : DepthRenderer<DepthAdheringDisplacementRenderer, DepthAdheringDisplacementRenderHook, bool>
+public class DepthAdheringDisplacementRenderer
+    : DepthRenderer<DepthAdheringDisplacementRenderer, DepthAdheringDisplacementRenderHook, bool>
 {
-    protected override bool Options { init => distortBehind = value; }
-
-    protected override bool OptionsEquals(bool options) => distortBehind == options;
-    protected override string OptionsToString(bool options) => $"({nameof(distortBehind)}: {options})";
-
-    private readonly bool distortBehind;
-
-    public override void Render()
+    protected override void RenderGroup(IGrouping<bool, DepthAdheringDisplacementRenderHook> renderHookGroup)
     {
-        List<DepthAdheringDisplacementRenderHook> visibleRenderHooks = Tracked.Where(renderHook => renderHook.EntityVisible).ToList();
-        if (visibleRenderHooks.Count == 0)
-            return;
+        bool distortBehind = renderHookGroup.Key;
 
         GameplayRenderer.End();
-
-        Camera camera = SceneAs<Level>().Camera;
 
         VirtualRenderTarget entityBuffer = RenderTargetHelper.GetTempBuffer();
         VirtualRenderTarget displacementMapBuffer = RenderTargetHelper.GetTempBuffer();
@@ -28,6 +18,8 @@ public class DepthAdheringDisplacementRenderer : DepthRenderer<DepthAdheringDisp
         if (prevRenderTargets.Length > 0)
             gameplayBuffer = prevRenderTargets[0].RenderTarget as RenderTarget2D ?? gameplayBuffer;
 
+        Camera camera = SceneAs<Level>().Camera;
+
         #region Displacement Map Rendering
 
         Color noDisplacementColor = DisplacementEffectBlocker.NoDisplacementColor;
@@ -36,7 +28,7 @@ public class DepthAdheringDisplacementRenderer : DepthRenderer<DepthAdheringDisp
 
         Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, camera.Matrix);
 
-        foreach (DepthAdheringDisplacementRenderHook renderHook in visibleRenderHooks)
+        foreach (DepthAdheringDisplacementRenderHook renderHook in renderHookGroup)
         {
             if (renderHook.Visible)
                 renderHook.RenderDisplacement();
@@ -74,7 +66,7 @@ public class DepthAdheringDisplacementRenderer : DepthRenderer<DepthAdheringDisp
         if (distortBehind)
             Draw.SpriteBatch.Draw(gameplayBuffer, camera.Position, Color.White);
 
-        foreach (DepthAdheringDisplacementRenderHook renderHook in visibleRenderHooks)
+        foreach (DepthAdheringDisplacementRenderHook renderHook in renderHookGroup)
             renderHook.RenderEntity();
 
         GameplayRenderer.End();

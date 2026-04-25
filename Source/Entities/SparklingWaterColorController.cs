@@ -3,23 +3,18 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [CustomEntity("SorbetHelper/SparklingWaterColorController")]
 [GlobalEntity(onlyGlobalIf: "global")]
 [Tracked]
-public class SparklingWaterColorController(EntityData data, Vector2 offset) : Entity(data.Position + offset)
+public class SparklingWaterColorController(EntityData data, Vector2 offset) : EntityProcessingController(data, offset)
 {
-    public readonly SparklingWaterRenderer.Settings Settings = new SparklingWaterRenderer.Settings(data);
-    public readonly int? AffectedDepth = data.Nullable<int>("affectedDepth");
+    private readonly SparklingWaterRenderer.Options options = new SparklingWaterRenderer.Options(data);
+    private readonly int? affectedDepth = data.Nullable<int>("affectedDepth");
 
-    public static SparklingWaterColorController GetController(Scene scene, int depth)
+    // prioritise controllers that specify a depth
+    protected override int ProcessPriority => affectedDepth is not null ? -1 : 0;
+
+    protected override void ProcessEntity(Entity entity)
     {
-        SparklingWaterColorController allDepthsController = null;
-        foreach (SparklingWaterColorController controller in scene.Tracker.GetEntities<SparklingWaterColorController>())
-        {
-            if (controller.AffectedDepth == depth)
-                return controller;
-
-            if (controller.AffectedDepth is null && allDepthsController is null)
-                allDepthsController = controller;
-        }
-
-        return allDepthsController;
+        if (entity is SparklingWater { RendererOptions: null } sparklingWater
+            && (affectedDepth == sparklingWater.Depth || affectedDepth is null))
+            sparklingWater.RendererOptions = options;
     }
 }

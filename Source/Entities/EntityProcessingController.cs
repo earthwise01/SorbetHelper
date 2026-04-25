@@ -10,14 +10,15 @@ public abstract class EntityProcessingController : Entity
     }
 
     protected HashSet<string> AffectedTypes { get; init; }
-
-    // these feel kinda out of placee but oh well
     protected int MinDepth { get; init; } = int.MinValue;
     protected int MaxDepth { get; init; } = int.MaxValue;
 
+    protected virtual int ProcessPriority => 0;
+
     private readonly ProcessModes processMode;
 
-    private string fromLevel;
+    private readonly bool roomWide;
+    private string fromRoom;
 
     protected EntityProcessingController(EntityData data, Vector2 offset, ProcessModes processMode = ProcessModes.OnEntityAwake)
         : base (data.Position + offset)
@@ -27,6 +28,7 @@ public abstract class EntityProcessingController : Entity
         if (data.Width > 0 && data.Height > 0)
         {
             Collider = new Hitbox(data.Width, data.Height);
+            roomWide = false;
         }
         else if (data.Nodes.Length == 2)
         {
@@ -38,10 +40,12 @@ public abstract class EntityProcessingController : Entity
             float height = MathF.Max(nodes[0].Y, nodes[1].Y) - topLeftY;
 
             Collider = new Hitbox(width, height, topLeftX - X, topLeftY - Y);
+            roomWide = false;
         }
         else
         {
             Collider = null;
+            roomWide = true;
         }
     }
 
@@ -68,7 +72,7 @@ public abstract class EntityProcessingController : Entity
     {
         base.Added(scene);
 
-        fromLevel = (scene as Level)?.Session.Level;
+        fromRoom = (scene as Level)?.Session.Level;
     }
 
     public override void Awake(Scene scene)
@@ -126,20 +130,25 @@ public abstract class EntityProcessingController : Entity
 
         static EntityProcessingController[] GetEntityProcessors(EntityList entities)
         {
-            string levelName = (entities.Scene as Level)?.Session.Level;
+            if (entities.Scene.Tracker.GetEntities<EntityProcessingController>() is not { Count: > 0 } trackedEntityProcessors)
+                return [];
 
-            // todo: prioritise non-roomwide controllers ?
-            return entities.Scene.Tracker.GetEntities<EntityProcessingController>()
-                                         .Where(e => e is EntityProcessingController { processMode: ProcessModes.OnEntityAwake } p
-                                                     && (p.fromLevel == levelName || p.TagCheck(Tags.Global | Tags.Persistent)))
-                                         .Cast<EntityProcessingController>()
-                                         .ToArray();
+            string currentRoom = (entities.Scene as Level)?.Session.Level;
+
+            // linq :revolving_hearts:
+            // (blehh is there a better way to do this,)
+            return trackedEntityProcessors.Cast<EntityProcessingController>()
+                                          .Where(c => c is { processMode: ProcessModes.OnEntityAwake }
+                                                      && (c.fromRoom == currentRoom || c.TagCheck(Tags.Global | Tags.Persistent)))
+                                          .OrderBy(c => c.roomWide)
+                                          .ThenBy(c => c.ProcessPriority)
+                                          .ToArray();
         }
 
         static void ProcessEntity(Entity entity, EntityProcessingController[] entityProcessors)
         {
-            foreach (EntityProcessingController processor in entityProcessors)
-                processor.Process(entity);
+            foreach (EntityProcessingController entityProcessor in entityProcessors)
+                entityProcessor.Process(entity);
         }
     }
 

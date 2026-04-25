@@ -1,7 +1,7 @@
 namespace Celeste.Mod.SorbetHelper.Components;
 
 [Tracked]
-public class DepthAdheringDisplacementRenderHook : Component
+public class DepthAdheringDisplacementRenderHook : Component, IDepthRendered<bool>
 {
     public readonly Action RenderEntity;
     public readonly Action RenderDisplacement;
@@ -11,7 +11,8 @@ public class DepthAdheringDisplacementRenderHook : Component
     private readonly VisibleOverride visibleOverride;
     public bool EntityVisible => visibleOverride?.EntityVisible != false;
 
-    public DepthAdheringDisplacementRenderHook(Action renderEntity, Action renderDisplacement, bool distortBehind, bool respectVisible) : base(false, true)
+    public DepthAdheringDisplacementRenderHook(Action renderEntity, Action renderDisplacement, bool distortBehind, bool respectVisible)
+        : base(false, true)
     {
         RenderEntity = renderEntity;
         RenderDisplacement = renderDisplacement;
@@ -21,10 +22,14 @@ public class DepthAdheringDisplacementRenderHook : Component
             visibleOverride = new VisibleOverride();
     }
 
-    public DepthAdheringDisplacementRenderHook(Action renderEntity, Action renderDisplacement, bool distortBehind) : this(renderEntity, renderDisplacement, distortBehind, true) { }
+    public DepthAdheringDisplacementRenderHook(Action renderEntity, Action renderDisplacement, bool distortBehind)
+        : this(renderEntity, renderDisplacement, distortBehind, true) { }
 
-    private void TrackSelf() => DepthAdheringDisplacementRenderer.GetRenderer(Scene, Entity.Depth, distortBehind).Track(this);
-    private void UntrackSelf() => DepthAdheringDisplacementRenderer.GetRenderer(Scene, Entity.Depth, distortBehind).Untrack(this);
+    private void TrackSelf() => DepthAdheringDisplacementRenderer.GetRenderer(Scene, Entity.Depth).Track(this);
+    private void UntrackSelf() => DepthAdheringDisplacementRenderer.GetRenderer(Scene, Entity.Depth).Untrack(this);
+
+    public bool GetRendererOptions() => distortBehind;
+    public bool GetVisible() => EntityVisible;
 
     public override void Added(Entity entity)
     {

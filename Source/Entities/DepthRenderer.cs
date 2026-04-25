@@ -1,55 +1,83 @@
 namespace Celeste.Mod.SorbetHelper.Entities;
 
+public interface IDepthRendered<out TOptions>
+    where TOptions : IEquatable<TOptions>
+{
+    public TOptions GetRendererOptions();
+    public bool GetVisible();
+}
+
 // generics :yum:
-public abstract class DepthRenderer<TSelf, TTrack, TOptions> : Entity
-    where TSelf : DepthRenderer<TSelf, TTrack, TOptions>, new()
+public abstract class DepthRenderer<TSelf, TRender, TOptions> : Entity
+    where TSelf : DepthRenderer<TSelf, TRender, TOptions>, new()
+    where TRender : IDepthRendered<TOptions>
+    where TOptions : IEquatable<TOptions>
 {
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(DepthRenderer<,,>)}";
 
-    protected abstract TOptions Options { init; }
+    private readonly List<TRender> allTracked = [];
+    private ILookup<TOptions, TRender> visibleGroups;
 
-    // hmm
-    protected abstract bool OptionsEquals(TOptions options);
-    protected virtual string OptionsToString(TOptions options) => options.ToString();
-
-    private readonly List<TTrack> tracked = [];
-    protected IReadOnlyList<TTrack> Tracked => tracked;
+    protected IReadOnlyList<TRender> AllTracked => allTracked;
+    protected ILookup<TOptions, TRender> VisibleGroups => visibleGroups;
 
     protected DepthRenderer()
     {
         Tag = Tags.Global;
+        Add(new BeforeRenderHook(OnBeforeRender));
     }
 
-    public void Track(TTrack toTrack) => tracked.Add(toTrack);
-    public void Untrack(TTrack toUntrack) => tracked.Remove(toUntrack);
+    public void Track(TRender toTrack) => allTracked.Add(toTrack);
+    public void Untrack(TRender toUntrack) => allTracked.Remove(toUntrack);
 
-    public static TSelf GetRenderer(Scene scene, int depth, TOptions options)
+    private void OnBeforeRender()
     {
-        // can't automatically track generic types weh
+        // kinda hate doing thisevery framee but i feel like it does make more sense having the visible checks here rather than hidden away in each renderer
+        // we're interating through the entire list >1 times a frame either way  it's just more obvious like this,
+        visibleGroups = allTracked.Where(tracked => tracked.GetVisible())
+                                  .ToLookup(tracked => tracked.GetRendererOptions());
+
+        BeforeRender();
+    }
+
+    protected virtual void BeforeRender()
+    {
+        foreach (IGrouping<TOptions, TRender> group in visibleGroups)
+            BeforeRenderGroup(group);
+    }
+
+    public override void Render()
+    {
+        foreach (IGrouping<TOptions, TRender> group in visibleGroups)
+            RenderGroup(group);
+    }
+
+    protected virtual void BeforeRenderGroup(IGrouping<TOptions, TRender> group) { }
+    protected virtual void RenderGroup(IGrouping<TOptions, TRender> group) { }
+
+    // wehh the world if u could call static method on generic parameters & calling methods on an implemented interface didnt require 5000 casts
+    public static TSelf GetRenderer(Scene scene, int depth)
+    {
+        // can't automatically track generic types using an attribute (and i don't rly feel like using addtypetotracker)
         if (!scene.Tracker.Entities.TryGetValue(typeof(TSelf), out List<Entity> trackedRenderers))
             throw new InvalidOperationException($"{nameof(DepthRenderer<,,>)} type {typeof(TSelf).Name} is not tracked!");
 
         if (trackedRenderers.Concat(scene.Entities.ToAdd)
-                            .FirstOrDefault(e => e is TSelf r && r.Depth == depth && r.OptionsEquals(options))
+                            .FirstOrDefault(e => e is TSelf r && r.Depth == depth)
             is TSelf renderer)
             return renderer;
 
-        scene.Add(renderer = new TSelf() { Depth = depth, Options = options });
-        Logger.Info(LogID, $"created new {typeof(TSelf).Name} with depth {depth}{(options is not null ? $" and options {renderer.OptionsToString(options)}." : ".")}");
+        scene.Add(renderer = new TSelf() { Depth = depth });
+        Logger.Info(LogID, $"created new {typeof(TSelf).Name} with depth {depth}.");
 
         return renderer;
     }
 }
 
 // hmm
-public abstract class DepthRenderer<TSelf, TTracked> : DepthRenderer<TSelf, TTracked, DepthRenderer<TSelf, TTracked>.NoOptions>
-    where TSelf : DepthRenderer<TSelf, TTracked>, new()
+public abstract class DepthRenderer<TSelf, TRender> : DepthRenderer<TSelf, TRender, DepthRenderer<TSelf, TRender>.NoOptions>
+    where TSelf : DepthRenderer<TSelf, TRender>, new()
+    where TRender : IDepthRendered<DepthRenderer<TSelf, TRender>.NoOptions>
 {
-    public sealed class NoOptions { private NoOptions() { } }
-
-    protected sealed override NoOptions Options { init { } }
-    protected sealed override bool OptionsEquals(NoOptions options) => true;
-    protected sealed override string OptionsToString(NoOptions options) => throw new InvalidOperationException();
-
-    public static TSelf GetRenderer(Scene scene, int depth) => GetRenderer(scene, depth, null);
+    public sealed record NoOptions { private NoOptions() { } }
 }
