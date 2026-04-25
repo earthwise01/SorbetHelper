@@ -164,10 +164,10 @@ local gravityFallingBlockAssociatedMods = {
     "ChronoHelper"
 }
 
-local customFallingBlock = createFallingBlockPlugin("SorbetHelper/CustomFallingBlock", "custom_falling_block", nil, nil, customFallingBlockFieldOrder, nil)
-local dashFallingBlock = createFallingBlockPlugin("SorbetHelper/DashFallingBlock", "dash_falling_block", nil, dashFallingBlockPlacementData, dashFallingBlockFieldOrder, dashFallingBlockFieldInfo)
-local customGravityFallingBlock = createFallingBlockPlugin("SorbetHelper/CustomGravityFallingBlock", "custom_gravity_falling_block", "gravity_custom_falling_block", nil, customFallingBlockFieldOrder, nil)
-local gravityDashFallingBlock = createFallingBlockPlugin("SorbetHelper/GravityDashFallingBlock", "gravity_dash_falling_block", "dash_gravity_falling_block", dashFallingBlockPlacementData, dashFallingBlockFieldOrder, dashFallingBlockFieldInfo)
+local customFallingBlock = createFallingBlockPlugin("SorbetHelper/CustomFallingBlock", "custom_falling_block", nil, customFallingBlockFieldOrder, nil, nil)
+local dashFallingBlock = createFallingBlockPlugin("SorbetHelper/DashFallingBlock", "dash_falling_block", nil, dashFallingBlockFieldOrder, dashFallingBlockPlacementData, dashFallingBlockFieldInfo)
+local customGravityFallingBlock = createFallingBlockPlugin("SorbetHelper/CustomGravityFallingBlock", "custom_gravity_falling_block", "gravity_custom_falling_block", customFallingBlockFieldOrder, nil, nil)
+local gravityDashFallingBlock = createFallingBlockPlugin("SorbetHelper/GravityDashFallingBlock", "gravity_dash_falling_block", "dash_gravity_falling_block", dashFallingBlockFieldOrder, dashFallingBlockPlacementData, dashFallingBlockFieldInfo)
 customGravityFallingBlock.associatedMods = gravityFallingBlockAssociatedMods
 gravityDashFallingBlock.associatedMods = gravityFallingBlockAssociatedMods
 
