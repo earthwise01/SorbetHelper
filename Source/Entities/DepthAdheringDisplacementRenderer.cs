@@ -4,7 +4,7 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 public class DepthAdheringDisplacementRenderer
     : DepthRenderer<DepthAdheringDisplacementRenderer, DepthAdheringDisplacementRenderHook, bool>
 {
-    protected override void RenderGroup(IGrouping<bool, DepthAdheringDisplacementRenderHook> renderHookGroup)
+    protected override void GroupRender(IGrouping<bool, DepthAdheringDisplacementRenderHook> renderHookGroup)
     {
         bool distortBehind = renderHookGroup.Key;
 

@@ -84,7 +84,7 @@ public class SparklingWaterRenderer
         }
     }
 
-    protected override void BeforeRenderGroup(IGrouping<Options, SparklingWater> waterGroup)
+    protected override void GroupBeforeRender(IGrouping<Options, SparklingWater> waterGroup)
     {
         Options options = waterGroup.Key;
 

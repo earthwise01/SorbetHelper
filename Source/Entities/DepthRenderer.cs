@@ -43,17 +43,17 @@ public abstract class DepthRenderer<TSelf, TRender, TOptions> : Entity
     protected virtual void BeforeRender()
     {
         foreach (IGrouping<TOptions, TRender> group in visibleGroups)
-            BeforeRenderGroup(group);
+            GroupBeforeRender(group);
     }
 
     public override void Render()
     {
         foreach (IGrouping<TOptions, TRender> group in visibleGroups)
-            RenderGroup(group);
+            GroupRender(group);
     }
 
-    protected virtual void BeforeRenderGroup(IGrouping<TOptions, TRender> group) { }
-    protected virtual void RenderGroup(IGrouping<TOptions, TRender> group) { }
+    protected virtual void GroupBeforeRender(IGrouping<TOptions, TRender> group) { }
+    protected virtual void GroupRender(IGrouping<TOptions, TRender> group) { }
 
     // wehh the world if u could call static method on generic parameters & calling methods on an implemented interface didnt require 5000 casts
     public static TSelf GetRenderer(Scene scene, int depth)
