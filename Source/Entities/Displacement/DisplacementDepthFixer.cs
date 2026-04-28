@@ -1,7 +1,7 @@
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/DepthAdheringDisplacementWrapper")]
-public class DisplacementDepthFixer : EntityProcessingController, IDepthRenderable<DepthAdheringDisplacementRenderHook, DepthAdheringDisplacementRenderer, bool>
+public class DisplacementDepthFixer : EntityProcessingController
 {
     private readonly bool distortBehind;
     private readonly bool ignoreBounds;
@@ -55,8 +55,4 @@ public class DisplacementDepthFixer : EntityProcessingController, IDepthRenderab
 
         return CollideRect(new Rectangle((int)entity.X, (int)entity.Y, (int)tempWidth, (int)tempHeight));
     }
-
-    public bool GetRendererOptions() => throw new NotImplementedException();
-
-    public bool GetVisible() => throw new NotImplementedException();
 }
