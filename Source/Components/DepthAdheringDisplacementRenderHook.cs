@@ -1,8 +1,7 @@
 namespace Celeste.Mod.SorbetHelper.Components;
 
 [Tracked]
-public class DepthAdheringDisplacementRenderHook
-    : Component, IDepthRenderable<DepthAdheringDisplacementRenderHook, DepthAdheringDisplacementRenderer, bool>
+public class DepthAdheringDisplacementRenderHook : Component, DepthAdheringDisplacementRenderer.IRenderable
 {
     public readonly Action RenderEntity;
     public readonly Action RenderDisplacement;

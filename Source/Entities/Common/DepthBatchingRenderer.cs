@@ -1,20 +1,17 @@
 namespace Celeste.Mod.SorbetHelper.Entities;
 
-public interface IDepthRenderable<TSelf, TRenderer, out TOptions>
-    where TSelf : IDepthRenderable<TSelf, TRenderer, TOptions>
-    where TRenderer : DepthBatchingRenderer<TRenderer, TSelf, TOptions>, new()
-    where TOptions : IEquatable<TOptions>
-{
-    public TOptions GetRendererOptions();
-    public bool GetVisible();
-}
-
 // generics :yum:
 public abstract class DepthBatchingRenderer<TSelf, TRendered, TOptions> : Entity
     where TSelf : DepthBatchingRenderer<TSelf, TRendered, TOptions>, new()
-    where TRendered : IDepthRenderable<TRendered, TSelf, TOptions>
+    where TRendered : DepthBatchingRenderer<TSelf, TRendered, TOptions>.IRenderable
     where TOptions : IEquatable<TOptions>
 {
+    public interface IRenderable
+    {
+        public TOptions GetRendererOptions();
+        public bool GetVisible();
+    }
+
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(DepthBatchingRenderer<,,>)}";
 
     private readonly List<TRendered> allTracked = [];
@@ -79,13 +76,10 @@ public abstract class DepthBatchingRenderer<TSelf, TRendered, TOptions> : Entity
 }
 
 // hmm^2
-public interface IDepthRenderable<TSelf, TRenderer> : IDepthRenderable<TSelf, TRenderer, DepthBatchingRenderer<TRenderer, TSelf>.NoOptions>
-    where TSelf : IDepthRenderable<TSelf, TRenderer, DepthBatchingRenderer<TRenderer, TSelf>.NoOptions>
-    where TRenderer : DepthBatchingRenderer<TRenderer, TSelf>, new();
-public abstract class DepthBatchingRenderer<TSelf, TRender>
-    : DepthBatchingRenderer<TSelf, TRender, DepthBatchingRenderer<TSelf, TRender>.NoOptions>
-    where TSelf : DepthBatchingRenderer<TSelf, TRender>, new()
-    where TRender : IDepthRenderable<TRender, TSelf, DepthBatchingRenderer<TSelf, TRender>.NoOptions>
+public abstract class DepthBatchingRenderer<TSelf, TRendered>
+    : DepthBatchingRenderer<TSelf, TRendered, DepthBatchingRenderer<TSelf, TRendered>.NoOptions>
+    where TSelf : DepthBatchingRenderer<TSelf, TRendered>, new()
+    where TRendered : DepthBatchingRenderer<TSelf, TRendered>.IRenderable
 {
     public sealed record NoOptions { private NoOptions() { } }
 }

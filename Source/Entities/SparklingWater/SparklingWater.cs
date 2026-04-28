@@ -3,7 +3,7 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [CustomEntity("SorbetHelper/SparklingWater")]
 [Tracked]
 [TrackedAs(typeof(Water))]
-public class SparklingWater : Water, IDepthRenderable<SparklingWater, SparklingWaterRenderer, SparklingWaterRenderer.Options>
+public class SparklingWater : Water, SparklingWaterRenderer.IRenderable
 {
     private class SparklingSurface : Surface
     {
