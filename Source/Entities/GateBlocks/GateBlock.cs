@@ -111,7 +111,7 @@ public abstract class GateBlock : Solid
         base.Added(scene);
 
         if (drawOutline)
-            GateBlockOutlineRenderer.TryCreateRenderer(scene);
+            GateBlockOutlineRenderer.GetOrCreateRenderer(scene);
     }
 
     public override void Awake(Scene scene)
@@ -488,12 +488,11 @@ public abstract class GateBlock : Solid
     }
 
     [Tracked]
-    private class GateBlockOutlineRenderer : Entity
+    private class GateBlockOutlineRenderer : Renderer<GateBlockOutlineRenderer>
     {
-        private GateBlockOutlineRenderer()
+        public GateBlockOutlineRenderer()
         {
             Depth = 1;
-            Tag = Tags.Persistent;
         }
 
         public override void Render()
@@ -505,15 +504,6 @@ public abstract class GateBlock : Solid
 
                 block.RenderOutline();
             }
-        }
-
-        public static void TryCreateRenderer(Scene scene)
-        {
-            if (scene.Tracker.GetEntities<GateBlockOutlineRenderer>()
-                             .Concat(scene.Entities.ToAdd)
-                             .FirstOrDefault(r => r is GateBlockOutlineRenderer)
-                is not GateBlockOutlineRenderer)
-                scene.Add(new GateBlockOutlineRenderer());
         }
     }
 }

@@ -14,15 +14,15 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [CustomEntity("SorbetHelper/MusicSyncControllerFMOD")]
 [GlobalEntity]
 [Tracked]
-public class MusicSyncControllerFMOD : Entity
+public class FMODMarkerToFlagController : Entity
 {
-    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(MusicSyncControllerFMOD)}";
+    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(FMODMarkerToFlagController)}";
 
     private const string SessionPrefix = "musicSync_";
 
     private readonly bool showDebugUI;
 
-    public MusicSyncControllerFMOD(EntityData data, Vector2 _)
+    public FMODMarkerToFlagController(EntityData data, Vector2 _)
     {
         // ReSharper disable once AssignmentInConditionalExpression
         if (Visible = showDebugUI = data.Bool("showDebugUI", false))
@@ -41,10 +41,10 @@ public class MusicSyncControllerFMOD : Entity
     {
         base.Added(scene);
 
-        if (scene.Tracker.CountEntities<MusicSyncControllerFMOD>() < 2)
+        if (scene.Tracker.CountEntities<FMODMarkerToFlagController>() < 2)
             return;
 
-        Logger.Warn(LogID, $"Tried to load a duplicate {nameof(MusicSyncControllerFMOD)} from room {SourceData?.Level?.Name ?? "???"} at position {SourceData?.Position.ToString() ?? "{X:??? Y:???}"}!");
+        Logger.Warn(LogID, $"Tried to load a duplicate {nameof(FMODMarkerToFlagController)} from room {SourceData?.Level?.Name ?? "???"} at position {SourceData?.Position.ToString() ?? "{X:??? Y:???}"}!");
         RemoveSelf();
     }
 

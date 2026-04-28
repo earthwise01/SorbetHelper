@@ -4,7 +4,7 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/ReturnBubbleBehaviorController")]
 [Tracked]
-public class ReturnBubbleBehaviorController : Entity
+public class ReturnBubbleTweaksController : Entity
 {
     private class CassetteFlyOptions(EntityData data)
     {
@@ -29,7 +29,7 @@ public class ReturnBubbleBehaviorController : Entity
 
     private readonly CassetteFlyOptions options;
 
-    public ReturnBubbleBehaviorController(EntityData data, Vector2 offset) : base(data.Position + offset)
+    public ReturnBubbleTweaksController(EntityData data, Vector2 offset) : base(data.Position + offset)
     {
         options = new CassetteFlyOptions(data);
         // hmm
@@ -81,7 +81,7 @@ public class ReturnBubbleBehaviorController : Entity
 
     private static IEnumerator On_CassetteFlyCoroutine(On.Celeste.Player.orig_CassetteFlyCoroutine orig, Player self)
     {
-        CassetteFlyOptions options = self.Scene.Tracker.GetEntity<ReturnBubbleBehaviorController>()?.options;
+        CassetteFlyOptions options = self.Scene.Tracker.GetEntity<ReturnBubbleTweaksController>()?.options;
         CassetteFlyOptionsComponent cassetteFlyComponent = self.GetComponentFromTracker<CassetteFlyOptionsComponent>();
 
         if (options is null)
@@ -190,7 +190,7 @@ public class ReturnBubbleBehaviorController : Entity
     private static EventInstance On_Audio_CreateInstance(On.Celeste.Audio.orig_CreateInstance orig, string path, Vector2? position = null)
     {
         if (path == SFX.game_gen_cassette_bubblereturn
-            && Engine.Scene.Tracker.GetEntity<ReturnBubbleBehaviorController>() is not null)
+            && Engine.Scene.Tracker.GetEntity<ReturnBubbleTweaksController>() is not null)
             return null;
 
         return orig(path, position);

@@ -87,7 +87,7 @@ public class MiniPopupTrigger(EntityData data, Vector2 offset, EntityID entityId
             return;
 
         triggered = true;
-        disablePopup = MiniPopupRenderer.GetMiniPopupRenderer(Scene)
+        disablePopup = MiniPopupRenderer.GetOrCreateRenderer(Scene)
                                         .CreatePopup(mode is Modes.WhilePlayerInside ? -1 : activeTime, mainTextId, subTextId,
                                             baseColor, accentColor, titleColor, iconPath, texturePath);
 

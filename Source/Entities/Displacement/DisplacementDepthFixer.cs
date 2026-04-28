@@ -1,12 +1,12 @@
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/DepthAdheringDisplacementWrapper")]
-public class DepthAdheringDisplacementWrapper : EntityProcessingController
+public class DisplacementDepthFixer : EntityProcessingController, IDepthRenderable<DepthAdheringDisplacementRenderHook, DepthAdheringDisplacementRenderer, bool>
 {
     private readonly bool distortBehind;
     private readonly bool ignoreBounds;
 
-    public DepthAdheringDisplacementWrapper(EntityData data, Vector2 offset) : base(data, offset)
+    public DisplacementDepthFixer(EntityData data, Vector2 offset) : base(data, offset)
     {
         if (data.Attr("affectedTypes").Split(',', StringSplitOptions.TrimAndRemoveEmpty).ToHashSet() is { Count: > 0 } affectedTypes)
             AffectedTypes = affectedTypes;
@@ -41,7 +41,7 @@ public class DepthAdheringDisplacementWrapper : EntityProcessingController
         if (entity.Collider is { } entityCollider)
             return entityCollider.Collide(Collider);
 
-        // if the entity doesn't have a collider (since waterfalls unfortunately don't while also being one of the main things you'd want to affect)
+        // if the entity doesn't have a collider (waterfalls unfortunately don't while also being one of the main things you'd want to affect)
         // try and make a fallback collider so that it's still possible to give them depth adhering displacement
         float tempWidth = 8f;
         float tempHeight = 8f;
@@ -55,4 +55,8 @@ public class DepthAdheringDisplacementWrapper : EntityProcessingController
 
         return CollideRect(new Rectangle((int)entity.X, (int)entity.Y, (int)tempWidth, (int)tempHeight));
     }
+
+    public bool GetRendererOptions() => throw new NotImplementedException();
+
+    public bool GetVisible() => throw new NotImplementedException();
 }

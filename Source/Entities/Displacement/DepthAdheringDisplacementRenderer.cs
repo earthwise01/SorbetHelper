@@ -2,7 +2,7 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 
 [Tracked]
 public class DepthAdheringDisplacementRenderer
-    : DepthRenderer<DepthAdheringDisplacementRenderer, DepthAdheringDisplacementRenderHook, bool>
+    : DepthBatchingRenderer<DepthAdheringDisplacementRenderer, DepthAdheringDisplacementRenderHook, bool>
 {
     protected override void GroupRender(IGrouping<bool, DepthAdheringDisplacementRenderHook> renderHookGroup)
     {

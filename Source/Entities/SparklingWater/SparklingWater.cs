@@ -3,7 +3,7 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [CustomEntity("SorbetHelper/SparklingWater")]
 [Tracked]
 [TrackedAs(typeof(Water))]
-public class SparklingWater : Water, IDepthRendered<SparklingWaterRenderer.Options>
+public class SparklingWater : Water, IDepthRenderable<SparklingWater, SparklingWaterRenderer, SparklingWaterRenderer.Options>
 {
     private class SparklingSurface : Surface
     {
@@ -235,8 +235,8 @@ public class SparklingWater : Water, IDepthRendered<SparklingWaterRenderer.Optio
             data.Int("depth", -9999), data.Bool("collidable", true), data.Bool("canSplash", true))
     { }
 
-    private void TrackSelf() => SparklingWaterRenderer.GetRenderer(Scene, Depth).Track(this);
-    private void UntrackSelf() => SparklingWaterRenderer.GetRenderer(Scene, Depth).Untrack(this);
+    private void TrackSelf() => SparklingWaterRenderer.Track(Scene, this, Depth);
+    private void UntrackSelf() => SparklingWaterRenderer.Untrack(Scene, this, Depth);
 
     public SparklingWaterRenderer.Options GetRendererOptions() => RendererOptions ?? SparklingWaterRenderer.Options.DefaultOptions;
     public bool GetVisible() => Visible && VisibleOnCamera;

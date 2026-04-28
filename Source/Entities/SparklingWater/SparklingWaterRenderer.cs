@@ -1,10 +1,7 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [Tracked]
-public class SparklingWaterRenderer
-    : DepthRenderer<SparklingWaterRenderer, SparklingWater, SparklingWaterRenderer.Options>
+public class SparklingWaterRenderer : DepthBatchingRenderer<SparklingWaterRenderer, SparklingWater, SparklingWaterRenderer.Options>
 {
     #region Options
 
@@ -80,6 +77,17 @@ public class SparklingWaterRenderer
             Engine.Instance.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             Engine.Instance.GraphicsDevice.BlendState = BlendState.AlphaBlend;
 
+            Camera camera = SceneAs<Level>().Camera;
+            Effect effect = SorbetHelperGFX.FxSparklingWater;
+            effect.Parameters["time"].SetValue(timer);
+            effect.Parameters["camera_pos"].SetValue(camera.Position);
+
+            Vector2 viewport = new Vector2(Engine.Graphics.GraphicsDevice.Viewport.Width, Engine.Graphics.GraphicsDevice.Viewport.Height);
+            Matrix matrix = camera.Matrix;
+            matrix *= Matrix.CreateScale(1f / viewport.X * 2f, (0f - 1f / viewport.Y) * 2f, 1f);
+            matrix *= Matrix.CreateTranslation(-1f, 1f, 0f);
+            effect.Parameters["World"].SetValue(matrix);
+
             base.BeforeRender();
         }
     }
@@ -88,31 +96,17 @@ public class SparklingWaterRenderer
     {
         Options options = waterGroup.Key;
 
-        Camera camera = SceneAs<Level>().Camera;
-
-        // prepare shader
-        Texture2D detailTexture = GFX.Game[options.DetailTexture].Texture.Texture_Safe;
         Effect effect = SorbetHelperGFX.FxSparklingWater;
         effect.Parameters["outline_color"].SetValue(options.OutlineColor.ToVector4());
         effect.Parameters["edge_color"].SetValue(options.EdgeColor.ToVector4());
         effect.Parameters["fill_color"].SetValue(options.FillColor.ToVector4());
-        effect.Parameters["texture_size"].SetValue(new Vector2(detailTexture.Width, detailTexture.Height));
         effect.Parameters["detail_config"].SetValue(new Vector4(options.CausticScale, options.CausticAlpha, options.BubbleAlpha, options.DisplacementSpeed));
-        effect.Parameters["time"].SetValue(timer);
-        effect.Parameters["camera_pos"].SetValue(camera.Position);
 
-        // prepare detail texture
+        Texture2D detailTexture = GFX.Game[options.DetailTexture].Texture.Texture_Safe;
+        effect.Parameters["texture_size"].SetValue(new Vector2(detailTexture.Width, detailTexture.Height));
         Engine.Graphics.GraphicsDevice.Textures[0] = detailTexture;
         Engine.Graphics.GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
 
-        // prepare matrix (based on GFX.DrawVertices)
-        Vector2 viewport = new Vector2(Engine.Graphics.GraphicsDevice.Viewport.Width, Engine.Graphics.GraphicsDevice.Viewport.Height);
-        Matrix matrix = camera.Matrix;
-        matrix *= Matrix.CreateScale(1f / viewport.X * 2f, (0f - 1f / viewport.Y) * 2f, 1f);
-        matrix *= Matrix.CreateTranslation(-1f, 1f, 0f);
-        effect.Parameters["World"].SetValue(matrix);
-
-        // draw water meshes
         foreach (EffectPass pass in effect.CurrentTechnique.Passes)
         {
             pass.Apply();

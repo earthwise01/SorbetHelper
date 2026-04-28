@@ -1,7 +1,8 @@
 namespace Celeste.Mod.SorbetHelper.Components;
 
 [Tracked]
-public class DepthAdheringDisplacementRenderHook : Component, IDepthRendered<bool>
+public class DepthAdheringDisplacementRenderHook
+    : Component, IDepthRenderable<DepthAdheringDisplacementRenderHook, DepthAdheringDisplacementRenderer, bool>
 {
     public readonly Action RenderEntity;
     public readonly Action RenderDisplacement;
@@ -25,8 +26,8 @@ public class DepthAdheringDisplacementRenderHook : Component, IDepthRendered<boo
     public DepthAdheringDisplacementRenderHook(Action renderEntity, Action renderDisplacement, bool distortBehind)
         : this(renderEntity, renderDisplacement, distortBehind, true) { }
 
-    private void TrackSelf() => DepthAdheringDisplacementRenderer.GetRenderer(Scene, Entity.Depth).Track(this);
-    private void UntrackSelf() => DepthAdheringDisplacementRenderer.GetRenderer(Scene, Entity.Depth).Untrack(this);
+    private void TrackSelf() => DepthAdheringDisplacementRenderer.Track(Scene, this, Entity.Depth);
+    private void UntrackSelf() => DepthAdheringDisplacementRenderer.Untrack(Scene, this, Entity.Depth);
 
     public bool GetRendererOptions() => distortBehind;
     public bool GetVisible() => EntityVisible;

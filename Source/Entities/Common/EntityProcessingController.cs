@@ -5,8 +5,8 @@ public abstract class EntityProcessingController : Entity
 {
     protected enum ProcessModes
     {
-        OnProcessorAwake,
-        OnEntityAwake
+        OnEntityAwake,
+        OnProcessorAwake
     }
 
     protected HashSet<string> AffectedTypes { get; init; }
@@ -62,7 +62,7 @@ public abstract class EntityProcessingController : Entity
         if (AffectedTypes is not null && !entity.CheckTypeName(AffectedTypes))
             return;
 
-        if (!entity.Depth.IsInRange(MinDepth, MaxDepth))
+        if (entity.Depth < MinDepth || entity.Depth > MaxDepth)
             return;
 
         ProcessEntity(entity);
@@ -138,7 +138,7 @@ public abstract class EntityProcessingController : Entity
             // linq :revolving_hearts:
             // (blehh is there a better way to do this,)
             return trackedEntityProcessors.Cast<EntityProcessingController>()
-                                          .Where(c => c is { processMode: ProcessModes.OnEntityAwake }
+                                          .Where(c => c.processMode == ProcessModes.OnEntityAwake
                                                       && (c.fromRoom == currentRoom || c.TagCheck(Tags.Global | Tags.Persistent)))
                                           .OrderBy(c => c.roomWide)
                                           .ThenBy(c => c.ProcessPriority)
