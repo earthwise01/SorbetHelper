@@ -58,35 +58,6 @@ public class StylegroundDepthController : Entity
             Tag |= Tags.PauseUpdate;
     }
 
-    private void RegisterStylegrounds(Level level)
-    {
-        RegisterStylegrounds(level.Background.Backdrops, backdropsBg);
-        RegisterStylegrounds(level.Foreground.Backdrops, backdropsFg);
-    }
-
-    private void RegisterStylegrounds(List<Backdrop> from, List<Backdrop> into)
-    {
-        HashSet<Backdrop> current = Scene.Tracker.GetEntity<StylegroundDepthController>().allAffectedBackdrops ??= [];
-
-        foreach (Backdrop backdrop in from)
-        {
-            if (!backdrop.Tags.Overlaps(stylegroundTags) || !current.Add(backdrop))
-                continue;
-
-            into.Add(backdrop);
-
-            if (backdrop is Parallax parallax && parallax.BlendState == BlendState.Additive)
-                parallax.BlendState = AdditiveTransparentAlphaBlendDestinationFix;
-        }
-    }
-
-    public override void Added(Scene scene)
-    {
-        base.Added(scene);
-
-        RegisterStylegrounds(SceneAs<Level>());
-    }
-
     public override void Removed(Scene scene)
     {
         base.Removed(scene);
@@ -197,6 +168,10 @@ public class StylegroundDepthController : Entity
         if (!SorbetHelperMapDataProcessor.StylegroundDepthControllers.TryGetValue((level.Session.Area.ID, level.Session.Area.Mode), out List<StylegroundDepthControllerData> depthControllers))
             return;
 
+        using var _ = new EasyStopwatch($"{nameof(StylegroundDepthController)}s took {{0}} to load.");
+
+        #region Add Controllers
+
         StylegroundDepthController trackedController = null;
         List<StylegroundDepthController> currentDepthControllers = [];
         foreach ((string tag, int depth, Modes mode) in depthControllers)
@@ -227,6 +202,45 @@ public class StylegroundDepthController : Entity
 
             depthController.stylegroundTags.Add(tag);
         }
+
+        #endregion
+
+        #region Register Stylegrounds
+
+        if (currentDepthControllers.Count == 0)
+            return;
+
+        HashSet<Backdrop> allAffectedBackdrops = trackedController!.allAffectedBackdrops ??= [];
+
+        RegisterStylegrounds(false);
+        RegisterStylegrounds(true);
+
+        void RegisterStylegrounds(bool foreground)
+        {
+            List<Backdrop> from = foreground ? level.Foreground.Backdrops : level.Background.Backdrops;
+
+            foreach (Backdrop backdrop in from)
+            {
+                foreach (StylegroundDepthController depthController in currentDepthControllers)
+                {
+                    if (!backdrop.Tags.Overlaps(depthController.stylegroundTags))
+                        continue;
+
+                    if (backdrop is Parallax parallax && parallax.BlendState == BlendState.Additive)
+                        parallax.BlendState = AdditiveTransparentAlphaBlendDestinationFix;
+
+                    allAffectedBackdrops.Add(backdrop);
+                    if (foreground)
+                        depthController.backdropsFg.Add(backdrop);
+                    else
+                        depthController.backdropsBg.Add(backdrop);
+
+                    break;
+                }
+            }
+        }
+
+        #endregion
     }
 
     private static void IL_BackdropRenderer_Render(ILContext il)
