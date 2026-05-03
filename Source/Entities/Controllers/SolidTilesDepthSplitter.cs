@@ -17,6 +17,13 @@ public class SolidTilesDepthSplitter : Entity
         return depthSplitter;
     }
 
+    private static readonly Autotiler.Behaviour AutotilerBehaviour = new Autotiler.Behaviour()
+    {
+        EdgesExtend = true,
+        EdgesIgnoreOutOfLevel = false,
+        PaddingIgnoreOutOfLevel = true
+    };
+
     private readonly HashSet<char> tiletypes;
     private readonly bool tryFillBehind;
 
@@ -55,25 +62,31 @@ public class SolidTilesDepthSplitter : Entity
         if (tryFillBehind)
             tryGetFillBehind = GenerateFillBehind(tileData, autotiler);
 
-        for (int x = 0; x < tileData.Columns; x++)
-        for (int y = 0; y < tileData.Rows; y++)
+        const int segmentSize = VirtualMap<char>.SegmentSize;
+        for (int segmentX = 0; segmentX < tileData.Columns; segmentX += segmentSize)
+        for (int segmentY = 0; segmentY < tileData.Rows; segmentY += segmentSize)
         {
-            if (tiletypes.Contains(tileData[x, y]))
+            if (!tileData.AnyInSegmentAtTile(segmentX, segmentY))
+                continue;
+
+            int segmentEndX = Math.Min(segmentX + segmentSize, tileData.Columns);
+            int segmentEndY = Math.Min(segmentY + segmentSize, tileData.Rows);
+            for (int x = segmentX; x < segmentEndX; x++)
+            for (int y = segmentY; y < segmentEndY; y++)
             {
+                if (!tiletypes.Contains(tileData[x, y]))
+                    continue;
+
                 tiles.Tiles[x, y] = origTiles.Tiles[x, y];
                 origTiles.Tiles[x, y] = tryGetFillBehind?.Invoke(x, y);
 
-                // only create anim tiles if necessary
-                if (origAnimTiles.tiles.AnyInSegmentAtTile(x, y))
-                {
-                    if (origAnimTiles.tiles[x, y] is null)
-                        continue;
+                if (origAnimTiles.tiles[x, y] is null)
+                    continue;
 
-                    animatedTiles ??= new AnimatedTiles(origAnimTiles.tiles.Columns, origAnimTiles.tiles.Rows, origAnimTiles.Bank);
+                animatedTiles ??= new AnimatedTiles(origAnimTiles.tiles.Columns, origAnimTiles.tiles.Rows, origAnimTiles.Bank);
 
-                    animatedTiles.tiles[x, y] = origAnimTiles.tiles[x, y];
-                    origAnimTiles.tiles[x, y] = null;
-                }
+                animatedTiles.tiles[x, y] = origAnimTiles.tiles[x, y];
+                origAnimTiles.tiles[x, y] = null;
             }
         }
 
@@ -83,50 +96,61 @@ public class SolidTilesDepthSplitter : Entity
             Add(animatedTiles);
     }
 
-    private Func<int, int, MTexture> GenerateFillBehind(VirtualMap<char> origTiles, Autotiler autotiler)
+    private Func<int, int, MTexture> GenerateFillBehind(VirtualMap<char> tileData, Autotiler autotiler)
     {
-        VirtualMap<char> newTiles = new VirtualMap<char>(origTiles.Columns, origTiles.Rows, origTiles.EmptyValue);
-        for (int x = 0; x < origTiles.Columns; x++)
-        for (int y = 0; y < origTiles.Rows; y++)
-            newTiles[x, y] = GetTile(x, y);
+        VirtualMap<char> filledTileData = new VirtualMap<char>(tileData.Columns, tileData.Rows, tileData.EmptyValue);
 
-        Autotiler.Generated generated = autotiler.GenerateMap(newTiles, paddingIgnoreOutOfLevel: true);
-
-        return (int x, int y) => tiletypes.Contains(newTiles[x, y]) ? null : generated.TileGrid.Tiles[x, y];
-
-        char GetTile(int x, int y)
+        const int segmentSize = VirtualMap<char>.SegmentSize;
+        for (int segmentX = 0; segmentX < tileData.Columns; segmentX += segmentSize)
+        for (int segmentY = 0; segmentY < tileData.Rows; segmentY += segmentSize)
         {
-            char origTile = origTiles[x, y];
-            if (!tiletypes.Contains(origTile))
-                return origTile;
+            if (!tileData.AnyInSegmentAtTile(segmentX, segmentY))
+                continue;
 
-            // try to get the fill tile from top/bottom/left/right neighbours
-            // otherwise, try the topleft/bottomleft/topright/bottomright neighbours
-            // otherwise, return the original tile
-            return TryGetFillFrom([origTiles[x, y - 1], origTiles[x, y + 1], origTiles[x - 1, y], origTiles[x + 1, y]])
-                   ?? TryGetFillFrom([origTiles[x - 1, y - 1], origTiles[x - 1, y + 1], origTiles[x + 1, y - 1], origTiles[x + 1, y + 1]])
-                   ?? origTile;
+            int segmentEndX = Math.Min(segmentX + segmentSize, tileData.Columns);
+            int segmentEndY = Math.Min(segmentY + segmentSize, tileData.Rows);
+            for (int x = segmentX; x < segmentEndX; x++)
+            for (int y = segmentY; y < segmentEndY; y++)
+                filledTileData[x, y] = GetFillTile(x, y, tileData, autotiler.lookup);
+        }
 
-            // returns whichever neighbour that connects to the original tile ignores the most of the others
-            char? TryGetFillFrom(char[] neighbours)
+        return (int x, int y) => !tiletypes.Contains(filledTileData[x, y])
+            ? autotiler.Generate(filledTileData, x, y, 1, 1, false, '0', AutotilerBehaviour).TileGrid.Tiles[0, 0]
+            : null;
+    }
+
+    private char GetFillTile(int x, int y, VirtualMap<char> tileData, Dictionary<char, Autotiler.TerrainType> terrainLookup)
+    {
+        char origTile = tileData[x, y];
+        if (!tiletypes.Contains(origTile))
+            return origTile;
+
+        // try to get the fill tile from top/bottom/left/right neighbours
+        // otherwise, try the topleft/bottomleft/topright/bottomright neighbours
+        // otherwise, return the original tile
+        return TryGetFillFrom([tileData[x, y - 1], tileData[x, y + 1], tileData[x - 1, y], tileData[x + 1, y]])
+               ?? TryGetFillFrom([tileData[x - 1, y - 1], tileData[x - 1, y + 1], tileData[x + 1, y - 1], tileData[x + 1, y + 1]])
+               ?? origTile;
+
+        // returns whichever neighbour that connects to the original tile ignores the most of the others
+        char? TryGetFillFrom(char[] neighbours)
+        {
+            char? fillTile = null;
+            foreach (char neighbour in neighbours)
             {
-                char? fillTile = null;
-                foreach (char neighbour in neighbours)
-                {
-                    // ignore any neighbours that are also being split
-                    if (tiletypes.Contains(neighbour))
-                        continue;
+                // ignore any neighbours that are also being split
+                if (tiletypes.Contains(neighbour))
+                    continue;
 
-                    // air ('0') isn't in the lookup but is treated as always connecting to origTile and always ignored by the other neighbours
-                    if ((neighbour == '0' && fillTile is null)
-                        || autotiler.lookup.TryGetValue(neighbour, out Autotiler.TerrainType neighbourData)
-                        && !neighbourData.Ignore(origTile)
-                        && (fillTile is null || fillTile == '0' || neighbourData.Ignore(fillTile.Value)))
-                        fillTile = neighbour;
-                }
-
-                return fillTile;
+                // air ('0') isn't in the lookup but is treated as always connecting to origTile and always ignored by the other neighbours
+                if ((neighbour == '0' && fillTile is null)
+                    || terrainLookup.TryGetValue(neighbour, out Autotiler.TerrainType neighbourData)
+                    && !neighbourData.Ignore(origTile)
+                    && (fillTile is null || fillTile == '0' || neighbourData.Ignore(fillTile.Value)))
+                    fillTile = neighbour;
             }
+
+            return fillTile;
         }
     }
 }
