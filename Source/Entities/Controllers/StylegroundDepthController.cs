@@ -168,8 +168,6 @@ public class StylegroundDepthController : Entity
         if (!SorbetHelperMapDataProcessor.StylegroundDepthControllers.TryGetValue((level.Session.Area.ID, level.Session.Area.Mode), out List<StylegroundDepthControllerData> depthControllers))
             return;
 
-        using var _ = new EasyStopwatch($"{nameof(StylegroundDepthController)}s took {{0}} to load.");
-
         #region Add Controllers
 
         StylegroundDepthController trackedController = null;
