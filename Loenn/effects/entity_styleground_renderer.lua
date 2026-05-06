@@ -8,7 +8,7 @@ entityStylegroundRenderer.defaultData = {
 
 entityStylegroundRenderer.fieldInformation = {
     _instructionsButton = {
-        fieldType = "sorbetHelper.infoButton"
+        fieldType = "sorbet_helper.info_button"
     }
 }
 
