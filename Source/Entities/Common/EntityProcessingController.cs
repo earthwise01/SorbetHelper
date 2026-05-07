@@ -140,7 +140,8 @@ public abstract class EntityProcessingController : Entity
             return trackedEntityProcessors.Cast<EntityProcessingController>()
                                           .Where(c => c.processMode == ProcessModes.OnEntityAwake
                                                       && (c.fromRoom == currentRoom || c.TagCheck(Tags.Global | Tags.Persistent)))
-                                          .OrderBy(c => c.roomWide)
+                                          .OrderBy(c => c.TagCheck(Tags.Global | Tags.Persistent))
+                                          .ThenBy(c => c.roomWide)
                                           .ThenBy(c => c.ProcessPriority)
                                           .ToArray();
         }
