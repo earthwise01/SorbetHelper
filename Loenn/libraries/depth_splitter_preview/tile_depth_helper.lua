@@ -31,7 +31,7 @@ function tileDepthHelper.getRandQuadIndex_compat(rng, quadCount)
         return utils.mod1(rng, quadCount)
     end
 
-    return 1 + math.floor(rng * (quadCount - 1))
+    return 1 + math.floor(rng * quadCount)
 end
 
 function tileDepthHelper.smartDrawingBatch_createMatrixBatch_compat(default, width, height, cellWidth, cellHeight)
