@@ -77,8 +77,8 @@ function sparklingWater.sprite(room, entity)
 
     local outlineColor, fillColor = getColors(room, entity)
     -- reduce alpha slightly
-    outlineColor[4] = outlineColor[4] * 0.8;
-    fillColor[4] = fillColor[4] * 0.8;
+    outlineColor[4] = (outlineColor[4] or 1) * 0.8;
+    fillColor[4] = (fillColor[4] or 1) * 0.8;
 
     return drawableRectangle.fromRectangle("bordered", x, y, width, height, fillColor, outlineColor)
 end

@@ -102,8 +102,12 @@ resizableWaterfall.fieldInformation = {
     }
 }
 
+local function endsWith(s, suffix)
+    return s:sub(-#suffix) == suffix
+end
+
 local function waterSearchPredicate(entity)
-    return entity._name == "water" or entity._name == "pandorasBox/coloredWater" or utils.endsWith(entity._name, "SparklingWater")
+    return entity._name == "water" or entity._name == "pandorasBox/coloredWater" or endsWith(entity._name, "SparklingWater")
 end
 
 local function collideFirst(rectangle, rectangles)
