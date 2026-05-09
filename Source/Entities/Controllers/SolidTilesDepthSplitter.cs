@@ -24,17 +24,17 @@ public class SolidTilesDepthSplitter : Entity
         PaddingIgnoreOutOfLevel = true
     };
 
-    private readonly HashSet<char> tiletypes;
+    private readonly HashSet<char> splitTiletypes;
     private readonly bool tryFillBehind;
 
     private TileGrid tiles;
     private AnimatedTiles animatedTiles;
 
-    private SolidTilesDepthSplitter(int depth, HashSet<char> tiletypes, bool tryFillBehind) : base()
+    private SolidTilesDepthSplitter(int depth, HashSet<char> splitTiletypes, bool tryFillBehind) : base()
     {
         Depth = depth;
-        this.tiletypes = tiletypes;
-        this.tiletypes.Remove('0');
+        this.splitTiletypes = splitTiletypes;
+        this.splitTiletypes.Remove('0');
         this.tryFillBehind = tryFillBehind;
     }
 
@@ -48,7 +48,7 @@ public class SolidTilesDepthSplitter : Entity
 
     private void SplitTiles(Vector2 position, VirtualMap<char> tileData, TileGrid origTiles, AnimatedTiles origAnimTiles, Autotiler autotiler)
     {
-        if (tiletypes.Count <= 0)
+        if (splitTiletypes.Count <= 0)
             return;
 
         Position = position;
@@ -58,9 +58,9 @@ public class SolidTilesDepthSplitter : Entity
             VisualExtend = origTiles.VisualExtend
         };
 
-        Func<int, int, MTexture> tryGetFillBehind = null;
-        if (tryFillBehind)
-            tryGetFillBehind = GenerateFillBehind(tileData, autotiler);
+        VirtualMap<char> fillBehindData = tryFillBehind
+            ? GenerateFillBehind(tileData, autotiler)
+            : null;
 
         const int segmentSize = VirtualMap<char>.SegmentSize;
         for (int segmentX = 0; segmentX < tileData.Columns; segmentX += segmentSize)
@@ -74,11 +74,13 @@ public class SolidTilesDepthSplitter : Entity
             for (int x = segmentX; x < segmentEndX; x++)
             for (int y = segmentY; y < segmentEndY; y++)
             {
-                if (!tiletypes.Contains(tileData[x, y]))
+                if (!splitTiletypes.Contains(tileData[x, y]))
                     continue;
 
                 tiles.Tiles[x, y] = origTiles.Tiles[x, y];
-                origTiles.Tiles[x, y] = tryGetFillBehind?.Invoke(x, y);
+                origTiles.Tiles[x, y] = fillBehindData is not null && !splitTiletypes.Contains(fillBehindData[x, y])
+                    ? GenerateTileAt(autotiler, fillBehindData, x, y)
+                    : null;
 
                 if (origAnimTiles.tiles[x, y] is null)
                     continue;
@@ -96,7 +98,7 @@ public class SolidTilesDepthSplitter : Entity
             Add(animatedTiles);
     }
 
-    private Func<int, int, MTexture> GenerateFillBehind(VirtualMap<char> tileData, Autotiler autotiler)
+    private VirtualMap<char> GenerateFillBehind(VirtualMap<char> tileData, Autotiler autotiler)
     {
         VirtualMap<char> filledTileData = new VirtualMap<char>(tileData.Columns, tileData.Rows, tileData.EmptyValue);
 
@@ -114,15 +116,13 @@ public class SolidTilesDepthSplitter : Entity
                 filledTileData[x, y] = GetFillTile(x, y, tileData, autotiler.lookup);
         }
 
-        return (int x, int y) => !tiletypes.Contains(filledTileData[x, y])
-            ? autotiler.Generate(filledTileData, x, y, 1, 1, false, '0', AutotilerBehaviour).TileGrid.Tiles[0, 0]
-            : null;
+        return filledTileData;
     }
 
     private char GetFillTile(int x, int y, VirtualMap<char> tileData, Dictionary<char, Autotiler.TerrainType> terrainLookup)
     {
         char origTile = tileData[x, y];
-        if (!tiletypes.Contains(origTile))
+        if (!splitTiletypes.Contains(origTile))
             return origTile;
 
         // try to get the fill tile from top/bottom/left/right neighbours
@@ -139,7 +139,7 @@ public class SolidTilesDepthSplitter : Entity
             foreach (char neighbour in neighbours)
             {
                 // ignore any neighbours that are also being split
-                if (tiletypes.Contains(neighbour))
+                if (splitTiletypes.Contains(neighbour))
                     continue;
 
                 // air ('0') isn't in the lookup but is treated as always connecting to origTile and always ignored by the other neighbours
@@ -152,5 +152,13 @@ public class SolidTilesDepthSplitter : Entity
 
             return fillTile;
         }
+    }
+
+    private static MTexture GenerateTileAt(Autotiler autotiler, VirtualMap<char> tileData, int x, int y)
+    {
+        List<MTexture> tileTextures = autotiler.TileHandler(tileData, x, y, Rectangle.Empty, '0', AutotilerBehaviour)?.Textures;
+        return tileTextures is not null
+            ? Calc.Random.Choose(tileTextures)
+            : null;
     }
 }
