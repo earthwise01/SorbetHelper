@@ -4,13 +4,10 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [Tracked]
 public class DisplacementEffectBlocker : Entity
 {
-    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(DisplacementEffectBlocker)}";
-
     public readonly bool DepthAdhering;
     public readonly bool WaterOnly;
 
-    private readonly string flag;
-    private readonly bool invertFlag;
+    private readonly Condition condition;
 
     public static readonly Color NoDisplacementColor = new Color(0.5f, 0.5f, 0.0f, 1.0f);
 
@@ -31,20 +28,23 @@ public class DisplacementEffectBlocker : Entity
         WaterOnly = data.Bool("waterOnly", false);
         Depth = data.Int("depth", 0);
 
-        flag = data.Attr("flag", "");
-        if (flag.StartsWith('!'))
-        {
-            invertFlag = true;
-            flag = flag.Substring(1);
-        }
+        condition = data.Condition("flag");
+    }
+
+    public override void Awake(Scene scene)
+    {
+        base.Awake(scene);
+
+        if (condition is not Condition.Empty)
+            Visible = condition.Check(SceneAs<Level>().Session);
     }
 
     public override void Update()
     {
         base.Update();
 
-        if (!string.IsNullOrEmpty(flag))
-            Visible = SceneAs<Level>().Session.GetFlag(flag, invertFlag);
+        if (condition is not Condition.Empty)
+            Visible = condition.Check(SceneAs<Level>().Session);
     }
 
     #region Hooks

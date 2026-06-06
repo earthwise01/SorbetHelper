@@ -59,7 +59,7 @@ internal class SorbetHelperMapDataProcessor : EverestMapDataProcessor
 
         void ProcessMusicSyncController(BinaryPacker.Element data)
         {
-            HashSet<string> eventNames = data.AttrList("eventNames", str => str).ToHashSet();
+            HashSet<string> eventNames = data.Attr("eventNames").Split(',', StringSplitOptions.TrimAndRemoveEmpty).ToHashSet();
             MusicSyncEvents[(AreaKey.ID, AreaKey.Mode)] = eventNames;
 
             Logger.Verbose(LogID, $"found a MusicSyncController in {AreaKey.SID} ({AreaKey.Mode})!");

@@ -5,8 +5,7 @@ public class CrumbleOnFlagBlock : Solid
 {
     private readonly char tileType;
     private readonly bool blendIn;
-    private readonly string flag;
-    private readonly bool inverted;
+    private readonly Condition breakCondition;
     private readonly bool playAudio;
     private readonly bool showDebris;
 
@@ -20,8 +19,7 @@ public class CrumbleOnFlagBlock : Solid
     {
         Depth = data.Int("depth", -10010);
         tileType = data.Char("tiletype", '3');
-        flag = data.Attr("flag", "");
-        inverted = data.Bool("inverted", false);
+        breakCondition = data.Condition("flag", data.Bool("inverted"), false);
         playAudio = data.Bool("playAudio", true);
         showDebris = data.Bool("showDebris", true);
         blendIn = data.Bool("blendin", true);
@@ -56,7 +54,7 @@ public class CrumbleOnFlagBlock : Solid
         Add(new TileInterceptor(tiles, highPriority: true));
         Add(lightOcclude = new LightOcclude());
 
-        if (CollideCheck<Player>() || level.Session.GetFlag(flag, inverted))
+        if (CollideCheck<Player>() || breakCondition.Check(level.Session))
         {
             lightOcclude.Alpha = tiles.Alpha = 0f;
             Collidable = false;
@@ -70,7 +68,7 @@ public class CrumbleOnFlagBlock : Solid
     {
         base.Update();
 
-        if (!string.IsNullOrEmpty(flag) && SceneAs<Level>().Session.GetFlag(flag, inverted) == Collidable)
+        if (breakCondition.Check(SceneAs<Level>().Session) == Collidable)
         {
             if (Collidable)
                 Break();

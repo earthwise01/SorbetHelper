@@ -30,7 +30,7 @@ sparklingWater.fieldOrder = {
 sparklingWater.fieldInformation = {
     depth = {
         fieldType = "integer",
-        options = sorbetHelper.getDepths({
+        options = sorbetHelper.getDepthOptions({
             {"Water", -9999}
         }),
         editable = true
@@ -41,20 +41,27 @@ function sparklingWater.rectangle(room, entity)
     return utils.rectangle(entity.x, entity.y, entity.width or 8, entity.height or 16)
 end
 
-local function getColors(currentRoom, self)
-    local defaultOutline, defaultFill = utils.getColor("87cefaf0"), utils.getColor("4480b890")
+local defaultFillColor, defaultOutlineColor = utils.getColor("4480b890"), utils.getColor("87cefaf0")
+local sessionFillColor, sessionOutlineColor = {1, 1, 1, 0.3 / 0.8}, {1, 1, 1, 0.8 / 0.8}
 
+local function getColorsFromController(controller)
+    local fillColor = sorbetHelper.isCounterOrSessionExpression(controller.fillColor) and sessionFillColor or utils.getColor(controller.fillColor) or defaultFillColor
+    local outlineColor = sorbetHelper.isCounterOrSessionExpression(controller.outlineColor) and sessionOutlineColor or utils.getColor(controller.outlineColor) or defaultOutlineColor
+    return fillColor, outlineColor
+end
+
+local function getColors(currentRoom, self)
     local map = loadedState.map
     if not map then
-        return defaultOutline, defaultFill
-     end
+        return defaultFillColor, defaultOutlineColor
+    end
 
     local allDepthsController = nil
     for _, room in pairs(map.rooms) do
         for _, entity in pairs(room.entities) do
             if entity._name == "SorbetHelper/SparklingWaterColorController" and (room == currentRoom or entity.global or utils.startsWith(room.name, "_bb_global")) then
                 if entity.affectedDepth == self.depth then
-                    return utils.getColor(entity.outlineColor) or defaultOutline, utils.getColor(entity.fillColor) or defaultFill
+                    return getColorsFromController(entity)
                 end
 
                 if not entity.affectedDepth and not allDepthsController then
@@ -65,20 +72,24 @@ local function getColors(currentRoom, self)
     end
 
     if allDepthsController then
-        return utils.getColor(allDepthsController.outlineColor) or defaultOutline, utils.getColor(allDepthsController.fillColor) or defaultFill
+        return getColorsFromController(allDepthsController)
     end
 
-    return defaultOutline, defaultFill
+    return defaultFillColor, defaultOutlineColor
+end
+
+local function multiplyAlpha(color, alpha)
+    return {color[1], color[2], color[3], (color[4] or 1) * alpha}
 end
 
 function sparklingWater.sprite(room, entity)
     local x, y = entity.x or 0, entity.y or 0
     local width, height = entity.width or 8, entity.height or 16
 
-    local outlineColor, fillColor = getColors(room, entity)
+    local fillColor, outlineColor = getColors(room, entity)
     -- reduce alpha slightly
-    outlineColor[4] = (outlineColor[4] or 1) * 0.8;
-    fillColor[4] = (fillColor[4] or 1) * 0.8;
+    fillColor = multiplyAlpha(fillColor, 0.8)
+    outlineColor = multiplyAlpha(outlineColor, 0.8)
 
     return drawableRectangle.fromRectangle("bordered", x, y, width, height, fillColor, outlineColor)
 end

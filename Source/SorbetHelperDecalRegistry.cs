@@ -14,7 +14,7 @@ public static class SorbetHelperDecalRegistry
 
         public override void ApplyTo(Decal decal)
         {
-            if (decal.Depth.IsInRange(minDepth, maxDepth))
+            if (Calc.IsInRange(decal.Depth, minDepth, maxDepth))
                 decal.Add(new LightCover(alpha));
         }
 
@@ -36,7 +36,7 @@ public static class SorbetHelperDecalRegistry
 
         public override void ApplyTo(Decal decal)
         {
-            if (decal.Depth.IsInRange(minDepth, maxDepth))
+            if (Calc.IsInRange(decal.Depth, minDepth, maxDepth))
                 decal.Add(new EntityStylegroundMarker(tag));
         }
 

@@ -10,10 +10,11 @@ entities.SorbetHelper/FlagToggledKillbox.placements.name.flag_toggled_killbox=Ki
 entities.SorbetHelper/FlagToggledKillbox.placements.description.flag_toggled_killbox=A killbox that can be toggled by a session flag.
 entities.SorbetHelper/FlagToggledKillbox.placements.name.accurate_killbox=Accurate Killbox
 entities.SorbetHelper/FlagToggledKillbox.placements.description.accurate_killbox=A custom killbox that only kills the player once they are fully beneath the top of the killbox, matching how the bottom of a room behaves.
-entities.SorbetHelper/FlagToggledKillbox.attributes.description.flag=An optional session flag that needs to be set in order for the killbox to be able to activate.
+entities.SorbetHelper/FlagToggledKillbox.attributes.description.flag=A session flag that must be set for the killbox to be able to activate. Leave empty for it to always be able to activate.\nAdd an exclamation mark before the flag name to require the flag to not be set instead,\n    e.g. `!myFlag`.\nIf Frost Helper is enabled, a Session Expression may be used instead by adding `expr:` before the expression,\n    e.g. `expr:#myCounter > 5`.
 entities.SorbetHelper/FlagToggledKillbox.attributes.name.inverted=Invert Flag
 entities.SorbetHelper/FlagToggledKillbox.attributes.description.inverted=When checked, the killbox can only be active when the flag is disabled, rather than when it is enabled.
-entities.SorbetHelper/FlagToggledKillbox.attributes.description.flagOnly=Whether the killbox's collidability should only be determined by its flag, instead of also requiring the player to be above it.
+entities.SorbetHelper/FlagToggledKillbox.attributes.name.flagOnly=Ignore Player Position
+entities.SorbetHelper/FlagToggledKillbox.attributes.description.flagOnly=Whether the killbox should not require the player to be above it in order to activate, and not deactivate if they go too far below it again.
 entities.SorbetHelper/FlagToggledKillbox.attributes.description.playerAboveThreshold=How far (in pixels) above the killbox the player needs to be in order for it to activate. Default is 32.
 entities.SorbetHelper/FlagToggledKillbox.attributes.name.lenientHitbox=Accurate Hitbox
 entities.SorbetHelper/FlagToggledKillbox.attributes.description.lenientHitbox=Whether the player should only die once they are fully beneath the top of the killbox, accurately matching how the kill plane at the bottom of a room behaves.
@@ -22,10 +23,10 @@ entities.SorbetHelper/FlagToggledKillbox.attributes.description.updateOnLoad=Whe
 # Kill Zone
 entities.SorbetHelper/KillZone.placements.name.killzone=Kill Zone
 entities.SorbetHelper/KillZone.placements.description.killzone=An invisible barrier which kills the player when touched.
-entities.SorbetHelper/KillZone.attributes.description.flag=The flag that needs to be set in order for the kill zone to be activated. Leaving this empty causes the kill zone to always be active.
+entities.SorbetHelper/KillZone.attributes.description.flag=A session flag that must be set for the kill zone to be collidable. Leave empty for it to always be collidable.\nAdd an exclamation mark before the flag name to require the flag to not be set instead,\n    e.g. `!myFlag`.\nIf Frost Helper is enabled, a Session Expression may be used instead by adding `expr:` before the expression,\n    e.g. `expr:#myCounter > 5`.
 entities.SorbetHelper/KillZone.attributes.name.inverted=Invert Flag
 entities.SorbetHelper/KillZone.attributes.description.inverted=When checked, the kill zone will only be active when the flag is disabled, rather than when it is enabled.
-entities.SorbetHelper/KillZone.attributes.description.fastKill=When checked, the player will die instantly upon touching the kill zone rather than getting knocked back a bit first.
+entities.SorbetHelper/KillZone.attributes.description.fastKill=Whether the player should die instantly when touching the kill zone rather than getting knocked back a bit first.
 entities.SorbetHelper/KillZone.attributes.description.collideHoldables=Whether holdables (like theo crystals or jellies) can collide with the kill zone.\nTheo crystals and jellies should be killed as expected, while other holdables will fall back to their behavior when touching a spinner.
 
 # Return Berry
@@ -35,8 +36,8 @@ entities.SorbetHelper/ReturnBerry.placements.name.strawberry_with_return_winged=
 entities.SorbetHelper/ReturnBerry.placements.description.strawberry_with_return_winged=A winged strawberry which puts the player in a bubble and moves them to its node when grabbed.
 entities.SorbetHelper/ReturnBerry.placements.name.search_engine_optimization=Strawberry With Return Berry
 entities.SorbetHelper/ReturnBerry.placements.name.search_engine_optimization_winged=Winged Strawberry With Return Berry Winged Return Berry
-entities.SorbetHelper/ReturnBerry.attributes.description.winged=Determines whether the strawberry has wings and attempts to vertically rise offscreen when the player dashes.
-entities.SorbetHelper/ReturnBerry.attributes.description.moon=Makes the strawberry render as a moon berry.\nCrashes the map if the strawberry also has wings due to the 'flap' animation not being present.
+entities.SorbetHelper/ReturnBerry.attributes.description.winged=Whether the strawberry should have wings and attempt to vertically rise offscreen when the player dashes.
+entities.SorbetHelper/ReturnBerry.attributes.description.moon=Makes the strawberry render as a moon berry.\nCrashes the map if the strawberry also has wings due to the `flap` animation not being present.
 entities.SorbetHelper/ReturnBerry.attributes.description.delay=The delay (in seconds) before the player is placed into a bubble after grabbing the strawberry. (Default = 0.3)
 entities.SorbetHelper/ReturnBerry.attributes.description.checkpointID=Manually determine what checkpoint section strawberries are visually grouped up in, showing up on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)
 entities.SorbetHelper/ReturnBerry.attributes.description.order=Manually determine what order strawberries are visually placed in on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)
@@ -49,7 +50,7 @@ entities.SorbetHelper/CustomFallingBlock.attributes.description.tiletype=Determi
 entities.SorbetHelper/CustomFallingBlock.attributes.description.direction=The direction the falling block will fall towards.
 entities.SorbetHelper/CustomFallingBlock.attributes.description.flagOnFall=An optional session flag to set when the block starts falling.
 entities.SorbetHelper/CustomFallingBlock.attributes.description.flagOnLand=An optional session flag to set when the block lands.
-entities.SorbetHelper/CustomFallingBlock.attributes.description.triggerFlag=An optional session flag which should trigger the block to fall.
+entities.SorbetHelper/CustomFallingBlock.attributes.description.triggerFlag=An optional session flag that should trigger this block to fall when set.\nAdd an exclamation mark before the flag name to require the flag to not be set instead,\n    e.g. `!myFlag`.\nIf Frost Helper is enabled, a Session Expression may be used instead by adding `expr:` before the expression,\n    e.g. `expr:#myCounter > 5`.
 entities.SorbetHelper/CustomFallingBlock.attributes.description.resetFlags=Whether the falling block should reset its session flags to false when loading, rather than leaving them as they were unless something else changes them.
 entities.SorbetHelper/CustomFallingBlock.attributes.description.fallOnTouch=Whether the block should fall when the player lands on it.
 entities.SorbetHelper/CustomFallingBlock.attributes.description.climbFall=Whether the block should also fall if the player climbs on its sides.\nRequires Fall On Touch to be enabled.
@@ -63,7 +64,7 @@ entities.SorbetHelper/CustomFallingBlock.attributes.description.maxSpeed=The max
 entities.SorbetHelper/CustomFallingBlock.attributes.description.acceleration=The acceleration of the block (in pixels per second) as it falls.
 entities.SorbetHelper/CustomFallingBlock.attributes.description.shakeSfx=The sound played by the block before it falls.
 entities.SorbetHelper/CustomFallingBlock.attributes.description.impactSfx=The sound played by the block when it lands on the ground.
-entities.SorbetHelper/CustomFallingBlock.attributes.description.depth=Determines the visual depth of the block.\nHigher values mean farther behind in the scene, default value is -9000.
+entities.SorbetHelper/CustomFallingBlock.attributes.description.depth=The visual depth of the block.\nHigher values mean farther behind in the scene, default value is -9000.
 entities.SorbetHelper/CustomFallingBlock.attributes.description.chronoHelperGravity=Whether the falling block should be affected by Gravity Falling Block Switches from Chrono Helper.\nRequires Chrono Helper.
 
 # Dash Falling Block
@@ -73,7 +74,7 @@ entities.SorbetHelper/DashFallingBlock.attributes.description.tiletype=Determine
 entities.SorbetHelper/DashFallingBlock.attributes.description.direction=The direction the falling block will fall towards.
 entities.SorbetHelper/DashFallingBlock.attributes.description.flagOnFall=An optional session flag to set when the block starts falling.
 entities.SorbetHelper/DashFallingBlock.attributes.description.flagOnLand=An optional session flag to set when the block lands.
-entities.SorbetHelper/DashFallingBlock.attributes.description.triggerFlag=An optional session flag which should trigger the block to fall.
+entities.SorbetHelper/DashFallingBlock.attributes.description.triggerFlag=An optional session flag that should trigger this block to fall when set.\nAdd an exclamation mark before the flag name to require the flag to not be set instead,\n    e.g. `!myFlag`.\nIf Frost Helper is enabled, a Session Expression may be used instead by adding `expr:` before the expression,\n    e.g. `expr:#myCounter > 5`.
 entities.SorbetHelper/DashFallingBlock.attributes.description.resetFlags=Whether the falling block should reset its session flags to false when loading, rather than leaving them as they were unless something else changes them.
 entities.SorbetHelper/DashFallingBlock.attributes.description.fallOnTouch=Whether the block should fall when the player lands on it.
 entities.SorbetHelper/DashFallingBlock.attributes.description.climbFall=Whether the block should also fall if the player climbs on its sides.\nRequires Fall On Touch to be enabled.
@@ -87,7 +88,7 @@ entities.SorbetHelper/DashFallingBlock.attributes.description.maxSpeed=The maxim
 entities.SorbetHelper/DashFallingBlock.attributes.description.acceleration=The acceleration of the block (in pixels per second) as it falls.
 entities.SorbetHelper/DashFallingBlock.attributes.description.shakeSfx=The sound played by the block before it falls.
 entities.SorbetHelper/DashFallingBlock.attributes.description.impactSfx=The sound played by the block when it lands on the ground, or is dashed into.
-entities.SorbetHelper/DashFallingBlock.attributes.description.depth=Determines the visual depth of the block.\nHigher values mean farther behind in the scene, default value is -9000.
+entities.SorbetHelper/DashFallingBlock.attributes.description.depth=The visual depth of the block.\nHigher values mean farther behind in the scene, default value is -9000.
 entities.SorbetHelper/DashFallingBlock.attributes.description.chronoHelperGravity=Whether the falling block should be affected by Gravity Falling Block Switches from Chrono Helper.\nRequires Chrono Helper.
 entities.SorbetHelper/DashFallingBlock.attributes.description.allowWavedash=Whether it is possible to wavedash on top of the block.
 entities.SorbetHelper/DashFallingBlock.attributes.name.dashCornerCorrection=Easier Wallbounce
@@ -95,7 +96,7 @@ entities.SorbetHelper/DashFallingBlock.attributes.description.dashCornerCorrecti
 entities.SorbetHelper/DashFallingBlock.attributes.name.fallDashMode=Fall Towards Dash Direction
 entities.SorbetHelper/DashFallingBlock.attributes.description.fallDashMode=Whether the direction the falling block will fall towards is determined by the direction it was dashed into from.\nOverrides the normal direction setting when enabled.
 entities.SorbetHelper/DashFallingBlock.attributes.description.refillDash=Whether the player should refill their dash when hitting the block.
-entities.SorbetHelper/DashFallingBlock.attributes.description.dashActivated=Determines whether the block can be activated by dashing into it. Disabling this effectively turns this into a regular custom falling block.
+entities.SorbetHelper/DashFallingBlock.attributes.description.dashActivated=Whether the block can be activated by dashing into it. Disabling this effectively turns this into a regular custom falling block.
 
 # Custom Gravity Falling Block
 entities.SorbetHelper/CustomGravityFallingBlock.placements.name.custom_gravity_falling_block=Custom Gravity Falling Block
@@ -105,7 +106,7 @@ entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.tiletype=
 entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.direction=The direction the falling block will fall towards.
 entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.flagOnFall=An optional session flag to set when the block starts falling.
 entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.flagOnLand=An optional session flag to set when the block lands.
-entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.triggerFlag=An optional session flag which should trigger the block to fall.
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.triggerFlag=An optional session flag that should trigger this block to fall when set.\nAdd an exclamation mark before the flag name to require the flag to not be set instead,\n    e.g. `!myFlag`.\nIf Frost Helper is enabled, a Session Expression may be used instead by adding `expr:` before the expression,\n    e.g. `expr:#myCounter > 5`.
 entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.resetFlags=Whether the falling block should reset its session flags to false when loading, rather than leaving them as they were unless something else changes them.
 entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.fallOnTouch=Whether the block should fall when the player lands on it.
 entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.climbFall=Whether the block should also fall if the player climbs on its sides.\nRequires Fall On Touch to be enabled.
@@ -119,7 +120,7 @@ entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.maxSpeed=
 entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.acceleration=The acceleration of the block (in pixels per second) as it falls.
 entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.shakeSfx=The sound played by the block before it falls.
 entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.impactSfx=The sound played by the block when it lands on the ground.
-entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.depth=Determines the visual depth of the block.\nHigher values mean farther behind in the scene, default value is -9000.
+entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.depth=The visual depth of the block.\nHigher values mean farther behind in the scene, default value is -9000.
 entities.SorbetHelper/CustomGravityFallingBlock.attributes.description.chronoHelperGravity=Whether the falling block should be affected by Gravity Falling Block Switches from Chrono Helper.\nRequires Chrono Helper.
 
 # Gravity Dash Falling Block
@@ -130,7 +131,7 @@ entities.SorbetHelper/GravityDashFallingBlock.attributes.description.tiletype=De
 entities.SorbetHelper/GravityDashFallingBlock.attributes.description.direction=The direction the falling block will fall towards.
 entities.SorbetHelper/GravityDashFallingBlock.attributes.description.flagOnFall=An optional session flag to set when the block starts falling.
 entities.SorbetHelper/GravityDashFallingBlock.attributes.description.flagOnLand=An optional session flag to set when the block lands.
-entities.SorbetHelper/GravityDashFallingBlock.attributes.description.triggerFlag=An optional session flag which should trigger the block to fall.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.triggerFlag=An optional session flag that should trigger this block to fall when set.\nAdd an exclamation mark before the flag name to require the flag to not be set instead,\n    e.g. `!myFlag`.\nIf Frost Helper is enabled, a Session Expression may be used instead by adding `expr:` before the expression,\n    e.g. `expr:#myCounter > 5`.
 entities.SorbetHelper/GravityDashFallingBlock.attributes.description.resetFlags=Whether the falling block should reset its session flags to false when loading, rather than leaving them as they were unless something else changes them.
 entities.SorbetHelper/GravityDashFallingBlock.attributes.description.fallOnTouch=Whether the block should fall when the player lands on it.
 entities.SorbetHelper/GravityDashFallingBlock.attributes.description.climbFall=Whether the block should also fall if the player climbs on its sides.\nRequires Fall On Touch to be enabled.
@@ -144,7 +145,7 @@ entities.SorbetHelper/GravityDashFallingBlock.attributes.description.maxSpeed=Th
 entities.SorbetHelper/GravityDashFallingBlock.attributes.description.acceleration=The acceleration of the block (in pixels per second) as it falls.
 entities.SorbetHelper/GravityDashFallingBlock.attributes.description.shakeSfx=The sound played by the block before it falls.
 entities.SorbetHelper/GravityDashFallingBlock.attributes.description.impactSfx=The sound played by the block when it lands on the ground, or is dashed into.
-entities.SorbetHelper/GravityDashFallingBlock.attributes.description.depth=Determines the visual depth of the block.\nHigher values mean farther behind in the scene, default value is -9000.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.depth=The visual depth of the block.\nHigher values mean farther behind in the scene, default value is -9000.
 entities.SorbetHelper/GravityDashFallingBlock.attributes.description.chronoHelperGravity=Whether the falling block should be affected by Gravity Falling Block Switches from Chrono Helper.\nRequires Chrono Helper.
 entities.SorbetHelper/GravityDashFallingBlock.attributes.description.allowWavedash=Whether it is possible to wavedash on top of the block.
 entities.SorbetHelper/GravityDashFallingBlock.attributes.name.dashCornerCorrection=Easier Wallbounce
@@ -152,7 +153,7 @@ entities.SorbetHelper/GravityDashFallingBlock.attributes.description.dashCornerC
 entities.SorbetHelper/GravityDashFallingBlock.attributes.name.fallDashMode=Fall Towards Dash Direction
 entities.SorbetHelper/GravityDashFallingBlock.attributes.description.fallDashMode=Whether the direction the falling block will fall towards is determined by the direction it was dashed into from.\nOverrides the normal direction setting when enabled.
 entities.SorbetHelper/GravityDashFallingBlock.attributes.description.refillDash=Whether the player should refill their dash when hitting the block.
-entities.SorbetHelper/GravityDashFallingBlock.attributes.description.dashActivated=Determines whether the block can be activated by dashing into it. Disabling this effectively turns this into a regular custom falling block.
+entities.SorbetHelper/GravityDashFallingBlock.attributes.description.dashActivated=Whether the block can be activated by dashing into it. Disabling this effectively turns this into a regular custom falling block.
 
 # Crumble On Flag Block
 entities.SorbetHelper/CrumbleOnFlagBlock.placements.name.crumble_on_flag_block=Crumble On Flag Block
@@ -162,12 +163,12 @@ entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.blendin=Whether 
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.tiletype=Determines the visual appearance of the block.
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.name.inverted=Invert Flag
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.inverted=When checked, the block will break when the flag is disabled, rather than when it is enabled.
-entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.flag=The flag that needs to be set in order for the block to break.
-entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.showDebris=Determines whether the block spawns debris when it breaks.
-entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.playAudio=Determines whether the block plays sound effects when breaking/appearing.
-entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.depth=Determines the visual depth of the block.\nHigher values mean farther behind in the scene, default value is -10010.
+entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.flag=A session flag that should trigger this block to break when set.\nAdd an exclamation mark before the flag name to require the flag to not be set instead,\n    e.g. `!myFlag`.\nIf Frost Helper is enabled, a Session Expression may be used instead by adding `expr:` before the expression,\n    e.g. `expr:#myCounter > 5`.
+entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.showDebris=Whether the block should spawn debris when it breaks.
+entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.playAudio=Whether the block should play a sound when breaking and reappearing.
+entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.depth=The visual depth of the block.\nHigher values mean farther behind in the scene, default value is -10010.
 entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.destroyAttached=Whether objects such as spikes that are attached to the block should be affected as well.
-entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.fadeInTime=Determines how long (in seconds) the block takes to visually fade back in when appearing.
+entities.SorbetHelper/CrumbleOnFlagBlock.attributes.description.fadeInTime=How long (in seconds) the block should take to visually fade back in when reappearing.
 
 # Big Waterfall
 entities.SorbetHelper/BigWaterfall.placements.name.resizable_waterfall_lines=Resizable Waterfall (Detail Lines)
@@ -179,11 +180,11 @@ entities.SorbetHelper/BigWaterfall.placements.description.resizable_waterfall_li
 entities.SorbetHelper/BigWaterfall.placements.name.search_engine_optimization=Big Waterfall Custom Waterfall
 entities.SorbetHelper/BigWaterfall.attributes.name.lines=Detail Lines
 entities.SorbetHelper/BigWaterfall.attributes.description.lines=Whether the waterfall should have additional lines near the edges and randomly in the center for detail.\nThis makes the waterfall appear closer in appearance to a vanilla big waterfall as opposed to a small waterfall.
-entities.SorbetHelper/BigWaterfall.attributes.description.color=The color of the waterfall.
+entities.SorbetHelper/BigWaterfall.attributes.description.color=The color of the waterfall.\nSupports using the value of a session counter as a packed color by adding a `#` before the counter name,\n    e.g. `#myPackedColor`.\nIf Frost Helper is enabled, supports using the value of a Session Expression as a packed color by adding `expr:` before the expression,\n    e.g. `expr:$sorbetHelper.hslColor($stamina / 110.0 * 0.5, 0.5, 0.75)`.
 entities.SorbetHelper/BigWaterfall.attributes.description.alpha=The alpha of the waterfall.
-entities.SorbetHelper/BigWaterfall.attributes.description.wavePercent=Determines the speed of the waterfall.\nRanges from 0.0 to 1.0, values closer to 1.0 result in faster waves. Vanilla small waterfalls use 0.8 and big waterfalls use 1.0.
+entities.SorbetHelper/BigWaterfall.attributes.description.wavePercent=The speed of the waterfall.\nRanges from 0.0 to 1.0, values closer to 1.0 result in faster waves. Vanilla small waterfalls use 0.8 and big waterfalls use 1.0.
 entities.SorbetHelper/BigWaterfall.attributes.description.depth=The visual depth of the waterfall.\nHigher values mean farther behind in the scene. Defaults to -9999 for the normal placement and -49900 for the above tiles placement.\nDoes not affect the displacement waves, which will still render above everything (unless used with a displacement depth fixer).
-entities.SorbetHelper/BigWaterfall.attributes.description.splashParticleDepth=Determines the visual depth to render the splash particles at, or whether to disable them completely.
+entities.SorbetHelper/BigWaterfall.attributes.description.splashParticleDepth=The visual depth to render the splash particles at, or whether to disable them completely.
 entities.SorbetHelper/BigWaterfall.attributes.description.ignoreSolids=Whether the waterfall can collide with solids (such as foreground tiles).
 entities.SorbetHelper/BigWaterfall.attributes.description.ignoreWater=Whether the waterfall can collide with water.
 entities.SorbetHelper/BigWaterfall.attributes.description.rippleWater=Whether the waterfall should create ripples when it lands in water.
@@ -195,21 +196,21 @@ entities.SorbetHelper/CustomLightbeam.placements.name.custom_lightbeam_rainbow=C
 entities.SorbetHelper/CustomLightbeam.placements.description.custom_lightbeam_rainbow=A customizable lightbeam which uses a rainbow gradient for its color.
 entities.SorbetHelper/CustomLightbeam.placements.name.rainbow_lightbeam=Rainbow Lightbeam
 entities.SorbetHelper/CustomLightbeam.placements.description.rainbow_lightbeam=A customizable lightbeam which uses a rainbow gradient for its color.
-entities.SorbetHelper/CustomLightbeam.attributes.description.flag=Determines the flag that needs to be set in order for the lightbeam to be activated.\nLeaving this empty causes the lightbeam to always be active.
+entities.SorbetHelper/CustomLightbeam.attributes.description.flag=A session flag that must be set for this lightbeam to be visible. Leave empty for it to always be visible.\nAdd an exclamation mark before the flag name to require the flag to not be set instead,\n    e.g. `!myFlag`.\nIf Frost Helper is enabled, a Session Expression may be used instead by adding `expr:` before the expression,\n    e.g. `expr:#myCounter > 5`.
 entities.SorbetHelper/CustomLightbeam.attributes.name.inverted=Invert Flag
 entities.SorbetHelper/CustomLightbeam.attributes.description.inverted=When checked, the lightbeam will only be active when the flag is disabled, rather than when it is enabled.
-entities.SorbetHelper/CustomLightbeam.attributes.description.flagFadeTime=Determines the time (in seconds) the lightbeam takes to fade in or out according to the flag.
-entities.SorbetHelper/CustomLightbeam.attributes.description.rotation=The rotation of the lightbeam.
-entities.SorbetHelper/CustomLightbeam.attributes.description.depth=Determines what visual layer the lightbeam should be on (higher values mean farther behind in the scene, default value is -9998).\nDoes not affect the particles.
+entities.SorbetHelper/CustomLightbeam.attributes.description.flagFadeTime=The time (in seconds) the lightbeam should take to fade in/out when the flag changes.
+entities.SorbetHelper/CustomLightbeam.attributes.description.rotation=The rotation of the lightbeam, in degrees.\nSupports using the value of a session slider by adding an `@` before the slider name,\n    e.g. `@mySlider`.\nIf Frost Helper is enabled, supports using the value of a Session Expression by adding `expr:` before the expression,\n    e.g. `expr:$sin(@mySlider) * 45.0`.
+entities.SorbetHelper/CustomLightbeam.attributes.description.depth=The visual depth of the lightbeam.\nHigher values mean farther behind in the scene, default value is -9998.\nDoes not affect the particles it emits.
 entities.SorbetHelper/CustomLightbeam.attributes.description.noParticles=Whether the lightbeam should emit not particles.
-entities.SorbetHelper/CustomLightbeam.attributes.description.texture=The texture of the lightbeam. Vanilla texture is 'util/lightbeam'.
-entities.SorbetHelper/CustomLightbeam.attributes.description.color=The color of the lightbeam.
+entities.SorbetHelper/CustomLightbeam.attributes.description.texture=The texture of the lightbeam. Vanilla texture is `util/lightbeam`.
+entities.SorbetHelper/CustomLightbeam.attributes.description.color=The color of the lightbeam.\nSupports using the value of a session counter as a packed color by adding a `#` before the counter name,\n    e.g. `#myPackedColor`.\nIf Frost Helper is enabled, supports using the value of a Session Expression as a packed color by adding `expr:` before the expression,\n    e.g. `expr:$sorbetHelper.hslColor($stamina / 110.0 * 0.5, 0.5, 0.75)`.
 entities.SorbetHelper/CustomLightbeam.attributes.description.alpha=The alpha of the lightbeam.
 entities.SorbetHelper/CustomLightbeam.attributes.description.additive=Whether the lightbeam should be rendered with additive blending.
 entities.SorbetHelper/CustomLightbeam.attributes.description.rainbow=Whether the lightbeam is rainbow.
-entities.SorbetHelper/CustomLightbeam.attributes.description.useCustomRainbowColors=When checked, overrides the normal rainbow colors (whether vanilla or from a rainbow spinner color controller) with custom ones specified by the lightbeam.\nChanging this requires clicking save changes and reopening this menu for the correct settings to appear.\n(Requires rainbow to be checked)
+entities.SorbetHelper/CustomLightbeam.attributes.description.useCustomRainbowColors=When checked, overrides the normal rainbow colors (whether vanilla or from a rainbow spinner color controller) with custom ones specified by the lightbeam.\nChanging this requires clicking save changes and reopening this menu for the correct settings to appear.\nRequires `Rainbow` to be enabled.
 entities.SorbetHelper/CustomLightbeam.attributes.name.colors=Rainbow Colors
-entities.SorbetHelper/CustomLightbeam.attributes.description.colors=The colors the rainbow lightbeam will use, separated by commas.\nAlpha can optionally be specifed per color by appending an additional value to it, e.g. 'ffffff80' means white with half opacity.
+entities.SorbetHelper/CustomLightbeam.attributes.description.colors=The colors the rainbow lightbeam will use, separated by commas.\nAlpha can optionally be specifed per color by appending an additional value to it, e.g. `ffffff80` means white with half opacity.
 entities.SorbetHelper/CustomLightbeam.attributes.name.gradientSize=Rainbow Gradient Size
 entities.SorbetHelper/CustomLightbeam.attributes.description.gradientSize=The distance required to achieve a complete loop across all colors. Vanilla value is 280.
 entities.SorbetHelper/CustomLightbeam.attributes.name.loopColors=Loop Rainbow Colors
@@ -219,18 +220,18 @@ entities.SorbetHelper/CustomLightbeam.attributes.description.centerX=The horizon
 entities.SorbetHelper/CustomLightbeam.attributes.name.centerY=Rainbow Center Y
 entities.SorbetHelper/CustomLightbeam.attributes.description.centerY=The vertical position of the center of the gradient. Uses "world" coordinates. Vanilla value is 0.
 entities.SorbetHelper/CustomLightbeam.attributes.name.gradientSpeed=Rainbow Gradient Speed
-entities.SorbetHelper/CustomLightbeam.attributes.description.gradientSpeed=Determines how fast the gradient scrolls, in pixels per second. You can use negative values to make it scroll in the opposite direction. Vanilla value is 50.
+entities.SorbetHelper/CustomLightbeam.attributes.description.gradientSpeed=How fast the gradient should scroll, in pixels per second. Negative values will make it scroll in the opposite direction. Vanilla value is 50.
 entities.SorbetHelper/CustomLightbeam.attributes.name.singleColor=Uniform Rainbow Color
 entities.SorbetHelper/CustomLightbeam.attributes.description.singleColor=Whether the rainbow lightbeam should be the same color everywhere instead of using a gradient across all of its beams.\nRequires `Rainbow` to be enabled.
 entities.SorbetHelper/CustomLightbeam.attributes.description.fadeWhenNear=Whether the lightbeam should fade out when the player is close to it.
 entities.SorbetHelper/CustomLightbeam.attributes.description.fadeOnTransition=Whether the lightbeam should fade out during screen transitions.
 entities.SorbetHelper/CustomLightbeam.attributes.name.scroll=Parallax
-entities.SorbetHelper/CustomLightbeam.attributes.description.scroll=Determines how fast the lightbeam should scroll compared to the camera.\nThe "anchor" position of the parallax effect can optionally be controlled by adding a node, to allow multiple lightbeams to scroll together more smoothly.
+entities.SorbetHelper/CustomLightbeam.attributes.description.scroll=How fast the lightbeam should scroll compared to the camera.\nThe "anchor" position of the parallax effect can optionally be controlled by adding a node, to allow multiple lightbeams to scroll together more smoothly.
 
 # Winged Strawberry Direction Controller
 entities.SorbetHelper/WingedStrawberryDirectionController.placements.name.winged_strawberry_direction_controller=Winged Strawberry Direction Controller
 entities.SorbetHelper/WingedStrawberryDirectionController.placements.description.winged_strawberry_direction_controller=A controller that changes the direction winged strawberries in the room will fly.
-entities.SorbetHelper/WingedStrawberryDirectionController.attributes.description.direction=Determines the direction winged strawberries in the room will fly.
+entities.SorbetHelper/WingedStrawberryDirectionController.attributes.description.direction=The direction winged strawberries in the room should fly.
 
 # Styleground Over Hud Controller
 entities.SorbetHelper/StylegroundOverHudController.attributes.description.pauseBehavior=How pausing should affect the stylegrounds.\n\nDisable When Paused-\n    The stylegrounds will pause, and appear behind the pause menu.\nUpdate When Paused-\n    The stylegrounds will appear above the pause menu and continue updating.
@@ -246,7 +247,7 @@ entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.useS
 entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.easing=The easer to use for the bubble's movement.\nVanilla value is SineInOut.
 entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.smoothCamera=Whether the camera should smoothly follow the player in the bubble rather than perfectly snapping to them.\nVanilla value is disabled.
 entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.refillDash=Whether the bubble should always refill the player's dash.\nVanilla value is disabled.
-entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.collisionMode=Determines how the player collides with stuff while in the bubble.\n- Vanilla\n    The player collides with stuff the same as in a vanilla return bubble.\n- SquishFix\n    Same as Vanilla, but prevents the player from dying if they collide with a moving block while in the bubble.\n- TriggersOnly\n    Completely disables all collision while inside the bubble, with the exception of with triggers.\n    Includes things like collecting berries inside solid tiles, exploding puffers, activating blocks like zip movers, etc.\n- NoCollide\n    Same as TriggersOnly, but also including triggers. Fully disables *all* collision.\nVanilla value is Vanilla.
+entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.collisionMode=Determines how the player collides with entities while in the bubble.\n- Vanilla\n    The player collides with entities the same as they would in a vanilla return bubble.\n- SquishFix\n    Same as Vanilla, but prevents the player from dying if they collide with a moving block while in the bubble.\n- TriggersOnly\n    Completely disables all collision while inside the bubble, apart from with triggers.\n    Prevents things like collecting berries inside solid tiles, causing puffers to explode, activating platforms (e.g. zip movers), etc.\n- NoCollide\n    Same as TriggersOnly, but including triggers. Fully disables all collision.\nVanilla value is Vanilla.
 
 # Light Cover Controller
 entities.SorbetHelper/LightCoverController.placements.name.light_cover_controller=Light Cover Controller
@@ -270,7 +271,7 @@ entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.name.ignoreBou
 entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.description.ignoreBounds=Whether to attempt to affect all entities in the room, even if the wrapper isn't touching them.
 entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.description.minDepth=The wrapper will not attempt to affect entities with a depth lower (closer to the camera) than this value.\nLeave empty to make uncapped.
 entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.description.maxDepth=The wrapper will not attempt to affect entities with a depth higher (farther from the camera) than this value.\nLeave empty to make uncapped.
-entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.description.affectedTypes=An optional comma separated list of entity SIDs (e.g. SorbetHelper/BigWaterfall) or C# entity class names (e.g. BigWaterfall or Celeste.Mod.SorbetHelper.Entities.BigWaterfall) to attempt to affect.\nLeave empty to affect all entities that use DisplacementRenderHooks.
+entities.SorbetHelper/DepthAdheringDisplacementWrapper.attributes.description.affectedTypes=An optional comma separated list of entity SIDs (e.g. SorbetHelper/BigWaterfall) or C# entity class names (e.g. ResizableWaterfall or Celeste.Mod.SorbetHelper.Entities.ResizableWaterfall) to attempt to affect.\nLeave empty to affect all entities that use DisplacementRenderHooks.
 
 # Displacement Effect Blocker
 entities.SorbetHelper/DisplacementEffectBlocker.placements.name.displacement_effect_blocker_full=Displacement Effect Blocker (Full)
@@ -282,7 +283,7 @@ entities.SorbetHelper/DisplacementEffectBlocker.placements.description.displacem
 entities.SorbetHelper/DisplacementEffectBlocker.attributes.name.waterOnly=Waves Only
 entities.SorbetHelper/DisplacementEffectBlocker.attributes.description.waterOnly=Whether the displacement blocker should only affect the wavy displacement from water, etc.\nDisabling this makes offset displacement like the burst effect from Madeline dashing or pulsing strawberries etc. also get blocked.
 entities.SorbetHelper/DisplacementEffectBlocker.attributes.description.depth=The depth of the displacement blocker.\nAny entity affected by a displacement depth fixer with a depth equal to or higher than this will be affected by the blocker.\nhigher values mean farther behind in the scene.
-entities.SorbetHelper/DisplacementEffectBlocker.attributes.description.flag=A session flag that needs to be enabled in order for the displacement blocker to be active. Leaving this empty causes the blocker to always be active.\nAdding a '!' before the flag name will make it need to be disabled instead in order for the displacement blocker to be active.
+entities.SorbetHelper/DisplacementEffectBlocker.attributes.description.flag=A session flag that must be set for the displacement blocker to be active. Leave empty for it to always be active.\nAdd an exclamation mark before the flag name to require the flag to not be set instead,\n    e.g. `!myFlag`.\nIf Frost Helper is enabled, a Session Expression may be used instead by adding `expr:` before the expression,\n    e.g. `expr:#myCounter > 5`.
 
 # Displacement Effect Area
 entities.SorbetHelper/DisplacementEffectArea.placements.name.displacement_effect_area=Displacement Effect Area
@@ -292,9 +293,9 @@ entities.SorbetHelper/DisplacementEffectArea.placements.description.displacement
 entities.SorbetHelper/DisplacementEffectArea.attributes.description.horizontalDisplacement=The horizontal displacement amount.\nRanges from -1.0 (14px leftwards displacement) to 1.0 (14px rightwards displacement), with 0.0 resulting in no displacement.
 entities.SorbetHelper/DisplacementEffectArea.attributes.description.verticalDisplacement=The vertical displacement amount.\nRanges from -1.0 (14px upwards displacement) to 1.0 (14px downwards displacement), with 0.0 resulting in no displacement.
 entities.SorbetHelper/DisplacementEffectArea.attributes.description.waterDisplacement=The water displacement amount.\nRanges from 0.0 to 1.0, values closer to 1.0 result in faster waves.\nWater uses 0.25, small waterfalls use 0.8, big waterfalls use 1.0, and heatwaves use 0.1.
-entities.SorbetHelper/DisplacementEffectArea.attributes.description.alpha=Determines the strength of the displacement.
+entities.SorbetHelper/DisplacementEffectArea.attributes.description.alpha=The strength of the displacement.
 entities.SorbetHelper/DisplacementEffectArea.attributes.description.depth=The visual depth the effect should be applied at.
-entities.SorbetHelper/DisplacementEffectArea.attributes.description.flag=A session flag that needs to be enabled in order for the displacement to be visible. Leaving this empty causes the displacement to always be visible.\nAdding a '!' before the flag name will make it need to be disabled instead in order for the displacement to be visible.
+entities.SorbetHelper/DisplacementEffectArea.attributes.description.flag=A session flag that must be set for the displacement to be visible. Leave empty for it to always be visible.\nAdd an exclamation mark before the flag name to require the flag to not be set instead,\n    e.g. `!myFlag`.\nIf Frost Helper is enabled, a Session Expression may be used instead by adding `expr:` before the expression,\n    e.g. `expr:#myCounter > 5`.
 
 # Entity Styleground Controller
 entities.SorbetHelper/EntityStylegroundController.placements.name.entity_as_styleground_controller=Entity As Styleground Controller
@@ -334,8 +335,8 @@ entities.SorbetHelper/SliderFadeXY.attributes.description.global=Whether the sli
 entities.SorbetHelper/SolidTilesDepthSplitter.placements.name.tileset_depth_splitter=Tileset Depth Splitter
 entities.SorbetHelper/SolidTilesDepthSplitter.placements.description.tileset_depth_splitter=A controller which allows changing the visual depth of specified tiletypes, and can automatically fill in any gaps on their edges visible from using the ignores attribute.
 entities.SorbetHelper/SolidTilesDepthSplitter.placements.name.solid_tiles_depth_splitter=Solid Tiles Depth Splitter
-entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.depth=Determines the visual depth the split tiletypes should be drawn at.\nHigher values mean farther behind in the scene.
-entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.tiletypes=Determines the tiletypes the controller should split.
+entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.depth=The visual depth the split tiletypes should be drawn at.\nHigher values mean farther behind in the scene.
+entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.tiletypes=The tiletypes the controller should split.
 entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.tryFillBehind=Whether to try and automatically fill in any gaps behind the edges of the split tiletypes with the tiletypes around them.
 entities.SorbetHelper/SolidTilesDepthSplitter.attributes.description.backgroundTiles=Whether to split background tiles instead of foreground tiles.\nChanging this requires clicking save changes and reopening this menu for the tiletype menu to show the correct options.
 
@@ -359,7 +360,7 @@ entities.SorbetHelper/DashGateBlock.placements.name.kevin_switch_gate=Kevin Swit
 entities.SorbetHelper/DashGateBlock.attributes.description.inactiveColor=The color of the block when not triggered yet.
 entities.SorbetHelper/DashGateBlock.attributes.description.activeColor=The color of the block while moving.
 entities.SorbetHelper/DashGateBlock.attributes.description.finishColor=The color of the block when it has reached its destination.
-entities.SorbetHelper/DashGateBlock.attributes.description.blockSprite=The texture path for the block.\nSee Graphics/Atlases/Gameplay/objects/SorbetHelper/gateblock/dash/ in SorbetHelper.zip for how the files should be organised.
+entities.SorbetHelper/DashGateBlock.attributes.description.blockSprite=The texture path for the block.\nSee `Graphics/Atlases/Gameplay/objects/SorbetHelper/gateblock/dash/` in `Mods/SorbetHelper.zip` for how the files should be organised.
 entities.SorbetHelper/DashGateBlock.attributes.description.iconSprite=The texture path for the icon in the center of the block.
 entities.SorbetHelper/DashGateBlock.attributes.description.shakeTime=The time (in seconds) the block spends shaking before starting to move. Default value is 0.5 seconds.
 entities.SorbetHelper/DashGateBlock.attributes.description.moveTime=The time (in seconds) the block takes to move to its destination after shaking. Default value is 1.8 seconds.
@@ -385,7 +386,7 @@ entities.SorbetHelper/TouchGateBlock.placements.description.touch_gate_block=A b
 entities.SorbetHelper/TouchGateBlock.attributes.description.inactiveColor=The color of the block when not triggered yet.
 entities.SorbetHelper/TouchGateBlock.attributes.description.activeColor=The color of the block while moving.
 entities.SorbetHelper/TouchGateBlock.attributes.description.finishColor=The color of the block when it has reached its destination.
-entities.SorbetHelper/TouchGateBlock.attributes.description.blockSprite=The texture path for the block.\nSee Graphics/Atlases/Gameplay/objects/SorbetHelper/gateblock/dash/ in SorbetHelper.zip for how the files should be organised.
+entities.SorbetHelper/TouchGateBlock.attributes.description.blockSprite=The texture path for the block.\nSee `Graphics/Atlases/Gameplay/objects/SorbetHelper/gateblock/dash/` in `Mods/SorbetHelper.zip` for how the files should be organised.
 entities.SorbetHelper/TouchGateBlock.attributes.description.iconSprite=The texture path for the icon in the center of the block.
 entities.SorbetHelper/TouchGateBlock.attributes.description.shakeTime=The time (in seconds) the block spends shaking before starting to move. Default value is 0.5 seconds.
 entities.SorbetHelper/TouchGateBlock.attributes.description.moveTime=The time (in seconds) the block takes to move to its destination after shaking. Default value is 1.8 seconds.
@@ -442,9 +443,9 @@ entities.SorbetHelper/SparklingWater.attributes.description.bottomSurface=Whethe
 # Sparkling Water Color Controller
 entities.SorbetHelper/SparklingWaterColorController.placements.name.sparkling_water_color_controller=Sparkling Water Color Controller
 entities.SorbetHelper/SparklingWaterColorController.placements.description.sparkling_water_color_controller=A controller which can customize the visual appearance of Sparkling Water entities.
-entities.SorbetHelper/SparklingWaterColorController.attributes.description.outlineColor=The color to use for the outline and details of the water.
-entities.SorbetHelper/SparklingWaterColorController.attributes.description.edgeColor=The color to use near the edges of the water.
-entities.SorbetHelper/SparklingWaterColorController.attributes.description.fillColor=The color to use in the center of the water.
+entities.SorbetHelper/SparklingWaterColorController.attributes.description.outlineColor=The color to use for the outline and details of the water.\nSupports using the value of a session counter as a packed color by adding a `#` before the counter name,\n    e.g. `#myPackedColor`.\nIf Frost Helper is enabled, supports using the value of a Session Expression as a packed color by adding `expr:` before the expression,\n    e.g. `expr:$sorbetHelper.hslColor($stamina / 110.0 * 0.5, 0.5, 0.75)`.
+entities.SorbetHelper/SparklingWaterColorController.attributes.description.edgeColor=The color to use near the edges of the water.\nSupports using the value of a session counter as a packed color by adding a `#` before the counter name,\n    e.g. `#myPackedColor`.\nIf Frost Helper is enabled, supports using the value of a Session Expression as a packed color by adding `expr:` before the expression,\n    e.g. `expr:$sorbetHelper.hslColor($stamina / 110.0 * 0.5, 0.5, 0.75)`.
+entities.SorbetHelper/SparklingWaterColorController.attributes.description.fillColor=The color to use in the center of the water.\nSupports using the value of a session counter as a packed color by adding a `#` before the counter name,\n    e.g. `#myPackedColor`.\nIf Frost Helper is enabled, supports using the value of a Session Expression as a packed color by adding `expr:` before the expression,\n    e.g. `expr:$sorbetHelper.hslColor($stamina / 110.0 * 0.5, 0.5, 0.75)`.
 entities.SorbetHelper/SparklingWaterColorController.attributes.description.detailTexture=The detail texture to use for the water.\nThis is a looping texture where each color channel contains texture data for a different detail layer:\n- The red channel contains a noise texture used to subtly animate the foam at the top of the water.\n- The green channel contains a caustic texture which is slowly scrolled across the water (with linear sampling), and is squished vertically near its surface.\n- The blue channel contains a bubble texture which slowly moves upwards (with point sampling).
 entities.SorbetHelper/SparklingWaterColorController.attributes.description.causticScale=The scale of the caustic detail layer.
 entities.SorbetHelper/SparklingWaterColorController.attributes.description.causticAlpha=The alpha of the caustic detail layer.
@@ -481,14 +482,14 @@ triggers.SorbetHelper/MiniPopupTrigger.attributes.description.subText=The dialog
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.baseColor=The base color of the mini popup.
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.accentColor=The color of the subtitle text and accent of the mini popup.
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.titleColor=The color of the title text of the mini popup.
-triggers.SorbetHelper/MiniPopupTrigger.attributes.description.iconTexture=An optional icon to display on the mini popup, relative to 'Graphics/Atlases/Gui/'.\nThe texture should be square shaped to prevent it from being stretched awkwardly to fit.
-triggers.SorbetHelper/MiniPopupTrigger.attributes.description.texturePath=The path to the base texture for for the popup, relative to 'Graphics/Atlases/Gui/'.\nExpects 2 textures to exist, both the specified base texture and an accent texture.\ne.g. inputting 'SorbetHelper/popup' means to use the two textures 'SorbetHelper/popup' and 'SorbetHelper/popupAccent'
+triggers.SorbetHelper/MiniPopupTrigger.attributes.description.iconTexture=An optional icon to display on the mini popup, relative to `Graphics/Atlases/Gui/`.\nThe texture should be square shaped to prevent it from being stretched awkwardly to fit.
+triggers.SorbetHelper/MiniPopupTrigger.attributes.description.texturePath=The path to the base texture for for the popup, relative to `Graphics/Atlases/Gui/`.\nExpects 2 textures to exist, both the specified base texture and an accent texture.\ne.g. inputting `SorbetHelper/popup` means to use the two textures `SorbetHelper/popup` and `SorbetHelper/popupAccent`
 triggers.SorbetHelper/MiniPopupTrigger.attributes.name.mode=Activation Mode
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.mode=Determines how the trigger will activate.
 triggers.SorbetHelper/MiniPopupTrigger.attributes.name.onlyOnce=Once Per Session
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.onlyOnce=Whether the trigger will not be reloaded on room load if it was activated previously in the session.
 triggers.SorbetHelper/MiniPopupTrigger.attributes.description.removeOnLeave=Whether the trigger can only be activated once per room load.
-triggers.SorbetHelper/MiniPopupTrigger.attributes.description.flag=A session flag.\nUsed as needed for the activation mode, otherwise determines whether or not the player can collide with the trigger.
+triggers.SorbetHelper/MiniPopupTrigger.attributes.description.flag=A session flag that is either used as specified by the activation mode, or must be set for the trigger to be collidable.\nAdd an exclamation mark before the flag name to require the flag to not be set instead,\n    e.g. `!myFlag`.\nIf Frost Helper is enabled, a Session Expression may be used instead by adding `expr:` before the expression,\n    e.g. `expr:#myCounter > 5`.
 
 # Color Dash Block State Trigger
 triggers.SorbetHelper/ColorDashBlockStateTrigger.placements.name.color_dash_block_state=Color Dash Block State Trigger

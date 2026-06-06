@@ -4,6 +4,7 @@ local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper"
 local crumbleOnFlagBlock = {}
 
 crumbleOnFlagBlock.name = "SorbetHelper/CrumbleOnFlagBlock"
+crumbleOnFlagBlock.associatedMods = sorbetHelper.getSessionExpressionAssociatedModsFunction({"flag"})
 function crumbleOnFlagBlock.placements()
     return {
         name = "crumble_on_flag_block",
@@ -36,7 +37,7 @@ crumbleOnFlagBlock.fieldOrder = {
 crumbleOnFlagBlock.fieldInformation = fakeTilesHelper.addTileFieldInformation({
     depth = {
         fieldType = "integer",
-        options = sorbetHelper.getDepths({
+        options = sorbetHelper.getDepthOptions({
             {"Crumble Wall On Rumble", -10010}
         }),
         editable = true

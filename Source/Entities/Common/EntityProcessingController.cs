@@ -142,7 +142,7 @@ public abstract class EntityProcessingController : Entity
                                                       && (c.fromRoom == currentRoom || c.TagCheck(Tags.Global | Tags.Persistent)))
                                           .OrderBy(c => c.TagCheck(Tags.Global | Tags.Persistent))
                                           .ThenBy(c => c.roomWide)
-                                          .ThenBy(c => c.ProcessPriority)
+                                          .ThenByDescending(c => c.ProcessPriority)
                                           .ToArray();
         }
 

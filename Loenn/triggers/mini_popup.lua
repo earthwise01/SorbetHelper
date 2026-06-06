@@ -1,3 +1,5 @@
+local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
+
 local miniPopupTrigger = {}
 
 local modes = {
@@ -8,6 +10,7 @@ local modes = {
 }
 
 miniPopupTrigger.name = "SorbetHelper/MiniPopupTrigger"
+miniPopupTrigger.associatedMods = sorbetHelper.getSessionExpressionAssociatedModsFunction({"flag"})
 miniPopupTrigger.placements = {
     name = "mini_popup",
     data = {

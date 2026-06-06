@@ -4,16 +4,13 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [Tracked]
 public class KillZone : Entity
 {
-    private readonly string flag;
-    private readonly bool inverted;
+    private readonly Condition condition;
     private readonly bool fastKill;
 
     public KillZone(EntityData data, Vector2 offset) : base(data.Position + offset)
     {
         Collider = new Hitbox(data.Width, data.Height);
-
-        flag = data.Attr("flag");
-        inverted = data.Bool("inverted");
+        condition = data.Condition("flag", data.Bool("inverted"));
         fastKill = data.Bool("fastKill", false);
         bool collideHoldables = data.Bool("collideHoldables", false);
 
@@ -28,16 +25,16 @@ public class KillZone : Entity
     {
         base.Awake(scene);
 
-        if (!string.IsNullOrEmpty(flag) && !SceneAs<Level>().Session.GetFlag(flag, inverted))
-            Collidable = false;
+        if (condition is not Condition.Empty)
+            Collidable = condition.Check(SceneAs<Level>().Session);
     }
 
     public override void Update()
     {
         base.Update();
 
-        if (!string.IsNullOrEmpty(flag))
-            Collidable = SceneAs<Level>().Session.GetFlag(flag, inverted);
+        if (condition is not Condition.Empty)
+            Collidable = condition.Check(SceneAs<Level>().Session);
     }
 
     private void OnPlayer(Player player)

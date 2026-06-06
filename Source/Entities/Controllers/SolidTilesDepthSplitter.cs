@@ -144,9 +144,9 @@ public class SolidTilesDepthSplitter : Entity
 
                 // air ('0') isn't in the lookup but is treated as always connecting to origTile and always ignored by the other neighbours
                 if ((neighbour == '0' && fillTile is null)
-                    || terrainLookup.TryGetValue(neighbour, out Autotiler.TerrainType neighbourData)
-                    && !neighbourData.Ignore(origTile)
-                    && (fillTile is null || fillTile == '0' || neighbourData.Ignore(fillTile.Value)))
+                    || (terrainLookup.TryGetValue(neighbour, out Autotiler.TerrainType neighbourData)
+                        && !neighbourData.Ignore(origTile)
+                        && (fillTile is null || fillTile == '0' || neighbourData.Ignore(fillTile.Value))))
                     fillTile = neighbour;
             }
 

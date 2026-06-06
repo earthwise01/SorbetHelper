@@ -9,7 +9,7 @@ internal static class RainbowHelper
 
     public static Color GetHue(Scene scene, Vector2 position)
     {
-        rainbowSpinner ??= new CrystalStaticSpinner(Vector2.Zero, false, CrystalColor.Rainbow);
+        rainbowSpinner ??= new CrystalStaticSpinner(Vector2.Zero, false, CrystalColor.Rainbow) { Collider = new Hitbox(2f, 2f, -1f, -1f) };
         rainbowSpinner.Scene = scene;
 
         return rainbowSpinner.GetHue(position);

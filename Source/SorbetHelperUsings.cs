@@ -27,4 +27,5 @@ global using Celeste.Mod.SorbetHelper.Triggers;
 global using Celeste.Mod.SorbetHelper.Components;
 global using Celeste.Mod.SorbetHelper.Backdrops;
 global using Celeste.Mod.SorbetHelper.Utils;
+global using Celeste.Mod.SorbetHelper.Utils.ValueSources;
 global using Celeste.Mod.SorbetHelper.Imports;

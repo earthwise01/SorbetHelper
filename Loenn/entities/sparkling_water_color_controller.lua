@@ -5,6 +5,7 @@ local sparklingWaterColorController = {}
 
 sparklingWaterColorController.name = "SorbetHelper/SparklingWaterColorController"
 sparklingWaterColorController.depth = sorbetHelper.controllerDepth
+sparklingWaterColorController.associatedMods = sorbetHelper.getSessionExpressionAssociatedModsFunction({"outlineColor", "edgeColor", "fillColor"})
 sparklingWaterColorController.placements = {
     name = "sparkling_water_color_controller",
     data = {
@@ -32,15 +33,15 @@ sparklingWaterColorController.fieldOrder = {
 
 sparklingWaterColorController.fieldInformation = {
     outlineColor = {
-        fieldType = "color",
+        fieldType = "sorbet_helper.color_source",
         showAlpha = true
     },
     edgeColor = {
-        fieldType = "color",
+        fieldType = "sorbet_helper.color_source",
         showAlpha = true
     },
     fillColor = {
-        fieldType = "color",
+        fieldType = "sorbet_helper.color_source",
         showAlpha = true
     },
     causticAlpha = {

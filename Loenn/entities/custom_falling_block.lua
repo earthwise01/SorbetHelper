@@ -1,7 +1,7 @@
 local fakeTilesHelper = require("helpers.fake_tiles")
 local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
 
-local function createFallingBlockPlugin(entityName, placementName, placementAltName, fieldOrder, extraPlacementData, extraFieldInformation)
+local function createFallingBlockPlugin(entityName, placementName, placementAltName, fieldOrder, extraPlacementData, extraFieldInformation, extraAssociatedMods)
     local fallingBlock = {}
 
     local directions = {
@@ -12,6 +12,8 @@ local function createFallingBlockPlugin(entityName, placementName, placementAltN
     }
 
     fallingBlock.name = entityName
+
+    fallingBlock.associatedMods = sorbetHelper.getSessionExpressionAssociatedModsFunction({"triggerFlag"}, extraAssociatedMods)
 
     local placementData = {
         width = 8,
@@ -91,7 +93,7 @@ local function createFallingBlockPlugin(entityName, placementName, placementAltN
         },
         depth = {
             fieldType = "integer",
-            options = sorbetHelper.getDepths(),
+            options = sorbetHelper.getDepthOptions(),
             editable = true
         }
     }
@@ -159,17 +161,10 @@ local dashFallingBlockFieldInfo = {
     }
 }
 
-local gravityFallingBlockAssociatedMods = {
-    "SorbetHelper",
-    "ChronoHelper"
-}
-
-local customFallingBlock = createFallingBlockPlugin("SorbetHelper/CustomFallingBlock", "custom_falling_block", nil, customFallingBlockFieldOrder, nil, nil)
-local dashFallingBlock = createFallingBlockPlugin("SorbetHelper/DashFallingBlock", "dash_falling_block", nil, dashFallingBlockFieldOrder, dashFallingBlockPlacementData, dashFallingBlockFieldInfo)
-local customGravityFallingBlock = createFallingBlockPlugin("SorbetHelper/CustomGravityFallingBlock", "custom_gravity_falling_block", "gravity_custom_falling_block", customFallingBlockFieldOrder, nil, nil)
-local gravityDashFallingBlock = createFallingBlockPlugin("SorbetHelper/GravityDashFallingBlock", "gravity_dash_falling_block", "dash_gravity_falling_block", dashFallingBlockFieldOrder, dashFallingBlockPlacementData, dashFallingBlockFieldInfo)
-customGravityFallingBlock.associatedMods = gravityFallingBlockAssociatedMods
-gravityDashFallingBlock.associatedMods = gravityFallingBlockAssociatedMods
+local customFallingBlock = createFallingBlockPlugin("SorbetHelper/CustomFallingBlock", "custom_falling_block", nil, customFallingBlockFieldOrder, nil, nil, nil)
+local dashFallingBlock = createFallingBlockPlugin("SorbetHelper/DashFallingBlock", "dash_falling_block", nil, dashFallingBlockFieldOrder, dashFallingBlockPlacementData, dashFallingBlockFieldInfo, nil)
+local customGravityFallingBlock = createFallingBlockPlugin("SorbetHelper/CustomGravityFallingBlock", "custom_gravity_falling_block", "gravity_custom_falling_block", customFallingBlockFieldOrder, nil, nil, {"ChronoHelper"})
+local gravityDashFallingBlock = createFallingBlockPlugin("SorbetHelper/GravityDashFallingBlock", "gravity_dash_falling_block", "dash_gravity_falling_block", dashFallingBlockFieldOrder, dashFallingBlockPlacementData, dashFallingBlockFieldInfo, {"ChronoHelper"})
 
 return {
     customFallingBlock,

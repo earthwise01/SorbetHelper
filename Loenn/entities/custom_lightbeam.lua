@@ -11,6 +11,7 @@ local rainbowHelper = mods.requireFromPlugin("libraries.rainbow_helper")
 local customLightbeam = {}
 
 customLightbeam.name = "SorbetHelper/CustomLightbeam"
+customLightbeam.associatedMods = sorbetHelper.getSessionExpressionAssociatedModsFunction({"flag", "rotation", "color"})
 customLightbeam.placements = {
     -- todo: should i be using this or maybe just the `default` fieldInformation options ? or even some custom way of declaring them
     default = {
@@ -102,9 +103,12 @@ function customLightbeam.fieldOrder(entity)
 end
 
 customLightbeam.fieldInformation = {
+    rotation = {
+        fieldType = "sorbet_helper.float_source"
+    },
     depth = {
         fieldType = "integer",
-        options = sorbetHelper.getDepths({
+        options = sorbetHelper.getDepthOptions({
             {"Lightbeams", -9998}
         }),
         editable = true
@@ -113,7 +117,7 @@ customLightbeam.fieldInformation = {
         minimumValue = 0.0
     },
     color = {
-        fieldType = "color"
+        fieldType = "sorbet_helper.color_source"
     },
     alpha = {
         default = 1.0,
@@ -135,101 +139,127 @@ customLightbeam.fieldInformation = {
     }
 }
 
-function customLightbeam.sprite(room, entity)
-    local sprites = {}
+local function getSprites(room, entity)
+    local x, y = room.x + entity.x, room.y + entity.y
+    local width, height = entity.width or 32, entity.height or 24
+    local halfWidth = math.floor(width / 2)
+    local theta = math.rad(tonumber(entity.rotation) or 0)
 
-    if entity.rainbow then
-        local colors = rainbowHelper.getColors(entity.colors or "89E5AE,88E0E0,87A9DD,9887DB,D088E2")
+    local beamTexture = entity.texture or "util/lightbeam"
+    local color = sorbetHelper.isCounterOrSessionExpression(entity.color) and {1, 1, 1} or utils.getColor(entity.color or "ccffff")
+    local rainbow = entity.rainbow or false
+    local rainbowSingleColor = entity.singleColor or false
+    local useCustomRainbowColors = entity.useCustomRainbowColors or false
 
-        if entity.singleColor then
-            sprites = lightBeamHelper.getSprites(room, entity, colors[1], false)
-        else
-            sprites = customLightbeam.getSpritesRainbow(room, entity, colors, false)
+    local function getRainbowHue(x, y, offsetX, offsetY)
+        if not rainbowSingleColor then
+            x, y = x + offsetX or 0, y + offsetY or 0
         end
-    else
-        sprites = lightBeamHelper.getSprites(room, entity, utils.getColor(entity.color), false)
+
+        return rainbowHelper.getHue(x, y, room, useCustomRainbowColors and entity or nil)
     end
 
-    return sprites
-end
-
--- modified from lightBeamHelper.getSprites to have a rainbow gradient effect
-function customLightbeam.getSpritesRainbow(room, entity, colors, onlyBase)
-    local lightBeamTexture = "util/lightbeam"
     local sprites = {}
-    local x, y = entity.x + room.x, entity.y + room.y
 
-    local theta = math.rad(entity.rotation or 0)
-    local width = entity.width or 32
-    local height = entity.height or 24
-    local halfWidth = math.floor(width / 2)
-    local widthOffsetX, widthOffsetY = halfWidth * math.cos(theta), halfWidth * math.sin(theta)
+    if rainbow and not singleColor then
+        for i = 0, width - 1, 4 do
+            local beamSprite = drawableSprite.fromTexture(beamTexture, entity)
+            local beamLengthScale = (height - 4) / beamSprite.meta.width
+            local beamOffset = -halfWidth + i
+            local offsetX = beamOffset * math.cos(theta)
+            local offsetY = beamOffset * math.sin(theta)
 
-    for i = 0, width - 1, 4 do
-        local sprite = drawableSprite.fromTexture(lightBeamTexture, entity)
-        local widthScale = (height - 4) / sprite.meta.width
-        local extraOffset = i - width + 4
-        local offsetX = utils.round(extraOffset * math.cos(theta))
-        local offsetY = utils.round(extraOffset * math.sin(theta))
+            local beamColor = table.shallowcopy(rainbow and getRainbowHue(x, y, offsetX, offsetY) or color)
+            beamColor[4] = 0.4
 
-        local color = rainbowHelper.getHue(x + widthOffsetX + offsetX, y + widthOffsetY + offsetY, colors, entity.gradientSize, entity.loopColors, entity.centerX, entity.centerY)
-        color[4] = 0.4
+            beamSprite:addPosition(offsetX, offsetY)
+            beamSprite:setColor(beamColor)
+            beamSprite:setJustification(0.0, 1.0)
+            beamSprite:setScale(beamLengthScale, 4)
+            beamSprite.rotation = theta + math.pi / 2
 
-        sprite:addPosition(widthOffsetX, widthOffsetY)
-        sprite:addPosition(offsetX, offsetY)
-        sprite:setColor(color)
-        sprite:setJustification(0.0, 0.0)
-        sprite:setScale(widthScale, 4)
-        sprite.rotation = theta + math.pi / 2
+            table.insert(sprites, beamSprite)
+        end
 
-        table.insert(sprites, sprite)
+    else
+        local baseSprite = drawableSprite.fromTexture(beamTexture, entity)
+        local baseLengthScale = (height - 4) / baseSprite.meta.width
+        local offsetX = -halfWidth * math.cos(theta)
+        local offsetY = -halfWidth * math.sin(theta)
+
+        local baseColor = table.shallowcopy(rainbow and getRainbowHue(x, y) or color)
+        baseColor[4] = 0.4
+
+        baseSprite:addPosition(offsetX, offsetY)
+        baseSprite:setColor(baseColor)
+        baseSprite:setJustification(0.0, 1.0)
+        baseSprite:setScale(baseLengthScale, width)
+        baseSprite.rotation = theta + math.pi / 2
+
+        table.insert(sprites, baseSprite)
     end
 
     utils.setSimpleCoordinateSeed(x, y)
 
-    -- Selection doesn't need the extra visual beams
-    if not onlyBase then
-        for i = 0, width - 1, 4 do
-            local num = i * 0.6
-            local lineWidth = 4 + math.sin(num * 0.5 + 1.2) * 4.0
-            local alpha = 0.6 + math.sin(num + 0.8) * 0.3
-            local offset = math.sin((num + i * 32) * 0.1 + math.sin(num * 0.05 + i * 0.1) * 0.25) * (width / 2.0 - lineWidth / 2.0)
+    for i = 0, width - 1, 4 do
+        local num = i * 0.6
+        local lineWidth = 4 + math.sin(num * 0.5 + 1.2) * 4.0
+        local alpha = 0.6 + math.sin(num + 0.8) * 0.3
+        local offset = math.sin((num + i * 32) * 0.1 + math.sin(num * 0.05 + i * 0.1) * 0.25) * (width / 2.0 - lineWidth / 2.0)
 
-            -- Makes rendering a bit less boring, not used by game
-            local offsetMultiplier = (math.random() - 0.5) * 2
+        -- not accurate to ingame but "makes rendering a bit less boring"
+        local offsetMultiplier = (math.random() - 0.5) * 2
 
-            for _ = 1, 2 do
-                local beamSprite = drawableSprite.fromTexture(lightBeamTexture, entity)
-                local beamWidth = math.random(-4, 4)
-                local extraOffset = offset * offsetMultiplier - width / 2 + beamWidth
-                local offsetX = utils.round(extraOffset * math.cos(theta))
-                local offsetY = utils.round(extraOffset * math.sin(theta))
-                local beamLengthScale = (height - math.random(4, math.floor(height / 2))) / beamSprite.meta.width
+        for _ = 1, 2 do
+            local beamSprite = drawableSprite.fromTexture(beamTexture, entity)
+            local beamWidth = math.random(-4, 4)
+            local beamOffset = offset * offsetMultiplier + beamWidth
+            local offsetX = beamOffset * math.cos(theta)
+            local offsetY = beamOffset * math.sin(theta)
+            local beamLengthScale = (height - math.random(4, math.floor(height / 2))) / beamSprite.meta.width
 
-                local color = rainbowHelper.getHue(x + widthOffsetX + offsetX, y + widthOffsetY + offsetY, colors, entity.gradientSize, entity.loopColors, entity.centerX, entity.centerY)
-                color[4] = alpha
+            local beamColor = table.shallowcopy(rainbow and getRainbowHue(x, y, offsetX, offsetY) or color)
+            beamColor[4] = alpha
 
-                beamSprite:addPosition(widthOffsetX, widthOffsetY)
-                beamSprite:addPosition(offsetX, offsetY)
-                beamSprite:setColor(color)
-                beamSprite:setJustification(0.0, 0.0)
-                beamSprite:setScale(beamLengthScale, beamWidth)
-                beamSprite.rotation = theta + math.pi / 2
+            beamSprite:addPosition(offsetX, offsetY)
+            beamSprite:setColor(beamColor)
+            beamSprite:setJustification(0.0, 0.0)
+            beamSprite:setScale(beamLengthScale, beamWidth)
+            beamSprite.rotation = theta + math.pi / 2
 
-                table.insert(sprites, beamSprite)
-            end
+            table.insert(sprites, beamSprite)
         end
     end
 
+
     return sprites
+end
+
+function customLightbeam.sprite(room, entity)
+    return getSprites(room, entity)
 end
 
 function customLightbeam.depth(room, entity)
     return entity.depth or -9998
 end
 
+local function getSelection(entity)
+    local width, height = entity.width or 32, entity.height or 24
+    local theta = math.rad(tonumber(entity.rotation) or 0)
+    local beamTexture = entity.texture or "util/lightbeam"
+
+    local baseSprite = drawableSprite.fromTexture(beamTexture, entity)
+    local baseLengthScale = (height - 4) / baseSprite.meta.width
+
+    baseSprite:setJustification(0.0, 0.5) -- 0.5 doesnt work when rendering fsr but it Does for getRectangle ?
+    baseSprite:setScale(baseLengthScale, width)
+    baseSprite.rotation = theta + math.pi / 2
+
+    return baseSprite:getRectangle()
+end
+
 function customLightbeam.selection(room, entity)
-    local base = lightBeamHelper.getSelection(room, entity)
+    local base = getSelection(entity)
     local nodes = entity.nodes or {}
 
     if #nodes < 1 then
@@ -242,14 +272,19 @@ function customLightbeam.selection(room, entity)
 end
 
 customLightbeam.rotate = lightBeamHelper.rotate
-customLightbeam.updateResizeSelection = lightBeamHelper.updateResizeSelection
+
+function customLightbeam.updateResizeSelection(room, entity, node, selection, offsetX, offsetY, directionX, directionY)
+    local newSelection = getSelection(entity)
+
+    selection.x = newSelection.x
+    selection.y = newSelection.y
+
+    selection.width = newSelection.width
+    selection.height = newSelection.height
+end
 
 function customLightbeam.nodeLimits(room, entity)
-    if entity.scroll then
-        return 0, 1
-    end
-
-    return 0, 0
+    return 0, entity.scroll and 1 or 0
 end
 
 function customLightbeam.nodeSprite(room, entity, node)

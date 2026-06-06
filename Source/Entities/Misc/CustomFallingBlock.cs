@@ -11,7 +11,8 @@ public class CustomFallingBlock : FallingBlock
         { "down", new Vector2(0f, 1f) }, { "up", new Vector2(0f, -1f) }, { "left", new Vector2(-1f, 0f) }, { "right", new Vector2(1f, 0f) }
     };
 
-    protected readonly string flagOnFall, flagOnLand, triggerFlag;
+    protected readonly string flagOnFall, flagOnLand;
+    protected readonly Condition triggerCondition;
     protected readonly bool resetFlags;
     protected bool fallOnTouch;
     protected bool fallOnStaticMover;
@@ -42,7 +43,7 @@ public class CustomFallingBlock : FallingBlock
         Direction = DirectionToVector[data.Attr("direction", "down").ToLower()];
         flagOnFall = data.Attr("flagOnFall", "");
         flagOnLand = data.Attr("flagOnLand", "");
-        triggerFlag = data.Attr("triggerFlag", "");
+        triggerCondition = data.Condition("triggerFlag", defaultValue: false);
         resetFlags = data.Bool("resetFlags", false);
         fallOnTouch = data.Bool("fallOnTouch", true);
         fallOnStaticMover = data.Bool("fallOnStaticMover", true);
@@ -82,8 +83,8 @@ public class CustomFallingBlock : FallingBlock
             session.SetFlag(flagOnFall, false);
         if (!string.IsNullOrEmpty(flagOnLand) && session.GetFlag(flagOnLand))
             session.SetFlag(flagOnLand, false);
-        if (!string.IsNullOrEmpty(triggerFlag) && session.GetFlag(triggerFlag))
-            session.SetFlag(triggerFlag, false);
+        if (triggerCondition is Condition.Flag { FlagName: { } flagName, Inverted: { } inverted } && session.GetFlag(flagName) != inverted) // grr evil backwards compat
+            session.SetFlag(flagName, inverted);
     }
 
     public override void Update()
@@ -99,7 +100,8 @@ public class CustomFallingBlock : FallingBlock
         }
 
         // flag trigger
-        if (!string.IsNullOrEmpty(triggerFlag) && !HasStartedFalling && !Triggered && SceneAs<Level>().Session.GetFlag(triggerFlag))
+        // todo: sync this up better if the condition is a flag and was triggered by another falling block's flagOnFall flag?
+        if (!HasStartedFalling && !Triggered && triggerCondition.Check(SceneAs<Level>().Session))
             Triggered = true;
 
         base.Update();

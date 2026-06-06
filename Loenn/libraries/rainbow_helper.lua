@@ -2,20 +2,13 @@ local utils = require("utils")
 
 local rainbowHelper = {}
 
--- lua-ified versions of a couple methods from fna/monocle and the gethue method needed for the gradient effect
-local function clamp(value, min, max)
-    if value < min then
-        return min
-    end
-    if value > max then
-        return max
-    end
-
-    return value
+-- lua-ified versions of a few methods from fna/monocle needed for the two gethue methods
+local function clamp(x, min, max)
+    return x < min and min or x > max and max or x
 end
 
 local function lerp(a, b, amount)
-    return a * (1 - amount) + b * amount
+    return a + (b - a) * amount
 end
 
 local function lerpColor(a, b, amount)
@@ -41,64 +34,83 @@ local function yoyo(value)
     return 1 - (value - 0.5) * 2
 end
 
-local function split(inputstr, seperator)
-    local result = {}
-
-    seperator = seperator or " "
-    for string in string.gmatch(inputstr, "([^" .. seperator .. "]+)") do
-        table.insert(result, string)
+local colorsCache = {}
+function rainbowHelper.getColorList(colorsString)
+    local cached = colorsCache[colorsString]
+    if cached then
+        return cached
     end
 
-    return result
-end
-
-function rainbowHelper.getColors(colorsString, loopColors)
-    loopColors = loopColors or false
     local colors = {}
-
-    for _, v in pairs(split(colorsString, ",")) do
-        table.insert(colors, utils.getColor(v))
+    for _, color in pairs(string.split(colorsString, ",")()) do
+        table.insert(colors, utils.getColor(color))
     end
 
-    if loopColors then
-        table.insert(colors, colors[1])
-    end
-
+    colorsCache[colorsString] = colors
     return colors
 end
 
-local defaultColors = rainbowHelper.getColors("89E5AE,88E0E0,87A9DD,9887DB,D088E2")
+-- lua-ified version of the GetHue method from rainbow spinners
+function rainbowHelper.getVanillaHue(x, y)
+    local r, g, b = utils.hsvToRgb(0.4 + yoyo(vectorLength(x, y) % 280 / 280) * 0.4, 0.4, 0.9)
+    return { r, g, b, 1 }
+end
 
-function rainbowHelper.getHue(x, y, colors, gradientSize, loopColors, centerX, centerY)
+-- lua-ified version of the GetRainbowHue method from custom lightbeams
+function rainbowHelper.getModdedHue(x, y, colors, gradientSize, loopColors, centerX, centerY)
     x, y = x or 0, y or 0
-    colors = colors or defaultColors
+    colors = colors or rainbowHelper.getColorList("89e5ae,88e0e0,87a9dd,9887db,d088e2")
     gradientSize = gradientSize or 280
     loopColors = loopColors or false
     centerX, centerY = centerX or 0, centerY or 0
 
-    if (#colors == 1) then
+    if #colors == 1 then
         return colors[1]
     end
 
     local progress = vectorLength(x - centerX, y - centerY)
-
     while progress < 0 do
         progress = progress + gradientSize
     end
-
     progress = progress % gradientSize / gradientSize
-    if not loopColors then
-        progress = yoyo(progress)
+
+    -- hmm
+    local progressInColors = not loopColors and ((#colors - 1) * yoyo(progress)) or (#colors * progress)
+    local colorIndex = math.floor(progressInColors)
+    local nextColorIndex = colorIndex + 1
+    local progressInIndex = progressInColors - colorIndex
+    return lerpColor(colors[(colorIndex % #colors) + 1], colors[(nextColorIndex % #colors) + 1], progressInIndex)
+end
+
+local function getHueFromController(x, y, controller)
+    return rainbowHelper.getModdedHue(x, y, rainbowHelper.getColorList(controller.colors), controller.gradientSize, controller.loopColors, controller.centerX, controller.centerY)
+end
+
+function rainbowHelper.getHue(x, y, room, controller)
+    if controller then
+        return getHueFromController(x, y, controller)
     end
 
-    if progress == 1 then
-        return colors[#colors]
+    if room then
+        local roomWideController = nil
+        for _, entity in pairs(room.entities) do
+            local name = entity._name
+            if name == "MaxHelpingHand/RainbowSpinnerColorAreaController" or name == "MaxHelpingHand/FlagRainbowSpinnerColorAreaController" then
+                if utils.aabbCheckInline(room.x + entity.x, room.y + entity.y, entity.width, entity.height, x - 1, y - 1, 2, 2) then
+                    return getHueFromController(x, y, entity)
+                end
+
+            elseif roomWideController == nil and (name == "MaxHelpingHand/RainbowSpinnerColorController" or name == "MaxHelpingHand/FlagRainbowSpinnerColorController") then
+                roomWideController = entity
+            end
+        end
+
+        if roomWideController then
+            return getHueFromController(x, y, roomWideController)
+        end
     end
 
-    local globalProgress = progress * (#colors - 1)
-    local colorIndex = math.floor(globalProgress)
-    local progressInIndex = globalProgress - colorIndex
-    return lerpColor(colors[colorIndex + 1], colors[colorIndex + 2], progressInIndex)
+    return rainbowHelper.getVanillaHue(x, y)
 end
 
 return rainbowHelper

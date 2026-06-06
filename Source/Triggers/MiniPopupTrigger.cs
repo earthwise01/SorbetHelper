@@ -13,7 +13,7 @@ public class MiniPopupTrigger(EntityData data, Vector2 offset, EntityID entityId
 
     private readonly Modes mode = data.Enum("mode", Modes.OnPlayerEnter);
 
-    private readonly string flag = data.Attr("flag", "");
+    private readonly Condition condition = data.Condition("flag");
     private readonly bool onlyOnce = data.Bool("onlyOnce", false);
     private readonly bool removeOnLeave = data.Bool("removeOnLeave", true);
 
@@ -25,7 +25,7 @@ public class MiniPopupTrigger(EntityData data, Vector2 offset, EntityID entityId
     private readonly string iconPath = data.Attr("iconTexture", "");
     private readonly string texturePath = data.Attr("texturePath", "");
 
-    private bool currentFlagState;
+    private bool currentConditionState;
     private bool triggered;
 
     private Action disablePopup;
@@ -34,33 +34,31 @@ public class MiniPopupTrigger(EntityData data, Vector2 offset, EntityID entityId
     {
         base.Awake(scene);
 
-        if (!string.IsNullOrEmpty(flag))
-            currentFlagState = SceneAs<Level>().Session.GetFlag(flag);
+        currentConditionState = condition.Check(SceneAs<Level>().Session);
+
+        if (mode is Modes.OnPlayerEnter or Modes.WhilePlayerInside)
+            Collidable = currentConditionState;
     }
 
     public override void Update()
     {
         base.Update();
 
-        if (string.IsNullOrEmpty(flag) || SceneAs<Level>().Session.GetFlag(flag) == currentFlagState)
-            return;
+        bool previousConditionState = currentConditionState;
+        currentConditionState = condition.Check(SceneAs<Level>().Session);
 
-        currentFlagState = !currentFlagState;
+        if (previousConditionState == currentConditionState)
+            return;
 
         switch (mode)
         {
             case Modes.OnPlayerEnter or Modes.WhilePlayerInside:
-                Collidable = currentFlagState;
+                Collidable = currentConditionState;
                 break;
 
-            case Modes.OnFlagEnabled:
-                if (currentFlagState)
-                    Trigger();
-                break;
-
-            case Modes.OnFlagDisabled:
-                if (!currentFlagState)
-                    Trigger();
+            case Modes.OnFlagEnabled when currentConditionState:
+            case Modes.OnFlagDisabled when !currentConditionState:
+                Trigger();
                 break;
         }
     }

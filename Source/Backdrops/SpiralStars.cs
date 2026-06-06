@@ -41,7 +41,10 @@ public class SpiralStars : Backdrop
     public SpiralStars(BinaryPacker.Element data) : base()
     {
         backgroundColor = Calc.HexToColorWithNonPremultipliedAlpha(data.Attr("backgroundColor", "00000000"));
-        Color[] colors = data.AttrList("colors", Calc.HexToColorWithNonPremultipliedAlpha, "ffffff").ToArray();
+        Color[] colors = data.Attr("colors", "ffffff")
+                             .Split(',', StringSplitOptions.TrimAndRemoveEmpty)
+                             .Select(Calc.HexToColorWithNonPremultipliedAlpha)
+                             .ToArray();
         center = new Vector2(data.AttrFloat("centerX", 160f), data.AttrFloat("centerY", 90f));
         speed = data.AttrFloat("speed", 70f);
         rotationSpeed = data.AttrFloat("rotationSpeed", -40f).ToRad();
@@ -87,7 +90,7 @@ public class SpiralStars : Backdrop
 
         foreach (Star star in stars)
         {
-            star.Distance = Mod(star.Distance - Engine.DeltaTime * speed, outerRadius + 1);
+            star.Distance = Calc.Mod(star.Distance - Engine.DeltaTime * speed, outerRadius + 1);
             star.Angle += Engine.DeltaTime * rotationSpeed;
             star.AnimationTimer += Engine.DeltaTime;
 
@@ -123,7 +126,7 @@ public class SpiralStars : Backdrop
 
     private void UpdateStarSprite(Star star, ref Star.StarSprite starSprite, float timeOffset)
     {
-        float distance = Mod(star.Distance - timeOffset * speed, outerRadius + 1);
+        float distance = Calc.Mod(star.Distance - timeOffset * speed, outerRadius + 1);
         float angle = star.Angle + timeOffset * rotationSpeed;
 
         Vector2 position = center + Calc.AngleToVector(angle, distance);
@@ -137,6 +140,4 @@ public class SpiralStars : Backdrop
         starSprite.Scale = scale;
         starSprite.FrameIndex = frameIndex;
     }
-
-    private static float Mod(float x, float m) => (x % m + m) % m;
 }

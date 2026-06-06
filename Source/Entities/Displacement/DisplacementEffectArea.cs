@@ -5,8 +5,7 @@ public class DisplacementEffectArea : Entity
 {
     private readonly Color color;
 
-    private readonly string flag;
-    private readonly bool invertFlag;
+    private readonly Condition condition;
 
     public DisplacementEffectArea(EntityData data, Vector2 offset) : base(data.Position + offset)
     {
@@ -19,12 +18,7 @@ public class DisplacementEffectArea : Entity
         float alpha = data.Float("alpha", 1.0f);
         color = new Color(horizontalDisplacement, verticalDisplacement, waterDisplacement) * alpha;
 
-        flag = data.Attr("flag", "");
-        if (flag.StartsWith('!'))
-        {
-            invertFlag = true;
-            flag = flag.Substring(1);
-        }
+        condition = data.Condition("flag");
 
         if (data.Bool("depthAdhering", false))
         {
@@ -39,9 +33,7 @@ public class DisplacementEffectArea : Entity
 
     private void RenderDisplacement()
     {
-        if (!string.IsNullOrEmpty(flag) && !SceneAs<Level>().Session.GetFlag(flag, invertFlag))
-            return;
-
-        Draw.Rect(Position, Width, Height, color);
+        if (condition.Check(SceneAs<Level>().Session))
+            Draw.Rect(Position, Width, Height, color);
     }
 }

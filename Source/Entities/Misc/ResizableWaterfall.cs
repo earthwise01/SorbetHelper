@@ -17,9 +17,10 @@ public class ResizableWaterfall : Entity
     private readonly float wavePercent;
     private readonly bool rippleWater;
 
-    private readonly Color baseColor;
-    private readonly Color surfaceColor;
-    private readonly Color fillColor;
+    private readonly ColorSource colorSource;
+    private readonly float baseAlpha;
+    private readonly float surfaceAlpha;
+    private readonly float fillAlpha;
     private readonly SplashParticleDepths splashParticleDepth;
 
     private Water water, topWater;
@@ -32,14 +33,14 @@ public class ResizableWaterfall : Entity
 
     public ResizableWaterfall(EntityData data, Vector2 offset) : base(data.Position + offset)
     {
-        Tag = Tags.TransitionUpdate;
+        Tag |= Tags.TransitionUpdate;
 
         width = data.Width;
 
-        float alpha = data.Float("alpha", 1f);
-        baseColor = Calc.HexToColor(data.Attr("color", "87CEFA")) * alpha;
-        surfaceColor = baseColor * 0.8f;
-        fillColor = baseColor * 0.3f;
+        colorSource = data.ColorSource("color", "87cefa");
+        baseAlpha = data.Float("alpha", 1f);
+        surfaceAlpha = baseAlpha * 0.8f;
+        fillAlpha = baseAlpha * 0.3f;
 
         Depth = data.Int("depth", -49900);
         splashParticleDepth = data.Enum("splashParticleDepth", SplashParticleDepths.ParticlesFG);
@@ -127,7 +128,7 @@ public class ResizableWaterfall : Entity
             && !level.Transitioning
             && (solid is not null || water is not null || topWater is not null))
         {
-            ParticleSystem particles = splashParticleDepth switch
+            ParticleSystem particleSystem = splashParticleDepth switch
             {
                 SplashParticleDepths.ParticlesBG => level.ParticlesBG,
                 SplashParticleDepths.Particles   => level.Particles,
@@ -135,11 +136,13 @@ public class ResizableWaterfall : Entity
                 _                                => throw new ArgumentOutOfRangeException()
             };
 
+            Color particleColor = colorSource.GetValue(level.Session) * baseAlpha;
+
             if (level.OnInterval(1f / 60f) && (solid is not null || water is not null))
-                particles.Emit(Water.P_Splash, 1, new Vector2(X + width / 2f, Y + height + 2f), new Vector2(width / 2f + 4f, 2f), baseColor, -MathF.PI / 2f);
+                particleSystem.Emit(Water.P_Splash, 1, new Vector2(X + width / 2f, Y + height + 2f), new Vector2(width / 2f + 4f, 2f), particleColor, -MathF.PI / 2f);
 
             if (level.OnInterval(0.15f) && topWater is not null)
-                particles.Emit(Water.P_Splash, 1, new Vector2(X + width / 2f, Y), new Vector2(width / 2f + 4f, 2f), baseColor, Calc.Random.Range(0, MathF.PI));
+                particleSystem.Emit(Water.P_Splash, 1, new Vector2(X + width / 2f, Y), new Vector2(width / 2f + 4f, 2f), particleColor, Calc.Random.Range(0, MathF.PI));
 
         }
     }
@@ -184,6 +187,10 @@ public class ResizableWaterfall : Entity
         if (!visibleOnCamera)
             return;
 
+        Color color = colorSource.GetValue(SceneAs<Level>().Session);
+        Color fillColor = color * fillAlpha;
+        Color surfaceColor = color * surfaceAlpha;
+
         int reduceEdges = width <= 8f ? 1 : 0;
         int edgeSize = 3 - reduceEdges;
 
@@ -226,11 +233,11 @@ public class ResizableWaterfall : Entity
 
         return;
 
-        void DrawWaterfallSlice(float x, Color color)
+        void DrawWaterfallSlice(float x, Color sliceColor)
         {
             float bottomSurfaceHeight = bottomWaterSurface is not null ? MathF.Round(bottomWaterSurface.GetSurfaceHeight(new Vector2(x, water!.Top))) : 0f;
             float topSurfaceHeight = topWaterSurface is not null ? MathF.Round(topWaterSurface.GetSurfaceHeight(new Vector2(x, topWater!.Bottom))) : 0f;
-            Draw.Rect(x, renderY + topSurfaceHeight, 1f, renderHeight - bottomSurfaceHeight - topSurfaceHeight, color);
+            Draw.Rect(x, renderY + topSurfaceHeight, 1f, renderHeight - bottomSurfaceHeight - topSurfaceHeight, sliceColor);
         }
     }
 

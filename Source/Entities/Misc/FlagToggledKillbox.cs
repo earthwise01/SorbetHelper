@@ -4,9 +4,8 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [TrackedAs(typeof(Killbox))]
 public class FlagToggledKillbox : Killbox
 {
-    private readonly string flag;
-    private readonly bool inverted;
-    private readonly bool flagOnly;
+    private readonly Condition enabledCondition;
+    private readonly bool ignorePlayerPosition;
 
     private readonly float playerAboveThreshold;
 
@@ -14,12 +13,9 @@ public class FlagToggledKillbox : Killbox
 
     public FlagToggledKillbox(EntityData data, Vector2 offset) : base(data, offset)
     {
-        flag = data.Attr("flag", "");
-        inverted = data.Bool("inverted", false);
-        flagOnly = data.Bool("flagOnly", false);
-
+        ignorePlayerPosition = data.Bool("flagOnly", false);
+        enabledCondition = data.Condition("flag", data.Bool("inverted", false));
         playerAboveThreshold = data.Float("playerAboveThreshold", 32f);
-
         updateOnLoad = data.Bool("updateOnLoad", false);
 
         if (data.Bool("lenientHitbox", false))
@@ -36,34 +32,31 @@ public class FlagToggledKillbox : Killbox
 
     public override void Update()
     {
-        // flag only mode checks
-        if (flagOnly)
+        Level level = SceneAs<Level>();
+        
+        // condition only mode checks
+        if (ignorePlayerPosition)
         {
-            if (string.IsNullOrEmpty(flag))
-                Collidable = inverted;
-            else
-                Collidable = SceneAs<Level>().Session.GetFlag(flag, inverted);
-
+            Collidable = enabledCondition.Check(level.Session);
             return;
         }
 
         // normal collidability checks
-        Player player = Scene.Tracker.GetEntity<Player>();
+        Player player = level.Tracker.GetEntity<Player>();
 
         if (!Collidable && player is not null && player.Bottom < Top - playerAboveThreshold)
             Collidable = true;
         else if (player is not null && player.Top > Bottom + 32f)
             Collidable = false;
 
-        // only keep collidable if the flag is set (or null/empty)
-        bool canBeCollidable = string.IsNullOrEmpty(flag) || SceneAs<Level>().Session.GetFlag(flag, inverted);
-        Collidable = Collidable && canBeCollidable;
+        // only become collidable if the condition is true
+        Collidable = Collidable && enabledCondition.Check(level.Session);
     }
 
     // based on Level.EnforceBounds
     private void LenientOnPlayer(Player player)
     {
-        if (player.Top > Top && SaveData.Instance.Assists.Invincible)
+        if (SaveData.Instance.Assists.Invincible && player.Top > Top)
         {
             player.Play("event:/game/general/assist_screenbottom");
             player.Bounce(Top);

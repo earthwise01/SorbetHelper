@@ -6,6 +6,7 @@ displacementEffectBlocker.name = "SorbetHelper/DisplacementEffectBlocker"
 displacementEffectBlocker.fillColor = {225 / 255, 245 / 255, 100 / 255, 0.25}
 displacementEffectBlocker.borderColor = {240 / 255, 210 / 255, 170 / 255, 0.5}
 displacementEffectBlocker.depth = sorbetHelper.controllerDepth
+displacementEffectBlocker.associatedMods = sorbetHelper.getSessionExpressionAssociatedModsFunction({"flag"})
 displacementEffectBlocker.placements = {
     {
         name = "displacement_effect_blocker_full",
@@ -59,7 +60,7 @@ displacementEffectBlocker.fieldOrder = {
 displacementEffectBlocker.fieldInformation = {
     depth = {
         fieldType = "integer",
-        options = sorbetHelper.getDepths({
+        options = sorbetHelper.getDepthOptions({
             {"Water & Waterfalls", -9999},
             {"FG Waterfalls", -49900}
         }),

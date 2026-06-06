@@ -351,7 +351,7 @@ public class SparklingWater : Water, SparklingWaterRenderer.IRenderable
             surface.DoRipple(new Vector2(position.X - width / 2f + (rippleDistance / 2f + rippleDistance * i), position.Y), strength * rippleStrengthMult);
 
         ParticleSystem particles = SceneAs<Level>().ParticlesFG;
-        Color splashColor = GetRendererOptions().OutlineColor;
+        Color splashColor = GetRendererOptions().OutlineColor.GetValue(SceneAs<Level>().Session);
         float splashY = onTop ? Top : Bottom;
         float splashDirection = onTop ? -MathF.PI / 2f : MathF.PI / 2f;
         for (int x = 0; x < width; x += 4)

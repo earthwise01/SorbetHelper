@@ -1,27 +1,56 @@
-using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Celeste.Mod.SorbetHelper.Utils;
 
 internal static class Extensions
 {
-    #region Misc Extensions
+    extension(string self)
+    {
+        public bool TryRemovePrefix(string prefix, out string result)
+        {
+            if (self.StartsWith(prefix, StringComparison.Ordinal))
+            {
+                result = self[prefix.Length..];
+                return true;
+            }
 
-    public static bool IsInRange(this int value, int min, int max) => value >= min && value <= max;
-    public static bool IsInRange(this float value, float min, float max) => value >= min && value <= max;
+            result = self;
+            return false;
+        }
+
+        public bool TryRemovePrefix(char prefix, out string result)
+        {
+            if (self.StartsWith(prefix))
+            {
+                result = self[1..];
+                return true;
+            }
+
+            result = self;
+            return false;
+        }
+    }
 
     extension(StringSplitOptions)
     {
         public static StringSplitOptions TrimAndRemoveEmpty => StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
     }
 
-    #endregion
-
-    #region Calc Extensions
-
     extension(Calc)
     {
-        // Modified from HexToColorWithAlpha in https://github.com/EverestAPI/Everest/blob/dev/Celeste.Mod.mm/Patches/Monocle/Calc.cs
+        public static int Mod(int x, int m)
+            => (x % m + m) % m;
+        public static float Mod(float x, float m)
+            => (x % m + m) % m;
+
+        public static bool IsInRange(int value, int min, int max)
+            => value >= min && value <= max;
+        public static bool IsInRange(float value, float min, float max)
+            => value >= min && value <= max;
+
+        #region Color Conversions
+
         /// <summary>
         /// Convert a hex color, possibly including a non-premultiplied alpha value, into an XNA <see cref="Color"/>.
         /// </summary>
@@ -29,6 +58,8 @@ internal static class Extensions
         /// <returns>an XNA <see cref="Color"/>, defaulting to <see cref="Color.White"/>.</returns>
         public static Color HexToColorWithNonPremultipliedAlpha(string hex)
         {
+            // modified from https://github.com/EverestAPI/Everest/blob/b24dd1e6ed4efc912e341de44b74497335393dce/Celeste.Mod.mm/Patches/Monocle/Calc.cs#L83
+
             int consumed = 0;
 
             if (hex.Length >= 1 && hex[0] == '#')
@@ -64,11 +95,39 @@ internal static class Extensions
                     return Color.White;
             }
         }
+
+        public static Color HslToColor(float hue, float s, float l)
+        {
+            if (s == 0f)
+                return new Color(l, l, l);
+
+            float hueSegment = hue * 6f;
+            float c = (1f - MathF.Abs(2f * l - 1f)) * s;
+            float x = c * (1f - MathF.Abs(hueSegment % 2f - 1f));
+            float m = l - c / 2f;
+
+            return (hueSegment) switch
+            {
+                < 1f => new Color(c + m, x + m, m),
+                < 2f => new Color(x + m, c + m, m),
+                < 3f => new Color(m, c + m, x + m),
+                < 4f => new Color(m, x + m, c + m),
+                < 5f => new Color(x + m, m, c + m),
+                _    => new Color(c + m, m, x + m),
+            };
+        }
+
+        #endregion
     }
+    
+    extension(Color self)
+    {
+        public int ToPackedInt()
+            => unchecked((int)self.PackedValue);
 
-    #endregion
-
-    #region Level Extensions
+        public static Color FromPackedInt(int packedValue)
+            => new Color() { PackedValue = unchecked((uint)packedValue) };
+    }
 
     extension(Level self)
     {
@@ -164,10 +223,6 @@ internal static class Extensions
         }
     }
 
-    #endregion
-
-    #region Entity Extensions
-
     extension(Entity self)
     {
         /// <summary>
@@ -205,19 +260,11 @@ internal static class Extensions
         }
     }
 
-    #endregion
-
-    #region Session Extensions
-
     extension(Session self)
     {
         public bool GetFlag(string flag, bool inverted)
             => self.GetFlag(flag) ^ inverted;
     }
-
-    #endregion
-
-    #region Camera Extensions
 
     extension(Camera self)
     {
@@ -229,10 +276,6 @@ internal static class Extensions
         public Vector2 GetZoomOutCenterOffset()
             => new Vector2(self.Viewport.Width / 2f - 320f / 2f, self.Viewport.Height / 2f - 180f / 2f);
     }
-
-    #endregion
-
-    #region EntityData Extensions
 
     extension(EntityData self)
     {
@@ -274,22 +317,23 @@ internal static class Extensions
             return null;
         }
 
+        public Condition Condition(string key, bool inverted = false, bool defaultValue = true)
+            => ValueSources.Condition.Create(self.Attr(key), inverted, defaultValue);
+
+        public FloatSource FloatSource(string key, float defaultValue = 0f)
+            => ValueSources.FloatSource.Create(self.Values?.GetValueOrDefault(key), defaultValue);
+
+        public IntSource IntSource(string key, int defaultValue = 0)
+            => ValueSources.IntSource.Create(self.Values?.GetValueOrDefault(key), defaultValue);
+
+        public ColorSource ColorSource(string key, string defaultHex = "ffffff")
+            => ValueSources.ColorSource.Create(self.Attr(key), defaultHex);
+
         public Ease.Easer Easer(string key, Ease.Easer defaultValue)
-            => Ease.StringToEaser.GetValueOrDefault(self.Attr(key, ""), defaultValue);
+            => Ease.FromNameOrDefault(self.Attr(key, ""), defaultValue);
         public Ease.Easer Easer(string key)
-            => Ease.StringToEaser.GetValueOrDefault(self.Attr(key, ""), Ease.Linear);
-
-        public IEnumerable<string> List(string key, string defaultValue = "")
-            => self.Attr(key, defaultValue).Split(',', StringSplitOptions.TrimAndRemoveEmpty);
-        public IEnumerable<T> List<T>(string key, Func<string, T> transform, string defaultValue = "")
-            => self.Attr(key, defaultValue).Split(',', StringSplitOptions.TrimAndRemoveEmpty).Select(transform);
-        public IEnumerable<T> List<T>(string key, Func<string, int, T> transform, string defaultValue = "")
-            => self.Attr(key, defaultValue).Split(',', StringSplitOptions.TrimAndRemoveEmpty).Select(transform);
+            => Ease.FromNameOrDefault(self.Attr(key, ""), Ease.Linear);
     }
-
-    #endregion
-
-    #region BinaryPacker.Element Extensions
 
     extension(BinaryPacker.Element self)
     {
@@ -318,47 +362,29 @@ internal static class Extensions
         }
 
         public Ease.Easer AttrEaser(string key, Ease.Easer defaultValue)
-            => Ease.StringToEaser.GetValueOrDefault(self.Attr(key, ""), defaultValue);
+            => Ease.FromNameOrDefault(self.Attr(key, ""), defaultValue);
         public Ease.Easer AttrEaser(string key)
-            => Ease.StringToEaser.GetValueOrDefault(self.Attr(key, ""), Ease.Linear);
-
-        public IEnumerable<T> AttrList<T>(string key, Func<string, T> transform, string defaultValue = "")
-            => self.Attr(key, defaultValue).Split(',', StringSplitOptions.TrimAndRemoveEmpty).Select(transform);
-        public IEnumerable<T> AttrList<T>(string key, Func<string, int, T> transform, string defaultValue = "")
-            => self.Attr(key, defaultValue).Split(',', StringSplitOptions.TrimAndRemoveEmpty).Select(transform);
+            => Ease.FromNameOrDefault(self.Attr(key, ""), Ease.Linear);
     }
-
-    #endregion
-
-    #region Ease Extensions
-
-    // grrr this kind of sucks but oh well
-    private static readonly ReadOnlyDictionary<string, Ease.Easer> EaseExtensions_StringToEaser
-        = new ReadOnlyDictionary<string, Ease.Easer>(new Dictionary<string, Ease.Easer>
-        {
-            { "Linear", Ease.Linear },
-            { "SineIn", Ease.SineIn }, { "SineOut", Ease.SineOut }, { "SineInOut", Ease.SineInOut },
-            { "QuadIn", Ease.QuadIn }, { "QuadOut", Ease.QuadOut }, { "QuadInOut", Ease.QuadInOut },
-            { "CubeIn", Ease.CubeIn }, { "CubeOut", Ease.CubeOut }, { "CubeInOut", Ease.CubeInOut },
-            { "QuintIn", Ease.QuintIn }, { "QuintOut", Ease.QuintOut }, { "QuintInOut", Ease.QuintInOut },
-            { "ExpoIn", Ease.ExpoIn }, { "ExpoOut", Ease.ExpoOut }, { "ExpoInOut", Ease.ExpoInOut },
-            { "BackIn", Ease.BackIn }, { "BackOut", Ease.BackOut }, { "BackInOut", Ease.BackInOut },
-            { "BigBackIn", Ease.BigBackIn }, { "BigBackOut", Ease.BigBackOut }, { "BigBackInOut", Ease.BigBackInOut },
-            { "ElasticIn", Ease.ElasticIn }, { "ElasticOut", Ease.ElasticOut }, { "ElasticInOut", Ease.ElasticInOut },
-            { "BounceIn", Ease.BounceIn }, { "BounceOut", Ease.BounceOut }, { "BounceInOut", Ease.BounceInOut },
-        });
 
     extension(Ease)
     {
-        /// <summary>
-        /// maps all Monocle <see cref="Ease.Easer"/>s to their names (i.e. <c>"SineInOut"</c> => <see cref="Ease.SineInOut"/>)
-        /// </summary>
-        public static ReadOnlyDictionary<string, Ease.Easer> StringToEaser => EaseExtensions_StringToEaser;
+        public static Ease.Easer FromNameOrDefault(string name, Ease.Easer defaultValue = null)
+            => name.ToLowerInvariant() switch
+            {
+                "linear"    => Ease.Linear,
+                "sinein"    => Ease.SineIn,    "sineout"    => Ease.SineOut,    "sineinout"    => Ease.SineInOut,
+                "quadin"    => Ease.QuadIn,    "quadout"    => Ease.QuadOut,    "quadinout"    => Ease.QuadInOut,
+                "cubein"    => Ease.CubeIn,    "cubeout"    => Ease.CubeOut,    "cubeinout"    => Ease.CubeInOut,
+                "quintin"   => Ease.QuintIn,   "quintout"   => Ease.QuintOut,   "quintinout"   => Ease.QuintInOut,
+                "expoin"    => Ease.ExpoIn,    "expoout"    => Ease.ExpoOut,    "expoinout"    => Ease.ExpoInOut,
+                "backin"    => Ease.BackIn,    "backout"    => Ease.BackOut,    "backinout"    => Ease.BackInOut,
+                "bigbackin" => Ease.BigBackIn, "bigbackout" => Ease.BigBackOut, "bigbackinout" => Ease.BigBackInOut,
+                "elasticin" => Ease.ElasticIn, "elasticout" => Ease.ElasticOut, "elasticinout" => Ease.ElasticInOut,
+                "bouncein"  => Ease.BounceIn,  "bounceout"  => Ease.BounceOut,  "bounceinout"  => Ease.BounceInOut,
+                _           => defaultValue
+            };
     }
-
-    #endregion
-
-    #region ILCursor Extensions
 
     extension(ILCursor self)
     {
@@ -372,6 +398,4 @@ internal static class Extensions
         public VariableDefinition AddVariable<T>()
             => AddVariable(self, typeof(T));
     }
-
-    #endregion
 }

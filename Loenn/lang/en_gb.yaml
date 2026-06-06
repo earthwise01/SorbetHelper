@@ -38,12 +38,18 @@ Entities:
         Description: A custom killbox that only kills the player once they are fully beneath the top of the killbox, matching how the bottom of a room behaves.
     Attributes:
       flag:
-        Description: An optional session flag that needs to be set in order for the killbox to be able to activate.
+        Description: |-
+          A session flag that must be set for the killbox to be able to activate. Leave empty for it to always be able to activate.
+          Add an exclamation mark before the flag name to require the flag to not be set instead,
+              e.g. `!myFlag`.
+          If Frost Helper is enabled, a Session Expression may be used instead by adding `expr:` before the expression,
+              e.g. `expr:#myCounter > 5`.
       inverted:
         Name: Invert Flag
         Description: When checked, the killbox can only be active when the flag is disabled, rather than when it is enabled.
       flagOnly:
-        Description: Whether the killbox's collidability should only be determined by its flag, instead of also requiring the player to be above it.
+        Name: Ignore Player Position
+        Description: Whether the killbox should not require the player to be above it in order to activate, and not deactivate if they go too far below it again.
       playerAboveThreshold:
         Description: How far (in pixels) above the killbox the player needs to be in order for it to activate. Default is 32.
       lenientHitbox:
@@ -59,12 +65,17 @@ Entities:
         Description: An invisible barrier which kills the player when touched.
     Attributes:
       flag:
-        Description: The flag that needs to be set in order for the kill zone to be activated. Leaving this empty causes the kill zone to always be active.
+        Description: |-
+          A session flag that must be set for the kill zone to be collidable. Leave empty for it to always be collidable.
+          Add an exclamation mark before the flag name to require the flag to not be set instead,
+              e.g. `!myFlag`.
+          If Frost Helper is enabled, a Session Expression may be used instead by adding `expr:` before the expression,
+              e.g. `expr:#myCounter > 5`.
       inverted:
         Name: Invert Flag
         Description: When checked, the kill zone will only be active when the flag is disabled, rather than when it is enabled.
       fastKill:
-        Description: When checked, the player will die instantly upon touching the kill zone rather than getting knocked back a bit first.
+        Description: Whether the player should die instantly when touching the kill zone rather than getting knocked back a bit first.
       collideHoldables:
         Description: |-
           Whether holdables (like theo crystals or jellies) can collide with the kill zone.
@@ -84,11 +95,11 @@ Entities:
         Name: Winged Strawberry With Return Berry Winged Return Berry
     Attributes:
       winged:
-        Description: Determines whether the strawberry has wings and attempts to vertically rise offscreen when the player dashes.
+        Description: Whether the strawberry should have wings and attempt to vertically rise offscreen when the player dashes.
       moon:
         Description: |-
           Makes the strawberry render as a moon berry.
-          Crashes the map if the strawberry also has wings due to the 'flap' animation not being present.
+          Crashes the map if the strawberry also has wings due to the `flap` animation not being present.
       delay:
         Description: The delay (in seconds) before the player is placed into a bubble after grabbing the strawberry. (Default = 0.3)
       checkpointID:
@@ -113,7 +124,12 @@ Entities:
       flagOnLand:
         Description: An optional session flag to set when the block lands.
       triggerFlag:
-        Description: An optional session flag which should trigger the block to fall.
+        Description: |-
+          An optional session flag that should trigger this block to fall when set.
+          Add an exclamation mark before the flag name to require the flag to not be set instead,
+              e.g. `!myFlag`.
+          If Frost Helper is enabled, a Session Expression may be used instead by adding `expr:` before the expression,
+              e.g. `expr:#myCounter > 5`.
       resetFlags:
         Description: Whether the falling block should reset its session flags to false when loading, rather than leaving them as they were unless something else changes them.
       fallOnTouch:
@@ -145,7 +161,7 @@ Entities:
         Description: The sound played by the block when it lands on the ground.
       depth:
         Description: |-
-          Determines the visual depth of the block.
+          The visual depth of the block.
           Higher values mean farther behind in the scene, default value is -9000.
       chronoHelperGravity:
         Description: |-
@@ -176,7 +192,7 @@ Entities:
       refillDash:
         Description: Whether the player should refill their dash when hitting the block.
       dashActivated:
-        Description: Determines whether the block can be activated by dashing into it. Disabling this effectively turns this into a regular custom falling block.
+        Description: Whether the block can be activated by dashing into it. Disabling this effectively turns this into a regular custom falling block.
 
   SorbetHelper/CustomGravityFallingBlock:
     Placements:
@@ -215,19 +231,24 @@ Entities:
         Name: Invert Flag
         Description: When checked, the block will break when the flag is disabled, rather than when it is enabled.
       flag:
-        Description: The flag that needs to be set in order for the block to break.
+        Description: |-
+          A session flag that should trigger this block to break when set.
+          Add an exclamation mark before the flag name to require the flag to not be set instead,
+              e.g. `!myFlag`.
+          If Frost Helper is enabled, a Session Expression may be used instead by adding `expr:` before the expression,
+              e.g. `expr:#myCounter > 5`.
       showDebris:
-        Description: Determines whether the block spawns debris when it breaks.
+        Description: Whether the block should spawn debris when it breaks.
       playAudio:
-        Description: Determines whether the block plays sound effects when breaking/appearing.
+        Description: Whether the block should play a sound when breaking and reappearing.
       depth:
         Description: |-
-          Determines the visual depth of the block.
+          The visual depth of the block.
           Higher values mean farther behind in the scene, default value is -10010.
       destroyAttached:
         Description: Whether objects such as spikes that are attached to the block should be affected as well.
       fadeInTime:
-        Description: Determines how long (in seconds) the block takes to visually fade back in when appearing.
+        Description: How long (in seconds) the block should take to visually fade back in when reappearing.
 
   SorbetHelper/BigWaterfall:
     Placements:
@@ -251,12 +272,17 @@ Entities:
           Whether the waterfall should have additional lines near the edges and randomly in the center for detail.
           This makes the waterfall appear closer in appearance to a vanilla big waterfall as opposed to a small waterfall.
       color:
-        Description: The color of the waterfall.
+        Description: |-
+          The color of the waterfall.
+          Supports using the value of a session counter as a packed color by adding a `#` before the counter name,
+              e.g. `#myPackedColor`.
+          If Frost Helper is enabled, supports using the value of a Session Expression as a packed color by adding `expr:` before the expression,
+              e.g. `expr:$sorbetHelper.hslColor($stamina / 110.0 * 0.5, 0.5, 0.75)`.
       alpha:
         Description: The alpha of the waterfall.
       wavePercent:
         Description: |-
-          Determines the speed of the waterfall.
+          The speed of the waterfall.
           Ranges from 0.0 to 1.0, values closer to 1.0 result in faster waves. Vanilla small waterfalls use 0.8 and big waterfalls use 1.0.
       depth:
         Description: |-
@@ -264,7 +290,7 @@ Entities:
           Higher values mean farther behind in the scene. Defaults to -9999 for the normal placement and -49900 for the above tiles placement.
           Does not affect the displacement waves, which will still render above everything (unless used with a displacement depth fixer).
       splashParticleDepth:
-        Description: Determines the visual depth to render the splash particles at, or whether to disable them completely.
+        Description: The visual depth to render the splash particles at, or whether to disable them completely.
       ignoreSolids:
         Description: Whether the waterfall can collide with solids (such as foreground tiles).
       ignoreWater:
@@ -288,25 +314,39 @@ Entities:
       # https://github.com/maddie480/MaddieHelpingHand/blob/master/Loenn/lang/en_gb.lang#L559
       flag:
         Description: |-
-          Determines the flag that needs to be set in order for the lightbeam to be activated.
-          Leaving this empty causes the lightbeam to always be active.
+          A session flag that must be set for this lightbeam to be visible. Leave empty for it to always be visible.
+          Add an exclamation mark before the flag name to require the flag to not be set instead,
+              e.g. `!myFlag`.
+          If Frost Helper is enabled, a Session Expression may be used instead by adding `expr:` before the expression,
+              e.g. `expr:#myCounter > 5`.
       inverted:
         Name: Invert Flag
         Description: When checked, the lightbeam will only be active when the flag is disabled, rather than when it is enabled.
       flagFadeTime:
-        Description: Determines the time (in seconds) the lightbeam takes to fade in or out according to the flag.
+        Description: The time (in seconds) the lightbeam should take to fade in/out when the flag changes.
       rotation:
-        Description: The rotation of the lightbeam.
+        Description: |-
+          The rotation of the lightbeam, in degrees.
+          Supports using the value of a session slider by adding an `@` before the slider name,
+              e.g. `@mySlider`.
+          If Frost Helper is enabled, supports using the value of a Session Expression by adding `expr:` before the expression,
+              e.g. `expr:$sin(@mySlider) * 45.0`.
       depth:
         Description: |-
-          Determines what visual layer the lightbeam should be on (higher values mean farther behind in the scene, default value is -9998).
-          Does not affect the particles.
+          The visual depth of the lightbeam.
+          Higher values mean farther behind in the scene, default value is -9998.
+          Does not affect the particles it emits.
       noParticles:
         Description: Whether the lightbeam should emit not particles.
       texture:
-        Description: The texture of the lightbeam. Vanilla texture is 'util/lightbeam'.
+        Description: The texture of the lightbeam. Vanilla texture is `util/lightbeam`.
       color:
-        Description: The color of the lightbeam.
+        Description: |-
+          The color of the lightbeam.
+          Supports using the value of a session counter as a packed color by adding a `#` before the counter name,
+              e.g. `#myPackedColor`.
+          If Frost Helper is enabled, supports using the value of a Session Expression as a packed color by adding `expr:` before the expression,
+              e.g. `expr:$sorbetHelper.hslColor($stamina / 110.0 * 0.5, 0.5, 0.75)`.
       alpha:
         Description: The alpha of the lightbeam.
       additive:
@@ -317,13 +357,12 @@ Entities:
         Description: |-
           When checked, overrides the normal rainbow colors (whether vanilla or from a rainbow spinner color controller) with custom ones specified by the lightbeam.
           Changing this requires clicking save changes and reopening this menu for the correct settings to appear.
-          (Requires rainbow to be checked)
-        # ^^^ might still be able to write this in a cleaner way but this should be good enough at least?
+          Requires `Rainbow` to be enabled.
       colors:
         Name: Rainbow Colors
         Description: |-
           The colors the rainbow lightbeam will use, separated by commas.
-          Alpha can optionally be specifed per color by appending an additional value to it, e.g. 'ffffff80' means white with half opacity.
+          Alpha can optionally be specifed per color by appending an additional value to it, e.g. `ffffff80` means white with half opacity.
       gradientSize:
         Name: Rainbow Gradient Size
         Description: The distance required to achieve a complete loop across all colors. Vanilla value is 280.
@@ -341,7 +380,7 @@ Entities:
         Description: The vertical position of the center of the gradient. Uses "world" coordinates. Vanilla value is 0.
       gradientSpeed:
         Name: Rainbow Gradient Speed
-        Description: Determines how fast the gradient scrolls, in pixels per second. You can use negative values to make it scroll in the opposite direction. Vanilla value is 50.
+        Description: How fast the gradient should scroll, in pixels per second. Negative values will make it scroll in the opposite direction. Vanilla value is 50.
       singleColor:
         Name: Uniform Rainbow Color
         Description: |-
@@ -354,7 +393,7 @@ Entities:
       scroll:
         Name: Parallax
         Description: |-
-          Determines how fast the lightbeam should scroll compared to the camera.
+          How fast the lightbeam should scroll compared to the camera.
           The "anchor" position of the parallax effect can optionally be controlled by adding a node, to allow multiple lightbeams to scroll together more smoothly.
 
   SorbetHelper/WingedStrawberryDirectionController:
@@ -364,7 +403,7 @@ Entities:
         Description: A controller that changes the direction winged strawberries in the room will fly.
     Attributes:
       direction:
-        Description: Determines the direction winged strawberries in the room will fly.
+        Description: The direction winged strawberries in the room should fly.
 
   SorbetHelper/StylegroundOverHudController:
     # Legacy, replaced by the Styleground Depth Controller
@@ -429,16 +468,16 @@ Entities:
           Vanilla value is disabled.
       collisionMode:
         Description: |-
-          Determines how the player collides with stuff while in the bubble.
+          Determines how the player collides with entities while in the bubble.
           - Vanilla
-              The player collides with stuff the same as in a vanilla return bubble.
+              The player collides with entities the same as they would in a vanilla return bubble.
           - SquishFix
               Same as Vanilla, but prevents the player from dying if they collide with a moving block while in the bubble.
           - TriggersOnly
-              Completely disables all collision while inside the bubble, with the exception of with triggers.
-              Includes things like collecting berries inside solid tiles, exploding puffers, activating blocks like zip movers, etc.
+              Completely disables all collision while inside the bubble, apart from with triggers.
+              Prevents things like collecting berries inside solid tiles, causing puffers to explode, activating platforms (e.g. zip movers), etc.
           - NoCollide
-              Same as TriggersOnly, but also including triggers. Fully disables *all* collision.
+              Same as TriggersOnly, but including triggers. Fully disables all collision.
           Vanilla value is Vanilla.
 
   SorbetHelper/LightCoverController:
@@ -488,7 +527,7 @@ Entities:
           Leave empty to make uncapped.
       affectedTypes:
         Description: |-
-          An optional comma separated list of entity SIDs (e.g. SorbetHelper/BigWaterfall) or C# entity class names (e.g. BigWaterfall or Celeste.Mod.SorbetHelper.Entities.BigWaterfall) to attempt to affect.
+          An optional comma separated list of entity SIDs (e.g. SorbetHelper/BigWaterfall) or C# entity class names (e.g. ResizableWaterfall or Celeste.Mod.SorbetHelper.Entities.ResizableWaterfall) to attempt to affect.
           Leave empty to affect all entities that use DisplacementRenderHooks.
 
   SorbetHelper/DisplacementEffectBlocker:
@@ -515,8 +554,11 @@ Entities:
           higher values mean farther behind in the scene.
       flag:
         Description: |-
-          A session flag that needs to be enabled in order for the displacement blocker to be active. Leaving this empty causes the blocker to always be active.
-          Adding a '!' before the flag name will make it need to be disabled instead in order for the displacement blocker to be active.
+          A session flag that must be set for the displacement blocker to be active. Leave empty for it to always be active.
+          Add an exclamation mark before the flag name to require the flag to not be set instead,
+              e.g. `!myFlag`.
+          If Frost Helper is enabled, a Session Expression may be used instead by adding `expr:` before the expression,
+              e.g. `expr:#myCounter > 5`.
 
   SorbetHelper/DisplacementEffectArea:
     Placements:
@@ -541,13 +583,17 @@ Entities:
           Ranges from 0.0 to 1.0, values closer to 1.0 result in faster waves.
           Water uses 0.25, small waterfalls use 0.8, big waterfalls use 1.0, and heatwaves use 0.1.
       alpha:
-        Description: Determines the strength of the displacement.
+        Description: The strength of the displacement.
       depth:
         Description: The visual depth the effect should be applied at.
       flag:
         Description: |-
-          A session flag that needs to be enabled in order for the displacement to be visible. Leaving this empty causes the displacement to always be visible.
-          Adding a '!' before the flag name will make it need to be disabled instead in order for the displacement to be visible.
+          A session flag that must be set for the displacement to be visible. Leave empty for it to always be visible.
+          Add an exclamation mark before the flag name to require the flag to not be set instead,
+              e.g. `!myFlag`.
+          If Frost Helper is enabled, a Session Expression may be used instead by adding `expr:` before the expression,
+              e.g. `expr:#myCounter > 5`.
+
 
   SorbetHelper/EntityStylegroundController:
     Placements:
@@ -641,10 +687,10 @@ Entities:
     Attributes:
       depth:
         Description: |-
-          Determines the visual depth the split tiletypes should be drawn at.
+          The visual depth the split tiletypes should be drawn at.
           Higher values mean farther behind in the scene.
       tiletypes:
-        Description: Determines the tiletypes the controller should split.
+        Description: The tiletypes the controller should split.
       tryFillBehind:
         Description: Whether to try and automatically fill in any gaps behind the edges of the split tiletypes with the tiletypes around them.
       backgroundTiles:
@@ -714,7 +760,7 @@ Entities:
       blockSprite:
         Description: |-
           The texture path for the block.
-          See Graphics/Atlases/Gameplay/objects/SorbetHelper/gateblock/dash/ in SorbetHelper.zip for how the files should be organised.
+          See `Graphics/Atlases/Gameplay/objects/SorbetHelper/gateblock/dash/` in `Mods/SorbetHelper.zip` for how the files should be organised.
       iconSprite:
         Description: The texture path for the icon in the center of the block.
       shakeTime:
@@ -766,7 +812,7 @@ Entities:
       blockSprite:
         Description: |-
           The texture path for the block.
-          See Graphics/Atlases/Gameplay/objects/SorbetHelper/gateblock/dash/ in SorbetHelper.zip for how the files should be organised.
+          See `Graphics/Atlases/Gameplay/objects/SorbetHelper/gateblock/dash/` in `Mods/SorbetHelper.zip` for how the files should be organised.
       iconSprite:
         Description: The texture path for the icon in the center of the block.
       shakeTime:
@@ -876,11 +922,26 @@ Entities:
         Description: A controller which can customize the visual appearance of Sparkling Water entities.
     Attributes:
       outlineColor:
-        Description: The color to use for the outline and details of the water.
+        Description: |-
+          The color to use for the outline and details of the water.
+          Supports using the value of a session counter as a packed color by adding a `#` before the counter name,
+              e.g. `#myPackedColor`.
+          If Frost Helper is enabled, supports using the value of a Session Expression as a packed color by adding `expr:` before the expression,
+              e.g. `expr:$sorbetHelper.hslColor($stamina / 110.0 * 0.5, 0.5, 0.75)`.
       edgeColor:
-        Description: The color to use near the edges of the water.
+        Description: |-
+          The color to use near the edges of the water.
+          Supports using the value of a session counter as a packed color by adding a `#` before the counter name,
+              e.g. `#myPackedColor`.
+          If Frost Helper is enabled, supports using the value of a Session Expression as a packed color by adding `expr:` before the expression,
+              e.g. `expr:$sorbetHelper.hslColor($stamina / 110.0 * 0.5, 0.5, 0.75)`.
       fillColor:
-        Description: The color to use in the center of the water.
+        Description: |-
+          The color to use in the center of the water.
+          Supports using the value of a session counter as a packed color by adding a `#` before the counter name,
+              e.g. `#myPackedColor`.
+          If Frost Helper is enabled, supports using the value of a Session Expression as a packed color by adding `expr:` before the expression,
+              e.g. `expr:$sorbetHelper.hslColor($stamina / 110.0 * 0.5, 0.5, 0.75)`.
       detailTexture:
         Description: |-
           The detail texture to use for the water.
@@ -972,13 +1033,13 @@ Triggers:
         Description: The color of the title text of the mini popup.
       iconTexture:
         Description: |-
-          An optional icon to display on the mini popup, relative to 'Graphics/Atlases/Gui/'.
+          An optional icon to display on the mini popup, relative to `Graphics/Atlases/Gui/`.
           The texture should be square shaped to prevent it from being stretched awkwardly to fit.
       texturePath:
         Description: |-
-          The path to the base texture for for the popup, relative to 'Graphics/Atlases/Gui/'.
+          The path to the base texture for for the popup, relative to `Graphics/Atlases/Gui/`.
           Expects 2 textures to exist, both the specified base texture and an accent texture.
-          e.g. inputting 'SorbetHelper/popup' means to use the two textures 'SorbetHelper/popup' and 'SorbetHelper/popupAccent'
+          e.g. inputting `SorbetHelper/popup` means to use the two textures `SorbetHelper/popup` and `SorbetHelper/popupAccent`
       mode:
         Name: Activation Mode
         Description: Determines how the trigger will activate.
@@ -989,8 +1050,11 @@ Triggers:
         Description: Whether the trigger can only be activated once per room load.
       flag:
         Description: |-
-          A session flag.
-          Used as needed for the activation mode, otherwise determines whether or not the player can collide with the trigger.
+          A session flag that is either used as specified by the activation mode, or must be set for the trigger to be collidable.
+          Add an exclamation mark before the flag name to require the flag to not be set instead,
+              e.g. `!myFlag`.
+          If Frost Helper is enabled, a Session Expression may be used instead by adding `expr:` before the expression,
+              e.g. `expr:#myCounter > 5`.
 
   SorbetHelper/ColorDashBlockStateTrigger:
     Placements:

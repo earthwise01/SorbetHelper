@@ -8,8 +8,7 @@ public class SparklingWaterColorController(EntityData data, Vector2 offset) : En
     private readonly SparklingWaterRenderer.Options options = new SparklingWaterRenderer.Options(data);
     private readonly int? affectedDepth = data.Nullable<int>("affectedDepth");
 
-    // prioritise controllers that specify a depth
-    protected override int ProcessPriority => affectedDepth is not null ? -1 : 0;
+    protected override int ProcessPriority => affectedDepth is not null ? 1 : 0;
 
     protected override void ProcessEntity(Entity entity)
     {

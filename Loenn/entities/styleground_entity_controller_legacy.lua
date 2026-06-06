@@ -16,7 +16,7 @@ stylegroundEntityController.fieldOrder = {
 stylegroundEntityController.fieldInformation = {
     depth = {
         fieldType = "integer",
-        options = sorbetHelper.getDepths(),
+        options = sorbetHelper.getDepthOptions(),
         editable = true
     }
 }

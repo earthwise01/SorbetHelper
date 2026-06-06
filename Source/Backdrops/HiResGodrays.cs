@@ -87,7 +87,10 @@ public class HiResGodrays : HiResBackdrop
         maxDuration = data.AttrFloat("maxDuration", 12f);
         minScale = data.AttrFloat("minScale", 1f);
         maxScale = data.AttrFloat("maxScale", 1f);
-        colors = data.AttrList("colors", Calc.HexToColorWithNonPremultipliedAlpha, "f52b6380").ToArray();
+        colors = data.Attr("colors", "f52b6380")
+                     .Split(',', StringSplitOptions.TrimAndRemoveEmpty)
+                     .Select(Calc.HexToColorWithNonPremultipliedAlpha)
+                     .ToArray();
         fadeNearPlayer = data.AttrBool("fadeNearPlayer", true);
 
         string texturePath = data.Attr("texturePath", "");
@@ -179,8 +182,8 @@ public class HiResGodrays : HiResBackdrop
 
             float percent = ray.Percent;
 
-            ray.RenderPosition.X = -offscreenPadding + Mod(ray.X - cameraPos.X * scrollX, 320f + offscreenPadding * 2f);
-            ray.RenderPosition.Y = -offscreenPadding + Mod(ray.Y - cameraPos.Y * scrollY, 180f + offscreenPadding * 2f);
+            ray.RenderPosition.X = -offscreenPadding + Calc.Mod(ray.X - cameraPos.X * scrollX, 320f + offscreenPadding * 2f);
+            ray.RenderPosition.Y = -offscreenPadding + Calc.Mod(ray.Y - cameraPos.Y * scrollY, 180f + offscreenPadding * 2f);
 
             float rayAlpha = Ease.CubeInOut(Calc.Clamp(((percent < 0.5f) ? percent : (1f - percent)) * 2f, 0f, 1f)) * alpha;
             ray.RenderColor = ray.Color * rayAlpha;
@@ -267,6 +270,4 @@ public class HiResGodrays : HiResBackdrop
             }
         }
     }
-
-    private static float Mod(float x, float m) => (x % m + m) % m;
 }

@@ -7,6 +7,7 @@ local flagToggledKillbox = {}
 flagToggledKillbox.name = "SorbetHelper/FlagToggledKillbox"
 flagToggledKillbox.depth = -1000005
 flagToggledKillbox.canResize = {true, false}
+flagToggledKillbox.associatedMods = sorbetHelper.getSessionExpressionAssociatedModsFunction({"flag"})
 flagToggledKillbox.placements = {
     {
         name = "flag_toggled_killbox",

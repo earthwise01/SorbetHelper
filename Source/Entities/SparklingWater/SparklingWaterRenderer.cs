@@ -6,33 +6,41 @@ public class SparklingWaterRenderer : DepthBatchingRenderer<SparklingWaterRender
     #region Options
 
     public record Options(
-        Color OutlineColor, Color EdgeColor, Color FillColor,
+        ColorSource OutlineColor,
+        ColorSource EdgeColor,
+        ColorSource FillColor,
         string DetailTexture,
-        float CausticScale, float CausticAlpha,
+        float CausticScale,
+        float CausticAlpha,
         float BubbleAlpha,
         float DisplacementSpeed)
     {
-        private static readonly Color DefaultOutlineColor = Calc.HexToColorWithNonPremultipliedAlpha("87cefaf0");
-        private static readonly Color DefaultEdgeColor = Calc.HexToColorWithNonPremultipliedAlpha("87cefa80");
-        private static readonly Color DefaultFillColor = Calc.HexToColorWithNonPremultipliedAlpha("4480b890");
+        private const string DefaultOutlineColor = "87cefaf0";
+        private const string DefaultEdgeColor = "87cefa80";
+        private const string DefaultFillColor = "4480b890";
         private const string DefaultDetailTexture = "objects/SorbetHelper/sparklingWater/detail";
-        private const float DefaultCausticScale = 0.8f, DefaultCausticAlpha = 0.15f;
+        private const float DefaultCausticScale = 0.8f;
+        private const float DefaultCausticAlpha = 0.15f;
         private const float DefaultBubbleAlpha = 0.3f;
         private const float DefaultDisplacementSpeed = 0.25f;
 
         public static readonly Options DefaultOptions = new Options(
-            DefaultOutlineColor, DefaultEdgeColor, DefaultFillColor,
+            ColorSource.Create(DefaultOutlineColor),
+            ColorSource.Create(DefaultEdgeColor),
+            ColorSource.Create(DefaultFillColor),
             DefaultDetailTexture,
-            DefaultCausticScale, DefaultCausticAlpha,
+            DefaultCausticScale,
+            DefaultCausticAlpha,
             DefaultBubbleAlpha,
             DefaultDisplacementSpeed);
 
         public Options(EntityData data)
-            : this(data.HexColorWithNonPremultipliedAlpha("outlineColor", DefaultOutlineColor),
-                data.HexColorWithNonPremultipliedAlpha("edgeColor", DefaultEdgeColor),
-                data.HexColorWithNonPremultipliedAlpha("fillColor", DefaultFillColor),
+            : this(data.ColorSource("outlineColor", DefaultOutlineColor),
+                data.ColorSource("edgeColor", DefaultEdgeColor),
+                data.ColorSource("fillColor", DefaultFillColor),
                 data.String("detailTexture", DefaultDetailTexture),
-                data.Float("causticScale", DefaultCausticScale), data.Float("causticAlpha", DefaultCausticAlpha),
+                data.Float("causticScale", DefaultCausticScale),
+                data.Float("causticAlpha", DefaultCausticAlpha),
                 data.Float("bubbleAlpha", DefaultBubbleAlpha),
                 data.Float("displacementSpeed", DefaultDisplacementSpeed))
         { }
@@ -96,10 +104,12 @@ public class SparklingWaterRenderer : DepthBatchingRenderer<SparklingWaterRender
     {
         Options options = waterGroup.Key;
 
+        Session session = SceneAs<Level>().Session;
+
         Effect effect = SorbetHelperGFX.FxSparklingWater;
-        effect.Parameters["outline_color"].SetValue(options.OutlineColor.ToVector4());
-        effect.Parameters["edge_color"].SetValue(options.EdgeColor.ToVector4());
-        effect.Parameters["fill_color"].SetValue(options.FillColor.ToVector4());
+        effect.Parameters["outline_color"].SetValue(options.OutlineColor.GetValue(session).ToVector4());
+        effect.Parameters["edge_color"].SetValue(options.EdgeColor.GetValue(session).ToVector4());
+        effect.Parameters["fill_color"].SetValue(options.FillColor.GetValue(session).ToVector4());
         effect.Parameters["detail_config"].SetValue(new Vector4(options.CausticScale, options.CausticAlpha, options.BubbleAlpha, options.DisplacementSpeed));
 
         Texture2D detailTexture = GFX.Game[options.DetailTexture].Texture.Texture_Safe;

@@ -27,7 +27,7 @@ function solidTilesDepthSplitter.fieldInformation(entity)
     return {
         depth = {
             fieldType = "integer",
-            options = sorbetHelper.getDepths({
+            options = sorbetHelper.getDepthOptions({
                 {"Above FG Decals", -10510},
                 {"Above FG Terrain", -10010},
                 {"Above BG Terrain", 9990}

@@ -1,3 +1,4 @@
+local utils = require("utils")
 local drawableSprite = require("structs.drawable_sprite")
 local drawableText = require("structs.drawable_text")
 local colors = require("consts.colors")
@@ -37,7 +38,7 @@ function sorbetHelper.getMapSIDs()
     return sids
 end
 
-function sorbetHelper.getDepths(extraOptions)
+function sorbetHelper.getDepthOptions(extraOptions)
     local depthOptions = {
         {"BG Terrain (10000)", 10000},
         {"BG Mirrors (9500)", 9500},
@@ -182,6 +183,55 @@ function sorbetHelper.getControllerSpriteFunction(textureName, globalCheck, noDu
         local warning = noDuplicates and sorbetHelper.checkForDuplicateInMap(entity) and "!Duplicate!" or nil
         local global = type(globalCheck) == "boolean" and globalCheck or globalCheck(room, entity)
         return sorbetHelper.getControllerSprites(entity.x or 0, entity.y or 0, textureName, global, warning)
+    end
+end
+
+--- session expression utils ---
+
+function sorbetHelper.isSessionCounter(str)
+    return type(str) == "string" and utils.startsWith(str, "#")
+end
+
+function sorbetHelper.isSessionSlider(str)
+    return type(str) == "string" and utils.startsWith(str, "@")
+end
+
+function sorbetHelper.isSessionExpression(str)
+    return type(str) == "string" and utils.startsWith(str, "expr:")
+end
+
+function sorbetHelper.isCounterOrSessionExpression(str)
+    return type(str) == "string" and (utils.startsWith(str, "#") or utils.startsWith(str, "expr:"))
+end
+
+function sorbetHelper.isSliderOrSessionExpression(str)
+    return type(str) == "string" and (utils.startsWith(str, "@") or utils.startsWith(str, "expr:"))
+end
+
+function sorbetHelper.getSessionExpressionAssociatedModsFunction(rawExpressionAttrs, extraAssociatedMods)
+    local expressionAttrs = {}
+    for _, attrName in pairs(rawExpressionAttrs) do
+        expressionAttrs[attrName] = true
+    end
+
+    return function(entity)
+        local associatedMods = {"SorbetHelper"}
+
+        if extraAssociatedMods then
+            local toAdd = utils.callIfFunction(extraAssociatedMods)
+            for _, associatedMod in ipairs(toAdd) do
+                table.insert(associatedMods, associatedMod)
+            end
+        end
+
+        for attrName, attrValue in pairs(entity) do
+            if expressionAttrs[attrName] ~= nil and sorbetHelper.isSessionExpression(tostring(attrValue)) then
+                table.insert(associatedMods, "FrostHelper")
+                break
+            end
+        end
+
+        return associatedMods
     end
 end
 

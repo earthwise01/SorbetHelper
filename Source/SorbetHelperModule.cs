@@ -17,6 +17,7 @@ public class SorbetHelperModule : EverestModule
     public override void Initialize()
     {
         SorbetHelperImports.Initialize();
+        SessionExpressionCommands.RegisterCommands();
     }
 
     public override void Load()

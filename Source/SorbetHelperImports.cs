@@ -6,6 +6,7 @@ internal static class SorbetHelperImports
     {
         CommunalHelperDashStates.Load();
         ExtendedCameraDynamics.Load();
+        FrostHelper.Load();
         GravityHelper.Load();
 
         // hmm

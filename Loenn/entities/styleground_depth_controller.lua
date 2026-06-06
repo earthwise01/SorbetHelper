@@ -3,7 +3,7 @@ local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper"
 
 local stylegroundDepthController = {}
 
-local depthOptions = sorbetHelper.getDepths()
+local depthOptions = sorbetHelper.getDepthOptions()
 table.insert(depthOptions, {"————————", ""})
 table.insert(depthOptions, {"Above Colorgrade", "AboveColorgrade"})
 table.insert(depthOptions, {"Above HUD", "AboveHud"})

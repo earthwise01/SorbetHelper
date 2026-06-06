@@ -163,8 +163,8 @@ public class ParallaxHiResSnow : HiResBackdrop
             // while the matrix used for rendering HiResBackdrops expects positions in camera space (320x180)
             Vector2 renderPosition = new Vector2()
             {
-                X = -OffscreenPadding + Mod(particle.Position.X / UpscaleAmount - cameraPos.X * particle.Scroll.X + zoomCenterOffset.X, 320f + OffscreenPadding * 2f),
-                Y = -OffscreenPadding + Mod(particle.Position.Y / UpscaleAmount - cameraPos.Y * particle.Scroll.Y + zoomCenterOffset.Y, 180f + OffscreenPadding * 2f)
+                X = -OffscreenPadding + Calc.Mod(particle.Position.X / UpscaleAmount - cameraPos.X * particle.Scroll.X + zoomCenterOffset.X, 320f + OffscreenPadding * 2f),
+                Y = -OffscreenPadding + Calc.Mod(particle.Position.Y / UpscaleAmount - cameraPos.Y * particle.Scroll.Y + zoomCenterOffset.Y, 180f + OffscreenPadding * 2f)
             };
             Vector2 renderScale = stretchScale * particle.Scale / UpscaleAmount;
 
@@ -177,6 +177,4 @@ public class ParallaxHiResSnow : HiResBackdrop
                 particleTexture.DrawCentered(renderPosition + new Vector2(x, y), particleColor, renderScale, shouldStretch ? stretchRotate : particle.Rotation);
         }
     }
-
-    private static float Mod(float x, float m) => (x % m + m) % m;
 }

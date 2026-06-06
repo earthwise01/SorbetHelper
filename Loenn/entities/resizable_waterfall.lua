@@ -16,6 +16,7 @@ local splashParticleDepths = {
 resizableWaterfall.name = "SorbetHelper/BigWaterfall"
 resizableWaterfall.canResize = {true, false}
 resizableWaterfall.minimumSize = {8, 0}
+resizableWaterfall.associatedMods = sorbetHelper.getSessionExpressionAssociatedModsFunction({"color"})
 resizableWaterfall.placements = {
     {
         name = "resizable_waterfall_lines",
@@ -77,7 +78,7 @@ resizableWaterfall.fieldOrder = {
 
 resizableWaterfall.fieldInformation = {
     color = {
-        fieldType = "color"
+        fieldType = "sorbet_helper.color_source"
     },
     alpha = {
         minimumValue = 0,
@@ -85,7 +86,7 @@ resizableWaterfall.fieldInformation = {
     },
     depth = {
         fieldType = "integer",
-        options = sorbetHelper.getDepths({
+        options = sorbetHelper.getDepthOptions({
             {"Water & Waterfalls", -9999},
             {"FG Waterfalls", -49900}
         }),
@@ -202,6 +203,8 @@ local function getWaterfallSprite(room, entity, fillColor, borderColor)
     return sprites
 end
 
+
+
 local function multiplyAlpha(color, alpha)
     -- loenn premultiplies waterfall colors normally even though it draws with alphamultiply blending
     -- return { color[1] * alpha, color[2] * alpha, color[3] * alpha, alpha }
@@ -210,9 +213,10 @@ local function multiplyAlpha(color, alpha)
 end
 
 function resizableWaterfall.sprite(room, entity)
-    local color = multiplyAlpha(utils.getColor(entity.color), entity.alpha or 1)
-    local fillColor = multiplyAlpha(color, 0.3)
-    local borderColor = multiplyAlpha(color, 0.8)
+    local color = sorbetHelper.isCounterOrSessionExpression(entity.color) and {1, 1, 1} or utils.getColor(entity.color or "87cefa")
+    local baseColor = multiplyAlpha(color, entity.alpha or 1)
+    local fillColor = multiplyAlpha(baseColor, 0.3)
+    local borderColor = multiplyAlpha(baseColor, 0.8)
 
     local result = getWaterfallSprite(room, entity, fillColor, borderColor)
 
