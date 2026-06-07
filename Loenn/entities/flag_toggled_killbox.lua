@@ -1,6 +1,7 @@
 local utils = require("utils")
 local drawableRectangle = require("structs.drawable_rectangle")
 local drawableText = require("structs.drawable_text")
+local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
 
 local flagToggledKillbox = {}
 

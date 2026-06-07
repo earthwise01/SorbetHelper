@@ -1,3 +1,5 @@
+local sorbetHelper = require("mods").requireFromPlugin("libraries.sorbet_helper")
+
 local killzone = {}
 
 killzone.name = "SorbetHelper/KillZone"
