@@ -34,7 +34,7 @@ function integerOrEnumField.getElement(name, value, options)
     local enum = options.enum or { }
 
     options.displayTransformer = function(v)
-        if v == nil or (type(v) ~= "number" and enum[v] == nil) then
+        if v == nil or (tonumber(v) == nil and enum[v] == nil) then
             return ""
         end
 
