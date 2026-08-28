@@ -1,7 +1,7 @@
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/LightCoverController")]
-[GlobalEntity(onlyGlobalIf: "global")]
+[GlobalEntity(globalAttributeName: "global")]
 public class LightCoverController : EntityProcessingController
 {
     private readonly float alpha;

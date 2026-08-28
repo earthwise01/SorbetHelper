@@ -253,10 +253,10 @@ entities.SorbetHelper/ReturnBubbleBehaviorController.attributes.description.coll
 entities.SorbetHelper/LightCoverController.placements.name.light_cover_controller=Light Cover Controller
 entities.SorbetHelper/LightCoverController.placements.description.light_cover_controller=A controller which makes specified entity types cover up any light touching them.
 entities.SorbetHelper/LightCoverController.attributes.name.classNames=Affected Types
-entities.SorbetHelper/LightCoverController.attributes.description.classNames=A comma separated list of entity SIDs (e.g. SorbetHelper/CustomLightbeam) or C# entity class names (e.g. CustomLightBeam or Celeste.Mod.SorbetHelper.Entities.CustomLightBeam) the controller should affect.
+entities.SorbetHelper/LightCoverController.attributes.description.classNames=A comma separated list of entity SIDs (e.g. SorbetHelper/CustomLightbeam) or C# type names (e.g. CustomLightBeam or Celeste.Mod.SorbetHelper.Entities.CustomLightBeam) the controller should affect.
 entities.SorbetHelper/LightCoverController.attributes.description.minDepth=The controller will not attempt to affect entities with a depth lower (closer to the camera) than this value.\nAllows restricting the controller to specific entities if you have multiple of the same type but with different depths.\nLeave empty to make uncapped.
 entities.SorbetHelper/LightCoverController.attributes.description.maxDepth=The controller will not attempt to affect entities with a depth higher (farther from the camera) than this value.\nAllows restricting the controller to specific entities if you have multiple of the same type but with different depths.\nLeave empty to make uncapped.
-entities.SorbetHelper/LightCoverController.attributes.description.global=Whether the controller should apply globally, to every entity as they are loaded.\nAllows even affecting entities added after room load, and automatically across the whole map.
+entities.SorbetHelper/LightCoverController.attributes.description.global=Whether the controller should be loaded globally, affecting entities even outside the room it's placed in.\nAlso allows affecting entities added after room load.
 entities.SorbetHelper/LightCoverController.attributes.description.alpha=The alpha of the light cover.
 
 # Depth Adhering Displacement Wrapper
@@ -301,10 +301,10 @@ entities.SorbetHelper/DisplacementEffectArea.attributes.description.flag=A sessi
 entities.SorbetHelper/EntityStylegroundController.placements.name.entity_as_styleground_controller=Entity As Styleground Controller
 entities.SorbetHelper/EntityStylegroundController.placements.description.entity_as_styleground_controller=Marks specified entity types to be drawn as a part of a styleground layer by an Entity As Styleground Renderer styleground.
 entities.SorbetHelper/EntityStylegroundController.attributes.name.classNames=Affected Types
-entities.SorbetHelper/EntityStylegroundController.attributes.description.classNames=A comma separated list of entity SIDs (e.g. SorbetHelper/CustomLightbeam) or C# entity class names (e.g. CustomLightBeam or Celeste.Mod.SorbetHelper.Entities.CustomLightBeam) the controller should affect.
+entities.SorbetHelper/EntityStylegroundController.attributes.description.classNames=A comma separated list of entity SIDs (e.g. SorbetHelper/CustomLightbeam) or C# type names (e.g. CustomLightBeam or Celeste.Mod.SorbetHelper.Entities.CustomLightBeam) the controller should affect.
 entities.SorbetHelper/EntityStylegroundController.attributes.description.minDepth=The controller will not attempt to affect entities with a depth lower (closer to the camera) than this value.\nAllows restricting the controller to specific entities if you have multiple of the same type but with different depths.\nLeave empty to make uncapped.
 entities.SorbetHelper/EntityStylegroundController.attributes.description.maxDepth=The controller will not attempt to affect entities with a depth higher (farther from the camera) than this value.\nAllows restricting the controller to specific entities if you have multiple of the same type but with different depths.\nLeave empty to make uncapped.
-entities.SorbetHelper/EntityStylegroundController.attributes.description.global=Whether the controller should apply globally, to every entity as they are loaded.\nAllows even affecting entities added after room load, and automatically across the whole map.
+entities.SorbetHelper/EntityStylegroundController.attributes.description.global=Whether the controller should be loaded globally, affecting entities even outside the room it's placed in.\nAlso allows affecting entities added after room load.
 entities.SorbetHelper/EntityStylegroundController.attributes.description.tag=The styleground tag used to match with an Entity As Styleground Renderer styleground.\nRequired in order for the controller to have any effect.
 entities.SorbetHelper/EntityStylegroundController.attributes.name._instructionsButton=Info
 entities.SorbetHelper/EntityStylegroundController.attributes.description._instructionsButton=~~~ some misc info ~~~\n- the controller *requires* the map to have an Entity As Styleground Renderer styleground with a matching tag field in order to work correctly.\n\n- for decals specifically, there is also a decal registry attribute available, <sorbetHelper_styleground rendererTag=""/>\n  this has the same requirement of an Entity As Styleground Renderer (though note that a controller isn't required when using the decal registry)\n\n- this controller is purely visual, and was originally intended for things like lightbeams, parallax decals, bg/fg waterfalls, etc.\n  non-visual only entities are also supported, but will not be made uncollidable, given parallax, looping, or other styleground-like behaviors.\n\n- be prepared to very occasionally find that some entities don't work correctly, especially if they have particularly complex rendering-\n  this is likely not the fault of either me or whoever made the entity,\n  but just a consequence of it (very reasonably) not expecting to be in these conditions, sorry!
@@ -453,6 +453,12 @@ entities.SorbetHelper/SparklingWaterColorController.attributes.description.bubbl
 entities.SorbetHelper/SparklingWaterColorController.attributes.description.displacementSpeed=The speed of the wavy displacement effect.\nA value of 0 disables the displacement altogether.
 entities.SorbetHelper/SparklingWaterColorController.attributes.description.affectedDepth=The depth of Sparkling Water entities to affect.\nLeave empty to affect all depths that don't have their own color controller.
 entities.SorbetHelper/SparklingWaterColorController.attributes.description.global=Whether this controller should be loaded globally.
+
+# Water Interaction Controller
+entities.SorbetHelper/WaterInteractionController.placements.name.water_interaction_controller=Water Interaction Controller
+entities.SorbetHelper/WaterInteractionController.placements.description.water_interaction_controller=A controller which makes specified entity types create splashes when entering/exiting water.
+entities.SorbetHelper/WaterInteractionController.attributes.description.affectedTypes=A comma seperated list of entity SIDs (e.g. SorbetHelper/CustomFallingBlock) or C# type names (e.g. CustomFallingBlock or Celeste.Mod.SorbetHelper.Entities.CustomFallingBlock) to give WaterInteraction components to.\nThis will allow them to cause ripples when colliding with water and drip after exiting it.
+entities.SorbetHelper/WaterInteractionController.attributes.description.global=Whether the controller should be loaded globally, affecting entities even outside the room it's placed in.
 
 # -- Triggers --
 

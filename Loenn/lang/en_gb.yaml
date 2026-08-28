@@ -7,12 +7,12 @@ ModName: Sorbet Helper
 
 Entities:
   # entries beginning with '$' are to be used with "Copy" and do not appear in the generated language file (see light cover controller, entity as styleground controller & dash falling block for examples)
-  $TypeNameController:
+  $TypeNameControllerV1:
     Attributes:
       classNames:
         Name: Affected Types
         Description: |-
-          A comma separated list of entity SIDs (e.g. SorbetHelper/CustomLightbeam) or C# entity class names (e.g. CustomLightBeam or Celeste.Mod.SorbetHelper.Entities.CustomLightBeam) the controller should affect.
+          A comma separated list of entity SIDs (e.g. SorbetHelper/CustomLightbeam) or C# type names (e.g. CustomLightBeam or Celeste.Mod.SorbetHelper.Entities.CustomLightBeam) the controller should affect.
       minDepth:
         Description: |-
           The controller will not attempt to affect entities with a depth lower (closer to the camera) than this value.
@@ -25,8 +25,8 @@ Entities:
           Leave empty to make uncapped.
       global:
         Description: |-
-          Whether the controller should apply globally, to every entity as they are loaded.
-          Allows even affecting entities added after room load, and automatically across the whole map.
+          Whether the controller should be loaded globally, affecting entities even outside the room it's placed in.
+          Also allows affecting entities added after room load.
 
   SorbetHelper/FlagToggledKillbox:
     Placements:
@@ -486,7 +486,7 @@ Entities:
         Name: Light Cover Controller
         Description: A controller which makes specified entity types cover up any light touching them.
     Copy:
-      - $TypeNameController
+      - $TypeNameControllerV1
     Attributes:
       alpha:
         Description: The alpha of the light cover.
@@ -601,7 +601,7 @@ Entities:
         Name: Entity As Styleground Controller
         Description: Marks specified entity types to be drawn as a part of a styleground layer by an Entity As Styleground Renderer styleground.
     Copy:
-      - $TypeNameController
+      - $TypeNameControllerV1
     Attributes:
       tag:
         Description: |-
@@ -965,6 +965,20 @@ Entities:
           Leave empty to affect all depths that don't have their own color controller.
       global:
         Description: Whether this controller should be loaded globally.
+
+  SorbetHelper/WaterInteractionController:
+    Placements:
+      water_interaction_controller:
+        Name: Water Interaction Controller
+        Description: A controller which makes specified entity types create splashes when entering/exiting water.
+    Attributes:
+      affectedTypes:
+        Description: |-
+          A comma seperated list of entity SIDs (e.g. SorbetHelper/CustomFallingBlock) or C# type names (e.g. CustomFallingBlock or Celeste.Mod.SorbetHelper.Entities.CustomFallingBlock) to give WaterInteraction components to.
+          This will allow them to cause ripples when colliding with water and drip after exiting it.
+      global:
+        Description: |-
+          Whether the controller should be loaded globally, affecting entities even outside the room it's placed in.
 
 Triggers:
   SorbetHelper/AlternateInteractPrompt:

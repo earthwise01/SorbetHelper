@@ -23,8 +23,8 @@ function sorbetHelper.getMapSIDs()
     if not loadedState.map then return sorbetHelper.getAllSIDs() end
 
     local sidsInMap = {}
-    for _, room in pairs(loadedState.map.rooms) do
-        for _, entity in pairs(room.entities) do
+    for _, room in ipairs(loadedState.map.rooms) do
+        for _, entity in ipairs(room.entities) do
             sidsInMap[entity._name] = true
         end
     end

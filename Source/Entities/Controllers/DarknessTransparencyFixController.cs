@@ -1,7 +1,7 @@
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/DarknessTransparencyFixController")]
-[GlobalEntity(onlyGlobalIf: "global")]
+[GlobalEntity(globalAttributeName: "global")]
 [Tracked]
 public class DarknessTransparencyFixController : Entity
 {

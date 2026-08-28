@@ -4,11 +4,11 @@ namespace Celeste.Mod.SorbetHelper.Utils;
 /// Registers an <see cref="Entity"/> that has a <see cref="CustomEntityAttribute"/> to be loaded during the <see cref="Everest.Events.LevelLoader.OnLoadingThread"/> event rather than when its room is loaded.<br/>
 /// Automatically adds the <see cref="Tags.Global"/> tag.
 /// </summary>
-/// <param name="onlyGlobalIf">If not <see langword="null"/>, the name of a <see langword="bool"/> value in the entity's <see cref="EntityData"/> that must be true for the entity to be treated as a global entity.</param>
+/// <param name="globalAttributeName">If not <see langword="null"/>, the name of a <see langword="bool"/> value in the entity's <see cref="EntityData"/> that must be true for the entity to be treated as a global entity.</param>
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-internal class GlobalEntityAttribute(string onlyGlobalIf = null) : Attribute
+internal class GlobalEntityAttribute(string globalAttributeName = null) : Attribute
 {
-    public readonly string OnlyGlobalIf = onlyGlobalIf;
+    public readonly string GlobalAttributeName = globalAttributeName;
 }
 
 internal static class GlobalEntityHelper
@@ -22,8 +22,8 @@ internal static class GlobalEntityHelper
     private static bool loadingGlobalEntities = false;
 
     private static bool IsGlobalEntity(EntityData entityData)
-        => (GlobalEntitySIDs.TryGetValue(entityData.Name, out string onlyGlobalIf)
-            && (string.IsNullOrEmpty(onlyGlobalIf) || entityData.Bool(onlyGlobalIf)))
+        => (GlobalEntitySIDs.TryGetValue(entityData.Name, out string globalAttributeName)
+            && (string.IsNullOrEmpty(globalAttributeName) || entityData.Bool(globalAttributeName)))
         || entityData.Bool(ForceGlobalAttribute);
 
 
@@ -37,7 +37,7 @@ internal static class GlobalEntityHelper
             if (globalEntityAttr is null)
                 continue;
 
-            string onlyGlobalIf = globalEntityAttr.OnlyGlobalIf;
+            string onlyGlobalIf = globalEntityAttr.GlobalAttributeName;
 
             if (type.GetCustomAttribute<CustomEntityAttribute>() is not { } customEntityAttr)
             {

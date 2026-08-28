@@ -4,7 +4,7 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 /// Marks entities with the specified type names with <see cref="EntityStylegroundMarker"/> components to be rendered by an <see cref="EntityStylegroundRenderer"/><br/>
 /// </summary>
 [CustomEntity("SorbetHelper/EntityStylegroundController")]
-[GlobalEntity(onlyGlobalIf: "global")]
+[GlobalEntity(globalAttributeName: "global")]
 public class EntityStylegroundController : EntityProcessingController
 {
     private readonly string stylegroundTag;

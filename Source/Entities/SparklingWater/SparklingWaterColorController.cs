@@ -1,7 +1,7 @@
 namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/SparklingWaterColorController")]
-[GlobalEntity(onlyGlobalIf: "global")]
+[GlobalEntity(globalAttributeName: "global")]
 [Tracked]
 public class SparklingWaterColorController(EntityData data, Vector2 offset) : EntityProcessingController(data, offset)
 {

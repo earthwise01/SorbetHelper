@@ -3,4 +3,4 @@
   DLL: bin/SorbetHelper.dll
   Dependencies:
     - Name: EverestCore
-      Version: 1.6249.0
+      Version: 1.6418.0
