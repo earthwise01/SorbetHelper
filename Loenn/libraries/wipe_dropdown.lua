@@ -12,5 +12,6 @@ local function registerWipe(wipeId, wipeName)
 end
 
 registerWipe("SorbetHelper/FourPointStarfieldWipe", "Four Point Starfield")
+registerWipe("SorbetHelper/CustomStarfieldWipe", "Custom Starfield (uses meta.yaml)")
 
 return {}

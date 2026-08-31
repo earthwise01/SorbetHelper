@@ -45,14 +45,14 @@ public abstract class IntSource : IEquatable<IntSource>
         string str = source?.ToString();
         if (!string.IsNullOrWhiteSpace(str))
         {
-            if (str.TryRemovePrefix('#', out string counterName))
+            if (str.StartsWith('#', out string counterName))
             {
                 if (!counterName.IsWhiteSpace())
                     return new SessionCounter(counterName);
 
                 Logger.Warn(LogID, $"Tried to create {nameof(IntSource)} for session counter with empty name!");
             }
-            else if (str.TryRemovePrefix("expr:", out string expression))
+            else if (str.StartsWith("expr:", out string expression))
             {
                 if (!expression.IsWhiteSpace())
                     return new SessionExpression(expression);

@@ -40,10 +40,10 @@ public abstract class Condition(bool inverted = false)
         if (!string.IsNullOrWhiteSpace(condition))
         {
             // kinda awkward maybee
-            if (condition.TryRemovePrefix('!', out condition))
+            if (condition.StartsWith('!', out condition))
                 inverted = !inverted;
 
-            if (condition.TryRemovePrefix("expr:", out string expression))
+            if (condition.StartsWith("expr:", out string expression))
             {
                 if (!expression.IsWhiteSpace())
                     return new SessionExpression(expression, inverted);

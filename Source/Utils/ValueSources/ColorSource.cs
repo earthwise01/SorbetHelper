@@ -33,7 +33,6 @@ public abstract class ColorSource : IEquatable<ColorSource>
             => Color.FromPackedInt(expression.GetInt(session));
     }
 
-    // kinda dont like having thiss but it is necessary for sparkling water grouping to actually do much i think
     protected abstract object EqualityIdentifier { get; }
 
     public abstract Color GetValue(Session session);
@@ -42,14 +41,16 @@ public abstract class ColorSource : IEquatable<ColorSource>
     {
         if (!string.IsNullOrWhiteSpace(source))
         {
-            if (source.TryRemovePrefix('#', out string counterName))
+            // todo: is this necessaryyy i feel like its just confusing when color hex codes Are known to start with #
+            //       and its only rly useful for avoiding a frosthelper dependency while keeping a microlithmisc dependency (feels unlikely)
+            if (source.StartsWith("#", out string counterName))
             {
                 if (!counterName.IsWhiteSpace())
                     return new SessionCounter(counterName);
 
                 Logger.Warn(LogID, $"Tried to create {nameof(ColorSource)} for session counter with empty name!");
             }
-            else if (source.TryRemovePrefix("expr:", out string expression))
+            else if (source.StartsWith("expr:", out string expression))
             {
                 if (!expression.IsWhiteSpace())
                     return new SessionExpression(expression);

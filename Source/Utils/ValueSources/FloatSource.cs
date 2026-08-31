@@ -45,14 +45,14 @@ public abstract class FloatSource : IEquatable<FloatSource>
         string str = source?.ToString();
         if (!string.IsNullOrWhiteSpace(str))
         {
-            if (str.TryRemovePrefix('@', out string sliderName))
+            if (str.StartsWith('@', out string sliderName))
             {
                 if (!sliderName.IsWhiteSpace())
                     return new SessionSlider(sliderName);
 
                 Logger.Warn(LogID, $"Tried to create {nameof(FloatSource)} for session slider with empty name!");
             }
-            else if (str.TryRemovePrefix("expr:", out string expression))
+            else if (str.StartsWith("expr:", out string expression))
             {
                 if (!expression.IsWhiteSpace())
                     return new SessionExpression(expression);

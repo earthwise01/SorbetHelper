@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Celeste.Mod.SorbetHelper.Utils;
@@ -7,27 +6,27 @@ internal static class Extensions
 {
     extension(string self)
     {
-        public bool TryRemovePrefix(string prefix, out string result)
+        public bool StartsWith(string value, out string remaining)
         {
-            if (self.StartsWith(prefix, StringComparison.Ordinal))
+            if (self.StartsWith(value, StringComparison.Ordinal))
             {
-                result = self[prefix.Length..];
+                remaining = self[value.Length..];
                 return true;
             }
 
-            result = self;
+            remaining = self;
             return false;
         }
 
-        public bool TryRemovePrefix(char prefix, out string result)
+        public bool StartsWith(char value, out string remaining)
         {
-            if (self.StartsWith(prefix))
+            if (self.StartsWith(value))
             {
-                result = self[1..];
+                remaining = self[1..];
                 return true;
             }
 
-            result = self;
+            remaining = self;
             return false;
         }
     }
