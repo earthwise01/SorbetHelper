@@ -1003,16 +1003,19 @@ Triggers:
           The alternate style to use.
           
           Bottom Corner:
-            A simple prompt that slides in from the bottom right corner of the screen when highlighted. Does not have an indicator when not highlighted.
+            A simple prompt that slides in from the bottom right corner of the screen when highlighted. Has no indicator regardless of the 'Hide Unless Highlighted' option.
           
           Small Arrow:
             A smaller floaty arrow, which the button prompt appears above when highlighted.
           
           Vanilla:
-            Identical to the vanilla interact prompt. Does not support the `Label Dialog ID` field.
+            Identical to the vanilla interact prompt. Does not support the 'Label Dialog ID' field.
+      hideWhenNotHighlighted:
+        Name: Hide Unless Highlighted
+        Description: Whether to hide the prompt when it is not currently highlighted/interactable.
       playHighlightSfx:
         Name: Has Highlight Effects
-        Description: Whether to still play the vanilla sfx (and bounce effects) when the prompt is highlighted.
+        Description: Whether to play the vanilla sfx and bounce effects when the prompt is highlighted.
       onLeft:
         Name: Flip Prompt
         Description: |-

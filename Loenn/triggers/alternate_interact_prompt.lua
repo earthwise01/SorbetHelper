@@ -1,7 +1,7 @@
 local alternateInteractPromptTrigger = {}
 
 local defaultPrompts = {
-    { "(None)", ""},
+    { "(None)", "" },
     { "Talk", "sorbethelper_ui_talk" },
     { "Use", "sorbethelper_ui_use" },
     { "Pet", "sorbethelper_ui_pet" },
@@ -25,6 +25,7 @@ alternateInteractPromptTrigger.placements = {
         data = {
             dialogId = "",
             style = "BottomCorner",
+            hideWhenNotHighlighted = true,
             playHighlightSfx = true,
             onLeft = false,
             useUpInput = false
@@ -36,6 +37,7 @@ alternateInteractPromptTrigger.placements = {
         data = {
             dialogId = "",
             style = "SmallArrow",
+            hideWhenNotHighlighted = false,
             playHighlightSfx = true,
             onLeft = false,
             useUpInput = false
@@ -47,6 +49,7 @@ alternateInteractPromptTrigger.placements = {
         data = {
             dialogId = "",
             style = "Vanilla",
+            hideWhenNotHighlighted = false,
             playHighlightSfx = true,
             onLeft = false,
             useUpInput = true
@@ -58,7 +61,7 @@ alternateInteractPromptTrigger.fieldOrder = {
     "x", "y",
     "width", "height",
     "style", "dialogId",
-    "useUpInput", "playHighlightSfx", "onLeft"
+    "hideWhenNotHighlighted", "playHighlightSfx", "useUpInput", "onLeft"
 }
 
 alternateInteractPromptTrigger.fieldInformation = {

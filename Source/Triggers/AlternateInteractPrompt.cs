@@ -19,13 +19,14 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
             Styles Style,
             string LabelDialogId,
             bool HighlightEffects,
+            bool HideWhenNotHighlighted,
             bool FlipPrompt,
             bool UseUpInput);
 
         private readonly Options options;
 
         private readonly Wiggler selectWiggle;
-        private float selectWiggleDelay;
+        private float selectWiggleCooldown;
         private float highlightedEase;
 
         private int lastMoveYValue;
@@ -42,8 +43,8 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
         {
             highlightedEase = Calc.Approach(highlightedEase, Highlighted ? 1f : 0f, Engine.DeltaTime * 4f);
 
-            if (selectWiggleDelay > 0f)
-                selectWiggleDelay -= Engine.DeltaTime;
+            if (selectWiggleCooldown > 0f)
+                selectWiggleCooldown -= Engine.DeltaTime;
 
             base.Update();
         }
@@ -70,7 +71,7 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
                     const int edgePaddingX = 100;
                     const int edgePaddingY = 80;
                     float width = GetPromptWidth(label);
-                    Vector2 drawPos = new Vector2(
+                    Vector2 drawPos = new(
                         x: 1920f - edgePaddingX + (edgePaddingX + width + offscreenPaddingX) * (1f - Ease.CubeOut(slideEase)),
                         y: 1080f - edgePaddingY
                     );
@@ -107,7 +108,7 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
                     Vector2 promptPos = drawPos - new Vector2(0, 80f) * zoomScale * upsideDownScale;
                     float promptAlpha = Ease.CubeInOut(slide) * alpha;
 
-                    GFX.Gui["SorbetHelper/smallTalkArrow"].DrawJustified(arrowPos, new Vector2(0.5f, 1f), lineColor * promptAlpha, arrowScale * upsideDownScale);
+                    GFX.Gui["SorbetHelper/smallTalkArrow"].DrawJustified(arrowPos, new Vector2(0.5f, 1f), lineColor * promptAlpha * (Highlighted || !options.HideWhenNotHighlighted ? 1f : Ease.CubeInOut(highlightedEase)), arrowScale * upsideDownScale);
 
                     RenderPrompt(
                         promptPos, Dialog.Clean(options.LabelDialogId), promptScale,
@@ -136,18 +137,24 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
                     float promptAlpha = Ease.CubeInOut(slide) * alpha;
                     Color hoverColor = lineColor * promptAlpha;
 
-                    if (!Highlighted) {
-                        GFX.Gui["hover/idle"].DrawJustified(drawPos, new Vector2(0.5f, 1f), hoverColor * alpha, promptScale * upsideDownScale);
-                        break;
+                    if (!Highlighted)
+                    {
+                        if (!options.HideWhenNotHighlighted)
+                        {
+                            GFX.Gui["hover/idle"].DrawJustified(drawPos, new Vector2(0.5f, 1f), hoverColor * alpha, promptScale * upsideDownScale);
+                            break;
+                        }
+
+                        promptAlpha *= Ease.CubeInOut(highlightedEase);
                     }
 
-                    Handler.HoverUI.Texture.DrawJustified(drawPos, new Vector2(0.5f, 1f), hoverColor * alpha, promptScale * upsideDownScale);
+                    Handler.HoverUI.Texture.DrawJustified(drawPos, new Vector2(0.5f, 1f), hoverColor * promptAlpha, promptScale * upsideDownScale);
 
                     Vector2 promptPos = drawPos + Handler.HoverUI.InputPosition * promptScale * upsideDownScale;
                     if (options.UseUpInput || Input.GuiInputController(Input.PrefixMode.Latest))
                         GetButtonTexture().DrawJustified(promptPos, new Vector2(0.5f), Color.White * promptAlpha, promptScale);
                     else
-                        ActiveFont.DrawOutline(Input.FirstKey(Input.Talk).ToString().ToUpper(), promptPos, new Vector2(0.5f), new Vector2(promptScale), Color.White * promptAlpha, 2f, Color.Black);
+                        ActiveFont.DrawOutline(Input.FirstKey(Input.Talk).ToString().ToUpper(), promptPos, new Vector2(0.5f), new Vector2(promptScale), Color.White * promptAlpha, 2f, Color.Black * promptAlpha);
 
                     break;
                 }
@@ -155,16 +162,8 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
         }
 
         // can't use Level.WorldToScreen since that doesn't account for extvar zoom (should that just b added there?)
-        public static Vector2 WorldToScreen(Level level, Vector2 position)
+        private static Vector2 WorldToScreen(Level level, Vector2 position)
             => Vector2.Transform(position, level.Camera.Matrix * level.GetCameraToScreenMatrix());
-
-        // feel like there could b better input button textures than these
-        public MTexture GetButtonTexture()
-            => options.UseUpInput
-                ? GFX.Gui[GravityHelper.IsImported && GravityHelper.IsPlayerInverted()
-                    ? "SorbetHelper/inputDown"
-                    : "SorbetHelper/inputUp"]
-                : Input.GuiButton(Input.Talk, Input.PrefixMode.Latest);
 
         private float GetPromptWidth(string label)
         {
@@ -176,26 +175,53 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
             return ActiveFont.Measure(label).X + 8f + buttonTexture.Width;
         }
 
+        // feel like there could b better input button textures than these
+        private MTexture GetButtonTexture()
+            => options.UseUpInput
+                ? GFX.Gui[GravityHelper.IsImported && GravityHelper.IsPlayerInverted()
+                    ? "SorbetHelper/inputDown"
+                    : "SorbetHelper/inputUp"]
+                : Input.GuiButton(Input.Talk, Input.PrefixMode.Latest);
+
         private void RenderPrompt(Vector2 position, string label, float scale, float justifyX = 0.5f, float justifyY = 1f, bool flipX = false, float wiggle = 0f, float promptAlpha = 1f)
         {
             MTexture buttonTexture = GetButtonTexture();
             float promptWidth = GetPromptWidth(label);
 
+            int outlineSize = scale > 0.5f ? 2 : 1;
+            Color color = Color.White * promptAlpha;
+            Color outlineColor = Color.Black * Ease.QuadIn(promptAlpha);
+
             position.X -= scale * promptWidth * (justifyX - 0.5f);
 
-            Vector2 buttonOrigin = new Vector2(buttonTexture.Width - promptWidth / 2f, buttonTexture.Height / 2f);
+            Vector2 buttonOrigin = new(buttonTexture.Width - promptWidth / 2f, buttonTexture.Height / 2f);
             if (flipX)
                 buttonOrigin.X = buttonTexture.Width - buttonOrigin.X;
-            buttonTexture.Draw(position, buttonOrigin, Color.White * promptAlpha, scale + wiggle);
+            DrawTextureWithCustomOutline(buttonTexture, position, buttonOrigin, scale + wiggle, color, outlineSize, outlineColor);
 
             if (string.IsNullOrEmpty(label))
                 return;
 
             float textWidth = ActiveFont.Measure(label).X;
-            Vector2 textJustify = new Vector2(promptWidth / 2f / textWidth, 0.5f);
+            Vector2 textJustify = new(promptWidth / 2f / textWidth, 0.5f);
             if (flipX)
                 textJustify.X = 1f - textJustify.X;
-            ActiveFont.DrawOutline(label, position, textJustify, Vector2.One * (scale + wiggle), Color.White * promptAlpha, scale > 0.5f ? 2f : 1f, Color.Black * promptAlpha);
+            ActiveFont.DrawOutline(label, position, textJustify, Vector2.One * (scale + wiggle), Color.White * promptAlpha, scale > 0.5f ? 2f : 1f, outlineColor);
+        }
+
+        private static void DrawTextureWithCustomOutline(MTexture texture, Vector2 position, Vector2 origin, float scale, Color color, int outline, Color outlineColor)
+        {
+            Rectangle clipRect = texture.ClipRect;
+            origin -= texture.DrawOffset;
+
+            for (int x = -1; x <= 1; ++x)
+            for (int y = -1; y <= 1; ++y)
+            {
+                if (x != 0 || y != 0)
+                    Draw.SpriteBatch.Draw(texture.Texture.Texture_Safe, position + new Vector2(x, y) * outline, clipRect, outlineColor, 0f, origin, scale, SpriteEffects.None, 0.0f);
+            }
+
+            Draw.SpriteBatch.Draw(texture.Texture.Texture_Safe, position, clipRect, color, 0f, origin, scale, SpriteEffects.None, 0f);
         }
 
         #region Hooks
@@ -229,7 +255,7 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
 
         private static void IL_TalkComponent_Update(ILContext il)
         {
-            ILCursor cursor = new ILCursor(il);
+            ILCursor cursor = new(il);
 
             if (!cursor.TryGotoNextBestFit(MoveType.After,
                 instr => instr.MatchLdsfld(typeof(Input), nameof(Input.Talk)),
@@ -269,8 +295,8 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
                 if (talkComponent.UI is not TalkComponentAltUI { options.UseUpInput: true } altUi)
                     return orig;
 
-                int playerUp = GravityHelper.IsImported && GravityHelper.IsPlayerInverted() ? 1 : -1; // is this a good idea?
-                return Input.MoveY.Value == playerUp && altUi.lastMoveYValue != playerUp;
+                int relativeUp = GravityHelper.IsImported && GravityHelper.IsPlayerInverted() ? 1 : -1; // is this a good idea?
+                return Input.MoveY.Value == relativeUp && altUi.lastMoveYValue != relativeUp;
             }
 
             static void SelectAnimate(TalkComponent talkComponent)
@@ -278,11 +304,11 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
                 if (talkComponent.UI is not TalkComponentAltUI altUi)
                     return;
 
-                if (altUi.selectWiggleDelay > 0f)
+                if (altUi.selectWiggleCooldown > 0f)
                     return;
 
                 altUi.selectWiggle.Start();
-                altUi.selectWiggleDelay = 0.5f;
+                altUi.selectWiggleCooldown = 0.5f;
             }
 
             static void SetLastUpInput(TalkComponent talkComponent)
@@ -300,8 +326,9 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
 
                 return altUi.options.Style switch
                 {
-                    Styles.BottomCorner => 0f,
-                    _                   => orig
+                    Styles.BottomCorner                         => 0f,
+                    _ when altUi.options.HideWhenNotHighlighted => 0.05f,
+                    _                                           => 0.1f
                 };
             }
         }
@@ -309,10 +336,11 @@ public class AlternateInteractPromptWrapper(EntityData data, Vector2 offset) : T
         #endregion
     }
 
-    private readonly TalkComponentAltUI.Options options = new TalkComponentAltUI.Options(
+    private readonly TalkComponentAltUI.Options options = new(
         data.Enum("style", TalkComponentAltUI.Styles.BottomCorner),
         data.Attr("dialogId", "sorbethelper_ui_talk"),
         data.Bool("playHighlightSfx", false),
+        data.Bool("hideWhenNotHighlighted", false),
         data.Bool("onLeft", false),
         data.Bool("useUpInput", false));
 
