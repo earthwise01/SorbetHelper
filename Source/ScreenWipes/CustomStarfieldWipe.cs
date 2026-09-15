@@ -1,11 +1,11 @@
-namespace Celeste.Mod.SorbetHelper.Wipes;
+namespace Celeste.Mod.SorbetHelper.ScreenWipes;
 
 [CustomWipe("SorbetHelper/CustomStarfieldWipe = Load", "SorbetHelper/FourPointStarfieldWipe = LoadFourPoint")]
 public class CustomStarfieldWipe : ScreenWipe
 {
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(CustomStarfieldWipe)}";
 
-    private struct Star(float scale)
+    private struct Star(SorbetHelperMetadata.CustomStarfieldWipeSettingsData settings, float scale)
     {
         public readonly float Scale = scale;
         public readonly float Speed = (0.5f + (1f - scale) * 0.5f) * Celeste.TargetWidth * 0.05f;
@@ -14,7 +14,7 @@ public class CustomStarfieldWipe : ScreenWipe
         public float X = Calc.Random.Range(0, HorizontalRange);
         public float Y = Celeste.TargetHeight * (0.5f + Calc.Random.Choose(-1, 1) * (1f - scale) * Calc.Random.Range(0.25f, 0.5f));
         public float Sine = Calc.Random.NextFloat(MathF.PI * 2f);
-        public float Rotation = MathF.PI / 4f - MathF.PI / 12f + Calc.Random.NextFloat(MathF.PI / 6f);
+        public float Rotation = (settings.StarRotation + Calc.Random.Range(-settings.StarRotationRange, settings.StarRotationRange)) * Calc.DegToRad;
 
         public void Update()
         {
@@ -29,25 +29,34 @@ public class CustomStarfieldWipe : ScreenWipe
     
     private const int StarCount = 64;
 
-    public const int DefaultPoints = 5;
-    public const float DefaultInnerRadius = 1f, DefaultOuterRadius = 2f;
+    public const int DefaultStarPoints = 5;
+    public const float DefaultStarPointLength = 1f;
+    public const float DefaultStarSize = 1f;
+    public const float DefaultStarRotation = 180f;
+    public const float DefaultStarRotationRange = 180f;
+
     public static readonly SorbetHelperMetadata.CustomStarfieldWipeSettingsData DefaultSettings = new()
     {
-        StarPoints = DefaultPoints,
-        StarInnerRadius = DefaultInnerRadius, StarOuterRadius = DefaultOuterRadius
+        StarPoints = DefaultStarPoints,
+        StarPointLength = DefaultStarPointLength,
+        StarSize = DefaultStarSize,
+        StarRotation = DefaultStarRotation,
+        StarRotationRange = DefaultStarRotationRange
     };
 
     public static readonly SorbetHelperMetadata.CustomStarfieldWipeSettingsData FourPointSettings = new()
     {
         StarPoints = 4,
-        StarInnerRadius = 1f, StarOuterRadius = 2.5f
+        StarPointLength = 1.5f,
+        StarSize = 1f,
+        StarRotation = 45f,
+        StarRotationRange = 15f
     };
 
-    private readonly SorbetHelperMetadata.CustomStarfieldWipeSettingsData settings;
-
     private readonly Vector2[] starShape;
-    private readonly int starVertexCount;
+    private readonly float starPointLength;
     private readonly Star[] stars;
+    private readonly int starVertexCount;
     private readonly VertexPositionColor[] vertices;
 
     private bool hasDrawn;
@@ -64,7 +73,7 @@ public class CustomStarfieldWipe : ScreenWipe
 
         if (areaKey is not { } key)
         {
-            Logger.Warn(LogID, "Couldn't find current AreaKey to get custom starfield settings from metadata with!");
+            Logger.Warn(LogID, "Couldn't get an AreaKey from the current scene to get custom starfield settings from metadata with!");
             return DefaultSettings;
         }
 
@@ -83,18 +92,28 @@ public class CustomStarfieldWipe : ScreenWipe
     public CustomStarfieldWipe(Scene scene, bool wipeIn, Action onComplete = null, SorbetHelperMetadata.CustomStarfieldWipeSettingsData settings = null)
         : base(scene, wipeIn, onComplete)
     {
-        this.settings = settings ?? DefaultSettings;
+        settings ??= DefaultSettings;
 
-        starShape = new Vector2[this.settings.StarPoints];
-        starVertexCount = (this.settings.StarPoints - 2) * 3 + this.settings.StarPoints * 3;
+        starShape = new Vector2[settings.StarPoints];
+        if (settings.StarPointinessAngle is { } starPointinessAngle and > 0f and <= 180f)
+        {
+            float sideLength = settings.StarSize * 2f * MathF.Sin(MathF.PI / settings.StarPoints);
+            starPointLength = (sideLength / 2f) / MathF.Tan((starPointinessAngle * Calc.DegToRad) / 2f);
+        }
+        else
+        {
+            starPointLength = settings.StarPointLength * settings.StarSize;
+        }
+
         stars = new Star[StarCount];
+        starVertexCount = (settings.StarPoints - 2) * 3 + settings.StarPoints * 3;
         vertices = new VertexPositionColor[starVertexCount * StarCount];
 
         for (int i = 0; i < starShape.Length; i++)
-            starShape[i] = Calc.AngleToVector(i / (float)starShape.Length * (MathF.PI * 2f), this.settings.StarInnerRadius);
+            starShape[i] = Calc.AngleToVector(i / (float)starShape.Length * (MathF.PI * 2f), settings.StarSize);
 
         for (int i = 0; i < stars.Length; i++)
-            stars[i] = new Star(MathF.Pow(i / (float)stars.Length, 5f));
+            stars[i] = new Star(settings, MathF.Pow(i / (float)stars.Length, 5f));
 
         for (int i = 0; i < vertices.Length; i++)
             vertices[i].Color = WipeIn ? Color.Black : Color.White;
@@ -150,7 +169,7 @@ public class CustomStarfieldWipe : ScreenWipe
         {
             Vector2 pointStart = starShape[i];
             Vector2 pointEnd = starShape[(i + 1) % starShape.Length];
-            Vector2 pointTip = (pointStart + pointEnd) * 0.5f + (pointStart - pointEnd).SafeNormalize(settings.StarOuterRadius - settings.StarInnerRadius).TurnRight();
+            Vector2 pointTip = (pointStart + pointEnd) * 0.5f + (pointStart - pointEnd).SafeNormalize().Perpendicular() * starPointLength;
             vertices[index++].Position = new Vector3(pointStart, 0f);
             vertices[index++].Position = new Vector3(pointTip, 0f);
             vertices[index++].Position = new Vector3(pointEnd, 0f);

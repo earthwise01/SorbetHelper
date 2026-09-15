@@ -17,9 +17,12 @@ public class SorbetHelperMetadata
 
     public class CustomStarfieldWipeSettingsData
     {
-        public int StarPoints { get; set; } = CustomStarfieldWipe.DefaultPoints;
-        public float StarInnerRadius { get; set; } = CustomStarfieldWipe.DefaultInnerRadius;
-        public float StarOuterRadius { get; set; } = CustomStarfieldWipe.DefaultOuterRadius;
+        public int StarPoints { get; set; } = CustomStarfieldWipe.DefaultStarPoints;
+        public float StarPointLength { get; set; } = CustomStarfieldWipe.DefaultStarPointLength;
+        public float? StarPointinessAngle { get; set; } = null;
+        public float StarSize { get; set; } = CustomStarfieldWipe.DefaultStarSize;
+        public float StarRotation { get; set; } = CustomStarfieldWipe.DefaultStarRotation;
+        public float StarRotationRange { get; set; } = CustomStarfieldWipe.DefaultStarRotationRange;
     }
 
     public CustomStarfieldWipeSettingsData CustomStarfieldWipeSettings { get; set; } = CustomStarfieldWipe.DefaultSettings;
@@ -33,7 +36,7 @@ public class SorbetHelperMetadata
         if (CachedMetadata.TryGetValue(areaKey.SID, out metadata))
             return metadata is not null;
 
-        // todo: hmm would this cause any issues with b/c sides
+        // todo: hmm would this have any weird behaviour with b/c sides
         string filename = AreaData.Get(areaKey).Mode[(int)areaKey.Mode].Path;
 
         if (Everest.Content.TryGet<AssetTypeYaml>($"Maps/{filename}.meta", out ModAsset asset)
@@ -48,7 +51,7 @@ public class SorbetHelperMetadata
             return true;
         }
 
-        Logger.Info(LogID, $"Could not get Sorbet Helper Metadata for '{areaKey.SID}' from 'Maps/{filename}.meta.yaml'");
+        Logger.Info(LogID, $"No Sorbet Helper Metadata found for '{areaKey.SID}' from 'Maps/{filename}.meta.yaml'.");
 
         CachedMetadata[areaKey.SID] = null;
         return false;
