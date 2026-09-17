@@ -22,7 +22,7 @@ public abstract class Condition(bool inverted = false)
 
     public sealed class SessionExpression(string expression, bool inverted = false) : Condition(inverted)
     {
-        public FrostHelper.SessionExpression Expression { get; } = new FrostHelper.SessionExpression(expression);
+        public FrostHelper.SessionExpression Expression { get; } = new(expression);
 
         protected override bool RawCheck(Session session)
             => session is not null && Expression.GetBool(session);

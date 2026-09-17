@@ -13,24 +13,15 @@ public abstract class ColorSource : IEquatable<ColorSource>
             => color;
     }
 
-    private sealed class SessionCounter(string counterName) : ColorSource
-    {
-        protected override object EqualityIdentifier
-            => counterName;
-
-        public override Color GetValue(Session session)
-            => Color.FromPackedInt(session.GetCounter(counterName));
-    }
-
     private sealed class SessionExpression(string expressionStr) : ColorSource
     {
-        private readonly FrostHelper.SessionExpression expression = new FrostHelper.SessionExpression(expressionStr);
+        private readonly FrostHelper.SessionExpression expression = new(expressionStr);
 
         protected override object EqualityIdentifier
             => expressionStr;
 
         public override Color GetValue(Session session)
-            => Color.FromPackedInt(expression.GetInt(session));
+            => expression.GetColor(session);
     }
 
     protected abstract object EqualityIdentifier { get; }
@@ -41,16 +32,7 @@ public abstract class ColorSource : IEquatable<ColorSource>
     {
         if (!string.IsNullOrWhiteSpace(source))
         {
-            // todo: is this necessaryyy i feel like its just confusing when color hex codes Are known to start with #
-            //       and its only rly useful for avoiding a frosthelper dependency while keeping a microlithmisc dependency (feels unlikely)
-            if (source.StartsWith("#", out string counterName))
-            {
-                if (!counterName.IsWhiteSpace())
-                    return new SessionCounter(counterName);
-
-                Logger.Warn(LogID, $"Tried to create {nameof(ColorSource)} for session counter with empty name!");
-            }
-            else if (source.StartsWith("expr:", out string expression))
+            if (source.StartsWith("expr:", out string expression))
             {
                 if (!expression.IsWhiteSpace())
                     return new SessionExpression(expression);

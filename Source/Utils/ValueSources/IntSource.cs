@@ -24,7 +24,7 @@ public abstract class IntSource : IEquatable<IntSource>
 
     private sealed class SessionExpression(string expressionStr) : IntSource
     {
-        private readonly FrostHelper.SessionExpression expression = new FrostHelper.SessionExpression(expressionStr);
+        private readonly FrostHelper.SessionExpression expression = new(expressionStr);
 
         protected override object EqualityIdentifier
             => expressionStr;

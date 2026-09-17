@@ -24,8 +24,10 @@ public class FMODMarkerToFlagController : Entity
 
     public FMODMarkerToFlagController(EntityData data, Vector2 _)
     {
-        // ReSharper disable once AssignmentInConditionalExpression
-        if (Visible = showDebugUI = data.Bool("showDebugUI", false))
+        showDebugUI = data.Bool("showDebugUI", false);
+
+        Visible = showDebugUI;
+        if (showDebugUI)
             Tag |= TagsExt.SubHUD;
 
         Tag |= Tags.TransitionUpdate;

@@ -7,7 +7,13 @@ namespace Celeste.Mod.SorbetHelper.Imports;
 [GenerateImports("FrostHelper", RequiredDependency = false)]
 public static partial class FrostHelper
 {
-    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(Imports)}/{nameof(FrostHelper)}";
+    private const string LogID = $"{nameof(SorbetHelper)}/{nameof(Imports)}.{nameof(FrostHelper)}";
+
+    #region Misc
+
+    public static partial Color GetColor(string colorString);
+
+    #endregion
 
     #region Session Expressions
 
@@ -54,6 +60,8 @@ public static partial class FrostHelper
             => GetFloatSessionExpressionValue(expressionObject, session, userdata);
         public string GetString(Session session, object userdata = null)
             => GetStringSessionExpressionValue(expressionObject, session, userdata);
+        public Color GetColor(Session session, object userdata = null)
+            => GetColorSessionExpressionValue(expressionObject, session, userdata);
     }
 
     #endregion
@@ -80,6 +88,17 @@ public static partial class FrostHelper
             string str     => str,
             IFormattable f => f.ToString(null, CultureInfo.InvariantCulture),
             { } obj        => obj.ToString() ?? ""
+        };
+
+    // makes mayb more sense with this but still useful to have
+    public static Color GetColorSessionExpressionValue(object expression, Session session, object userdata = null)
+        => GetSessionExpressionValue(expression, session, userdata) switch
+        {
+            Color color => color,
+            int i      => Calc.HexToColor(i),
+            float f    => Calc.HexToColor((int)f),
+            string str => GetColor(str),
+            _          => Color.White
         };
 
     public static partial void RegisterSimpleSessionExpressionCommand(string modName, string cmdName, Func<Session, object> func);

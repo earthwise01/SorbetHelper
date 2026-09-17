@@ -1,4 +1,4 @@
-namespace Celeste.Mod.SorbetHelper.Utils;
+namespace Celeste.Mod.SorbetHelper.Utils.Disposables;
 
 /// <summary>
 /// Resets the <see cref="Texture"/> slots, <see cref="SamplerState"/> slots, <see cref="BlendState"/>, <see cref="DepthStencilState"/>, <see cref="RasterizerState"/>, and optionally the render targets of a given <see cref="GraphicsDevice"/> when disposed.

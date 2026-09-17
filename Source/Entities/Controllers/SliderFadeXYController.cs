@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.IO;
 
 namespace Celeste.Mod.SorbetHelper.Entities;
 

@@ -13,7 +13,7 @@ internal static class SessionExpressionCommands
 
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(SessionExpressionCommands)}";
 
-    private const string ModName = "sorbetHelper";
+    private const string CommandPrefix = "sorbet";
 
     internal static void RegisterCommands()
     {
@@ -32,22 +32,22 @@ internal static class SessionExpressionCommands
             if (method.GetCustomAttribute<SessionExpressionCommand>() is not { Name: { } commandName })
                 return;
 
-            string commandSignature = $"${ModName}.{commandName}";
+            string commandSignature = $"${CommandPrefix}.{commandName}";
 
             ParameterInfo[] parameters = method.GetParameters();
 
-            if (method.ReturnType != typeof(object)
+            if (method.ReturnType == typeof(void)
                 || parameters.Length < 1
                 || parameters[0].ParameterType != typeof(Session))
             {
-                Logger.Warn(LogID, $"Found Session Expression command '{commandSignature}' ({method.Name}) with invalid signature! Should return an 'object' and take a 'Session' as its first parameter.");
+                Logger.Warn(LogID, $"Found Session Expression command '{commandSignature}' ({method.Name}) with invalid signature! Must not return 'void' and take a 'Session' as its first parameter.");
                 return;
             }
 
             MethodInvoker methodInvoker = MethodInvoker.Create(method);
             if (parameters.Length == 1)
             {
-                FrostHelper.RegisterSimpleSessionExpressionCommand(ModName, commandName, session => methodInvoker.Invoke(null, session));
+                FrostHelper.RegisterSimpleSessionExpressionCommand(CommandPrefix, commandName, session => methodInvoker.Invoke(null, session));
                 Logger.Info(LogID, $"Registered Session Expression simple command '{commandSignature}'");
             }
             else
@@ -64,12 +64,12 @@ internal static class SessionExpressionCommands
                         || parameter.ParameterType == typeof(Color))
                         continue;
 
-                    Logger.Warn(LogID, $"Found parameter with invalid type on Session Expression function command '{commandSignature}' ({method.Name}): '{parameter.ParameterType.GetTypeName()} {parameter.Name}'. Only 'bool', 'int', 'float', 'string', 'object', or 'Color' parameters are supported.");
+                    Logger.Warn(LogID, $"Found parameter with invalid type on Session Expression function command '{commandSignature}' ({method.Name}): '{parameter.ParameterType.GetTypeName()} {parameter.Name}'. Only 'bool', 'int', 'float', 'string', 'Color', or 'object' parameters are supported.");
                     return;
                 }
 
                 string functionCommandSignature = GetFunctionCommandSignature(commandSignature, parameters);
-                FrostHelper.RegisterFunctionSessionExpressionCommand(ModName, commandName, (session, args) =>
+                FrostHelper.RegisterFunctionSessionExpressionCommand(CommandPrefix, commandName, (session, args) =>
                 {
                     Span<object> arguments = new object[parameters.Length];
 
@@ -96,50 +96,52 @@ internal static class SessionExpressionCommands
         }
     }
 
-    #region Misc Commands
+    #region Sorbet Helper Commands
 
-    // i should probably ask if this can go in base frosthelperr
-    [SessionExpressionCommand("timeActive")]
-    private static object GetTimeActive(Session session)
-        => Engine.Scene.TimeActive;
+    // color packing/unpacking
 
-    #endregion
+    [SessionExpressionCommand("packColor")]
+    private static int PackColor(Session session, Color color)
+        => color.ToPackedInt();
 
-    #region Color Packing Commands
+    [SessionExpressionCommand("unpackColor")]
+    private static Color UnpackColor(Session session, int packedColor)
+        => Color.FromPackedInt(packedColor);
 
-    [SessionExpressionCommand("rgbColor")]
-    private static object PackRgbColor(Session session, float r, float g, float b, float a = 1f, float alpha = 1f)
-        => (new Color(r, g, b, a) * alpha).ToPackedInt();
+    // misc color things
 
-    [SessionExpressionCommand("hslColor")]
-    private static object PackHslColor(Session session, float h, float s, float l, float alpha = 1f)
-        => (Calc.HslToColor(Calc.Mod(h, 1f), s, l) * alpha).ToPackedInt();
+    [SessionExpressionCommand("rgba")]
+    private static Color Rgba(Session session, float r, float g, float b, float a = 1f, float alpha = 1f)
+        => new(r * alpha, g * alpha, b * alpha, a * alpha);
 
-    [SessionExpressionCommand("hsvColor")]
-    private static object PackHsvColor(Session session, float h, float s, float v, float alpha = 1f)
-        => (Calc.HsvToColor(Calc.Mod(h, 1f), s, v) * alpha).ToPackedInt();
+    [SessionExpressionCommand("hsl")]
+    private static Color Hsl(Session session, float h, float s, float l, float alpha = 1f)
+        => Calc.HslToColor(Calc.Mod(h, 1f), s, l) * alpha;
 
-    [SessionExpressionCommand("hexColor")]
-    private static object PackHexColor(Session session, string hexColor, float alpha = 1f)
-        => (Calc.HexToColorWithNonPremultipliedAlpha(hexColor) * alpha).ToPackedInt();
+    [SessionExpressionCommand("nonPremultHex")]
+    private static Color NonPremultHex(Session session, string hex)
+        => Calc.HexToColorWithNonPremultipliedAlpha(hex);
 
-    #endregion
+    [SessionExpressionCommand("fromNonPremult")]
+    private static Color FromNonPremult(Session session, Color color)
+        => Color.FromNonPremultiplied(color.R, color.G, color.B, color.A);
 
-    #region Color Lerp Commands
+    [SessionExpressionCommand("multAlpha")]
+    private static Color MultAlpha(Session session, Color color, float alpha)
+        => color * alpha;
 
-    [SessionExpressionCommand("lerpColorRgb")]
-    private static object LerpColorRgb(Session session, Color color1, Color color2, float amount)
-        => Color.Lerp(color1, color2, amount).ToPackedInt();
+    [SessionExpressionCommand("rgbLerp")]
+    private static Color RgbLerp(Session session, Color color1, Color color2, float amount)
+        => Color.Lerp(color1, color2, amount);
 
-    // todo: hsl/hsv lerp?
+    // todo: hsv/hsl lerp?
+    // todo: oklab/oklch colors/lerping?
 
-    #endregion
+    // ternary
 
-    #region Misc Color Commands
-
-    [SessionExpressionCommand("multiplyColorAlpha")]
-    private static object MultiplyColorAlpha(Session session, Color color, float alpha)
-        => (color * alpha).ToPackedInt();
+    [SessionExpressionCommand("ternary")]
+    private static object Ternary(Session session, bool condition, object trueResult, object falseResult)
+        => condition ? trueResult : falseResult;
 
     #endregion
 
@@ -157,10 +159,11 @@ internal static class SessionExpressionCommands
             return GetNumber<float>(arg);
         if (parameterType == typeof(string))
             return GetString(arg);
-        if (parameterType == typeof(object))
-            return arg;
         if (parameterType == typeof(Color))
             return GetColor(arg);
+        if (parameterType == typeof(object))
+            return arg;
+
         throw new ArgumentException($"Unsupported parameter type for Session Expression function commands: {parameterType.FullName}");
     }
 
@@ -193,11 +196,11 @@ internal static class SessionExpressionCommands
 
     private static Color GetColor(object obj) => obj switch
     {
-        Color color     => color,
-        int packedColor => Color.FromPackedInt(packedColor),
-        string str      => Calc.HexToColorWithNonPremultipliedAlpha(str),
-        IFormattable f  => Calc.HexToColorWithNonPremultipliedAlpha(f.ToString(null, CultureInfo.InvariantCulture)),
-        _               => Color.White
+        Color color => color,
+        int i       => Calc.HexToColor(i), // growls .   at least i give a pack color function
+        float f     => Calc.HexToColor((int)f),
+        string str  => FrostHelper.GetColor(str), // also growlss .   at least i give a multiply alpha function
+        _           => Color.White
     };
 
     #endregion
@@ -215,7 +218,7 @@ internal static class SessionExpressionCommands
         if (type == typeof(string))
             return "string";
         if (type == typeof(object))
-            return "object";
+            return "any";
         return type.Name;
     }
 

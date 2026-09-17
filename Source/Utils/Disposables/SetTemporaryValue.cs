@@ -1,4 +1,4 @@
-namespace Celeste.Mod.SorbetHelper.Utils;
+namespace Celeste.Mod.SorbetHelper.Utils.Disposables;
 
 /// <summary>
 /// Sets a reference to a temporary value and restores the original value when disposed.

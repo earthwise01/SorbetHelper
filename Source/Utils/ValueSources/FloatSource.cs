@@ -22,9 +22,18 @@ public abstract class FloatSource : IEquatable<FloatSource>
             => session.GetSlider(sliderName);
     }
 
+    private sealed class SessionCounter(string counterName) : FloatSource
+    {
+        protected override object EqualityIdentifier
+            => counterName;
+
+        public override float GetValue(Session session)
+            => session.GetCounter(counterName);
+    }
+
     private sealed class SessionExpression(string expressionStr) : FloatSource
     {
-        private readonly FrostHelper.SessionExpression expression = new FrostHelper.SessionExpression(expressionStr);
+        private readonly FrostHelper.SessionExpression expression = new(expressionStr);
 
         protected override object EqualityIdentifier
             => expressionStr;
@@ -52,6 +61,13 @@ public abstract class FloatSource : IEquatable<FloatSource>
 
                 Logger.Warn(LogID, $"Tried to create {nameof(FloatSource)} for session slider with empty name!");
             }
+            else if (str.StartsWith('#', out string counterName))
+            {
+                if (!counterName.IsWhiteSpace())
+                    return new SessionSlider(counterName);
+
+                Logger.Warn(LogID, $"Tried to create {nameof(FloatSource)} for session counter with empty name!");
+            }
             else if (str.StartsWith("expr:", out string expression))
             {
                 if (!expression.IsWhiteSpace())
@@ -62,7 +78,7 @@ public abstract class FloatSource : IEquatable<FloatSource>
             else if (float.TryParse(str, out float parsedValue))
                 return new LiteralFloat(parsedValue);
             else
-                Logger.Warn(LogID, $"Tried to create {nameof(FloatSource)} for invalid source: {str}!");
+                Logger.Warn(LogID, $"Tried to create {nameof(FloatSource)} for invalid source: '{str}'!");
         }
 
         return new LiteralFloat(defaultValue);
