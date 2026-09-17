@@ -9,10 +9,10 @@ public class DisplacementEffectBlocker : Entity
 
     private readonly Condition condition;
 
-    public static readonly Color NoDisplacementColor = new Color(0.5f, 0.5f, 0.0f, 1.0f);
+    public static readonly Color NoDisplacementColor = new(0.5f, 0.5f, 0.0f, 1.0f);
 
-    public static readonly Color NoWaterDisplacementMultColor = new Color(1.0f, 1.0f, 0.0f, 1.0f);
-    public static readonly BlendState WaterDisplacementBlockerBlendState = new BlendState
+    public static readonly Color NoWaterDisplacementMultColor = new(1.0f, 1.0f, 0.0f, 1.0f);
+    public static readonly BlendState WaterDisplacementBlockerBlendState = new()
     {
         Name = "DisplacementEffectBlocker.WaterDisplacementBlocker",
         ColorSourceBlend = Blend.Zero,
@@ -63,7 +63,7 @@ public class DisplacementEffectBlocker : Entity
 
     private static void IL_DisplacementRenderer_BeforeRender(ILContext il)
     {
-        ILCursor cursor = new ILCursor(il)
+        ILCursor cursor = new(il)
         {
             Index = -1
         };

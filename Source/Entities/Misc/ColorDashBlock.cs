@@ -84,7 +84,7 @@ public class ColorDashBlock : Solid
 
         // setup colors for static movers
         Color fadeColor = Calc.HexToColor("667da5");
-        Color disabledColor = new Color(fadeColor.R / 255f * (color.R / 255f), fadeColor.G / 255f * (color.G / 255f), fadeColor.B / 255f * (color.B / 255f), 1f);
+        Color disabledColor = new(fadeColor.R / 255f * (color.R / 255f), fadeColor.G / 255f * (color.G / 255f), fadeColor.B / 255f * (color.B / 255f), 1f);
         foreach (StaticMover staticMover in staticMovers)
         {
             if (staticMover.Entity is Spikes spikes)
@@ -222,8 +222,8 @@ public class ColorDashBlock : Solid
 
     private Image CreateImage(float x, float y, int tx, int ty, MTexture tex)
     {
-        Vector2 imageOffset = new Vector2(x - X, y - Y);
-        Image image = new Image(tex.GetSubtexture(tx * 8, ty * 8, 8, 8));
+        Vector2 imageOffset = new(x - X, y - Y);
+        Image image = new(tex.GetSubtexture(tx * 8, ty * 8, 8, 8));
         Vector2 imageGroupOrigin = groupOrigin - Position;
         image.Origin = imageGroupOrigin - imageOffset;
         image.Position = imageGroupOrigin;
@@ -333,7 +333,7 @@ public class ColorDashBlock : Solid
             else
                 StopShaking();
 
-            Vector2 scale = new Vector2(1f + wiggler.Value * 0.05f * wigglerScaler.X, 1f + wiggler.Value * 0.15f * wigglerScaler.Y);
+            Vector2 scale = new(1f + wiggler.Value * 0.05f * wigglerScaler.X, 1f + wiggler.Value * 0.15f * wigglerScaler.Y);
             foreach (ColorDashBlock colorDashBlock in group)
             {
                 colorDashBlock.shakeAmount = shakeAmount;
@@ -420,7 +420,7 @@ public class ColorDashBlock : Solid
     // taken and slighly modified from PlaybackBillboard
     private void DrawNoise(ref uint seed)
     {
-        Vector2 scale = new Vector2(1f + wiggler.Value * 0.05f * wigglerScaler.X, 1f + wiggler.Value * 0.15f * wigglerScaler.Y);
+        Vector2 scale = new(1f + wiggler.Value * 0.05f * wigglerScaler.X, 1f + wiggler.Value * 0.15f * wigglerScaler.Y);
 
         Vector2 rectPosition = groupOrigin;
         Vector2 rectOrigin = groupOrigin - Position;
@@ -428,11 +428,11 @@ public class ColorDashBlock : Solid
         int rectY = (int)Math.Round(rectPosition.Y - rectOrigin.Y * scale.Y);
         int rectW = (int)Math.Round(rectPosition.X + (Width - rectOrigin.X) * scale.X) - rectX;
         int rectH = (int)Math.Round(rectPosition.Y + (Height - rectOrigin.Y) * scale.Y) - rectY;
-        Rectangle noiseBounds = new Rectangle(rectX, rectY, rectW, rectH);
+        Rectangle noiseBounds = new(rectX, rectY, rectW, rectH);
 
         string texturePath = $"objects/SorbetHelper/colorDashBlock/{(Collidable ? "solidNoise" : "pressedNoise")}";
         MTexture noiseTexture = GFX.Game[texturePath];
-        Vector2 noiseRandPos = new Vector2(PseudoRandRange(ref seed, 0f, noiseTexture.Width / 2f), PseudoRandRange(ref seed, 0f, noiseTexture.Height / 2f));
+        Vector2 noiseRandPos = new(PseudoRandRange(ref seed, 0f, noiseTexture.Width / 2f), PseudoRandRange(ref seed, 0f, noiseTexture.Height / 2f));
         Vector2 noiseOriginOffset = Position - new Vector2(noiseBounds.X, noiseBounds.Y);
         Vector2 noiseHalfSize = new Vector2(noiseTexture.Width, noiseTexture.Height) / 2f;
 
@@ -444,7 +444,7 @@ public class ColorDashBlock : Solid
                 float sourceHeight = Math.Min(noiseBounds.Height - y, noiseHalfSize.Y);
                 int sourceX = (int)(noiseTexture.ClipRect.X + noiseRandPos.X + noiseOriginOffset.X);
                 int sourceY = (int)(noiseTexture.ClipRect.Y + noiseRandPos.Y + noiseOriginOffset.Y);
-                Rectangle sourceRect = new Rectangle(sourceX, sourceY, (int)sourceWidth, (int)sourceHeight);
+                Rectangle sourceRect = new(sourceX, sourceY, (int)sourceWidth, (int)sourceHeight);
                 Draw.SpriteBatch.Draw(noiseTexture.Texture.Texture_Safe, new Vector2(noiseBounds.X + x, noiseBounds.Y + y), sourceRect, color);
             }
         }

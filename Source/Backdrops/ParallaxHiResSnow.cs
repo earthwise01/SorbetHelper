@@ -161,7 +161,7 @@ public class ParallaxHiResSnow : HiResBackdrop
 
             // need to divide the position by UpscaleAmount here since the snow particles are positioned at 6x scale (1920x1080) as a leftover from vanilla HiResSnow,
             // while the matrix used for rendering HiResBackdrops expects positions in camera space (320x180)
-            Vector2 renderPosition = new Vector2()
+            Vector2 renderPosition = new()
             {
                 X = -OffscreenPadding + Calc.Mod(particle.Position.X / UpscaleAmount - cameraPos.X * particle.Scroll.X + zoomCenterOffset.X, 320f + OffscreenPadding * 2f),
                 Y = -OffscreenPadding + Calc.Mod(particle.Position.Y / UpscaleAmount - cameraPos.Y * particle.Scroll.Y + zoomCenterOffset.Y, 180f + OffscreenPadding * 2f)

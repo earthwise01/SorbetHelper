@@ -208,7 +208,7 @@ public class ReturnBubbleTweaksController : Entity
     // this suckssss
     private static void IL_Collide_Check(ILContext il)
     {
-        ILCursor cursor = new ILCursor(il);
+        ILCursor cursor = new(il);
 
         ILLabel returnLabel = null;
         if (!cursor.TryGotoNextBestFit(MoveType.After,

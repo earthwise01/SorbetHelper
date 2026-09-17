@@ -33,7 +33,7 @@ public class EntityStylegroundRenderer : Backdrop
 
     private List<EntityStylegroundMarker> GetEntitiesToRender(List<Component> components)
     {
-        List<EntityStylegroundMarker> markers = new List<EntityStylegroundMarker>(components.Count);
+        List<EntityStylegroundMarker> markers = new(components.Count);
 
         foreach (Component component in components)
         {

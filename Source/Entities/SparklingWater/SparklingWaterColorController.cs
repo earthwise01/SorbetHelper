@@ -5,7 +5,7 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [Tracked]
 public class SparklingWaterColorController(EntityData data, Vector2 offset) : EntityProcessingController(data, offset)
 {
-    private readonly SparklingWaterRenderer.Options options = new SparklingWaterRenderer.Options(data);
+    private readonly SparklingWaterRenderer.Options options = new(data);
     private readonly int? affectedDepth = data.Nullable<int>("affectedDepth");
 
     protected override int ProcessPriority => affectedDepth is not null ? 1 : 0;

@@ -6,7 +6,7 @@ public class WingedStrawberryDirectionController(EntityData data, Vector2 offset
 {
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(WingedStrawberryDirectionController)}";
 
-    private static readonly Dictionary<string, Vector2> DirectionToVector = new Dictionary<string, Vector2>
+    private static readonly Dictionary<string, Vector2> DirectionToVector = new()
     {
         { "up", new Vector2(0f, -1f) }, { "down", new Vector2(0f, 1f) }, { "left", new Vector2(-1f, 0f) }, { "right", new Vector2(1f, 0f) },
         { "upleft", new Vector2(-1f, -1f) }, { "upright", new Vector2(1f, -1f) }, { "downleft", new Vector2(-1f, 1f) }, { "downright", new Vector2(1f, 1f) }
@@ -34,7 +34,7 @@ public class WingedStrawberryDirectionController(EntityData data, Vector2 offset
 
     private static void IL_Strawberry_orig_Update(ILContext il)
     {
-        ILCursor cursor = new ILCursor(il);
+        ILCursor cursor = new(il);
 
         VariableDefinition controllerVariable = cursor.AddVariable<WingedStrawberryDirectionController>();
 

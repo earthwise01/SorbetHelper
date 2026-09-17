@@ -38,7 +38,7 @@ internal class SorbetHelperMapDataProcessor : EverestMapDataProcessor
             if (!int.TryParse(depthAttr, out depth) && !Enum.TryParse(depthAttr, true, out mode))
                 Logger.Warn(LogID, "invalid depth for Styleground Depth Controller! " + depthAttr);
 
-            StylegroundDepthController.StylegroundDepthControllerData depthController = new StylegroundDepthController.StylegroundDepthControllerData(stylegroundTag, depth, mode);
+            StylegroundDepthController.StylegroundDepthControllerData depthController = new(stylegroundTag, depth, mode);
             depthControllers.Add(depthController);
 
             Logger.Verbose(LogID, $"found a StylegroundDepthController in {AreaKey.SID} {AreaKey.ID} ({AreaKey.Mode}), with depth {depthAttr}!");

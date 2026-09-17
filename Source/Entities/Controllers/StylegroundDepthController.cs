@@ -24,7 +24,7 @@ public class StylegroundDepthController : Entity
         public static float Scale;
     }
 
-    private static readonly BlendState AdditiveTransparentAlphaBlendDestinationFix = new BlendState()
+    private static readonly BlendState AdditiveTransparentAlphaBlendDestinationFix = new()
     {
         ColorSourceBlend = Blend.SourceAlpha,
         AlphaSourceBlend = Blend.Zero, // Blend.SourceAlpha,
@@ -243,7 +243,7 @@ public class StylegroundDepthController : Entity
 
     private static void IL_BackdropRenderer_Render(ILContext il)
     {
-        ILCursor cursor = new ILCursor(il);
+        ILCursor cursor = new(il);
 
         VariableDefinition depthRenderedBackdropsVariable = cursor.AddVariable<HashSet<Backdrop>>();
 
@@ -278,7 +278,7 @@ public class StylegroundDepthController : Entity
 
     private static void IL_Level_Render(ILContext il)
     {
-        ILCursor cursor = new ILCursor(il);
+        ILCursor cursor = new(il);
 
         if (!cursor.TryGotoNextBestFit(MoveType.Before,
             instr => instr.MatchLdarg0(),

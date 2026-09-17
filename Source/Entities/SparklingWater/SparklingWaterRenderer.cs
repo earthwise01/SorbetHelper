@@ -24,7 +24,7 @@ public class SparklingWaterRenderer : DepthBatchingRenderer<SparklingWaterRender
         private const float DefaultBubbleAlpha = 0.3f;
         private const float DefaultDisplacementSpeed = 0.25f;
 
-        public static readonly Options DefaultOptions = new Options(
+        public static readonly Options DefaultOptions = new(
             ColorSource.Create(DefaultOutlineColor),
             ColorSource.Create(DefaultEdgeColor),
             ColorSource.Create(DefaultFillColor),
@@ -50,10 +50,10 @@ public class SparklingWaterRenderer : DepthBatchingRenderer<SparklingWaterRender
 
     #region Renderer
 
-    public static readonly Color OutlineMaskColor = new Color(0f, 0.5f, 1f);
-    public static readonly Color TopEdgeMaskColor = new Color(1f, 1f, 0f);
-    public static readonly Color BottomEdgeMaskColor = new Color(1f, 0f, 0f);
-    public static readonly Color FillMaskColor = new Color(0f, 0.5f, 0f);
+    public static readonly Color OutlineMaskColor = new(0f, 0.5f, 1f);
+    public static readonly Color TopEdgeMaskColor = new(1f, 1f, 0f);
+    public static readonly Color BottomEdgeMaskColor = new(1f, 0f, 0f);
+    public static readonly Color FillMaskColor = new(0f, 0.5f, 0f);
 
     private VirtualRenderTarget buffer, displacementBuffer;
 
@@ -90,7 +90,7 @@ public class SparklingWaterRenderer : DepthBatchingRenderer<SparklingWaterRender
             effect.Parameters["time"].SetValue(timer);
             effect.Parameters["camera_pos"].SetValue(camera.Position);
 
-            Vector2 viewport = new Vector2(Engine.Graphics.GraphicsDevice.Viewport.Width, Engine.Graphics.GraphicsDevice.Viewport.Height);
+            Vector2 viewport = new(Engine.Graphics.GraphicsDevice.Viewport.Width, Engine.Graphics.GraphicsDevice.Viewport.Height);
             Matrix matrix = camera.Matrix;
             matrix *= Matrix.CreateScale(1f / viewport.X * 2f, (0f - 1f / viewport.Y) * 2f, 1f);
             matrix *= Matrix.CreateTranslation(-1f, 1f, 0f);

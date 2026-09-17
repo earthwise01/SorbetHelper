@@ -41,7 +41,7 @@ public class MovingPlatformHittable(PlatformHitCallback onHit, bool breakDashBlo
 
     private static void IL_Platform_MoveHExactCollideSolids(ILContext il)
     {
-        ILCursor cursor = new ILCursor(il);
+        ILCursor cursor = new(il);
 
         if (!cursor.TryGotoNextBestFit(MoveType.AfterLabel,
             instr => instr.MatchLdarg2(),
@@ -61,7 +61,7 @@ public class MovingPlatformHittable(PlatformHitCallback onHit, bool breakDashBlo
 
     private static void IL_Platform_MoveVExactCollideSolids(ILContext il)
     {
-        ILCursor cursor = new ILCursor(il);
+        ILCursor cursor = new(il);
 
         if (!cursor.TryGotoNextBestFit(MoveType.AfterLabel,
             instr => instr.MatchLdarg2(),

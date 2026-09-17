@@ -6,7 +6,7 @@ public class SolidTilesDepthSplitter : Entity
 {
     public static Entity Load(Level level, LevelData levelData, Vector2 position, EntityData entityData)
     {
-        SolidTilesDepthSplitter depthSplitter = new SolidTilesDepthSplitter(entityData.Int("depth", Depths.FGDecals - 10),
+        SolidTilesDepthSplitter depthSplitter = new(entityData.Int("depth", Depths.FGDecals - 10),
             entityData.Attr("tiletypes", "3").ToHashSet(), entityData.Bool("tryFillBehind", false));
 
         if (!entityData.Bool("backgroundTiles", false))
@@ -17,7 +17,7 @@ public class SolidTilesDepthSplitter : Entity
         return depthSplitter;
     }
 
-    private static readonly Autotiler.Behaviour AutotilerBehaviour = new Autotiler.Behaviour()
+    private static readonly Autotiler.Behaviour AutotilerBehaviour = new()
     {
         EdgesExtend = true,
         EdgesIgnoreOutOfLevel = false,
@@ -100,7 +100,7 @@ public class SolidTilesDepthSplitter : Entity
 
     private VirtualMap<char> GenerateFillBehind(VirtualMap<char> tileData, Autotiler autotiler)
     {
-        VirtualMap<char> filledTileData = new VirtualMap<char>(tileData.Columns, tileData.Rows, tileData.EmptyValue);
+        VirtualMap<char> filledTileData = new(tileData.Columns, tileData.Rows, tileData.EmptyValue);
 
         const int segmentSize = VirtualMap<char>.SegmentSize;
         for (int segmentX = 0; segmentX < tileData.Columns; segmentX += segmentSize)

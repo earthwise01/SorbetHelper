@@ -72,7 +72,7 @@ public class SpiralStars : Backdrop
         stars = new Star[data.AttrInt("starCount", 100)];
         for (int i = 0; i < stars.Length; i++)
         {
-            Star star = new Star(Calc.Random.Next(textureSets.Count), colors[Calc.Random.Next(colors.Length)], trailLength)
+            Star star = new(Calc.Random.Next(textureSets.Count), colors[Calc.Random.Next(colors.Length)], trailLength)
             {
                 Distance = Calc.Random.NextFloat(outerRadius),
                 Angle = Calc.Random.NextAngle(),

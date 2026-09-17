@@ -159,7 +159,7 @@ public class SparklingWater : Water, SparklingWaterRenderer.IRenderable
         }
     }
 
-    private static readonly ParticleType P_SparklingSplash = new ParticleType()
+    private static readonly ParticleType P_SparklingSplash = new()
     {
         Source = GFX.Game["particles/feather"],
         FadeMode = ParticleType.FadeModes.Linear,
@@ -272,7 +272,7 @@ public class SparklingWater : Water, SparklingWaterRenderer.IRenderable
         // update visibility
         Camera camera = SceneAs<Level>().Camera;
         const int visibilityBuffer = 24;
-        Rectangle cameraRect = new Rectangle((int)camera.X - visibilityBuffer, (int)camera.Y - visibilityBuffer,
+        Rectangle cameraRect = new((int)camera.X - visibilityBuffer, (int)camera.Y - visibilityBuffer,
             camera.Width + visibilityBuffer, camera.Height + visibilityBuffer);
 
         VisibleOnCamera = Left < cameraRect.Right && Right > cameraRect.Left

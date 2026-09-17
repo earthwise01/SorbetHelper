@@ -6,7 +6,7 @@ public class CustomFallingBlock : FallingBlock
 {
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(CustomFallingBlock)}";
 
-    private static readonly Dictionary<string, Vector2> DirectionToVector = new Dictionary<string, Vector2>
+    private static readonly Dictionary<string, Vector2> DirectionToVector = new()
     {
         { "down", new Vector2(0f, 1f) }, { "up", new Vector2(0f, -1f) }, { "left", new Vector2(-1f, 0f) }, { "right", new Vector2(1f, 0f) }
     };
@@ -277,7 +277,7 @@ public class CustomFallingBlock : FallingBlock
     {
         Vector2 dir = Direction.FourWayNormal();
 
-        ParticleType P_DirectionalLandDust = new ParticleType(P_LandDust)
+        ParticleType P_DirectionalLandDust = new(P_LandDust)
         {
             Acceleration = dir * -30f
         };

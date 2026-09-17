@@ -38,7 +38,7 @@ public class ExplodeHittable(ExplodeHitCallback onHit)
 
     private static void IL_Puffer_Explode(ILContext il)
     {
-        ILCursor cursor = new ILCursor(il);
+        ILCursor cursor = new(il);
 
         if (!cursor.TryGotoNextBestFit(MoveType.Before,
             instr => instr.MatchLdarg0(),
@@ -52,7 +52,7 @@ public class ExplodeHittable(ExplodeHitCallback onHit)
 
     private static void IL_Seeker_RegenerateCoroutine(ILContext il)
     {
-        ILCursor cursor = new ILCursor(il);
+        ILCursor cursor = new(il);
         int seekerVariable = 1;
 
         if (!cursor.TryGotoNextBestFit(MoveType.Before,

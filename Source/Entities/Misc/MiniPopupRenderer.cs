@@ -24,14 +24,14 @@ public class MiniPopupRenderer : Renderer<MiniPopupRenderer>
     // Creating the popup returns an action that removes the popup so the respective MiniPopupTrigger can remove it if its mode is set to WhilePlayerInside - grog
     public Action CreatePopup(float activeTime, string mainTextId, string subTextId)
     {
-        Popup popup = new Popup(activeTime, mainTextId, subTextId, Color.Black, Color.LightCoral, Color.White);
+        Popup popup = new(activeTime, mainTextId, subTextId, Color.Black, Color.LightCoral, Color.White);
         popups.Add(popup);
         return () => popup.Active = false;
     }
 
     public Action CreatePopup(float activeTime, string mainTextId, string subTextId, Color baseColor, Color accentColor, Color titleColor, string iconPath = null, string texturePath = null, int widthOverride = -1)
     {
-        Popup popup = new Popup(activeTime, mainTextId, subTextId, baseColor, accentColor, titleColor, iconPath,
+        Popup popup = new(activeTime, mainTextId, subTextId, baseColor, accentColor, titleColor, iconPath,
             texturePath, widthOverride);
         popups.Add(popup);
         return () => popup.Active = false;

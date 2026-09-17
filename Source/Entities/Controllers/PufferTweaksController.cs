@@ -60,7 +60,7 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
 
     private static void IL_Puffer_Update(ILContext il)
     {
-        ILCursor cursor = new ILCursor(il)
+        ILCursor cursor = new(il)
         {
             Index = -1
         };
@@ -107,7 +107,7 @@ public class PufferTweaksController(EntityData data, Vector2 offset) : Entity(da
 
     private static void IL_Puffer_HitSpring(ILContext il)
     {
-        ILCursor cursor = new ILCursor(il);
+        ILCursor cursor = new(il);
 
         if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(0f)))
             throw new HookHelper.HookException(il, "Unable to find upwards speed threshold `0f` to modify.");

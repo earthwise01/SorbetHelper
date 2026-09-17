@@ -5,7 +5,7 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 [Tracked]
 public class DarknessTransparencyFixController : Entity
 {
-    private static readonly BlendState DestinationTransparencySubtractAlphaFixed = new BlendState()
+    private static readonly BlendState DestinationTransparencySubtractAlphaFixed = new()
     {
         // use ColorSourceBlend = Blend.DestinationAlpha instead so that darkness behaves correctly with premultiplied alpha
         ColorSourceBlend = Blend.DestinationAlpha, // Blend.One,

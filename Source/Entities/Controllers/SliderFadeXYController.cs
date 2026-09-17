@@ -39,7 +39,7 @@ public class SliderFadeXYController : Entity
 
     private static Backdrop.Fader CreateFader(string raw)
     {
-        Backdrop.Fader fader = new Backdrop.Fader();
+        Backdrop.Fader fader = new();
 
         string[] zones = raw.Split(':');
         for (int i = 0; i < zones.Length; i++)

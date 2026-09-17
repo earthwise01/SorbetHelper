@@ -166,7 +166,7 @@ public class HiResGodrays : HiResBackdrop
         Player player = level.Tracker.GetEntity<Player>();
 
         Vector2 skew1 = Calc.AngleToVector(-1.6707964f, 1f);
-        Vector2 skew2 = new Vector2(0f - skew1.Y, skew1.X);
+        Vector2 skew2 = new(0f - skew1.Y, skew1.X);
         int vertexIndex = 0;
         for (int i = 0; i < rays.Length; i++)
         {
@@ -199,7 +199,7 @@ public class HiResGodrays : HiResBackdrop
             for (int x = 0; x < 320 * visibleScreens + offscreenPadding; x += 320 + offscreenPadding * 2)
             for (int y = 0; y < 180 * visibleScreens + offscreenPadding; y += 180 + offscreenPadding * 2)
             {
-                Vector2 renderPos = new Vector2(ray.RenderPosition.X + x, ray.RenderPosition.Y + y);
+                Vector2 renderPos = new(ray.RenderPosition.X + x, ray.RenderPosition.Y + y);
                 Color renderColor = ray.RenderColor;
 
                 //  need to do this here so that the correct godray fades etc etc,
@@ -210,10 +210,10 @@ public class HiResGodrays : HiResBackdrop
                         renderColor *= 0.25f + 0.75f * (playerDistance / 64f);
                 }
 
-                VertexPositionColor v1 = new VertexPositionColor(new Vector3(renderPos + skew2 * rayWidth + skew1 * rayLength, 0f), renderColor);
-                VertexPositionColor v2 = new VertexPositionColor(new Vector3(renderPos - skew2 * rayWidth, 0f), renderColor);
-                VertexPositionColor v3 = new VertexPositionColor(new Vector3(renderPos + skew2 * rayWidth, 0f), renderColor);
-                VertexPositionColor v4 = new VertexPositionColor(new Vector3(renderPos - skew2 * rayWidth - skew1 * rayLength, 0f), renderColor);
+                VertexPositionColor v1 = new(new Vector3(renderPos + skew2 * rayWidth + skew1 * rayLength, 0f), renderColor);
+                VertexPositionColor v2 = new(new Vector3(renderPos - skew2 * rayWidth, 0f), renderColor);
+                VertexPositionColor v3 = new(new Vector3(renderPos + skew2 * rayWidth, 0f), renderColor);
+                VertexPositionColor v4 = new(new Vector3(renderPos - skew2 * rayWidth - skew1 * rayLength, 0f), renderColor);
                 vertices[vertexIndex++] = v1;
                 vertices[vertexIndex++] = v2;
                 vertices[vertexIndex++] = v3;
@@ -256,7 +256,7 @@ public class HiResGodrays : HiResBackdrop
             for (int x = 0; x < cameraWidth + offscreenPadding; x += 320 + offscreenPadding * 2)
             for (int y = 0; y < cameraHeight + offscreenPadding; y += 180 + offscreenPadding * 2)
             {
-                Vector2 renderPos = new Vector2(ray.RenderPosition.X + x, ray.RenderPosition.Y + y);
+                Vector2 renderPos = new(ray.RenderPosition.X + x, ray.RenderPosition.Y + y);
                 Color renderColor = ray.RenderColor;
 
                 if (fadeNearPlayer && player is not null)

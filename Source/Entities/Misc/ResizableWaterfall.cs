@@ -152,7 +152,7 @@ public class ResizableWaterfall : Entity
         if (!visibleOnCamera)
             return;
 
-        Color waveColor = new Color(0.5f, 0.5f, wavePercent, 1f);
+        Color waveColor = new(0.5f, 0.5f, wavePercent, 1f);
 
         Water.Surface bottomWaterSurface = water?.TopSurface;
         Water.Surface topWaterSurface = topWater?.BottomSurface;

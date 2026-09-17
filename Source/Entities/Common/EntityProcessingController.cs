@@ -103,7 +103,7 @@ public abstract class EntityProcessingController : Entity
 
     private static void IL_EntityList_UpdateLists(ILContext il)
     {
-        ILCursor cursor = new ILCursor(il);
+        ILCursor cursor = new(il);
 
         if (!cursor.TryGotoNextBestFit(MoveType.Before,
             instr => instr.MatchLdarg(0),

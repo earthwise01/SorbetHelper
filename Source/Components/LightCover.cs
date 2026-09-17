@@ -22,7 +22,7 @@ public class LightCover(float alpha) : Component(false, true)
 
     private static void IL_LightingRenderer_BeforeRender(ILContext il)
     {
-        ILCursor cursor = new ILCursor(il)
+        ILCursor cursor = new(il)
         {
             Index = -1
         };

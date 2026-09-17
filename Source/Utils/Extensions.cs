@@ -105,7 +105,7 @@ internal static class Extensions
             float x = c * (1f - MathF.Abs(hueSegment % 2f - 1f));
             float m = l - c / 2f;
 
-            return (hueSegment) switch
+            return hueSegment switch
             {
                 < 1f => new Color(c + m, x + m, m),
                 < 2f => new Color(x + m, c + m, m),
@@ -125,7 +125,7 @@ internal static class Extensions
             => unchecked((int)self.PackedValue);
 
         public static Color FromPackedInt(int packedValue)
-            => new Color() { PackedValue = unchecked((uint)packedValue) };
+            => new() { PackedValue = unchecked((uint)packedValue) };
     }
 
     extension(Level self)
@@ -195,11 +195,11 @@ internal static class Extensions
             float zoomTarget = ExtendedCameraDynamics.IsImported && ExtendedCameraDynamics.ExtendedCameraHooksEnabled()
                 ? self.Zoom
                 : self.ZoomTarget;
-            Vector2 dimensions = new Vector2(320f, 180f);
+            Vector2 dimensions = new(320f, 180f);
             Vector2 scaledDimensions = dimensions / zoomTarget;
             Vector2 zoomOrigin = zoomTarget != 1f ? (self.ZoomFocusPoint - scaledDimensions / 2f) / (dimensions - scaledDimensions) * dimensions : Vector2.Zero;
 
-            Vector2 paddingOffset = new Vector2(self.ScreenPadding, self.ScreenPadding * (9f / 16f));
+            Vector2 paddingOffset = new(self.ScreenPadding, self.ScreenPadding * (9f / 16f));
             if (ExtendedVariantsCompat.IsLoaded)
                 paddingOffset = ExtendedVariantsCompat.AddZoomPaddingOffset(paddingOffset);
 
@@ -273,7 +273,7 @@ internal static class Extensions
         public Vector2 GetCenter()
             => self.Position + new Vector2(self.Viewport.Width / 2f, self.Viewport.Height / 2f);
         public Vector2 GetZoomOutCenterOffset()
-            => new Vector2(self.Viewport.Width / 2f - 320f / 2f, self.Viewport.Height / 2f - 180f / 2f);
+            => new(self.Viewport.Width / 2f - 320f / 2f, self.Viewport.Height / 2f - 180f / 2f);
     }
 
     extension(EntityData self)
@@ -389,7 +389,7 @@ internal static class Extensions
     {
         public VariableDefinition AddVariable(Type type)
         {
-            VariableDefinition variableDefinition = new VariableDefinition(self.Context.Import(type));
+            VariableDefinition variableDefinition = new(self.Context.Import(type));
             self.Body.Variables.Add(variableDefinition);
             return variableDefinition;
         }

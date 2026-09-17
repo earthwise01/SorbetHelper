@@ -250,7 +250,7 @@ public abstract class GateBlock : Solid
             toColor = startColor;
         }
 
-        Color noReturnFillColor = new Color((int)(toColor.R * 0.7f), (int)(toColor.G * 0.67f), (int)(toColor.B * 0.8f), 255);
+        Color noReturnFillColor = new((int)(toColor.R * 0.7f), (int)(toColor.G * 0.67f), (int)(toColor.B * 0.8f), 255);
 
         // wait until triggered
         while (!Triggered)
@@ -314,14 +314,14 @@ public abstract class GateBlock : Solid
         // create dust particles on any edges touching solids
         using (new SetTemporaryValue<bool>(ref Collidable, false))
         {
-            Vector2 dustSpacing = new Vector2(0f, 2f);
+            Vector2 dustSpacing = new(0f, 2f);
             bool makeLeftDust = moveTo.X <= moveFrom.X;
             bool makeRightDust = moveTo.X >= moveFrom.X;
             for (int ty = 0; ty < Height / 8f; ty++)
             {
                 if (makeLeftDust)
                 {
-                    Vector2 collideAt = new Vector2(Left - 1f, Top + 4f + ty * 8);
+                    Vector2 collideAt = new(Left - 1f, Top + 4f + ty * 8);
                     Vector2 noCollideAt = collideAt + Vector2.UnitX;
                     if (Scene.CollideCheck<Solid>(collideAt) && !Scene.CollideCheck<Solid>(noCollideAt))
                     {
@@ -332,7 +332,7 @@ public abstract class GateBlock : Solid
 
                 if (makeRightDust)
                 {
-                    Vector2 collideAt = new Vector2(Right + 1f, Top + 4f + ty * 8);
+                    Vector2 collideAt = new(Right + 1f, Top + 4f + ty * 8);
                     Vector2 noCollideAt = collideAt - Vector2.UnitX * 2f;
                     if (Scene.CollideCheck<Solid>(collideAt) && !Scene.CollideCheck<Solid>(noCollideAt))
                     {
@@ -349,7 +349,7 @@ public abstract class GateBlock : Solid
             {
                 if (makeTopDust)
                 {
-                    Vector2 collideAt = new Vector2(Left + 4f + tx * 8, Top - 1f);
+                    Vector2 collideAt = new(Left + 4f + tx * 8, Top - 1f);
                     Vector2 noCollideAt = collideAt + Vector2.UnitY;
                     if (Scene.CollideCheck<Solid>(collideAt) && !Scene.CollideCheck<Solid>(noCollideAt))
                     {
@@ -360,7 +360,7 @@ public abstract class GateBlock : Solid
 
                 if (makeBottomDust)
                 {
-                    Vector2 collideAt = new Vector2(Left + 4f + tx * 8, Bottom + 1f);
+                    Vector2 collideAt = new(Left + 4f + tx * 8, Bottom + 1f);
                     Vector2 noCollideAt = collideAt - Vector2.UnitY * 2f;
                     if (Scene.CollideCheck<Solid>(collideAt) && !Scene.CollideCheck<Solid>(noCollideAt))
                     {
@@ -448,7 +448,7 @@ public abstract class GateBlock : Solid
         if (hitScale == Vector2.One && hitOffset == Vector2.Zero)
             return new Rectangle((int)renderPosition.X, (int)renderPosition.Y, (int)Width, (int)Height);
 
-        Vector2 origin = new Vector2(Width / 2f, Height / 2f);
+        Vector2 origin = new(Width / 2f, Height / 2f);
         renderPosition += origin;
         int rectX = (int)Math.Round(renderPosition.X - origin.X * Scale.X);
         int rectY = (int)Math.Round(renderPosition.Y - origin.Y * Scale.Y);
@@ -460,7 +460,7 @@ public abstract class GateBlock : Solid
     protected void DrawBlockNiceSlice(MTexture nineSlice, Color color)
     {
         Vector2 renderPosition = Position + Offset;
-        Vector2 center = new Vector2(renderPosition.X + Width / 2f, renderPosition.Y + Height / 2f);
+        Vector2 center = new(renderPosition.X + Width / 2f, renderPosition.Y + Height / 2f);
         Vector2 tilePosition = renderPosition;
 
         int widthInTiles = (int)Width / 8;
@@ -469,7 +469,7 @@ public abstract class GateBlock : Solid
         Texture2D texture = nineSlice.Texture.Texture_Safe;
         int clipStartX = nineSlice.ClipRect.X;
         int clipStartY = nineSlice.ClipRect.Y;
-        Rectangle clipRect = new Rectangle(clipStartX, clipStartY, 8, 8);
+        Rectangle clipRect = new(clipStartX, clipStartY, 8, 8);
 
         for (int tx = 0; tx < widthInTiles; tx++)
         {
