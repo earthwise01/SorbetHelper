@@ -95,6 +95,18 @@ internal static class Extensions
             }
         }
 
+        public static Color HexToColorWithAlpha(int hex)
+            => new((byte)(hex >> 24), (byte)(hex >> 16), (byte)(hex >> 8), (byte)hex);
+
+        public static int ColorToHexWithAlpha(Color color)
+            => (color.R << 24) | (color.G << 16) | (color.B << 8) | color.A;
+
+        public static Color HexToColorAbgr(int hexAbgr)
+            => new() { PackedValue = unchecked((uint)hexAbgr) };
+
+        public static int ColorToHexAbgr(Color color)
+            => unchecked((int)color.PackedValue);
+
         public static Color HslToColor(float hue, float s, float l)
         {
             if (s == 0f)
@@ -116,23 +128,83 @@ internal static class Extensions
             };
         }
 
+        // oklab colours
+        // see https://bottosson.github.io/posts/oklab/#converting-from-linear-srgb-to-oklab
+
+        public static (float L, float a, float b) ColorToOklab(Color color)
+        {
+            float a = color.A / 255f;
+            float r = ToLinearRgb(color.R / 255f / a);
+            float g = ToLinearRgb(color.G / 255f / a);
+            float b = ToLinearRgb(color.B / 255f / a);
+
+            float l = 0.4122214708f * r + 0.5363325363f * g + 0.0514459929f * b;
+            float m = 0.2119034982f * r + 0.6806995451f * g + 0.1073969566f * b;
+            float s = 0.0883024619f * r + 0.2817188376f * g + 0.6299787005f * b;
+
+            float l_ = MathF.Cbrt(l);
+            float m_ = MathF.Cbrt(m);
+            float s_ = MathF.Cbrt(s);
+
+            return (
+                0.2104542553f * l_ + 0.7936177850f * m_ - 0.0040720468f * s_,
+                1.9779984951f * l_ - 2.4285922050f * m_ + 0.4505937099f * s_,
+                0.0259040371f * l_ + 0.7827717662f * m_ - 0.8086757660f * s_
+            );
+
+            static float ToLinearRgb(float x)
+                => x >= 0.04045 ? MathF.Pow((x + 0.055f) / (1f + 0.055f), 2.4f) : x / 12.92f;
+        }
+
+        public static Color OklabToColor(float L, float a, float b)
+        {
+            float l_ = L + 0.3963377774f * a + 0.2158037573f * b;
+            float m_ = L - 0.1055613458f * a - 0.0638541728f * b;
+            float s_ = L - 0.0894841775f * a - 1.2914855480f * b;
+
+            float l = l_ * l_ * l_;
+            float m = m_ * m_ * m_;
+            float s = s_ * s_ * s_;
+
+            // todo: clip to srgb gamut ???
+            return new Color(
+                FromLinearRgb(+4.0767416621f * l - 3.3077115913f * m + 0.2309699292f * s),
+                FromLinearRgb(-1.2684380046f * l + 2.6097574011f * m - 0.3413193965f * s),
+                FromLinearRgb(-0.0041960863f * l - 0.7034186147f * m + 1.7076147010f * s),
+                1f
+            );
+
+            static float FromLinearRgb(float x)
+                => x >= 0.0031308f ? 1.055f * MathF.Pow(x, 1f / 2.4f) - 0.055f : 12.92f * x;
+        }
+
         #endregion
     }
     
     extension(Color self)
     {
-        public int ToPackedInt()
-            => unchecked((int)self.PackedValue);
+        public string ToHexString()
+            => self.A == 255 ? $"{self.R:x2}{self.G:x2}{self.B:x2}" : $"{self.R:x2}{self.G:x2}{self.B:X2}{self.A:x2}";
 
-        public static Color FromPackedInt(int packedValue)
-            => new() { PackedValue = unchecked((uint)packedValue) };
+        public static Color LerpOklab(Color color1, Color color2, float amount)
+        {
+            amount = Math.Clamp(amount, 0f, 1f);
+
+            (float L1, float a1, float b1) = ColorToOklab(color1);
+            (float L2, float a2, float b2) = ColorToOklab(color2);
+            return OklabToColor(
+                MathHelper.Lerp(L1, L2, amount),
+                MathHelper.Lerp(a1, a2, amount),
+                MathHelper.Lerp(b1, b2, amount)
+            ) * MathHelper.Lerp(color1.A / 255f, color2.A / 255f, amount);
+        }
     }
 
     extension(Level self)
     {
         /// <summary>
         /// Loads an <see cref="Entity"/> from <see cref="EntityData"/> into a <see cref="Level"/>, and copies a reference to it into a list.<br/>
-        /// If multiplie entities are loaded (e.g. due to an event on <see cref="Everest.Events.Level.OnLoadEntity"/>), all newly loaded entities will be added to the list.
+        /// If multiple entities are loaded (e.g. due to an event on <see cref="Everest.Events.Level.OnLoadEntity"/>), all newly loaded entities will be added to the list.
         /// </summary>
         /// <param name="entityData">The <see cref="EntityData"/> to load.</param>
         /// <param name="level">The <see cref="Level"/> to use for loading the <see cref="EntityData"/>, using <see cref="Level.LoadCustomEntity"/>.</param>
@@ -158,7 +230,7 @@ internal static class Extensions
 
         /// <summary>
         /// Loads an <see cref="Entity"/> from <see cref="EntityData"/> into a <see cref="Level"/>, and returns a reference to it<br/>
-        /// If multiplie entities are loaded (e.g. due to an event on <see cref="Everest.Events.Level.OnLoadEntity"/>), this only returns the first one loaded.
+        /// If multiple entities are loaded (e.g. due to an event on <see cref="Everest.Events.Level.OnLoadEntity"/>), this only returns the first one loaded.
         /// </summary>
         /// <param name="entityData">The <see cref="EntityData"/> to load.</param>
         /// <param name="level">The <see cref="Level"/> to use for loading the <see cref="EntityData"/>, using <see cref="Level.LoadCustomEntity"/>.</param>

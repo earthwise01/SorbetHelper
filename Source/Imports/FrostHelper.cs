@@ -81,24 +81,23 @@ public static partial class FrostHelper
     public static partial bool GetBoolSessionExpressionValue(object expression, Session session);
     public static partial bool GetBoolSessionExpressionValue(object expression, Session session, object userdata);
 
-    // not sure why frosthelper doesn't have an export for this
     public static string GetStringSessionExpressionValue(object expression, Session session, object userdata = null)
         => GetSessionExpressionValue(expression, session, userdata) switch
         {
             string str     => str,
+            Color color    => color.ToHexString(),
             IFormattable f => f.ToString(null, CultureInfo.InvariantCulture),
             { } obj        => obj.ToString() ?? ""
         };
 
-    // makes mayb more sense with this but still useful to have
     public static Color GetColorSessionExpressionValue(object expression, Session session, object userdata = null)
         => GetSessionExpressionValue(expression, session, userdata) switch
         {
             Color color => color,
-            int i      => Calc.HexToColor(i),
-            float f    => Calc.HexToColor((int)f),
-            string str => GetColor(str),
-            _          => Color.White
+            int i       => Calc.HexToColorWithAlpha(i),
+            float f     => Calc.HexToColorWithAlpha((int)f),
+            string str  => GetColor(str),
+            _           => Color.White
         };
 
     public static partial void RegisterSimpleSessionExpressionCommand(string modName, string cmdName, Func<Session, object> func);

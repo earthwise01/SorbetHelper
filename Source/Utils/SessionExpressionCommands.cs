@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Numerics;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace Celeste.Mod.SorbetHelper.Utils;
 
@@ -98,50 +99,37 @@ internal static class SessionExpressionCommands
 
     #region Sorbet Helper Commands
 
-    // color packing/unpacking
+    // probably removeable if/when microlithmisc gets built in support for rgba colours instead of just abgr (aka packedvalues)
+    [SessionExpressionCommand("packHexAbgr")]
+    private static int PackHexAbgr(Session session, Color color)
+        => Calc.ColorToHexAbgr(color);
 
-    [SessionExpressionCommand("packColor")]
-    private static int PackColor(Session session, Color color)
-        => color.ToPackedInt();
-
-    [SessionExpressionCommand("unpackColor")]
-    private static Color UnpackColor(Session session, int packedColor)
-        => Color.FromPackedInt(packedColor);
-
-    // misc color things
-
-    [SessionExpressionCommand("rgba")]
-    private static Color Rgba(Session session, float r, float g, float b, float a = 1f, float alpha = 1f)
-        => new(r * alpha, g * alpha, b * alpha, a * alpha);
-
-    [SessionExpressionCommand("hsl")]
-    private static Color Hsl(Session session, float h, float s, float l, float alpha = 1f)
-        => Calc.HslToColor(Calc.Mod(h, 1f), s, l) * alpha;
-
-    [SessionExpressionCommand("nonPremultHex")]
-    private static Color NonPremultHex(Session session, string hex)
-        => Calc.HexToColorWithNonPremultipliedAlpha(hex);
+    [SessionExpressionCommand("unpackHexAbgr")]
+    private static Color UnpackHexAbgr(Session session, int packedColor)
+        => Calc.HexToColorAbgr(packedColor);
 
     [SessionExpressionCommand("fromNonPremult")]
     private static Color FromNonPremult(Session session, Color color)
         => Color.FromNonPremultiplied(color.R, color.G, color.B, color.A);
 
-    [SessionExpressionCommand("multAlpha")]
-    private static Color MultAlpha(Session session, Color color, float alpha)
-        => color * alpha;
+    [SessionExpressionCommand("hsl")]
+    private static Color Hsl(Session session, float h, float s, float l, int alpha = 255)
+        => Calc.HslToColor(Calc.Mod(h, 1f), s, l) with { A = (byte)alpha };
 
-    [SessionExpressionCommand("rgbLerp")]
-    private static Color RgbLerp(Session session, Color color1, Color color2, float amount)
-        => Color.Lerp(color1, color2, amount);
+    [SessionExpressionCommand("oklab")]
+    private static Color Oklab(Session session, float L, float a, float b)
+        => Calc.OklabToColor(L, a, b);
 
-    // todo: hsv/hsl lerp?
-    // todo: oklab/oklch colors/lerping?
+    [SessionExpressionCommand("oklch")]
+    private static Color Oklch(Session session, float L, float C, float h)
+    {
+        (float a, float b) = (C * MathF.Cos(h), C * MathF.Sin(h));
+        return Calc.OklabToColor(L, a, b);
+    }
 
-    // ternary
-
-    [SessionExpressionCommand("ternary")]
-    private static object Ternary(Session session, bool condition, object trueResult, object falseResult)
-        => condition ? trueResult : falseResult;
+    [SessionExpressionCommand("lerpOklab")]
+    private static Color LerpOklab(Session session, Color color1, Color color2, float amount)
+        => Color.LerpOklab(color1, color2, amount);
 
     #endregion
 
@@ -184,12 +172,14 @@ internal static class SessionExpressionCommands
         int n    => T.CreateTruncating(n),
         short n  => T.CreateTruncating(n),
         byte n   => T.CreateTruncating(n),
+        Color c  => T.CreateTruncating(Calc.ColorToHexWithAlpha(c)),
         _        => T.Zero
     };
 
     private static string GetString(object obj) => obj switch
     {
         string str     => str,
+        Color color    => color.ToHexString(),
         IFormattable f => f.ToString(null, CultureInfo.InvariantCulture),
         _              => obj.ToString() ?? ""
     };
@@ -197,9 +187,9 @@ internal static class SessionExpressionCommands
     private static Color GetColor(object obj) => obj switch
     {
         Color color => color,
-        int i       => Calc.HexToColor(i), // growls .   at least i give a pack color function
-        float f     => Calc.HexToColor((int)f),
-        string str  => FrostHelper.GetColor(str), // also growlss .   at least i give a multiply alpha function
+        int i       => Calc.HexToColorWithAlpha(i),
+        float f     => Calc.HexToColorWithAlpha((int)f),
+        string str  => FrostHelper.GetColor(str),
         _           => Color.White
     };
 
