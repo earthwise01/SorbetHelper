@@ -6,35 +6,23 @@ public abstract class IntSource : IEquatable<IntSource>
 
     private sealed class LiteralInt(int value) : IntSource
     {
-        protected override object EqualityIdentifier
-            => value;
-
-        public override int GetValue(Session session)
-            => value;
+        protected override object EqualityIdentifier => value;
+        public override int GetValue(Session session) => value;
     }
     
     private sealed class SessionCounter(string counterName) : IntSource
     {
-        protected override object EqualityIdentifier
-            => counterName;
-
-        public override int GetValue(Session session)
-            => session.GetCounter(counterName);
+        protected override object EqualityIdentifier => counterName;
+        public override int GetValue(Session session) => session.GetCounter(counterName);
     }
 
-    private sealed class SessionExpression(string expressionStr) : IntSource
+    private sealed class SessionExpression(FrostHelper.SessionExpression<int> expression) : IntSource
     {
-        private readonly FrostHelper.SessionExpression expression = new(expressionStr);
-
-        protected override object EqualityIdentifier
-            => expressionStr;
-
-        public override int GetValue(Session session)
-            => expression.GetInt(session);
+        protected override object EqualityIdentifier => expression.SourceText;
+        public override int GetValue(Session session) => expression.Get(session);
     }
 
     protected abstract object EqualityIdentifier { get; }
-
     public abstract int GetValue(Session session);
 
     public static IntSource Create(object source, int defaultValue = 0)
@@ -52,17 +40,17 @@ public abstract class IntSource : IEquatable<IntSource>
 
                 Logger.Warn(LogID, $"Tried to create {nameof(IntSource)} for session counter with empty name!");
             }
-            else if (str.StartsWith("expr:", out string expression))
+            else if (str.StartsWith("expr:", out string expressionStr))
             {
-                if (!expression.IsWhiteSpace())
+                if (FrostHelper.SessionExpression<int>.CreateOrNull(expressionStr) is { } expression)
                     return new SessionExpression(expression);
 
-                Logger.Warn(LogID, $"Tried to create {nameof(IntSource)} for empty session expression!");
+                Logger.Warn(LogID, $"Tried to create {nameof(IntSource)} for {(FrostHelper.IsImported ? $"invalid session expression `{expressionStr}`" : $"session expression `{expressionStr}`, but Frost Helper is not loaded")}!");
             }
             else if (int.TryParse(str, out int parsedValue))
                 return new LiteralInt(parsedValue);
             else
-                Logger.Warn(LogID, $"Tried to create {nameof(IntSource)} for invalid source: {str}!");
+                Logger.Warn(LogID, $"Tried to create {nameof(IntSource)} for invalid source: `{str}`!");
         }
 
         return new LiteralInt(defaultValue);

@@ -4,3 +4,6 @@
   Dependencies:
     - Name: EverestCore
       Version: 1.6418.0
+  OptionalDependencies:
+    - Name: FrostHelper
+      Version: 1.81.0

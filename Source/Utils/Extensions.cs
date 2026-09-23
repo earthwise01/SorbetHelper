@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Celeste.Mod.SorbetHelper.Utils;
@@ -6,28 +7,24 @@ internal static class Extensions
 {
     extension(string self)
     {
-        public bool StartsWith(string value, out string remaining)
+        public bool StartsWith([NotNull] string value, [NotNullWhen(true)] out string rest)
         {
-            if (self.StartsWith(value, StringComparison.Ordinal))
-            {
-                remaining = self[value.Length..];
-                return true;
-            }
+            rest = null;
+            if (!self.StartsWith(value, StringComparison.Ordinal))
+                return false;
 
-            remaining = self;
-            return false;
+            rest = self[value.Length..];
+            return true;
         }
 
-        public bool StartsWith(char value, out string remaining)
+        public bool StartsWith(char value, [NotNullWhen(true)] out string rest)
         {
-            if (self.StartsWith(value))
-            {
-                remaining = self[1..];
-                return true;
-            }
+            rest = null;
+            if (!self.StartsWith(value))
+                return false;
 
-            remaining = self;
-            return false;
+            rest = self[1..];
+            return true;
         }
     }
 

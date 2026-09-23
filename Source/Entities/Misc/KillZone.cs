@@ -25,7 +25,7 @@ public class KillZone : Entity
     {
         base.Awake(scene);
 
-        if (condition is not Condition.Empty)
+        if (condition is not Condition.None)
             Collidable = condition.Check(SceneAs<Level>().Session);
     }
 
@@ -33,7 +33,7 @@ public class KillZone : Entity
     {
         base.Update();
 
-        if (condition is not Condition.Empty)
+        if (condition is not Condition.None)
             Collidable = condition.Check(SceneAs<Level>().Session);
     }
 

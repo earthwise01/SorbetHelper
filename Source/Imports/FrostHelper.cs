@@ -1,6 +1,9 @@
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using ModInteropImportGenerator;
+
+// A type alias for a part of a fancy-styled description, used by Session Expressions.
+// Contents is the text to render, ColorId decides the color/style used for that text.
+// Recognized ColorId's are: "default", "whitespace", "operator", "literal", "string", "flag", "counter", "slider", "field", "command", "type";
+using ApiRenderPart = (string Contents, string ColorId, System.Collections.Generic.IReadOnlyList<(string Contents, string ColorId)> Tooltip);
 
 namespace Celeste.Mod.SorbetHelper.Imports;
 
@@ -9,103 +12,152 @@ public static partial class FrostHelper
 {
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(Imports)}.{nameof(FrostHelper)}";
 
-    #region Misc
-
-    public static partial Color GetColor(string colorString);
-
-    #endregion
-
     #region Session Expressions
 
     #region Session Expression Wrapper Class
 
-    public sealed class SessionExpression
+    public sealed class SessionExpression<T>
     {
-        private static object EmptyExpression
-        {
-            get
-            {
-                if (field is null)
-                    TryCreateSessionExpression("", out field);
+        private readonly Func<Session, object, T> compiledExpression;
 
-                return field;
-            }
-        }
+        public string SourceText { get; }
 
-        private readonly object expressionObject;
+        private SessionExpression(Func<Session, object, T> compiledExpression, string expressionStr)
+            => (this.compiledExpression, SourceText) = (compiledExpression, expressionStr);
 
-        public Type ReturnType
-            => GetSessionExpressionReturnedType(expressionObject);
+        public T Get(Session session)
+            => compiledExpression.Invoke(session, null);
 
-        public SessionExpression(string expression)
+        public T Get(Session session, object userdata)
+            => compiledExpression.Invoke(session, userdata);
+
+        public static SessionExpression<T> CreateOrNull(string expression, object context = null)
         {
             if (!IsImported)
-                throw new InvalidOperationException($"Attempted to parse session expression '{expression}', but Frost Helper is not imported!");
-
-            if (!TryCreateSessionExpression(expression, out expressionObject))
             {
-                Logger.Warn(LogID, $"Failed to parse session expression '{expression}'");
-                expressionObject = EmptyExpression;
+                Logger.Warn(LogID, $"Attempted to parse session expression `{expression}`, but Frost Helper is not loaded!");
+                return null;
             }
+
+            if (string.IsNullOrWhiteSpace(expression))
+            {
+                Logger.Warn(LogID, "Attempted to parse empty session expression!");
+                return null;
+            }
+
+            if (CreateTypedSessionExpressionOrNull<T>(expression, context) is not { } compiledExpression)
+            {
+                Logger.Warn(LogID, $"Failed to parse session expression `{expression}`!");
+                return null;
+            }
+
+            return new SessionExpression<T>(compiledExpression, expression);
         }
-
-        public object Get(Session session, object userdata = null)
-            => GetSessionExpressionValue(expressionObject, session, userdata);
-
-        public bool GetBool(Session session, object userdata = null)
-            => GetBoolSessionExpressionValue(expressionObject, session, userdata);
-        public int GetInt(Session session, object userdata = null)
-            => GetIntSessionExpressionValue(expressionObject, session, userdata);
-        public float GetFloat(Session session, object userdata = null)
-            => GetFloatSessionExpressionValue(expressionObject, session, userdata);
-        public string GetString(Session session, object userdata = null)
-            => GetStringSessionExpressionValue(expressionObject, session, userdata);
-        public Color GetColor(Session session, object userdata = null)
-            => GetColorSessionExpressionValue(expressionObject, session, userdata);
     }
 
     #endregion
 
-    public static partial bool TryCreateSessionExpression(string str, [NotNullWhen(true)] out object expression);
-    public static partial bool TryCreateSessionExpression(string str, object context, [NotNullWhen(true)] out object expression);
+    /// <summary>
+    /// Creates a delegate which can evaluate a Session Expression efficiently.
+    /// This is the recommended way to evaluate session expressions.
+    /// This function should only be called once when creating an entity, the delegate should be stored for re-use.
+    /// Added in Frost Helper 1.81.0
+    /// </summary>
+    /// <param name="str">The expression</param>
+    /// <param name="context">The Session Expression Context to use, leave null to use the global context. The context object should be generated by <see cref="CreateSessionExpressionContextV2"/>.</param>
+    /// <param name="returnType">The type that should be returned by the expression.</param>
+    /// <returns>A delegate which evaluates the expression. Will always be of type Func{Session, object?, returnType} and can safely be cast to that type.</returns>
+    public static partial Delegate CreateTypedSessionExpressionOrNull(string str, object context, Type returnType);
 
-    public static partial object GetSessionExpressionValue(object expression, Session session);
-    public static partial object GetSessionExpressionValue(object expression, Session session, object userdata);
+    /// <summary>
+    /// Creates a delegate which can evaluate a Session Expression efficiently.
+    /// This is the recommended way to evaluate session expressions.
+    /// This function should only be called once when creating an entity, the delegate should be stored for re-use.
+    /// Added in Frost Helper 1.81.0
+    /// </summary>
+    /// <param name="str">The expression</param>
+    /// <param name="context">The Session Expression Context to use, leave null to use the global context. The context object should be generated by <see cref="CreateSessionExpressionContextV2"/>.</param>
+    /// <typeparam name="T">The type that should be returned by the expression.</typeparam>
+    /// <returns>A delegate which evaluates the expression.</returns>
+    public static Func<Session, object, T> CreateTypedSessionExpressionOrNull<T>(string str, object context)
+        => (Func<Session, object, T>)CreateTypedSessionExpressionOrNull(str, context, typeof(T));
 
-    public static partial Type GetSessionExpressionReturnedType(object expression);
+    /// <summary>
+    /// Coerces the given value to the target type, using Session Expression rules.
+    /// Added in Frost Helper 1.81.0
+    /// </summary>
+    public static partial object CoerceValueInSessionExpression(object value, Type targetType);
 
-    public static partial int GetIntSessionExpressionValue(object expression, Session session);
-    public static partial int GetIntSessionExpressionValue(object expression, Session session, object userdata);
-    public static partial float GetFloatSessionExpressionValue(object expression, Session session);
-    public static partial float GetFloatSessionExpressionValue(object expression, Session session, object userdata);
-    public static partial bool GetBoolSessionExpressionValue(object expression, Session session);
-    public static partial bool GetBoolSessionExpressionValue(object expression, Session session, object userdata);
+    /// <summary>
+    /// Registers a simple Session Expression command, which will be accessible in Session Expressions via
+    /// - $cmdName if a context is provided,
+    /// - $modName.cmdName if the command is global (no context is provided).
+    /// Added in Frost Helper 1.81.0
+    /// </summary>
+    /// <param name="modName">Name of the mod which registers this command. Will be used to prefix the command name.</param>
+    /// <param name="cmdName">Name of the command</param>
+    /// <param name="context">The Expression Context, created via CreateSessionExpressionContextV2, to register this command to. Leave null to register the command globally.</param>
+    /// <param name="command">
+    /// Function called each time the command needs to be evaluated. Must have a return type.
+    /// May accept up to 2 arguments, where the first one is a Session, and the second is userdata.
+    /// Userdata is object? by default, it can be typed as a different type if the command is registered non-globally.
+    /// If userdata is not typed as object?, and the correct userdata type is not passed when evaluating the command, an exception will be thrown.
+    ///
+    /// For optimal performance, make sure the delegate is created from a static method, like:
+    /// <code>
+    /// static void Register() {
+    ///     RegisterSimpleSessionExpressionCommandV2("yourMod", "three", null, [], Three);
+    /// }
+    ///
+    /// static int Three() {
+    ///    return 3;
+    /// }
+    /// </code>
+    /// </param>
+    /// <param name="description">Description of this command, visible in Mapping Utils. (ApiRenderPart is defined in Api.RenderPart.cs)</param>
+    public static partial void RegisterSimpleSessionExpressionCommandV2(string modName, string cmdName, object context, IReadOnlyList<ApiRenderPart> description, Delegate command);
 
-    public static string GetStringSessionExpressionValue(object expression, Session session, object userdata = null)
-        => GetSessionExpressionValue(expression, session, userdata) switch
-        {
-            string str     => str,
-            Color color    => color.ToHexString(),
-            IFormattable f => f.ToString(null, CultureInfo.InvariantCulture),
-            { } obj        => obj.ToString() ?? ""
-        };
+    /// <summary>
+    /// Registers a simple Session Expression function, which will be accessible in Session Expressions via
+    /// - $cmdName(...) if a context is provided,
+    /// - $modName.cmdName(...) if the command is global (no context is provided).
+    /// </summary>
+    /// Added in Frost Helper 1.81.0
+    /// <param name="modName">Name of the mod which registers this command. Will be used to prefix the command name.</param>
+    /// <param name="cmdName">Name of the command</param>
+    /// <param name="context">The Expression Context, created via CreateSessionExpressionContextV2, to register this command to. Leave null to register the command globally.</param>
+    /// <param name="func">
+    /// Function called each time the function needs to be evaluated. Must have a return type.
+    /// MUST accept at least 2 arguments, where the first one is a Session, and the second is userdata.
+    /// Userdata is object? by default, it can be typed as a different type if the command is registered non-globally.
+    /// If userdata is not typed as object?, and the correct userdata type is not passed when evaluating the function, an exception will be thrown.
+    ///
+    /// The delegate may accept more than 2 arguments, in which case all further arguments will be obtained from the Session Expression.
+    /// These arguments may accept any C# type, arguments will be coerced automatically using usual Session Expression rules.
+    ///
+    /// For optimal performance, make sure the delegate is created from a static method, like:
+    /// <code>
+    /// static void Register() {
+    ///     RegisterFunctionSessionExpressionCommandV2("yourMod", "sum", null, [], Sum);
+    /// }
+    ///
+    /// static int Sum(Session session, object? userdata, int a, int b) {
+    ///    return a + b;
+    /// }
+    /// </code>
+    /// </param>
+    /// <param name="description">Description of this function, visible in Mapping Utils. (ApiRenderPart is defined in Api.RenderPart.cs)</param>
+    public static partial void RegisterFunctionSessionExpressionCommandV2(string modName, string cmdName, object context, IReadOnlyList<ApiRenderPart> description, Delegate func);
 
-    public static Color GetColorSessionExpressionValue(object expression, Session session, object userdata = null)
-        => GetSessionExpressionValue(expression, session, userdata) switch
-        {
-            Color color => color,
-            int i       => Calc.HexToColorWithAlpha(i),
-            float f     => Calc.HexToColorWithAlpha((int)f),
-            string str  => GetColor(str),
-            _           => Color.White
-        };
-
-    public static partial void RegisterSimpleSessionExpressionCommand(string modName, string cmdName, Func<Session, object> func);
-    public static partial void RegisterFunctionSessionExpressionCommand(string modName, string cmdName, Func<Session, IReadOnlyList<object>, object> func);
-
-    public static partial object CreateSessionExpressionContext(
-        Dictionary<string, Func<Session, object, object>> simpleCommands,
-        Dictionary<string, Func<Session, object, IReadOnlyList<object>, object>> functionCommands);
+    /// <summary>
+    /// Creates a Session Expression Context object, which can be passed to <see cref="CreateTypedSessionExpressionOrNull(string,object,Type)"/>
+    /// This allows you to register custom commands for specific entities.
+    /// A context should be created once, and reused as much as possible.
+    ///
+    /// Commands and functions can be added to this context via other API functions.
+    /// Added in Frost Helper 1.81.0
+    /// </summary>
+    public static partial object CreateSessionExpressionContextV2();
 
     #endregion
 }

@@ -6,38 +6,29 @@ public abstract class ColorSource : IEquatable<ColorSource>
 
     private sealed class LiteralColor(Color color) : ColorSource
     {
-        protected override object EqualityIdentifier
-            => color;
-
-        public override Color GetValue(Session session)
-            => color;
+        protected override object EqualityIdentifier => color;
+        public override Color GetValue(Session session) => color;
     }
 
-    private sealed class SessionExpression(string expressionStr) : ColorSource
+    private sealed class SessionExpression(FrostHelper.SessionExpression<Color> expression) : ColorSource
     {
-        private readonly FrostHelper.SessionExpression expression = new(expressionStr);
-
-        protected override object EqualityIdentifier
-            => expressionStr;
-
-        public override Color GetValue(Session session)
-            => expression.GetColor(session);
+        protected override object EqualityIdentifier => expression.SourceText;
+        public override Color GetValue(Session session) => expression.Get(session);
     }
 
     protected abstract object EqualityIdentifier { get; }
-
     public abstract Color GetValue(Session session);
 
     public static ColorSource Create(string source, string defaultHex = "ffffff")
     {
         if (!string.IsNullOrWhiteSpace(source))
         {
-            if (source.StartsWith("expr:", out string expression))
+            if (source.StartsWith("expr:", out string expressionStr))
             {
-                if (!expression.IsWhiteSpace())
+                if (FrostHelper.SessionExpression<Color>.CreateOrNull(expressionStr) is { } expression)
                     return new SessionExpression(expression);
 
-                Logger.Warn(LogID, $"Tried to create {nameof(ColorSource)} for empty session expression!");
+                Logger.Warn(LogID, $"Tried to create {nameof(ColorSource)} for {(FrostHelper.IsImported ? $"invalid session expression `{expressionStr}`" : $"session expression `{expressionStr}`, but Frost Helper is not loaded")}!");
             }
             else
                 return new LiteralColor(Calc.HexToColorWithNonPremultipliedAlpha(source));
@@ -48,16 +39,11 @@ public abstract class ColorSource : IEquatable<ColorSource>
 
     #region Equality Members
 
-    public bool Equals(ColorSource other)
-        => other is not null && (ReferenceEquals(this, other) || Equals(EqualityIdentifier, other.EqualityIdentifier));
-    public override bool Equals(object obj)
-        => obj is not null && (ReferenceEquals(this, obj) || (obj.GetType() == GetType() && Equals((ColorSource)obj)));
-    public override int GetHashCode()
-        => EqualityIdentifier?.GetHashCode() ?? 0;
-    public static bool operator ==(ColorSource left, ColorSource right)
-        => Equals(left, right);
-    public static bool operator !=(ColorSource left, ColorSource right)
-        => !Equals(left, right);
+    public bool Equals(ColorSource other) => other is not null && (ReferenceEquals(this, other) || Equals(EqualityIdentifier, other.EqualityIdentifier));
+    public override bool Equals(object obj) => obj is not null && (ReferenceEquals(this, obj) || (obj.GetType() == GetType() && Equals((ColorSource)obj)));
+    public override int GetHashCode() => EqualityIdentifier?.GetHashCode() ?? 0;
+    public static bool operator ==(ColorSource left, ColorSource right) => Equals(left, right);
+    public static bool operator !=(ColorSource left, ColorSource right) => !Equals(left, right);
 
     #endregion
 }
