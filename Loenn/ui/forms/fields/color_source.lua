@@ -53,9 +53,14 @@ function colorSourceField._MT.__index:fieldValid(...)
         return self._allowEmpty
     end
 
-    local counterOrExpression = sorbetHelper.isCounterOrSessionExpression(current)
-    local colorParsed = utils.parseHexColor(current)
-    return counterOrExpression or colorParsed
+    if sorbetHelper.isSessionExpression(current) then
+        return true
+
+    else if utils.parseHexColor(current) then
+        return true
+    end
+
+    return false
 end
 
 local function getValueOrEmptyFallback(element, value)
@@ -67,21 +72,21 @@ local function getValueOrEmptyFallback(element, value)
 end
 
 local function updateFieldPreview(element, new)
-    local counterOrExpression = sorbetHelper.isCounterOrSessionExpression(new)
+    local isSessionExpression = sorbetHelper.isSessionExpression(new)
     local colorParsed, r, g, b = utils.parseHexColor(getValueOrEmptyFallback(element, new))
 
-    element._counterOrExpression = counterOrExpression
+    element._isSessionExpression = isSessionExpression
     element._colorParsed = colorParsed
     element._r, element._g, element._b = r, g, b
 
-    return counterOrExpression, colorParsed, r, g, b
+    return isSessionExpression, colorParsed, r, g, b
 end
 
 local function getFieldChangedFunction(formField)
     return function(element, new, old)
-        local counterOrExpression, colorParsed = updateFieldPreview(element, new)
+        local isSessionExpression, colorParsed = updateFieldPreview(element, new)
         local wasValid = formField:fieldValid()
-        local valid = counterOrExpression or colorParsed
+        local valid = isSessionExpression or colorParsed
 
         formField.currentValue = new
 
@@ -111,7 +116,7 @@ local function getColorPreviewArea(element)
 end
 
 local function drawColorPreview(element)
-    if not element or element._counterOrExpression then
+    if not element or element._isSessionExpression then
         return
     end
 
@@ -149,8 +154,6 @@ end
 function colorSourceField.getElement(name, value, options)
     local formField = {}
 
-    value = fixNumberColor(value)
-
     local minWidth = options.minWidth or options.width or 160
     local maxWidth = options.maxWidth or options.width or 160
     local allowEmpty = options.allowEmpty
@@ -171,8 +174,8 @@ function colorSourceField.getElement(name, value, options)
         function()
             local text = field:getText() or ""
 
-            if sorbetHelper.isCounterOrSessionExpression(text) then
-                return nil
+            if sorbetHelper.isSessionExpression(text) then
+                return
             end
 
             local pickerOptions = {

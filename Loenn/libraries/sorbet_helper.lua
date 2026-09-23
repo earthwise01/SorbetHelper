@@ -208,6 +208,10 @@ function sorbetHelper.isSliderOrSessionExpression(str)
     return type(str) == "string" and (utils.startsWith(str, "@") or utils.startsWith(str, "expr:"))
 end
 
+function sorbetHelper.isCounterSliderOrSessionExpression(str)
+    return type(str) == "string" and (utils.startsWith(str, "#") or utils.startsWith(str, "@") or utils.startsWith(str, "expr:"))
+end
+
 function sorbetHelper.getSessionExpressionAssociatedModsFunction(rawExpressionAttrs, extraAssociatedMods)
     local expressionAttrs = {}
     for _, attrName in pairs(rawExpressionAttrs) do

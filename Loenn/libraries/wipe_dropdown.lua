@@ -1,8 +1,8 @@
 local languageRegistry = require("language_registry")
 local celesteEnums = require("consts.celeste_enums")
 
--- Inject SorbetHelper wipes into the dropdown in map metadata.
--- Based on FemtoHelper (ty sunset) and JungleHelper by proxy (ty maddie)
+-- inject SorbetHelper wipes into the dropdown in map metadata
+-- vaguely based on FemtoHelper (ty sunset) and JungleHelper by proxy (ty maddie)
 
 local sorbetHelperName = languageRegistry.getLanguage().mods.SorbetHelper.name
 
