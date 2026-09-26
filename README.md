@@ -92,7 +92,7 @@ for any bugs/suggestions, pls feel free to either ping `@limimimia` in [celestec
     - makes decals cover up any light touching them
     - differs from the everest `lightOcclude` attribute in that it covers up light using the decal's sprite, rather than blocks light using a specified rectangle
     - has the following attributes:
-        - `alpha(float)` - the strength of the light cover (defaults to 1.0)
+        - `alpha(float)` - the alpha of the light cover (defaults to 1.0)
         - `maximumDepth(int)` - the maximum (farthest from the camera) depth a decal can have while being affected (defaults to -1 to only affect decals above madeline)
         - `minimumDepth(int)` - the minimum (closest to the camera) depth a decal can have while being affected (defaults to uncapped)
     - examples:
@@ -123,7 +123,6 @@ for any bugs/suggestions, pls feel free to either ping `@limimimia` in [celestec
     - custom version of the vanilla starfield wipe (seen in farewell) but with four-pointed stars instead of five-pointed stars. originally from starfall cove from ssc2026
 - Custom Starfield Wipe
     - highly customisable version of the vanilla starfield wipe (seen in farewell)
-
     - settings are defined in your map's `.meta.yaml` file's `SorbetHelperMetadata` section like so:
       ```yaml
       SorbetHelperMetadata:
