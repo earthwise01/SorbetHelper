@@ -45,13 +45,13 @@ public class SorbetHelperMetadata
             && asset.TryDeserialize(out SorbetHelperYaml meta)
             && meta?.SorbetHelperMetadata is { } deserialized)
         {
-            Logger.Info(LogID, $"Caching Sorbet Helper Metadata for '{areaKey.SID}' from 'Maps/{filename}.meta.yaml'");
+            Logger.Info(LogID, $"Cached Sorbet Helper Metadata for '{areaKey.SID}' from 'Maps/{filename}.meta.yaml'.");
 
             metadata = CachedMetadata[areaKey.SID] = deserialized;
             return true;
         }
 
-        Logger.Info(LogID, $"No Sorbet Helper Metadata found for '{areaKey.SID}' from 'Maps/{filename}.meta.yaml'.");
+        Logger.Info(LogID, $"No Sorbet Helper Metadata found for '{areaKey.SID}' in 'Maps/{filename}.meta.yaml'.");
 
         CachedMetadata[areaKey.SID] = null;
         return false;
