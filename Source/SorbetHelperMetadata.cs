@@ -20,7 +20,7 @@ public class SorbetHelperMetadata
         public int StarPoints { get; set; } = CustomStarfieldWipe.DefaultStarPoints;
         public float StarPointLength { get; set; } = CustomStarfieldWipe.DefaultStarPointLength;
         public float? StarPointinessAngle { get; set; } = null;
-        public float StarSize { get; set; } = CustomStarfieldWipe.DefaultStarSize;
+        public float StarScale { get; set; } = CustomStarfieldWipe.DefaultStarScale;
         public float StarRotation { get; set; } = CustomStarfieldWipe.DefaultStarRotation;
         public float StarRotationRange { get; set; } = CustomStarfieldWipe.DefaultStarRotationRange;
     }

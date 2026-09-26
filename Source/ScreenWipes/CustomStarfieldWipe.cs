@@ -31,7 +31,7 @@ public class CustomStarfieldWipe : ScreenWipe
 
     public const int DefaultStarPoints = 5;
     public const float DefaultStarPointLength = 1f;
-    public const float DefaultStarSize = 1f;
+    public const float DefaultStarScale = 1f;
     public const float DefaultStarRotation = 180f;
     public const float DefaultStarRotationRange = 180f;
 
@@ -39,7 +39,7 @@ public class CustomStarfieldWipe : ScreenWipe
     {
         StarPoints = DefaultStarPoints,
         StarPointLength = DefaultStarPointLength,
-        StarSize = DefaultStarSize,
+        StarScale = DefaultStarScale,
         StarRotation = DefaultStarRotation,
         StarRotationRange = DefaultStarRotationRange
     };
@@ -48,7 +48,7 @@ public class CustomStarfieldWipe : ScreenWipe
     {
         StarPoints = 4,
         StarPointLength = 1.5f,
-        StarSize = 1f,
+        StarScale = 1f,
         StarRotation = 45f,
         StarRotationRange = 15f
     };
@@ -97,12 +97,12 @@ public class CustomStarfieldWipe : ScreenWipe
         starShape = new Vector2[settings.StarPoints];
         if (settings.StarPointinessAngle is { } starPointinessAngle and > 0f and <= 180f)
         {
-            float sideLength = settings.StarSize * 2f * MathF.Sin(MathF.PI / settings.StarPoints);
+            float sideLength = settings.StarScale * 2f * MathF.Sin(MathF.PI / settings.StarPoints);
             starPointLength = (sideLength / 2f) / MathF.Tan((starPointinessAngle * Calc.DegToRad) / 2f);
         }
         else
         {
-            starPointLength = settings.StarPointLength * settings.StarSize;
+            starPointLength = settings.StarPointLength * settings.StarScale;
         }
 
         stars = new Star[StarCount];
@@ -110,7 +110,7 @@ public class CustomStarfieldWipe : ScreenWipe
         vertices = new VertexPositionColor[starVertexCount * StarCount];
 
         for (int i = 0; i < starShape.Length; i++)
-            starShape[i] = Calc.AngleToVector(i / (float)starShape.Length * (MathF.PI * 2f), settings.StarSize);
+            starShape[i] = Calc.AngleToVector(i / (float)starShape.Length * (MathF.PI * 2f), settings.StarScale);
 
         for (int i = 0; i < stars.Length; i++)
             stars[i] = new Star(settings, MathF.Pow(i / (float)stars.Length, 5f));
