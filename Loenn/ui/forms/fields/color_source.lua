@@ -56,7 +56,7 @@ function colorSourceField._MT.__index:fieldValid(...)
     if sorbetHelper.isSessionExpression(current) then
         return true
 
-    else if utils.parseHexColor(current) then
+    elseif utils.parseHexColor(current) then
         return true
     end
 

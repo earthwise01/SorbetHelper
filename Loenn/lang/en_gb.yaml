@@ -274,10 +274,8 @@ Entities:
       color:
         Description: |-
           The color of the waterfall.
-          Supports using the value of a session counter as a packed color by adding a `#` before the counter name,
-              e.g. `#myPackedColor`.
-          If Frost Helper is enabled, supports using the value of a Session Expression as a packed color by adding `expr:` before the expression,
-              e.g. `expr:$sorbetHelper.hslColor($stamina / 110.0 * 0.5, 0.5, 0.75)`.
+          If Frost Helper is enabled, supports using the color value of a Session Expression by adding `expr:` before the expression,
+              e.g. `expr:$hsv($stamina / 110 * 0.5, 0.4, 0.9)`.
       alpha:
         Description: The alpha of the waterfall.
       wavePercent:
@@ -327,8 +325,8 @@ Entities:
       rotation:
         Description: |-
           The rotation of the lightbeam, in degrees.
-          Supports using the value of a session slider by adding an `@` before the slider name,
-              e.g. `@mySlider`.
+          Supports using the value of a session slider or counter by adding an `@` or `#` before the slider or counter name,
+              e.g. `@mySlider` or `#myCounter`.
           If Frost Helper is enabled, supports using the value of a Session Expression by adding `expr:` before the expression,
               e.g. `expr:$sin(@mySlider) * 45.0`.
       depth:
@@ -343,10 +341,8 @@ Entities:
       color:
         Description: |-
           The color of the lightbeam.
-          Supports using the value of a session counter as a packed color by adding a `#` before the counter name,
-              e.g. `#myPackedColor`.
-          If Frost Helper is enabled, supports using the value of a Session Expression as a packed color by adding `expr:` before the expression,
-              e.g. `expr:$sorbetHelper.hslColor($stamina / 110.0 * 0.5, 0.5, 0.75)`.
+          If Frost Helper is enabled, supports using the color value of a Session Expression by adding `expr:` before the expression,
+              e.g. `expr:$hsv($stamina / 110 * 0.5, 0.4, 0.9)`.
       alpha:
         Description: The alpha of the lightbeam.
       additive:
@@ -924,24 +920,18 @@ Entities:
       outlineColor:
         Description: |-
           The color to use for the outline and details of the water.
-          Supports using the value of a session counter as a packed color by adding a `#` before the counter name,
-              e.g. `#myPackedColor`.
-          If Frost Helper is enabled, supports using the value of a Session Expression as a packed color by adding `expr:` before the expression,
-              e.g. `expr:$sorbetHelper.hslColor($stamina / 110.0 * 0.5, 0.5, 0.75)`.
+          If Frost Helper is enabled, supports using the color value of a Session Expression by adding `expr:` before the expression,
+              e.g. `expr:$hsv($stamina / 110 * 0.5, 0.4, 0.9)`.
       edgeColor:
         Description: |-
           The color to use near the edges of the water.
-          Supports using the value of a session counter as a packed color by adding a `#` before the counter name,
-              e.g. `#myPackedColor`.
-          If Frost Helper is enabled, supports using the value of a Session Expression as a packed color by adding `expr:` before the expression,
-              e.g. `expr:$sorbetHelper.hslColor($stamina / 110.0 * 0.5, 0.5, 0.75)`.
+          If Frost Helper is enabled, supports using the color value of a Session Expression by adding `expr:` before the expression,
+              e.g. `expr:$hsv($stamina / 110 * 0.5, 0.4, 0.9) * 0.5`.
       fillColor:
         Description: |-
           The color to use in the center of the water.
-          Supports using the value of a session counter as a packed color by adding a `#` before the counter name,
-              e.g. `#myPackedColor`.
-          If Frost Helper is enabled, supports using the value of a Session Expression as a packed color by adding `expr:` before the expression,
-              e.g. `expr:$sorbetHelper.hslColor($stamina / 110.0 * 0.5, 0.5, 0.75)`.
+          If Frost Helper is enabled, supports using the color value of a Session Expression by adding `expr:` before the expression,
+              e.g. `expr:$hsv($stamina / 110 * 0.5, 0.4, 0.9) * 0.5`.
       detailTexture:
         Description: |-
           The detail texture to use for the water.
