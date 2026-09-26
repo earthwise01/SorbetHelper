@@ -134,9 +134,7 @@ for any bugs/suggestions, pls feel free to either ping `@limimimia` in [celestec
           StarRotation: 180.0          # (float) the base rotation of each star.
           StarRotationRange: 180.0     # (float) the range around StarRotation a star's initial rotation can be.
       ```
-
     - the settings for the vanilla starfield wipe and the four-point starfield wipe are:
-
       | Type                 | `StarPoints` | `StarPointLength` | `StarPointinessAngle` | `StarScale` | `StarRotation` | `StarRotationRange` |
       |----------------------|:------------:|:-----------------:|:---------------------:|:-----------:|:--------------:|:-------------------:|
       | Starfield            |     `5`      |       `1.0`       |          n/a          |    `1.0`    |    `180.0`     |       `180.0`       |
