@@ -51,6 +51,8 @@ for any bugs/suggestions, pls feel free to either ping `@limimimia` in [celestec
     - allows rendering specified entity types as part of an "entity as styleground renderer" styleground with a matching tag
 - Light Cover Controller
     - makes specified entity types cover up any light touching them
+- Water Interaction Controller
+    - makes specified entity types create ripples when entering/exiting water
 - Return Bubble Tweaks Controller
     - fixes a few bugs with and has a few options for configuring the return bubble player state
 - Puffer Tweaks Controller
