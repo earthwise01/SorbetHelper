@@ -244,7 +244,7 @@ public class ColorDashBlock : Solid
 
     private DashCollisionResults OnDashed(Player player, Vector2 dir)
     {
-        if (!SaveData.Instance.Assists.Invincible && player.CollideCheck<Spikes>())
+        if (!SaveData.Instance.Assists.Invincible && player?.Scene is not null && player.CollideCheck<Spikes>())
             return DashCollisionResults.NormalCollision;
 
         SceneAs<Level>().DirectionalShake(dir, 0.25f);
