@@ -22,7 +22,7 @@ public class DepthAdheringDisplacementRenderer
 
         #region Displacement Map Rendering
 
-        Color noDisplacementColor = DisplacementEffectBlocker.NoDisplacementColor;
+        Color noDisplacementColor = DisplacementEffectAreaBlocker.NoDisplacementColor;
         Engine.Instance.GraphicsDevice.SetRenderTarget(displacementMapBuffer);
         Engine.Instance.GraphicsDevice.Clear(noDisplacementColor);
 
@@ -34,23 +34,25 @@ public class DepthAdheringDisplacementRenderer
                 renderHook.RenderDisplacement();
         }
 
-        List<Entity> displacementBlockers = Scene.Tracker.GetEntities<DisplacementEffectBlocker>();
-        foreach (Entity entity in displacementBlockers)
+        List<DisplacementEffectAreaBlocker> waterBlockers = [];
+        foreach (Entity entity in Scene.Tracker.GetEntities<DisplacementEffectAreaBlocker>())
         {
-            if (entity is DisplacementEffectBlocker { Visible: true, DepthAdhering: true, WaterOnly: false } && entity.Depth <= Depth)
-                Draw.Rect(entity.X, entity.Y, entity.Width, entity.Height, noDisplacementColor);
+            if (entity is not DisplacementEffectAreaBlocker { Visible: true, DepthAdhering: true } blocker || blocker.Depth > Depth)
+                continue;
+
+            if (!blocker.WaterOnly)
+                Draw.Rect(blocker.Position, blocker.Width, blocker.Height, noDisplacementColor);
+            else
+                waterBlockers.Add(blocker);
         }
 
         Draw.SpriteBatch.End();
 
-        List<Entity> waterBlockers = displacementBlockers.Where(entity => entity is DisplacementEffectBlocker { Visible: true, DepthAdhering: true, WaterOnly: true } && entity.Depth <= Depth).ToList();
         if (waterBlockers.Count > 0)
         {
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, DisplacementEffectBlocker.WaterDisplacementBlockerBlendState, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, camera.Matrix);
-
-            foreach (Entity entity in waterBlockers)
-                Draw.Rect(entity.Position, entity.Width, entity.Height, DisplacementEffectBlocker.NoWaterDisplacementMultColor);
-
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, DisplacementEffectAreaBlocker.WaterChannelOnlyBlendState, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, camera.Matrix);
+            foreach (DisplacementEffectAreaBlocker blocker in waterBlockers)
+                Draw.Rect(blocker.Position, blocker.Width, blocker.Height, noDisplacementColor);
             Draw.SpriteBatch.End();
         }
 

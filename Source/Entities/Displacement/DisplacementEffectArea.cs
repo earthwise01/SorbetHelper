@@ -12,8 +12,8 @@ public class DisplacementEffectArea : Entity
         Collider = new Hitbox(data.Width, data.Height);
 
         // remap the values from the "more friendly" -1 to 1 range to the actual expected 0 to 1 range (where 0.5 is no displacement)
-        float horizontalDisplacement = 1f - (data.Float("horizontalDisplacement", 0.0f) + 1f) / 2f;
-        float verticalDisplacement = 1f - (data.Float("verticalDisplacement", 0.0f) + 1f) / 2f;
+        float horizontalDisplacement = 1f - (data.Float("horizontalDisplacement", 0f) + 1f) / 2f;
+        float verticalDisplacement = 1f - (data.Float("verticalDisplacement", 0f) + 1f) / 2f;
         float waterDisplacement = data.Float("waterDisplacement", 0.25f);
         float alpha = data.Float("alpha", 1.0f);
         color = new Color(horizontalDisplacement, verticalDisplacement, waterDisplacement) * alpha;

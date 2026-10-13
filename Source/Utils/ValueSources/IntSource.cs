@@ -4,7 +4,7 @@ public abstract class IntSource : IEquatable<IntSource>
 {
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(IntSource)}";
 
-    private sealed class LiteralInt(int value) : IntSource
+    private sealed class ConstInt(int value) : IntSource
     {
         protected override object EqualityIdentifier => value;
         public override int GetValue(Session session) => value;
@@ -28,7 +28,7 @@ public abstract class IntSource : IEquatable<IntSource>
     public static IntSource Create(object source, int defaultValue = 0)
     {
         if (source is int value)
-            return new LiteralInt(value);
+            return new ConstInt(value);
 
         string str = source?.ToString();
         if (!string.IsNullOrWhiteSpace(str))
@@ -48,12 +48,12 @@ public abstract class IntSource : IEquatable<IntSource>
                 Logger.Warn(LogID, $"Tried to create {nameof(IntSource)} for {(FrostHelper.IsImported ? $"invalid session expression `{expressionStr}`" : $"session expression `{expressionStr}`, but Frost Helper is not loaded")}!");
             }
             else if (int.TryParse(str, out int parsedValue))
-                return new LiteralInt(parsedValue);
+                return new ConstInt(parsedValue);
             else
                 Logger.Warn(LogID, $"Tried to create {nameof(IntSource)} for invalid source: `{str}`!");
         }
 
-        return new LiteralInt(defaultValue);
+        return new ConstInt(defaultValue);
     }
 
     #region Equality Members

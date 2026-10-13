@@ -4,7 +4,7 @@ public abstract class FloatSource : IEquatable<FloatSource>
 {
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(FloatSource)}";
 
-    private sealed class LiteralFloat(float value) : FloatSource
+    private sealed class ConstFloat(float value) : FloatSource
     {
         protected override object EqualityIdentifier => value;
         public override float GetValue(Session session) => value;
@@ -34,7 +34,7 @@ public abstract class FloatSource : IEquatable<FloatSource>
     public static FloatSource Create(object source, float defaultValue = 0f)
     {
         if (source is float value)
-            return new LiteralFloat(value);
+            return new ConstFloat(value);
 
         string str = source?.ToString();
         if (!string.IsNullOrWhiteSpace(str))
@@ -61,12 +61,12 @@ public abstract class FloatSource : IEquatable<FloatSource>
                 Logger.Warn(LogID, $"Tried to create {nameof(FloatSource)} for {(FrostHelper.IsImported ? $"invalid session expression `{expressionStr}`" : $"session expression `{expressionStr}`, but Frost Helper is not loaded")}!");
             }
             else if (float.TryParse(str, out float parsedValue))
-                return new LiteralFloat(parsedValue);
+                return new ConstFloat(parsedValue);
             else
                 Logger.Warn(LogID, $"Tried to create {nameof(FloatSource)} for invalid source: `{str}`!");
         }
 
-        return new LiteralFloat(defaultValue);
+        return new ConstFloat(defaultValue);
     }
 
     #region Equality Members

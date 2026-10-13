@@ -2,26 +2,26 @@ namespace Celeste.Mod.SorbetHelper.Entities;
 
 [CustomEntity("SorbetHelper/DisplacementEffectBlocker")]
 [Tracked]
-public class DisplacementEffectBlocker : Entity
+public class DisplacementEffectAreaBlocker : Entity
 {
-    public readonly bool DepthAdhering;
-    public readonly bool WaterOnly;
+    public bool DepthAdhering { get; }
+    public bool WaterOnly { get; }
 
     private readonly Condition condition;
 
     public static readonly Color NoDisplacementColor = new(0.5f, 0.5f, 0.0f, 1.0f);
 
-    public static readonly Color NoWaterDisplacementMultColor = new(1.0f, 1.0f, 0.0f, 1.0f);
-    public static readonly BlendState WaterDisplacementBlockerBlendState = new()
+    public static readonly BlendState WaterChannelOnlyBlendState = new()
     {
-        Name = "DisplacementEffectBlocker.WaterDisplacementBlocker",
-        ColorSourceBlend = Blend.Zero,
-        AlphaSourceBlend = Blend.Zero,
-        ColorDestinationBlend = Blend.SourceColor,
-        AlphaDestinationBlend = Blend.One
+        Name = "DisplacementEffectAreaBlocker.WaterChannelOnly",
+        ColorSourceBlend = Blend.One,
+        AlphaSourceBlend = Blend.One,
+        ColorDestinationBlend = Blend.InverseSourceAlpha,
+        AlphaDestinationBlend = Blend.InverseSourceAlpha,
+        ColorWriteChannels = ColorWriteChannels.Blue // water displacement uses the blue channel
     };
 
-    public DisplacementEffectBlocker(EntityData data, Vector2 offset) : base(data.Position + offset)
+    public DisplacementEffectAreaBlocker(EntityData data, Vector2 offset) : base(data.Position + offset)
     {
         Collider = new Hitbox(data.Width, data.Height);
         DepthAdhering = data.Bool("depthAdhering", false);
@@ -68,40 +68,47 @@ public class DisplacementEffectBlocker : Entity
             Index = -1
         };
 
+        VariableDefinition waterBlockersVariable = cursor.AddVariable<List<DisplacementEffectAreaBlocker>>();
+
         if (!cursor.TryGotoPrev(MoveType.Before, instr => instr.MatchCallvirt<SpriteBatch>("End")))
             throw new HookHelper.HookException(il, "Unable to find `SpriteBatch.End` call to insert full displacement blocking before.");
 
         cursor.EmitLdarg1();
+        cursor.EmitLdloca(waterBlockersVariable);
         cursor.EmitDelegate(RenderFullBlockers);
 
         if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<SpriteBatch>("End")))
             throw new HookHelper.HookException(il, "Unable to find `SpriteBatch.End` call to insert water displacement blocking after.");
 
         cursor.EmitLdarg1();
+        cursor.EmitLdloc(waterBlockersVariable);
         cursor.EmitDelegate(RenderWaterBlockers);
 
         return;
 
-        static void RenderFullBlockers(Scene scene)
+        static void RenderFullBlockers(Scene scene, out List<DisplacementEffectAreaBlocker> waterBlockers)
         {
-            foreach (Entity entity in scene.Tracker.GetEntities<DisplacementEffectBlocker>()
-                                                   .Where(e => e is DisplacementEffectBlocker { Visible: true, DepthAdhering: false, WaterOnly: false }))
+            waterBlockers = [];
+            foreach (Entity entity in scene.Tracker.GetEntities<DisplacementEffectAreaBlocker>())
             {
-                Draw.Rect(entity.Position, entity.Width, entity.Height, NoDisplacementColor);
+                if (entity is not DisplacementEffectAreaBlocker { Visible: true, DepthAdhering: false } blocker)
+                    continue;
+
+                if (!blocker.WaterOnly)
+                    Draw.Rect(blocker.Position, blocker.Width, blocker.Height, NoDisplacementColor);
+                else
+                    waterBlockers.Add(blocker);
             }
         }
 
-        static void RenderWaterBlockers(Scene scene)
+        static void RenderWaterBlockers(Scene scene, List<DisplacementEffectAreaBlocker> waterBlockers)
         {
-            List<Entity> waterBlockers = scene.Tracker.GetEntities<DisplacementEffectBlocker>()
-                                                      .Where(e => e is DisplacementEffectBlocker { Visible: true, DepthAdhering: false, WaterOnly: true })
-                                                      .ToList();
             if (waterBlockers.Count <= 0)
                 return;
 
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, WaterDisplacementBlockerBlendState, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, (scene as Level)!.Camera.Matrix);
-            foreach (Entity entity in waterBlockers)
-                Draw.Rect(entity.Position, entity.Width, entity.Height, NoWaterDisplacementMultColor);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, WaterChannelOnlyBlendState, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, (scene as Level)!.Camera.Matrix);
+            foreach (DisplacementEffectAreaBlocker blocker in waterBlockers)
+                Draw.Rect(blocker.Position, blocker.Width, blocker.Height, NoDisplacementColor);
             Draw.SpriteBatch.End();
         }
     }

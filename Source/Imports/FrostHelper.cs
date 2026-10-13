@@ -18,18 +18,18 @@ public static partial class FrostHelper
 
     public sealed class SessionExpression<T>
     {
-        private readonly Func<Session, object, T> compiledExpression;
+        private readonly Func<Session, object, T> expressionFunc;
 
         public string SourceText { get; }
 
-        private SessionExpression(Func<Session, object, T> compiledExpression, string expressionStr)
-            => (this.compiledExpression, SourceText) = (compiledExpression, expressionStr);
+        private SessionExpression(Func<Session, object, T> expressionFunc, string expressionStr)
+            => (this.expressionFunc, SourceText) = (expressionFunc, expressionStr);
 
         public T Get(Session session)
-            => compiledExpression.Invoke(session, null);
+            => expressionFunc.Invoke(session, null);
 
         public T Get(Session session, object userdata)
-            => compiledExpression.Invoke(session, userdata);
+            => expressionFunc.Invoke(session, userdata);
 
         public static SessionExpression<T> CreateOrNull(string expression, object context = null)
         {
@@ -45,13 +45,13 @@ public static partial class FrostHelper
                 return null;
             }
 
-            if (CreateTypedSessionExpressionOrNull<T>(expression, context) is not { } compiledExpression)
+            if (CreateTypedSessionExpressionOrNull<T>(expression, context) is not { } expressionFunc)
             {
                 Logger.Warn(LogID, $"Failed to parse session expression `{expression}`!");
                 return null;
             }
 
-            return new SessionExpression<T>(compiledExpression, expression);
+            return new SessionExpression<T>(expressionFunc, expression);
         }
     }
 

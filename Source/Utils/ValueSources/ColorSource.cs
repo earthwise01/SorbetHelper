@@ -4,7 +4,7 @@ public abstract class ColorSource : IEquatable<ColorSource>
 {
     private const string LogID = $"{nameof(SorbetHelper)}/{nameof(ColorSource)}";
 
-    private sealed class LiteralColor(Color color) : ColorSource
+    private sealed class ConstColor(Color color) : ColorSource
     {
         protected override object EqualityIdentifier => color;
         public override Color GetValue(Session session) => color;
@@ -31,10 +31,10 @@ public abstract class ColorSource : IEquatable<ColorSource>
                 Logger.Warn(LogID, $"Tried to create {nameof(ColorSource)} for {(FrostHelper.IsImported ? $"invalid session expression `{expressionStr}`" : $"session expression `{expressionStr}`, but Frost Helper is not loaded")}!");
             }
             else
-                return new LiteralColor(Calc.HexToColorWithNonPremultipliedAlpha(source));
+                return new ConstColor(Calc.HexToColorWithNonPremultipliedAlpha(source));
         }
 
-        return new LiteralColor(Calc.HexToColorWithNonPremultipliedAlpha(defaultHex));
+        return new ConstColor(Calc.HexToColorWithNonPremultipliedAlpha(defaultHex));
     }
 
     #region Equality Members

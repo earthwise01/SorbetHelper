@@ -1,19 +1,30 @@
 namespace Celeste.Mod.SorbetHelper.Entities;
 
-[CustomEntity("SorbetHelper/DepthAdheringDisplacementWrapper")]
-public class DisplacementDepthFixer : EntityProcessingController
+[CustomEntity("SorbetHelper/DisplacementEffectModifier", "SorbetHelper/DepthAdheringDisplacementWrapper")]
+public class DisplacementEffectModifier : EntityProcessingController
 {
-    private readonly bool distortBehind;
+    private enum ModificationModes
+    {
+        AtEntityDepth,
+        EntityOnly,
+        Remove
+    }
+
+    private readonly ModificationModes mode;
     private readonly bool ignoreBounds;
 
-    public DisplacementDepthFixer(EntityData data, Vector2 offset) : base(data, offset)
+    public DisplacementEffectModifier(EntityData data, Vector2 offset) : base(data, offset)
     {
         if (data.Attr("affectedTypes").Split(',', StringSplitOptions.TrimAndRemoveEmpty).ToHashSet() is { Count: > 0 } affectedTypes)
             AffectedTypes = affectedTypes;
         MinDepth = data.Int("minDepth", int.MinValue);
         MaxDepth = data.Int("maxDepth", int.MaxValue);
 
-        distortBehind = data.Bool("distortBehind");
+        mode = data.Nullable<bool>("distortBehind") is { } distortBehind
+            ? distortBehind
+                ? ModificationModes.AtEntityDepth
+                : ModificationModes.EntityOnly
+            : data.Enum("mode", ModificationModes.AtEntityDepth);
         ignoreBounds = data.Bool("ignoreBounds");
     }
 
@@ -26,14 +37,25 @@ public class DisplacementDepthFixer : EntityProcessingController
         if (displacementRenderHooks.Length == 0)
             return;
 
-        Action renderDisplacement = null;
-        foreach (DisplacementRenderHook displacementRenderHook in displacementRenderHooks)
+        switch (mode)
         {
-            renderDisplacement += displacementRenderHook.RenderDisplacement;
-            displacementRenderHook.RemoveSelf();
-        }
+            case ModificationModes.AtEntityDepth or ModificationModes.EntityOnly:
+                Action renderDisplacement = null;
+                foreach (DisplacementRenderHook displacementRenderHook in displacementRenderHooks)
+                {
+                    renderDisplacement += displacementRenderHook.RenderDisplacement;
+                    displacementRenderHook.RemoveSelf();
+                }
 
-        entity.Add(new DepthAdheringDisplacementRenderHook(entity.Render, renderDisplacement, distortBehind));
+                bool distortBehind = mode == ModificationModes.AtEntityDepth;
+                entity.Add(new DepthAdheringDisplacementRenderHook(entity.Render, renderDisplacement, distortBehind));
+                break;
+
+            case ModificationModes.Remove:
+                foreach (DisplacementRenderHook displacementRenderHook in displacementRenderHooks)
+                    displacementRenderHook.RemoveSelf();
+                break;
+        }
     }
 
     private bool CollideCheckWithNullHitboxFallback(Entity entity)
