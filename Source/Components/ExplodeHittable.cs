@@ -1,19 +1,17 @@
-using static Celeste.Mod.SorbetHelper.Components.ExplodeHittable;
-
 namespace Celeste.Mod.SorbetHelper.Components;
 
 [Tracked]
-public class ExplodeHittable(ExplodeHitCallback onHit)
-    : Component(false, false)
+public class ExplosionCollider(Action<Entity, Vector2> onCollide) : Component(false, false)
 {
-    public delegate void ExplodeHitCallback(Entity entity, Vector2 direction);
+    public Action<Entity, Vector2> OnCollide = onCollide;
 
-    public ExplodeHitCallback OnHit = onHit;
-
-    public static void ActivateExplodeHittables(Entity self)
+    public static void TriggerExplosionColliders(Entity entity)
     {
-        foreach (ExplodeHittable expolodeHittable in self.CollideAllByComponent<ExplodeHittable>())
-            expolodeHittable.OnHit(self, expolodeHittable.Entity.Center - self.Position);
+        foreach (ExplosionCollider explosionCollider in entity.Scene.Tracker.GetComponents<ExplosionCollider>())
+        {
+            if (entity.CollideCheck(explosionCollider.Entity))
+                explosionCollider.OnCollide(entity, explosionCollider.Entity.Center - entity.Position);
+        }
     }
 
     #region Hooks
@@ -24,9 +22,7 @@ public class ExplodeHittable(ExplodeHitCallback onHit)
     internal static void Load()
     {
         IL.Celeste.Puffer.Explode += IL_Puffer_Explode;
-        ilHook_Seeker_RegenerateCoroutine = new ILHook(
-            typeof(Seeker).GetMethod(nameof(Seeker.RegenerateCoroutine), HookHelper.Bind.NonPublicInstance)!.GetStateMachineTarget()!,
-            IL_Seeker_RegenerateCoroutine);
+        ilHook_Seeker_RegenerateCoroutine = new ILHook(typeof(Seeker).GetMethod(nameof(Seeker.RegenerateCoroutine), HookHelper.Bind.NonPublicInstance)!.GetStateMachineTarget()!, IL_Seeker_RegenerateCoroutine);
     }
 
     [OnUnload]
@@ -40,29 +36,29 @@ public class ExplodeHittable(ExplodeHitCallback onHit)
     {
         ILCursor cursor = new(il);
 
-        if (!cursor.TryGotoNextBestFit(MoveType.Before,
+        if (!cursor.TryGotoNextBestFit(MoveType.AfterLabel,
             instr => instr.MatchLdarg0(),
-            instr => instr.MatchCallOrCallvirt<Entity>(nameof(Entity.CollideFirst)),
-            instr => instr.MatchStloc(out _)))
-            throw new HookHelper.HookException(il, "Unable to find puffer explosion collision checks to modify.");
+            instr => instr.MatchLdloc0(),
+            instr => instr.MatchCallOrCallvirt<Entity>("set_Collider")))
+            throw new HookHelper.HookException(il, "Unable to find assignment of original collider to `this.Collider`.");
 
         cursor.EmitLdarg0();
-        cursor.EmitDelegate(ActivateExplodeHittables);
+        cursor.EmitDelegate(TriggerExplosionColliders);
     }
 
     private static void IL_Seeker_RegenerateCoroutine(ILContext il)
     {
         ILCursor cursor = new(il);
-        int seekerVariable = 1;
 
-        if (!cursor.TryGotoNextBestFit(MoveType.Before,
-            instr => instr.MatchLdloc(out seekerVariable),
-            instr => instr.MatchCallOrCallvirt<Entity>(nameof(Entity.CollideFirst)),
-            instr => instr.MatchStloc(out _)))
-            throw new HookHelper.HookException(il, "Unable to find seeker explosion collision checks to modify.");
+        if (!cursor.TryGotoNextBestFit(MoveType.AfterLabel,
+            instr => instr.MatchLdloc1(),
+            instr => instr.MatchLdloc1(),
+            instr => instr.MatchLdfld<Seeker>("physicsHitbox"),
+            instr => instr.MatchCallOrCallvirt<Entity>("set_Collider")))
+            throw new HookHelper.HookException(il, "Unable to find assignment of `this.physicsHitbox` to `this.Collider`.");
 
-        cursor.EmitLdloc(seekerVariable);
-        cursor.EmitDelegate(ActivateExplodeHittables);
+        cursor.EmitLdloc1();
+        cursor.EmitDelegate(TriggerExplosionColliders);
     }
 
     #endregion

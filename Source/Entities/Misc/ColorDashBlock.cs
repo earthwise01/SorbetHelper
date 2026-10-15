@@ -50,7 +50,6 @@ public class ColorDashBlock : Solid
 
         OnDashCollide = OnDashed;
 
-        // switch if communal helper dream tunnel dashed
         bool switchOnDreamTunnel = data.Bool("switchOnDreamTunnel", false);
         if (switchOnDreamTunnel && CommunalHelperDashStates.IsImported)
         {
@@ -74,6 +73,10 @@ public class ColorDashBlock : Solid
 
             Add(CommunalHelperDashStates.DreamTunnelInteraction(OnEnter, OnExit));
         }
+
+        bool switchOnMovingSolidHit = data.Bool("switchOnMovingSolidHit", false);
+        if (switchOnMovingSolidHit)
+            Add(new MovingPlatformHittable((_, _) => Switch(), false));
     }
 
     #region Setup

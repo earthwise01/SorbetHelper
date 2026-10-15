@@ -200,7 +200,7 @@ entities.SorbetHelper/CustomLightbeam.attributes.description.flag=A session flag
 entities.SorbetHelper/CustomLightbeam.attributes.name.inverted=Invert Flag
 entities.SorbetHelper/CustomLightbeam.attributes.description.inverted=When checked, the lightbeam will only be active when the flag is disabled, rather than when it is enabled.
 entities.SorbetHelper/CustomLightbeam.attributes.description.flagFadeTime=The time (in seconds) the lightbeam should take to fade in/out when the flag changes.
-entities.SorbetHelper/CustomLightbeam.attributes.description.rotation=The rotation of the lightbeam, in degrees.\nSupports using the value of a session slider or counter by adding an `@` or a `#` before the slider name,\n    e.g. `@mySlider` or `#myCounter`.\nIf Frost Helper is enabled, supports using the value of a Session Expression by adding `expr:` before the expression,\n    e.g. `expr:$sin(@mySlider) * 45.0`.
+entities.SorbetHelper/CustomLightbeam.attributes.description.rotation=The rotation of the lightbeam, in degrees.\nSupports using the value of a session slider or counter by adding an `@` or `#` before the slider or counter name,\n    e.g. `@mySlider` or `#myCounter`.\nIf Frost Helper is enabled, supports using the value of a Session Expression by adding `expr:` before the expression,\n    e.g. `expr:$sin(@mySlider) * 45.0`.
 entities.SorbetHelper/CustomLightbeam.attributes.description.depth=The visual depth of the lightbeam.\nHigher values mean farther behind in the scene, default value is -9998.\nDoes not affect the particles it emits.
 entities.SorbetHelper/CustomLightbeam.attributes.description.noParticles=Whether the lightbeam should emit not particles.
 entities.SorbetHelper/CustomLightbeam.attributes.description.texture=The texture of the lightbeam. Vanilla texture is `util/lightbeam`.
@@ -425,6 +425,7 @@ entities.SorbetHelper/ColorDashBlock.placements.name.color_dash_block_1=Color Da
 entities.SorbetHelper/ColorDashBlock.placements.description.color_dash_block_1=A block which switches collidability according the current color index, and switches the current color index when dashed into.
 entities.SorbetHelper/ColorDashBlock.attributes.description.index=The index of the block.
 entities.SorbetHelper/ColorDashBlock.attributes.description.switchOnDreamTunnel=Whether the block should switch if the player dashes through it with a Communal Helper Dream Tunnel Dash.
+entities.SorbetHelper/ColorDashBlock.attributes.description.switchOnMovingSolidHit=Whether the block should switch if hit by a moving platform that can break dash blocks (e.g. falling blocks, kevins, etc).
 
 # Darkness Transparency Fix Controller
 entities.SorbetHelper/DarknessTransparencyFixController.placements.name.darkness_transparency_fix_controller=Fix Darkness Transparency Controller

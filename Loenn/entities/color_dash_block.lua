@@ -25,9 +25,10 @@ for i, _ in ipairs(colors) do
         name = string.format("color_dash_block_%s", i - 1),
         data = {
             index = i - 1,
-            switchOnDreamTunnel = false,
             width = 16,
-            height = 16
+            height = 16,
+            switchOnDreamTunnel = false,
+            switchOnMovingSolidHit = false
         }
     }
 end
@@ -35,7 +36,7 @@ end
 colorDashBlock.fieldOrder = {
     "x", "y",
     "width", "height",
-    "index", "switchOnDreamTunnel"
+    "index", "switchOnDreamTunnel", "switchOnMovingSolidHit"
 }
 
 colorDashBlock.fieldInformation = {

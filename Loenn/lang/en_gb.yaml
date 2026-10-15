@@ -879,6 +879,8 @@ Entities:
         Description: The index of the block.
       switchOnDreamTunnel:
         Description: Whether the block should switch if the player dashes through it with a Communal Helper Dream Tunnel Dash.
+      switchOnMovingSolidHit:
+        Description: Whether the block should switch if hit by a moving platform that can break dash blocks (e.g. falling blocks, kevins, etc).
 
   SorbetHelper/DarknessTransparencyFixController:
     Placements:

@@ -1,18 +1,14 @@
-using static Celeste.Mod.SorbetHelper.Components.MovingPlatformHittable;
-
 namespace Celeste.Mod.SorbetHelper.Components;
 
 [Tracked]
-public class MovingPlatformHittable(PlatformHitCallback onHit, bool breakDashBlocksRequired = true)
+public class MovingPlatformHittable(Action<Platform, Vector2>  onHit, bool breakDashBlocksRequired = true)
     : Component(false, false)
 {
-    public delegate void PlatformHitCallback(Platform platform, Vector2 direction);
-
-    public PlatformHitCallback OnHit = onHit;
+    public Action<Platform, Vector2> OnHit = onHit;
 
     private readonly bool breakDashBlocksRequired = breakDashBlocksRequired;
 
-    public static void ActivateMovingPlatformHittables(Platform self, Vector2 direction, bool breakDashBlocks)
+    public static void TriggerMovingPlatformHittables(Platform self, Vector2 direction, bool breakDashBlocks)
     {
         List<MovingPlatformHittable> toHit = self.CollideAllByComponent<MovingPlatformHittable>(self.Position + direction);
 
@@ -56,7 +52,7 @@ public class MovingPlatformHittable(PlatformHitCallback onHit, bool breakDashBlo
         return;
 
         static void ActivateMovingPlatformHittablesH(Platform self, int directionSign, bool thruDashBlocks)
-            => ActivateMovingPlatformHittables(self, new Vector2(directionSign, 0f), thruDashBlocks);
+            => TriggerMovingPlatformHittables(self, new Vector2(directionSign, 0f), thruDashBlocks);
     }
 
     private static void IL_Platform_MoveVExactCollideSolids(ILContext il)
@@ -76,7 +72,7 @@ public class MovingPlatformHittable(PlatformHitCallback onHit, bool breakDashBlo
         return;
 
         static void ActivateMovingPlatformHittablesV(Platform self, int directionSign, bool thruDashBlocks)
-            => ActivateMovingPlatformHittables(self, new Vector2(0f, directionSign), thruDashBlocks);
+            => TriggerMovingPlatformHittables(self, new Vector2(0f, directionSign), thruDashBlocks);
     }
 
     #endregion

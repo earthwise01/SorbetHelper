@@ -4,26 +4,31 @@ namespace Celeste.Mod.SorbetHelper.Triggers;
 [Tracked]
 public class ColorDashBlockStateTrigger(EntityData data, Vector2 offset) : Trigger(data, offset)
 {
-    public enum Modes { OnLevelLoad, OnPlayerSpawn, OnPlayerEnter }
+    private enum Modes
+    {
+        OnLevelLoad,
+        OnPlayerSpawn,
+        OnPlayerEnter
+    }
 
-    public readonly Modes Mode = data.Enum("mode", Modes.OnPlayerEnter);
-    public readonly int Index = data.Int("index", 0);
+    private readonly Modes mode = data.Enum("mode", Modes.OnPlayerEnter);
+    private readonly int index = data.Int("index", 0);
 
     public override void Added(Scene scene)
     {
         base.Added(scene);
 
-        if (Mode is Modes.OnLevelLoad)
-            ColorDashBlock.SetColorDashBlockIndex(SceneAs<Level>().Session, Index);
+        if (mode is Modes.OnLevelLoad)
+            ColorDashBlock.SetColorDashBlockIndex(SceneAs<Level>().Session, index);
     }
 
     public override void OnEnter(Player player)
     {
         base.OnEnter(player);
 
-        if (Mode is Modes.OnPlayerEnter)
+        if (mode is Modes.OnPlayerEnter)
         {
-            ColorDashBlock.SetColorDashBlockIndex(SceneAs<Level>().Session, Index);
+            ColorDashBlock.SetColorDashBlockIndex(SceneAs<Level>().Session, index);
             foreach (ColorDashBlock colorDashBlock in Scene.Tracker.GetEntities<ColorDashBlock>())
                 colorDashBlock.UpdateState(playEffects: false);
         }
@@ -45,8 +50,8 @@ public class ColorDashBlockStateTrigger(EntityData data, Vector2 offset) : Trigg
 
     private static void Event_Player_Spawn(Player player)
     {
-        if (player.CollideFirst<ColorDashBlockStateTrigger>() is { Mode: Modes.OnPlayerSpawn } trigger)
-            ColorDashBlock.SetColorDashBlockIndex(trigger.SceneAs<Level>().Session, trigger.Index);
+        if (player.CollideFirst<ColorDashBlockStateTrigger>() is { mode: Modes.OnPlayerSpawn } trigger)
+            ColorDashBlock.SetColorDashBlockIndex(trigger.SceneAs<Level>().Session, trigger.index);
     }
 
     #endregion
